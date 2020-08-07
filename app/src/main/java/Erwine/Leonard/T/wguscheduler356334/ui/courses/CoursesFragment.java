@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wgusheduler356334.ui.notifications;
+package Erwine.Leonard.T.wguscheduler356334.ui.courses;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,19 +12,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import Erwine.Leonard.T.wgusheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.R;
 
-public class NotificationsFragment extends Fragment {
+public class CoursesFragment extends Fragment {
 
-    private NotificationsViewModel notificationsViewModel;
+    private CoursesViewModel coursesViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                ViewModelProviders.of(this).get(NotificationsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_notifications, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        coursesViewModel =
+                ViewModelProviders.of(this).get(CoursesViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_courses, container, false);
+        final TextView textView = root.findViewById(R.id.text_courses);
+        coursesViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

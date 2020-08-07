@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wgusheduler356334;
+package Erwine.Leonard.T.wguscheduler356334;
 
 import org.junit.Test;
 

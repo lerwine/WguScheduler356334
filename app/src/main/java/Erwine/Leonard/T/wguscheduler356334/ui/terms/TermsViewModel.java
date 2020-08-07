@@ -1,14 +1,14 @@
-package Erwine.Leonard.T.wgusheduler356334.ui.home;
+package Erwine.Leonard.T.wguscheduler356334.ui.terms;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class HomeViewModel extends ViewModel {
+public class TermsViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public HomeViewModel() {
+    public TermsViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is home fragment");
     }

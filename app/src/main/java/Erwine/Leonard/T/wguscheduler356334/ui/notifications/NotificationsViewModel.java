@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wgusheduler356334.ui.notifications;
+package Erwine.Leonard.T.wguscheduler356334.ui.notifications;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
