@@ -10,7 +10,7 @@ public class TermsViewModel extends ViewModel {
 
     public TermsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mText.setValue("Terms List/Edit goes here");
     }
 
     public LiveData<String> getText() {

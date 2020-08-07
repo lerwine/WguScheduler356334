@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("Erwine.Leonard.T.wgusheduler356334", appContext.getPackageName());
+        assertEquals("Erwine.Leonard.T.wguscheduler356334", appContext.getPackageName());
     }
 }
