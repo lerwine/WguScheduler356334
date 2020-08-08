@@ -6,27 +6,26 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.ui.terms.TermItemViewModel;
+import java.util.List;
 
 @Dao
 public interface TermDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertTerm(TermItemViewModel term);
+    void insertTerm(TermEntity term);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<TermItemViewModel> terms);
+    void insertAll(List<TermEntity> terms);
 
     @Delete
-    void deleteTerm(TermItemViewModel term);
+    void deleteTerm(TermEntity term);
 
     @Query("SELECT * FROM terms WHERE id = :id")
-    TermItemViewModel getTermById(int id);
+    TermEntity getTermById(int id);
 
     @Query("SELECT * FROM terms ORDER BY [start], [end]")
-    LiveData<List<TermItemViewModel>> getAll();
+    LiveData<List<TermEntity>> getAll();
 
     @Query("SELECT COUNT(*) FROM terms")
     int getCount();

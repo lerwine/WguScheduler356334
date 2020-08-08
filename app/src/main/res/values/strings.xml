@@ -3,16 +3,21 @@
     <string name="title_terms">Terms</string>
     <string name="title_courses">Courses</string>
     <string name="title_notifications">Notifications</string>
-    <string name="title_activity_edit_term">EditTermActivity</string>
+    <string name="title_activity_edit_term">Edit Term</string>
+    <string name="title_activity_new_term">Add New Term</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="nameOfTerm">Name of Term</string>
     <string name="startOfTerm">Start of Term</string>
     <string name="endOfTerm">End of Term</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="delete_term">Delete Term</string>
+    <string name="discard_changes">Discard Changes</string>
+    <string name="required">* Required</string>
+    <string name="start_after_end">Start date cannot occur after the end date</string>
 </resources>

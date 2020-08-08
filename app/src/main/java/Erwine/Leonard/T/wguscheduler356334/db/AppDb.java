@@ -7,9 +7,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-import Erwine.Leonard.T.wguscheduler356334.ui.terms.TermItemViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.SampleData;
 
-@Database(entities = {TermItemViewModel.class}, version = 1, exportSchema = false)
+@Database(entities = {TermEntity.class}, version = 1, exportSchema = false)
 @TypeConverters(LocalDateConverter.class)
 public abstract class AppDb extends RoomDatabase {
     public static final String DB_NAME = "WguScheduler.db";
@@ -18,7 +18,7 @@ public abstract class AppDb extends RoomDatabase {
 
     public abstract TermDAO termDAO();
 
-    public static AppDb getInstance(Context context) {
+    static AppDb getInstance(Context context) {
         if (null == instance) {
             synchronized (SYNC_ROOT) {
                 if (null == instance) {

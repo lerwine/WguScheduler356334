@@ -1,65 +1,52 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.terms;
 
-import android.util.Range;
-
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
-import java.util.Date;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
+
+import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.TermEntity;
 
 @Entity(tableName = "terms")
-public class TermItemViewModel {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
-    private String name;
-    private LocalDate start;
-    private LocalDate end;
+public class TermItemViewModel extends AndroidViewModel {
+
+    private MutableLiveData<TermEntity> liveData = new MutableLiveData<>();
+    private DbLoader dbLoader;
+
+    //    private MutableLiveData<String> mText;
 
     @Ignore
-    public TermItemViewModel() {
-
+    public TermItemViewModel(@NonNull Application application) {
+        super(application);
+        dbLoader = DbLoader.getInstance(getApplication());
     }
 
-    @Ignore
-    public TermItemViewModel(String name, LocalDate start, LocalDate end) {
-        this.name = Values.asNonNullAndWsNormalized(name);
-        this.start = start;
-        this.end = end;
+    public MutableLiveData<TermEntity> getLiveData() {
+        return liveData;
     }
 
-    public TermItemViewModel(int id, String name, LocalDate start, LocalDate end) {
-        this(name, start, end);
-        this.id = id;
+    public void save(String name, LocalDate start, LocalDate end) {
+        TermEntity entity = liveData.getValue();
+        if (null == entity) {
+            entity = new TermEntity(name, start, end);
+        } else {
+            entity.setName(name);
+            entity.setStart(start);
+            entity.setEnd(end);
+        }
+        dbLoader.insertTerm(entity);
     }
 
-    public int getId() {
-        return id;
+    public void load(int id) {
+        dbLoader.loadTermById(id, liveData);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getStart() {
-        return start;
-    }
-
-    public void setStart(LocalDate start) {
-        this.start = start;
-    }
-
-    public LocalDate getEnd() {
-        return end;
-    }
-
-    public void setEnd(LocalDate end) {
-        this.end = end;
+    public void delete() {
+        dbLoader.deleteTerm(liveData.getValue());
     }
 }

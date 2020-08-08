@@ -17,33 +17,32 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_edit_12" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/deleteTermButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorAccent"
-        android:clickable="true"
-        android:tint="@color/colorAccentInverse"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editTermButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_delete_12" />
-
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/nameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="4dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="TextView"
         android:textColor="@color/colorPrimaryDark"
         android:textColorHighlight="@color/colorPrimary"
         android:textColorLink="@color/colorAccent"
         android:textSize="@dimen/list_item_text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/rangeTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/deleteTermButton"
+        app:layout_constraintStart_toEndOf="@+id/editTermButton"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/rangeTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textColorHighlight="@color/colorPrimary"
+        android:textColorLink="@color/colorAccent"
+        android:textSize="@dimen/list_item_detail_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTermButton"
+        app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

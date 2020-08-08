@@ -6,43 +6,113 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <TextView
+        android:id="@+id/nameOfTermLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:text="@string/nameOfTerm"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textEditTermName"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/textEditTermName"
+        style="@style/Base.Widget.MaterialComponents.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nameOfTermError"
+        app:layout_constraintTop_toBottomOf="@id/nameOfTermLabel" />
+
+    <TextView
+        android:id="@+id/nameOfTermError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/required"
+        android:textColor="@color/colorError"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/startOfTermLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/textEditTermName" />
 
-        <EditText
-            android:id="@+id/textEditTermName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/nameOfTerm"
-            android:inputType="textCapWords"
-            android:maxLines="1" />
+    <TextView
+        android:id="@+id/startOfTermLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:text="@string/startOfTerm"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toTopOf="@id/editTextStartOfTerm"
+        app:layout_constraintTop_toBottomOf="@id/nameOfTermError" />
 
-        <EditText
-            android:id="@+id/editTextStartOfTerm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/startOfTerm"
-            android:inputType="date" />
+    <EditText
+        android:id="@+id/editTextStartOfTerm"
+        style="@style/Base.Widget.MaterialComponents.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/startOfTermError"
+        app:layout_constraintTop_toBottomOf="@id/startOfTermLabel" />
 
-        <EditText
-            android:id="@+id/editTextEndOfTerm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/endOfTerm"
-            android:inputType="date" />
+    <TextView
+        android:id="@+id/startOfTermError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorError"
+        android:textStyle="bold"
+        android:text="@string/required"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/endOfTermLabel"
+        app:layout_constraintTop_toBottomOf="@id/editTextStartOfTerm" />
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/endOfTermLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:text="@string/endOfTerm"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/editTextEndOfTerm"
+        app:layout_constraintTop_toBottomOf="@id/startOfTermError" />
+
+    <EditText
+        android:id="@+id/editTextEndOfTerm"
+        style="@style/Base.Widget.MaterialComponents.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/endOfTermError"
+        app:layout_constraintTop_toBottomOf="@id/endOfTermLabel" />
+
+    <TextView
+        android:id="@+id/endOfTermError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorError"
+        android:textStyle="bold"
+        android:text="@string/required"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextEndOfTerm" />
 </androidx.constraintlayout.widget.ConstraintLayout>

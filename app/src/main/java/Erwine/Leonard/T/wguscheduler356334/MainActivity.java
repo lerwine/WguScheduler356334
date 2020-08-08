@@ -1,16 +1,28 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.app.Application;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static ViewModelProvider.AndroidViewModelFactory viewModelFactory;
+
+    public static ViewModelProvider.AndroidViewModelFactory getViewModelFactory(@NonNull Application application) {
+        if (null == viewModelFactory) {
+            viewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(application);
+        }
+        return viewModelFactory;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
