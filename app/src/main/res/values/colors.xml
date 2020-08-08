@@ -5,5 +5,7 @@
     <color name="colorAccent">#6C2F00</color>
     <color name="colorAccentInverse">#FFFFFF</color>
     <color name="colorPrimaryInverse">#FFF176</color>
-    <color name="colorError">#B71C1C</color>
+    <color name="colorError">#E10B0B</color>
+    <color name="colorErrorDark">#B71C1C</color>
+    <color name="colorErrorAccent">#A63E0E</color>
 </resources>

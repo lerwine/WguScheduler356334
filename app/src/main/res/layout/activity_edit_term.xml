@@ -30,60 +30,11 @@
         layout="@layout/content_edit_term"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
-
-    <LinearLayout
-        android:id="@+id/buttonLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="bottom|end"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/saveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:backgroundTint="@color/colorAccent"
-            android:tint="@color/colorAccentInverse"
-            android:tooltipText="@string/save_changes"
-            app:maxImageSize="@dimen/normal_button_image_size"
-            app:srcCompat="@drawable/ic_two_tone_save_24" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/deleteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginVertical="@dimen/fab_margin"
-            android:layout_marginRight="@dimen/fab_margin"
-            android:backgroundTint="@color/colorAccent"
-            android:tint="@color/colorAccentInverse"
-            android:tooltipText="@string/delete_term"
-            app:maxImageSize="@dimen/normal_button_image_size"
-            app:srcCompat="@drawable/ic_two_tone_delete_forever_24" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/cancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginVertical="@dimen/fab_margin"
-            android:layout_marginRight="@dimen/fab_margin"
-            android:backgroundTint="@color/colorAccent"
-            android:tint="@color/colorAccentInverse"
-            android:tooltipText="@string/discard_changes"
-            app:fabSize="auto"
-            app:maxImageSize="@dimen/normal_button_image_size"
-            app:srcCompat="@drawable/ic_two_tone_undo_24" />
-    </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

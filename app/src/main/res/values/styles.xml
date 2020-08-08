@@ -7,13 +7,23 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ErrorTheme" parent="TextAppearance.AppCompat.Body2">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorError</item>
-        <item name="colorPrimaryDark">@color/colorError</item>
-        <item name="colorAccent">@color/colorError</item>
+    <style name="WGU.Scheduler.FieldLabel" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="WGU.Scheduler.ErrorText" parent="TextAppearance.AppCompat.Body2">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorErrorDark</item>
+        <item name="colorPrimary">@color/colorError</item>
+        <item name="colorPrimaryDark">@color/colorErrorDark</item>
+        <item name="colorAccent">@color/colorErrorAccent</item>
+    </style>
+
+    <style name="WGU.Scheduler.TextInputEditText" parent="Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:background">@android:drawable/edit_text</item>
+    </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

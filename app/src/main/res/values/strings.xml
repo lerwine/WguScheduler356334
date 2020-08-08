@@ -16,7 +16,11 @@
     <string name="startOfTerm">Start of Term</string>
     <string name="endOfTerm">End of Term</string>
     <string name="save_changes">Save Changes</string>
-    <string name="delete_term">Delete Term</string>
+    <string name="delete_term_title">Delete Term</string>
+    <string name="delete_term_confirm">This action cannot be undone!\n\nAre you sure you want to delete this term?</string>
+    <string name="delete">Delete</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="discard_changes">Discard Changes</string>
     <string name="required">* Required</string>
     <string name="start_after_end">Start date cannot occur after the end date</string>
