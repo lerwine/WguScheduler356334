@@ -3,11 +3,6 @@ package Erwine.Leonard.T.wguscheduler356334;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -18,12 +13,17 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
-import Erwine.Leonard.T.wguscheduler356334.db.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.terms.TermItemViewModel;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 
 public class EditTermActivity extends AppCompatActivity {
     public static final String EXTRAS_KEY_TERM_ID = "term_id";
@@ -37,7 +37,7 @@ public class EditTermActivity extends AppCompatActivity {
     private TextView startOfTermError;
     private EditText editTextEndOfTerm;
     private TextView endOfTermError;
-    private TermItemViewModel itemViewModel;
+    private EditTermViewModel itemViewModel;
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean newTerm;
@@ -49,8 +49,8 @@ public class EditTermActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_term);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_two_tone_save_24);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_two_tone_save_24);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         if (null != savedInstanceState) {
             editInitialized = savedInstanceState.getBoolean(STATE_KEY_EDIT_INITIALIZED, false);
             long v = savedInstanceState.getLong(STATE_KEY_START_DATE, -1);
@@ -69,7 +69,7 @@ public class EditTermActivity extends AppCompatActivity {
         editTextEndOfTerm = findViewById(R.id.editTextEndOfTerm);
         endOfTermError = findViewById(R.id.endOfTermError);
 
-        itemViewModel = MainActivity.getViewModelFactory(getApplication()).create(TermItemViewModel.class);
+        itemViewModel = MainActivity.getViewModelFactory(getApplication()).create(EditTermViewModel.class);
         itemViewModel.getLiveData().observe(this, this::onTermEntityChanged);
 
         editTextStartOfTerm.setOnClickListener(this::onStartClick);
@@ -82,12 +82,18 @@ public class EditTermActivity extends AppCompatActivity {
         } else {
             setTitle(R.string.title_activity_edit_term);
             int id = extras.getInt(EXTRAS_KEY_TERM_ID);
-            itemViewModel.load(id);
+            itemViewModel.load(id).onErrorReturn((throwable) -> {
+                AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.read_error_title)
+                        .setMessage(getString(R.string.read_error_message, throwable.getMessage())).setCancelable(false).show();
+                finish();
+                return null;
+            }).subscribe();
         }
         textEditTermName.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -95,7 +101,8 @@ public class EditTermActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) { }
+            public void afterTextChanged(Editable editable) {
+            }
         });
         validateFields(textEditTermName.getText().toString(), startDate, endDate);
     }
@@ -130,8 +137,11 @@ public class EditTermActivity extends AppCompatActivity {
             saveAndReturn();
             return true;
         } else if (itemId == R.id.action_delete) {
-            AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.delete_term_title).setMessage(R.string.delete_term_confirm).setPositiveButton(R.string.yes, (dialogInterface, i1) -> {
-                itemViewModel.delete();
+            new AlertDialog.Builder(this).setTitle(R.string.delete_term_title).setMessage(R.string.delete_term_confirm).setPositiveButton(R.string.yes, (dialogInterface, i1) -> {
+                itemViewModel.delete().subscribe(this::finish, (throwable) ->
+                        new AlertDialog.Builder(this).setTitle(R.string.delete_error_title)
+                                .setMessage(getString(R.string.delete_error_message, throwable.getMessage())).setCancelable(false).show()
+                );
                 finish();
             }).setNegativeButton(R.string.no, null).show();
         } else if (itemId == R.id.action_cancel) {
@@ -146,8 +156,10 @@ public class EditTermActivity extends AppCompatActivity {
     }
 
     private void saveAndReturn() {
-        itemViewModel.save(textEditTermName.getText().toString(), startDate, endDate);
-        finish();
+        itemViewModel.save(textEditTermName.getText().toString(), startDate, endDate).subscribe(this::finish, (throwable) ->
+                new AlertDialog.Builder(this).setTitle(R.string.save_error_title)
+                        .setMessage(getString(R.string.save_error_message, throwable.getMessage())).setCancelable(false).show()
+        );
     }
 
     private void onStartDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -236,10 +248,10 @@ public class EditTermActivity extends AppCompatActivity {
             if (name.trim().isEmpty()) {
                 nameOfTermError.setText(getString(R.string.required));
                 nameOfTermError.setVisibility(View.VISIBLE);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
             } else {
                 nameOfTermError.setVisibility(View.GONE);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
             }
             return;
         }
@@ -249,7 +261,7 @@ public class EditTermActivity extends AppCompatActivity {
         } else {
             nameOfTermError.setVisibility(View.GONE);
         }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
     }
 
 }

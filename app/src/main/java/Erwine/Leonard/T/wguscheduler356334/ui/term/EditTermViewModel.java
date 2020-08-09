@@ -1,6 +1,7 @@
-package Erwine.Leonard.T.wguscheduler356334.ui.terms;
+package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
@@ -10,10 +11,12 @@ import androidx.room.Ignore;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.db.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import io.reactivex.Completable;
+import io.reactivex.Single;
 
 @Entity(tableName = "terms")
-public class TermItemViewModel extends AndroidViewModel {
+public class EditTermViewModel extends AndroidViewModel {
 
     private MutableLiveData<TermEntity> liveData = new MutableLiveData<>();
     private DbLoader dbLoader;
@@ -21,7 +24,7 @@ public class TermItemViewModel extends AndroidViewModel {
     //    private MutableLiveData<String> mText;
 
     @Ignore
-    public TermItemViewModel(@NonNull Application application) {
+    public EditTermViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
     }
@@ -30,7 +33,7 @@ public class TermItemViewModel extends AndroidViewModel {
         return liveData;
     }
 
-    public void save(String name, LocalDate start, LocalDate end) {
+    public Completable save(String name, LocalDate start, LocalDate end) {
         TermEntity entity = liveData.getValue();
         if (null == entity) {
             entity = new TermEntity(name, start, end);
@@ -39,14 +42,14 @@ public class TermItemViewModel extends AndroidViewModel {
             entity.setStart(start);
             entity.setEnd(end);
         }
-        dbLoader.insertTerm(entity);
+        return dbLoader.saveTerm(entity);
     }
 
-    public void load(int id) {
-        dbLoader.loadTermById(id, liveData);
+    public Single<TermEntity> load(int id) {
+        return dbLoader.getTermById(id).doAfterSuccess((termEntity) -> liveData.postValue(termEntity));
     }
 
-    public void delete() {
-        dbLoader.deleteTerm(liveData.getValue());
+    public Completable delete() {
+        return dbLoader.deleteTerm(liveData.getValue());
     }
 }

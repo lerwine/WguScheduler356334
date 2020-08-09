@@ -1,11 +1,12 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
-import android.util.Range;
+import android.annotation.SuppressLint;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.db.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 
 public class SampleData {
 
@@ -13,6 +14,7 @@ public class SampleData {
 
     }
 
+    @SuppressLint("DefaultLocale")
     public static List<TermEntity> getData() {
         List<TermEntity> data = new ArrayList<>();
         LocalDate termBreak = LocalDate.now().withMonth(5).withDayOfMonth(1);

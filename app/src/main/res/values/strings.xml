@@ -18,6 +18,12 @@
     <string name="save_changes">Save Changes</string>
     <string name="delete_term_title">Delete Term</string>
     <string name="delete_term_confirm">This action cannot be undone!\n\nAre you sure you want to delete this term?</string>
+    <string name="save_error_title">Save Error</string>
+    <string name="save_error_message">An unexpected error has occurred while saving the record to the database: %s</string>
+    <string name="read_error_title">Read Error</string>
+    <string name="read_error_message">An unexpected error has occurred while retrieving the record to the database: %s</string>
+    <string name="delete_error_title">Delete Error</string>
+    <string name="delete_error_message">An unexpected error has occurred while removing the record from the database: %s</string>
     <string name="delete">Delete</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

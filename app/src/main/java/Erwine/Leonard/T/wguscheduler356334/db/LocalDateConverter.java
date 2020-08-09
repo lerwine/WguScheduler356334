@@ -12,7 +12,8 @@ public class LocalDateConverter {
     }
 
     @TypeConverter
-    public static  Long fromLocalDate(LocalDate date) {
+    public static Long fromLocalDate(LocalDate date) {
         return (null == date) ? null : date.toEpochDay();
     }
+
 }

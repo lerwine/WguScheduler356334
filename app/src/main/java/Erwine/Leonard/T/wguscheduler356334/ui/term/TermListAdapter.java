@@ -1,5 +1,6 @@
-package Erwine.Leonard.T.wguscheduler356334.ui.terms;
+package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -19,17 +20,17 @@ import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.EditTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.db.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 
-public class TermsAdapter extends RecyclerView.Adapter<TermsAdapter.ViewHolder> {
+public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHolder> {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
-    private final List<TermEntity> mItems;
-    private final Context mContext;
+    private final List<TermEntity> entityList;
+    private final Context context;
 
-    public TermsAdapter(List<TermEntity> items, Context context) {
-        this.mItems = items;
-        this.mContext = context;
+    public TermListAdapter(List<TermEntity> items, Context context) {
+        this.entityList = items;
+        this.context = context;
     }
 
     @NonNull
@@ -40,9 +41,10 @@ public class TermsAdapter extends RecyclerView.Adapter<TermsAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final TermEntity item = mItems.get(position);
+        final TermEntity item = entityList.get(position);
         holder.nameTextView.setText(item.getName());
         LocalDate start = item.getStart();
         LocalDate end = item.getEnd();
@@ -58,15 +60,15 @@ public class TermsAdapter extends RecyclerView.Adapter<TermsAdapter.ViewHolder> 
             holder.rangeTextView.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
         }
         holder.editTermButton.setOnClickListener((view) -> {
-            Intent intent = new Intent(mContext, EditTermActivity.class);
+            Intent intent = new Intent(context, EditTermActivity.class);
             intent.putExtra(EditTermActivity.EXTRAS_KEY_TERM_ID, item.getId());
-            mContext.startActivity(intent);
+            context.startActivity(intent);
         });
     }
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return entityList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

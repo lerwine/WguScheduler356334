@@ -1,16 +1,16 @@
-package Erwine.Leonard.T.wguscheduler356334.ui.courses;
+package Erwine.Leonard.T.wguscheduler356334.ui.notification;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class CoursesViewModel extends ViewModel {
+public class NotificationsViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public CoursesViewModel() {
+    public NotificationsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Courses list / edit goes here");
+        mText.setValue("This is notifications fragment");
     }
 
     public LiveData<String> getText() {

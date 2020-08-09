@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wguscheduler356334.ui.terms;
+package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.app.Application;
 
@@ -9,23 +9,21 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.db.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 
-public class TermsViewModel extends AndroidViewModel {
+public class TermListViewModel extends AndroidViewModel {
+
     private final DbLoader dbLoader;
     private final LiveData<List<TermEntity>> terms;
 
-    public TermsViewModel(@NonNull Application application) {
+    public TermListViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
-        terms = dbLoader.getTerms();
+        terms = dbLoader.getAllTerms();
     }
 
     public LiveData<List<TermEntity>> getTerms() {
         return terms;
     }
 
-//    public LiveData<String> getText() {
-//        return mText;
-//    }
 }
