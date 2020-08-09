@@ -33,29 +33,31 @@ public class MentorEntity {
     private String name;
     private List<String> phoneNumbers;
     private List<String> emailAddresses;
+    private String notes;
     @Ignore
     private LiveData<List<CourseEntity>> courses;
 
-    public MentorEntity(String name, List<String> phoneNumbers, List<String> emailAddresses, int id) {
-        this(name, phoneNumbers, emailAddresses);
+    public MentorEntity(String name, String notes, List<String> phoneNumbers, List<String> emailAddresses, int id) {
+        this(name, notes, phoneNumbers, emailAddresses);
         this.id = id;
     }
 
     @Ignore
-    public MentorEntity(String name, List<String> phoneNumbers, List<String> emailAddresses) {
+    public MentorEntity(String name, String notes, List<String> phoneNumbers, List<String> emailAddresses) {
         this.name = Values.asNonNullAndWsNormalized(name);
+        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
         this.phoneNumbers = (null == phoneNumbers) ? new ArrayList<>() : phoneNumbers;
         this.emailAddresses = (null == emailAddresses) ? new ArrayList<>() : emailAddresses;
     }
 
     @Ignore
-    public MentorEntity(String name) {
-        this(name, null, null);
+    public MentorEntity(String name, String notes) {
+        this(name, notes, null, null);
     }
 
     @Ignore
     public MentorEntity() {
-        this(null, null, null);
+        this(null, null, null, null);
     }
 
     public Integer getId() {
@@ -68,6 +70,14 @@ public class MentorEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
     public List<String> getPhoneNumbers() {
@@ -108,7 +118,8 @@ public class MentorEntity {
         return null == that.id &&
                 name.equals(that.name) &&
                 phoneNumbers.equals(that.phoneNumbers) &&
-                emailAddresses.equals(that.emailAddresses);
+                emailAddresses.equals(that.emailAddresses) &&
+                notes.equals(that.notes);
     }
 
     @Override
@@ -116,7 +127,7 @@ public class MentorEntity {
         if (id > 0) {
             return id;
         }
-        return Objects.hash(id, name, phoneNumbers, emailAddresses);
+        return Objects.hash(id, name, notes, phoneNumbers, emailAddresses);
     }
 
     @SuppressWarnings("NullableProblems")
@@ -127,6 +138,7 @@ public class MentorEntity {
                 ", name='" + name + '\'' +
                 ", phoneNumbers=" + phoneNumbers +
                 ", emailAddresses=" + emailAddresses +
+                ", notes='" + notes + '\'' +
                 '}';
     }
 }

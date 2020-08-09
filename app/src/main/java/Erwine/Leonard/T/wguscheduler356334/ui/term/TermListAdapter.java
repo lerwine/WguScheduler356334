@@ -45,21 +45,21 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final TermEntity item = entityList.get(position);
-        holder.nameTextView.setText(item.getName());
+        holder.text_view_term_list_item_name.setText(item.getName());
         LocalDate start = item.getStart();
         LocalDate end = item.getEnd();
         if (null == start) {
             if (null == end) {
-                holder.rangeTextView.setText("? to ?");
+                holder.text_view_term_list_item_range.setText("? to ?");
             } else {
-                holder.rangeTextView.setText(String.format("? to %s", FORMATTER.format(end)));
+                holder.text_view_term_list_item_range.setText(String.format("? to %s", FORMATTER.format(end)));
             }
         } else if (null == end) {
-            holder.rangeTextView.setText(String.format("%s to ?", FORMATTER.format(start)));
+            holder.text_view_term_list_item_range.setText(String.format("%s to ?", FORMATTER.format(start)));
         } else {
-            holder.rangeTextView.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
+            holder.text_view_term_list_item_range.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
         }
-        holder.editTermButton.setOnClickListener((view) -> {
+        holder.button_term_list_item_edit.setOnClickListener((view) -> {
             Intent intent = new Intent(context, EditTermActivity.class);
             intent.putExtra(EditTermActivity.EXTRAS_KEY_TERM_ID, item.getId());
             context.startActivity(intent);
@@ -72,16 +72,17 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView nameTextView;
-        private TextView rangeTextView;
-        private FloatingActionButton editTermButton;
+        private TextView text_view_term_list_item_name;
+        private TextView text_view_term_list_item_range;
+        private FloatingActionButton button_term_list_item_edit;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            nameTextView = itemView.findViewById(R.id.nameTextView);
-            rangeTextView = itemView.findViewById(R.id.rangeTextView);
-            editTermButton = itemView.findViewById(R.id.editTermButton);
+            text_view_term_list_item_name = itemView.findViewById(R.id.text_view_term_list_item_name);
+            text_view_term_list_item_range = itemView.findViewById(R.id.text_view_term_list_item_range);
+            button_term_list_item_edit = itemView.findViewById(R.id.button_term_list_item_edit);
         }
 
     }
+
 }

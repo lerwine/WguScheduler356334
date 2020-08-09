@@ -7,9 +7,9 @@
         android:title="@string/title_terms" />
 
     <item
-        android:id="@+id/navigation_courses"
-        android:icon="@drawable/ic_course"
-        android:title="@string/title_courses" />
+        android:id="@+id/navigation_mentors"
+        android:icon="@drawable/ic_mentor"
+        android:title="@string/title_mentors" />
 
     <item
         android:id="@+id/navigation_notifications"

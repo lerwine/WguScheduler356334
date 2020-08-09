@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_term_list" />
 
     <fragment
-        android:id="@+id/navigation_courses"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment"
-        android:label="@string/title_courses"
-        tools:layout="@layout/fragment_courses" />
+        android:id="@+id/navigation_mentors"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorListFragment"
+        android:label="@string/title_mentors"
+        tools:layout="@layout/fragment_mentor_list" />
 
     <fragment
         android:id="@+id/navigation_notifications"

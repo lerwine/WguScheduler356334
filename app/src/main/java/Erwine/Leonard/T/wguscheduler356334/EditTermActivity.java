@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -26,28 +27,29 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 
 public class EditTermActivity extends AppCompatActivity {
+
     public static final String EXTRAS_KEY_TERM_ID = "term_id";
     public static final String STATE_KEY_EDIT_INITIALIZED = "edit_initialized";
     public static final String STATE_KEY_START_DATE = "start_date";
     public static final String STATE_KEY_END_DATE = "end_date";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
-    private EditText textEditTermName;
-    private TextView nameOfTermError;
-    private EditText editTextStartOfTerm;
-    private TextView startOfTermError;
-    private EditText editTextEndOfTerm;
-    private TextView endOfTermError;
+    private EditText edit_text_term_name;
+    private TextView text_view_term_name_error;
+    private EditText edit_text_term_start;
+    private TextView text_view_term_start_error;
+    private EditText edit_text_term_end;
+    private TextView text_view_term_end_error;
+    private EditText edit_text_term_notes;
     private EditTermViewModel itemViewModel;
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean newTerm;
     private boolean editInitialized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_term);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_term_edit);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_two_tone_save_24);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -62,34 +64,34 @@ public class EditTermActivity extends AppCompatActivity {
                 endDate = LocalDate.ofEpochDay(v);
             }
         }
-        textEditTermName = findViewById(R.id.textEditTermName);
-        nameOfTermError = findViewById(R.id.nameOfTermError);
-        editTextStartOfTerm = findViewById(R.id.editTextStartOfTerm);
-        startOfTermError = findViewById(R.id.startOfTermError);
-        editTextEndOfTerm = findViewById(R.id.editTextEndOfTerm);
-        endOfTermError = findViewById(R.id.endOfTermError);
+        edit_text_term_name = findViewById(R.id.edit_text_term_name);
+        text_view_term_name_error = findViewById(R.id.text_view_term_name_error);
+        edit_text_term_start = findViewById(R.id.edit_text_term_start);
+        text_view_term_start_error = findViewById(R.id.text_view_term_start_error);
+        edit_text_term_end = findViewById(R.id.edit_text_term_end);
+        text_view_term_end_error = findViewById(R.id.text_view_term_end_error);
+        edit_text_term_notes = findViewById(R.id.edit_text_term_notes);
 
         itemViewModel = MainActivity.getViewModelFactory(getApplication()).create(EditTermViewModel.class);
         itemViewModel.getLiveData().observe(this, this::onTermEntityChanged);
 
-        editTextStartOfTerm.setOnClickListener(this::onStartClick);
-        editTextEndOfTerm.setOnClickListener(this::onEndClick);
+        edit_text_term_start.setOnClickListener(this::onStartClick);
+        edit_text_term_end.setOnClickListener(this::onEndClick);
 
         Bundle extras = getIntent().getExtras();
-        newTerm = null == extras;
-        if (newTerm) {
+        if (null == extras) {
             setTitle(R.string.title_activity_new_term);
         } else {
             setTitle(R.string.title_activity_edit_term);
             int id = extras.getInt(EXTRAS_KEY_TERM_ID);
             itemViewModel.load(id).onErrorReturn((throwable) -> {
-                AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.read_error_title)
+                new AlertDialog.Builder(this).setTitle(R.string.read_error_title)
                         .setMessage(getString(R.string.read_error_message, throwable.getMessage())).setCancelable(false).show();
                 finish();
                 return null;
             }).subscribe();
         }
-        textEditTermName.addTextChangedListener(new TextWatcher() {
+        edit_text_term_name.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -104,7 +106,7 @@ public class EditTermActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
             }
         });
-        validateFields(textEditTermName.getText().toString(), startDate, endDate);
+        validateFields(edit_text_term_name.getText().toString(), startDate, endDate);
     }
 
     @Override
@@ -121,15 +123,17 @@ public class EditTermActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_term_editor, menu);
-        if (newTerm) {
+        if (null == itemViewModel.getLiveData().getValue()) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setEnabled(false);
             menuItem.setVisible(false);
         }
-        validateFields(textEditTermName.getText().toString(), startDate, endDate);
+        validateFields(edit_text_term_name.getText().toString(), startDate, endDate);
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
@@ -155,20 +159,22 @@ public class EditTermActivity extends AppCompatActivity {
         saveAndReturn();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     private void saveAndReturn() {
-        itemViewModel.save(textEditTermName.getText().toString(), startDate, endDate).subscribe(this::finish, (throwable) ->
+        itemViewModel.save(edit_text_term_name.getText().toString(), startDate, endDate, edit_text_term_notes.getText().toString()).subscribe(this::finish, (throwable) ->
                 new AlertDialog.Builder(this).setTitle(R.string.save_error_title)
                         .setMessage(getString(R.string.save_error_message, throwable.getMessage())).setCancelable(false).show()
         );
     }
 
     private void onStartDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        startDate = LocalDate.of(year, monthOfYear, dayOfMonth);
+        startDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
         updateStartText();
     }
 
     private void onEndDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        endDate = LocalDate.of(year, monthOfYear, dayOfMonth);
+        endDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
         updateEndText();
     }
 
@@ -189,12 +195,13 @@ public class EditTermActivity extends AppCompatActivity {
     }
 
     private void onTermEntityChanged(TermEntity termEntity) {
-        String n, s, e;
+        String n, s, e, t;
         if (null == termEntity) {
-            n = s = e = "";
+            n = s = e = t = "";
             startDate = endDate = null;
         } else {
             n = termEntity.getName();
+            t = termEntity.getNotes();
             LocalDate date = termEntity.getStart();
             s = (null == date) ? "" : FORMATTER.format(date);
             startDate = date;
@@ -203,9 +210,10 @@ public class EditTermActivity extends AppCompatActivity {
             endDate = date;
         }
         if (!editInitialized) {
-            textEditTermName.setText(n);
-            editTextStartOfTerm.setText(s);
-            editTextEndOfTerm.setText(e);
+            edit_text_term_name.setText(n);
+            edit_text_term_start.setText(s);
+            edit_text_term_end.setText(e);
+            edit_text_term_notes.setText(t);
         }
         validateFields(n, startDate, endDate);
     }
@@ -213,53 +221,53 @@ public class EditTermActivity extends AppCompatActivity {
     private void updateStartText() {
         LocalDate date = startDate;
         if (null == date) {
-            editTextStartOfTerm.setText("");
+            edit_text_term_start.setText("");
         } else {
-            editTextStartOfTerm.setText(FORMATTER.format(date));
+            edit_text_term_start.setText(FORMATTER.format(date));
         }
-        validateFields(textEditTermName.getText().toString(), date, endDate);
+        validateFields(edit_text_term_name.getText().toString(), date, endDate);
     }
 
     private void updateEndText() {
         LocalDate date = endDate;
         if (null == date) {
-            editTextEndOfTerm.setText("");
+            edit_text_term_end.setText("");
         } else {
-            editTextEndOfTerm.setText(FORMATTER.format(date));
+            edit_text_term_end.setText(FORMATTER.format(date));
         }
-        validateFields(textEditTermName.getText().toString(), startDate, date);
+        validateFields(edit_text_term_name.getText().toString(), startDate, date);
     }
 
     private void validateFields(String name, LocalDate start, LocalDate end) {
         if (null == start) {
-            startOfTermError.setText(getString(R.string.required));
-            startOfTermError.setVisibility(View.VISIBLE);
+            text_view_term_start_error.setText(getString(R.string.required));
+            text_view_term_start_error.setVisibility(View.VISIBLE);
         } else if (null == end) {
-            endOfTermError.setText(getString(R.string.required));
-            endOfTermError.setVisibility(View.VISIBLE);
-            startOfTermError.setVisibility(View.GONE);
+            text_view_term_end_error.setText(getString(R.string.required));
+            text_view_term_end_error.setVisibility(View.VISIBLE);
+            text_view_term_start_error.setVisibility(View.GONE);
         } else if (start.compareTo(end) > 0) {
-            startOfTermError.setText(getString(R.string.start_after_end));
-            startOfTermError.setVisibility(View.VISIBLE);
-            endOfTermError.setVisibility(View.GONE);
+            text_view_term_start_error.setText(getString(R.string.start_after_end));
+            text_view_term_start_error.setVisibility(View.VISIBLE);
+            text_view_term_end_error.setVisibility(View.GONE);
         } else {
-            startOfTermError.setVisibility(View.GONE);
-            endOfTermError.setVisibility(View.GONE);
+            text_view_term_start_error.setVisibility(View.GONE);
+            text_view_term_end_error.setVisibility(View.GONE);
             if (name.trim().isEmpty()) {
-                nameOfTermError.setText(getString(R.string.required));
-                nameOfTermError.setVisibility(View.VISIBLE);
+                text_view_term_name_error.setText(getString(R.string.required));
+                text_view_term_name_error.setVisibility(View.VISIBLE);
                 Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
             } else {
-                nameOfTermError.setVisibility(View.GONE);
+                text_view_term_name_error.setVisibility(View.GONE);
                 Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
             }
             return;
         }
         if (name.trim().isEmpty()) {
-            nameOfTermError.setText(getString(R.string.required));
-            nameOfTermError.setVisibility(View.VISIBLE);
+            text_view_term_name_error.setText(getString(R.string.required));
+            text_view_term_name_error.setVisibility(View.VISIBLE);
         } else {
-            nameOfTermError.setVisibility(View.GONE);
+            text_view_term_name_error.setVisibility(View.GONE);
         }
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
     }

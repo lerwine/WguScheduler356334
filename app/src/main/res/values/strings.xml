@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WGU Scheduler</string>
     <string name="title_terms">Terms</string>
-    <string name="title_courses">Courses</string>
+    <string name="title_mentors">Mentors</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_edit_term">Edit Term</string>
     <string name="title_activity_new_term">Add New Term</string>
@@ -30,4 +30,9 @@
     <string name="discard_changes">Discard Changes</string>
     <string name="required">* Required</string>
     <string name="start_after_end">Start date cannot occur after the end date</string>
+    <string name="notes">Notes</string>
+    <string name="title_activity_edit_mentor">EditMentorActivity</string>
+    <string name="mentor_name">Mentor Name</string>
+    <string name="phone_number">Phone Number(s)</string>
+    <string name="email_address">Email Address(es)</string>
 </resources>

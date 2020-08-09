@@ -15,6 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 @Database(entities = {TermEntity.class, MentorEntity.class, CourseEntity.class, AssessmentEntity.class}, version = 1, exportSchema = false)
 @TypeConverters({LocalDateConverter.class, CourseStatusConverter.class, StringListConverter.class, AssessmentStatusConverter.class})
 public abstract class AppDb extends RoomDatabase {
+
     public static final String DB_NAME = "WguScheduler.db";
     public static final String TABLE_NAME_TERMS = "terms";
     public static final String TABLE_NAME_MENTORS = "mentors";

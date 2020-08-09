@@ -26,7 +26,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 public class TermListFragment extends Fragment {
 
     private TermListViewModel termListViewModel;
-    private RecyclerView recyclerView;
+    private RecyclerView recycler_view_terms;
     private List<TermEntity> items;
     private TermListAdapter adapter;
 
@@ -34,13 +34,13 @@ public class TermListFragment extends Fragment {
         items = new ArrayList<>();
         View root = inflater.inflate(R.layout.fragment_term_list, container, false);
 
-        recyclerView = root.findViewById(R.id.recycler_view_terms);
-        recyclerView.setHasFixedSize(true);
+        recycler_view_terms = root.findViewById(R.id.recycler_view_terms);
+        recycler_view_terms.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
-        recyclerView.addItemDecoration(decoration);
-        FloatingActionButton fab = root.findViewById(R.id.addTermActionButton);
+        recycler_view_terms.setLayoutManager(linearLayoutManager);
+        DividerItemDecoration decoration = new DividerItemDecoration(recycler_view_terms.getContext(), linearLayoutManager.getOrientation());
+        recycler_view_terms.addItemDecoration(decoration);
+        FloatingActionButton fab = root.findViewById(R.id.button_terms_add);
         fab.setOnClickListener(this::onNewTermClick);
 
         return root;
@@ -58,7 +58,7 @@ public class TermListFragment extends Fragment {
         items.addAll(list);
         if (null == adapter) {
             adapter = new TermListAdapter(items, getContext());
-            recyclerView.setAdapter(adapter);
+            recycler_view_terms.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
         }

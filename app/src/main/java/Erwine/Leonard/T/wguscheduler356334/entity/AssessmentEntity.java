@@ -34,38 +34,40 @@ public class AssessmentEntity {
     private AssessmentStatus status;
     private LocalDate goalDate;
     private LocalDate evaluationDate;
-    private boolean performanceAsseessment;
+    private boolean performanceAssessment;
+    private String notes;
 
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAsseessment, LocalDate evaluationDate, int courseId,
+    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes, LocalDate evaluationDate, int courseId,
                             int id) {
-        this(code, title, status, goalDate, performanceAsseessment, evaluationDate, courseId);
+        this(code, title, status, goalDate, performanceAssessment, notes, evaluationDate, courseId);
         this.id = id;
     }
 
     @Ignore
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAsseessment, LocalDate evaluationDate, int courseId) {
-        this(code, title, status, goalDate, performanceAsseessment, evaluationDate);
+    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes, LocalDate evaluationDate, int courseId) {
+        this(code, title, status, goalDate, performanceAssessment, notes, evaluationDate);
         this.courseId = courseId;
     }
 
     @Ignore
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAsseessment, LocalDate evaluationDate) {
-        this(code, title, status, goalDate, performanceAsseessment);
+    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes, LocalDate evaluationDate) {
+        this(code, title, status, goalDate, performanceAssessment, notes);
         this.evaluationDate = evaluationDate;
     }
 
     @Ignore
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAsseessment) {
+    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes) {
         this.code = Values.asNonNullAndWsNormalized(code);
         this.title = Values.asNonNullAndWsNormalized(title);
         this.status = (null == status) ? AssessmentStatus.NOT_STARTED : status;
         this.goalDate = goalDate;
-        this.performanceAsseessment = performanceAsseessment;
+        this.performanceAssessment = performanceAssessment;
+        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
     @Ignore
     public AssessmentEntity() {
-        this(null, null, null, null, false);
+        this(null, null, null, null, false, null);
     }
 
     public Integer getId() {
@@ -112,12 +114,20 @@ public class AssessmentEntity {
         this.goalDate = goalDate;
     }
 
-    public boolean isPerformanceAsseessment() {
-        return performanceAsseessment;
+    public boolean isPerformanceAssessment() {
+        return performanceAssessment;
     }
 
-    public void setPerformanceAsseessment(boolean performanceAsseessment) {
-        this.performanceAsseessment = performanceAsseessment;
+    public void setPerformanceAssessment(boolean performanceAssessment) {
+        this.performanceAssessment = performanceAssessment;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
     public LocalDate getEvaluationDate() {
@@ -138,12 +148,13 @@ public class AssessmentEntity {
         }
         return null == that.id &&
                 courseId == that.courseId &&
-                performanceAsseessment == that.performanceAsseessment &&
+                performanceAssessment == that.performanceAssessment &&
                 code.equals(that.code) &&
                 title.equals(that.title) &&
                 status == that.status &&
                 Objects.equals(goalDate, that.goalDate) &&
-                Objects.equals(evaluationDate, that.evaluationDate);
+                Objects.equals(evaluationDate, that.evaluationDate) &&
+                notes.equals(that.notes);
     }
 
     @Override
@@ -151,7 +162,7 @@ public class AssessmentEntity {
         if (id > 0) {
             return id;
         }
-        return Objects.hash(id, courseId, code, title, status, goalDate, evaluationDate, performanceAsseessment);
+        return Objects.hash(id, courseId, code, title, status, goalDate, evaluationDate, performanceAssessment, notes);
     }
 
     @SuppressWarnings("NullableProblems")
@@ -165,7 +176,8 @@ public class AssessmentEntity {
                 ", status=" + status +
                 ", goalDate=" + goalDate +
                 ", evaluationDate=" + evaluationDate +
-                ", performanceAsseessment=" + performanceAsseessment +
+                ", performanceAssessment=" + performanceAssessment +
+                ", notes='" + notes + '\'' +
                 '}';
     }
 }

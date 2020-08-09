@@ -33,24 +33,26 @@ public class TermEntity {
     private String name;
     private LocalDate start;
     private LocalDate end;
+    private String notes;
     @Ignore
     private LiveData<List<CourseEntity>> courses;
 
-    public TermEntity(String name, LocalDate start, LocalDate end, int id) {
-        this(name, start, end);
+    public TermEntity(String name, LocalDate start, LocalDate end, String notes, int id) {
+        this(name, start, end, notes);
         this.id = id;
     }
 
     @Ignore
-    public TermEntity(String name, LocalDate start, LocalDate end) {
+    public TermEntity(String name, LocalDate start, LocalDate end, String notes) {
         this.name = Values.asNonNullAndWsNormalized(name);
         this.start = start;
         this.end = end;
+        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
     @Ignore
     public TermEntity() {
-        this(null, null, null);
+        this(null, null, null, null);
     }
 
     public Integer getId() {
@@ -81,6 +83,14 @@ public class TermEntity {
         this.end = end;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+    }
+
     @Ignore
     public LiveData<List<CourseEntity>> getCourses(Context context) {
         if (null == courses) {
@@ -102,7 +112,8 @@ public class TermEntity {
         }
         return null == that.id && name.equals(that.name) &&
                 Objects.equals(start, that.start) &&
-                Objects.equals(end, that.end);
+                Objects.equals(end, that.end) &&
+                notes.equals(that.notes);
     }
 
     @Override
@@ -110,7 +121,7 @@ public class TermEntity {
         if (id > 0) {
             return id;
         }
-        return Objects.hash(name, start, end);
+        return Objects.hash(name, start, end, notes);
     }
 
     @SuppressWarnings("NullableProblems")
@@ -121,6 +132,7 @@ public class TermEntity {
                 ", name='" + name + '\'' +
                 ", start=" + start +
                 ", end=" + end +
+                ", notes='" + notes + '\'' +
                 '}';
     }
 }

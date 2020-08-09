@@ -8,11 +8,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.LogHelper;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -20,6 +23,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class DbLoader {
+
+    private static final Logger LOG = LogHelper.setLoggerAndHandlerLevels(Logger.getLogger(DbLoader.class.getName()), Level.FINER);
+//    private static final Logger LOG = Logger.getLogger(DbLoader.class.getName());
+
     private static DbLoader instance;
     private final AppDb appDb;
     private final Scheduler scheduler;
