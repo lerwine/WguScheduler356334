@@ -12,6 +12,7 @@ import androidx.room.PrimaryKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
@@ -46,8 +47,8 @@ public class MentorEntity {
     public MentorEntity(String name, String notes, List<String> phoneNumbers, List<String> emailAddresses) {
         this.name = Values.asNonNullAndWsNormalized(name);
         this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
-        this.phoneNumbers = (null == phoneNumbers) ? new ArrayList<>() : phoneNumbers;
-        this.emailAddresses = (null == emailAddresses) ? new ArrayList<>() : emailAddresses;
+        this.phoneNumbers = phoneNumbers;
+        this.emailAddresses = emailAddresses;
     }
 
     @Ignore
@@ -80,21 +81,23 @@ public class MentorEntity {
         this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
-    public List<String> getPhoneNumbers() {
+    public synchronized List<String> getPhoneNumbers() {
+        if (null == phoneNumbers) {
+            phoneNumbers = new ArrayList<>();
+        }
         return phoneNumbers;
     }
 
-    public void setPhoneNumbers(List<String> phoneNumbers) {
-        this.phoneNumbers = phoneNumbers;
-    }
+    public synchronized void setPhoneNumbers(List<String> phoneNumbers) { this.phoneNumbers = phoneNumbers;  }
 
-    public List<String> getEmailAddresses() {
+    public synchronized List<String> getEmailAddresses() {
+        if (null == emailAddresses) {
+            emailAddresses = new ArrayList<>();
+        }
         return emailAddresses;
     }
 
-    public void setEmailAddresses(List<String> emailAddresses) {
-        this.emailAddresses = emailAddresses;
-    }
+    public synchronized void setEmailAddresses(List<String> emailAddresses) { this.emailAddresses = emailAddresses; }
 
     @Ignore
     public LiveData<List<CourseEntity>> getCourses(Context context) {
