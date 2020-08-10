@@ -38,7 +38,7 @@ public class EditMentorActivity extends AppCompatActivity {
     private boolean editInitialized;
     private EditText edit_text_mentor_name;
     private TextView text_view_mentor_name_error;
-    private RecyclerView recycler_view_mentor_email;
+    private EmailAddressFragment fragment_mentor_email;
     private FloatingActionButton button_mentor_add_address;
     private RecyclerView recycler_view_mentor_phone;
     private FloatingActionButton button_mentor_add_phone;
@@ -56,20 +56,19 @@ public class EditMentorActivity extends AppCompatActivity {
         editInitialized = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_EDIT_INITIALIZED, false);
         edit_text_mentor_name = findViewById(R.id.edit_text_mentor_name);
         text_view_mentor_name_error = findViewById(R.id.text_view_mentor_name_error);
-        recycler_view_mentor_email = findViewById(R.id.recycler_view_mentor_email);
         button_mentor_add_address = findViewById(R.id.button_mentor_add_address);
         recycler_view_mentor_phone = findViewById(R.id.recycler_view_mentor_phone);
         button_mentor_add_phone = findViewById(R.id.button_mentor_add_phone);
         edit_text_mentor_notes = findViewById(R.id.edit_text_mentor_notes);
-
-        recycler_view_mentor_email.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recycler_view_mentor_email.setLayoutManager(linearLayoutManager);
+        fragment_mentor_email = (EmailAddressFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_mentor_email);
+//        recycler_view_mentor_email.setHasFixedSize(true);
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+//        recycler_view_mentor_email.setLayoutManager(linearLayoutManager);
 //        DividerItemDecoration decoration = new DividerItemDecoration(recycler_view_mentor_email.getContext(), linearLayoutManager.getOrientation());
 //        recycler_view_mentor_email.addItemDecoration(decoration);
 
         recycler_view_mentor_phone.setHasFixedSize(true);
-        linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recycler_view_mentor_phone.setLayoutManager(linearLayoutManager);
 //        decoration = new DividerItemDecoration(recycler_view_mentor_phone.getContext(), linearLayoutManager.getOrientation());
 //        recycler_view_mentor_phone.addItemDecoration(decoration);
@@ -138,6 +137,7 @@ public class EditMentorActivity extends AppCompatActivity {
     private void onMentorEntityChanged(MentorEntity mentorEntity) {
         if (!editInitialized) {
             edit_text_mentor_name.setText(mentorEntity.getName());
+            fragment_mentor_email.setEmailAddresses(mentorEntity.getEmailAddresses());
         }
     }
 }

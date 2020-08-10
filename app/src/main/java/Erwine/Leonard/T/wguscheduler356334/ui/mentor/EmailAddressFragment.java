@@ -12,18 +12,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.dummy.DummyContent;
+import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 /**
  * A fragment representing a list of Items.
  */
 public class EmailAddressFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
+    public static final String ARG_EMAIL_ADDRESSES = "email-addresses";
+    private ArrayList<String> emailAddresses = new ArrayList<>();
+    private EmailAddressListAdapter listAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -32,12 +35,11 @@ public class EmailAddressFragment extends Fragment {
     public EmailAddressFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static EmailAddressFragment newInstance(int columnCount) {
+    public static EmailAddressFragment newInstance(ArrayList<String> emailAddresses) {
         EmailAddressFragment fragment = new EmailAddressFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putStringArrayList(ARG_EMAIL_ADDRESSES, emailAddresses);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,7 +49,7 @@ public class EmailAddressFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            emailAddresses = getArguments().getStringArrayList(ARG_EMAIL_ADDRESSES);
         }
     }
 
@@ -60,13 +62,19 @@ public class EmailAddressFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new EmailAddressListAdapter(DummyContent.ITEMS));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            listAdapter = new EmailAddressListAdapter(emailAddresses);
+            recyclerView.setAdapter(listAdapter);
         }
         return view;
+    }
+
+    public void setEmailAddresses(String emailAddresses) {
+        String[] lines = (null == emailAddresses || emailAddresses.isEmpty()) ? new String[0] : Values.REGEX_LINEBREAKN.split(emailAddresses);
+        this.emailAddresses.clear();
+        Collections.addAll(this.emailAddresses, lines);
+        if (null != listAdapter) {
+            listAdapter.setEmailAddresses(this.emailAddresses);
+        }
     }
 }

@@ -32,19 +32,19 @@ public class MentorEntity {
     private Integer id;
     @ColumnInfo(name = COLNAME_NAME)
     private String name;
-    private List<String> phoneNumbers;
-    private List<String> emailAddresses;
+    private String phoneNumbers;
+    private String emailAddresses;
     private String notes;
     @Ignore
     private LiveData<List<CourseEntity>> courses;
 
-    public MentorEntity(String name, String notes, List<String> phoneNumbers, List<String> emailAddresses, int id) {
+    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses, int id) {
         this(name, notes, phoneNumbers, emailAddresses);
         this.id = id;
     }
 
     @Ignore
-    public MentorEntity(String name, String notes, List<String> phoneNumbers, List<String> emailAddresses) {
+    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses) {
         this.name = Values.asNonNullAndWsNormalized(name);
         this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
         this.phoneNumbers = phoneNumbers;
@@ -81,23 +81,17 @@ public class MentorEntity {
         this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
-    public synchronized List<String> getPhoneNumbers() {
-        if (null == phoneNumbers) {
-            phoneNumbers = new ArrayList<>();
-        }
-        return phoneNumbers;
+    public synchronized String getPhoneNumbers() { return phoneNumbers; }
+
+    public synchronized void setPhoneNumbers(String phoneNumbers) {
+        this.phoneNumbers = Values.asWsNormalizedStringLines(phoneNumbers);
     }
 
-    public synchronized void setPhoneNumbers(List<String> phoneNumbers) { this.phoneNumbers = phoneNumbers;  }
+    public synchronized String getEmailAddresses() { return emailAddresses; }
 
-    public synchronized List<String> getEmailAddresses() {
-        if (null == emailAddresses) {
-            emailAddresses = new ArrayList<>();
-        }
-        return emailAddresses;
+    public synchronized void setEmailAddresses(String emailAddresses) {
+        this.emailAddresses = Values.asWsNormalizedStringLines(emailAddresses);
     }
-
-    public synchronized void setEmailAddresses(List<String> emailAddresses) { this.emailAddresses = emailAddresses; }
 
     @Ignore
     public LiveData<List<CourseEntity>> getCourses(Context context) {

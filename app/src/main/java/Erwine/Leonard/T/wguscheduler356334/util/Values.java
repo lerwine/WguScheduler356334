@@ -3,6 +3,8 @@ package Erwine.Leonard.T.wguscheduler356334.util;
 import android.text.Editable;
 import android.text.TextWatcher;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,6 +89,27 @@ public class Values {
             sb.append(asNonNullAndWsNormalized(lines[i]));
         }
         return sb.toString();
+    }
+
+    public static String asWsNormalizedStringLines(String value) {
+        if (null == value || (value = value.trim()).isEmpty()) {
+            return "";
+        }
+
+        String[] lines = REGEX_LINEBREAKN.split(value);
+        if (lines.length < 2) {
+            return asNonNullAndWsNormalized(value);
+        }
+        Iterator<String> iterator = Arrays.stream(lines).map(Values::asNonNullAndWsNormalized).filter((t) -> !t.isEmpty()).iterator();
+        if (iterator.hasNext()) {
+            StringBuilder sb = new StringBuilder(asNonNullAndWsNormalized(iterator.next()));
+            while (iterator.hasNext()) {
+                sb.append("\n");
+                sb.append(asNonNullAndWsNormalized(iterator.next()));
+            }
+            return sb.toString();
+        }
+        return "";
     }
 
 }

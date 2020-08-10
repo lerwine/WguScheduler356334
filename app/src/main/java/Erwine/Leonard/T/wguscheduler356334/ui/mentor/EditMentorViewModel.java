@@ -31,7 +31,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         return liveData;
     }
 
-    public Completable save(String name, List<String> emailAddresses, List<String> phoneNumbers, String notes) {
+    public Completable save(String name, String emailAddresses, String phoneNumbers, String notes) {
         MentorEntity entity = liveData.getValue();
         if (null == entity) {
             entity = new MentorEntity(name, notes, emailAddresses, phoneNumbers);

@@ -51,29 +51,24 @@
         android:layout_marginTop="@dimen/control_margin"
         android:text="@string/email_address"
         android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-        app:layout_constraintBottom_toTopOf="@id/recycler_view_mentor_email"
+        app:layout_constraintBottom_toTopOf="@id/fragment_mentor_email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_mentor_name_error" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_mentor_email"
+    <fragment
+        android:id="@+id/fragment_mentor_email"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.mentor.EmailAddressFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/button_mentor_add_address"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_mentor_email_label"
-        app:layout_constraintVertical_bias="0.0">
-
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_mentor_add_address"
@@ -86,7 +81,7 @@
         app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/text_view_mentor_phone_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view_mentor_email" />
+        app:layout_constraintTop_toBottomOf="@+id/fragment_mentor_email" />
 
     <TextView
         android:id="@+id/text_view_mentor_phone_label"
