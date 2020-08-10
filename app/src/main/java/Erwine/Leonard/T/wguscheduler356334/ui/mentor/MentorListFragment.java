@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +39,8 @@ public class MentorListFragment extends Fragment {
         recycler_view_mentors.setLayoutManager(linearLayoutManager);
         DividerItemDecoration decoration = new DividerItemDecoration(recycler_view_mentors.getContext(), linearLayoutManager.getOrientation());
         recycler_view_mentors.addItemDecoration(decoration);
-//        FloatingActionButton fab = root.findViewById(R.id.addMentorActionButton);
-//        fab.setOnClickListener(this::onNewMentorClick);
+        FloatingActionButton fab = root.findViewById(R.id.button_mentors_add);
+        fab.setOnClickListener(this::onNewMentorClick);
 
         return root;
     }
@@ -60,8 +63,8 @@ public class MentorListFragment extends Fragment {
         }
     }
 
-//    private void onNewMentorClick(View view) {
-//        Intent intent = new Intent(getContext(), EditTermActivity.class);
-//        startActivity(intent);
-//    }
+    private void onNewMentorClick(View view) {
+        Intent intent = new Intent(getContext(), EditMentorActivity.class);
+        startActivity(intent);
+    }
 }

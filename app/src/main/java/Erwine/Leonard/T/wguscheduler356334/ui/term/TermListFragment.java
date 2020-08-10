@@ -18,7 +18,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.EditTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;

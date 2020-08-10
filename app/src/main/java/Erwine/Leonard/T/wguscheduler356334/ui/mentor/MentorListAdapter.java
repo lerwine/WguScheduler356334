@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +39,11 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final MentorEntity item = entityList.get(position);
         holder.text_view_mentor_list_item_name.setText(item.getName());
-//        holder.editMentorButton.setOnClickListener((view) -> {
-//            Intent intent = new Intent(context, EditTermActivity.class);
-//            intent.putExtra(EditTermActivity.EXTRAS_KEY_TERM_ID, item.getId());
-//            context.startActivity(intent);
-//        });
+        holder.button_mentor_list_item_edit.setOnClickListener((view) -> {
+            Intent intent = new Intent(context, EditMentorActivity.class);
+            intent.putExtra(EditMentorActivity.EXTRAS_KEY_MENTOR_ID, item.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override

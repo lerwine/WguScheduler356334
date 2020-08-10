@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wguscheduler356334;
+package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -23,8 +23,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 public class EditTermActivity extends AppCompatActivity {
 
@@ -91,21 +94,7 @@ public class EditTermActivity extends AppCompatActivity {
                 return null;
             }).subscribe();
         }
-        edit_text_term_name.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                validateFields(charSequence.toString(), startDate, endDate);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+        edit_text_term_name.addTextChangedListener(Values.textWatcherForTextChanged((t) -> validateFields(t, startDate, endDate)));
         validateFields(edit_text_term_name.getText().toString(), startDate, endDate);
     }
 
@@ -124,7 +113,7 @@ public class EditTermActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_term_editor, menu);
         if (null == itemViewModel.getLiveData().getValue()) {
-            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            MenuItem menuItem = menu.findItem(R.id.action_term_delete);
             menuItem.setEnabled(false);
             menuItem.setVisible(false);
         }
@@ -140,7 +129,7 @@ public class EditTermActivity extends AppCompatActivity {
         if (itemId == android.R.id.home) {
             saveAndReturn();
             return true;
-        } else if (itemId == R.id.action_delete) {
+        } else if (itemId == R.id.action_term_delete) {
             new AlertDialog.Builder(this).setTitle(R.string.delete_term_title).setMessage(R.string.delete_term_confirm).setPositiveButton(R.string.yes, (dialogInterface, i1) -> {
                 itemViewModel.delete().subscribe(this::finish, (throwable) ->
                         new AlertDialog.Builder(this).setTitle(R.string.delete_error_title)
@@ -148,7 +137,7 @@ public class EditTermActivity extends AppCompatActivity {
                 );
                 finish();
             }).setNegativeButton(R.string.no, null).show();
-        } else if (itemId == R.id.action_cancel) {
+        } else if (itemId == R.id.action_term_cancel) {
             finish();
         }
         return super.onOptionsItemSelected(item);

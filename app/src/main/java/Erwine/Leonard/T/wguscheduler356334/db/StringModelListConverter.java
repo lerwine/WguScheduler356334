@@ -6,15 +6,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
-public class StringListConverter {
+public class StringModelListConverter {
 
     @TypeConverter
-    public static List<String> toStringList(String value) {
-        ArrayList<String> list = new ArrayList<>();
+    public static List<String> toStringModelList(String value) {
+        List<String> list = new ArrayList<>();
         if (null != value && !(value = value.trim()).isEmpty()) {
             String[] lines = Values.REGEX_LINEBREAKN.split(value);
             Collections.addAll(list, lines);
@@ -23,11 +22,11 @@ public class StringListConverter {
     }
 
     @TypeConverter
-    public static String fromStringList(List<String> value) {
+    public static String fromStringModelList(List<String> value) {
         if (null == value || value.isEmpty()) {
             return "";
         }
-        Iterator<String> iterator = value.stream().filter(Objects::nonNull).map(Values::asNonNullAndWsNormalized).iterator();
+        Iterator<String> iterator = value.stream().map(Values::asNonNullAndWsNormalized).iterator();
         if (!iterator.hasNext()) {
             return "";
         }

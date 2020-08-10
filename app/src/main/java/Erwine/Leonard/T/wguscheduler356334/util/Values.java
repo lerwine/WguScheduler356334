@@ -1,5 +1,9 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,6 +11,25 @@ public class Values {
 
     public static final Pattern REGEX_NON_NORMAL_WHITESPACES = Pattern.compile(" \\s+|(?! )\\s+");
     public static final Pattern REGEX_LINEBREAKN = Pattern.compile("[\\r\\n]+");
+
+    public static TextWatcher textWatcherForTextChanged(final Consumer<String> onTextChanged) {
+        return new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                onTextChanged.accept(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+
+        };
+    }
 
     /**
      * Ensures a {@link String} value is not null and does not contain extraneous white space characters.

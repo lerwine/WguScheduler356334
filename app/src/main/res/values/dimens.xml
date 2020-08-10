@@ -7,4 +7,5 @@
     <dimen name="control_margin">8dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="normal_button_image_size">42dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

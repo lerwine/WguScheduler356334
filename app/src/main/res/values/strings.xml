@@ -18,6 +18,12 @@
     <string name="save_changes">Save Changes</string>
     <string name="delete_term_title">Delete Term</string>
     <string name="delete_term_confirm">This action cannot be undone!\n\nAre you sure you want to delete this term?</string>
+    <string name="delete_mentor_title">Delete Mentor</string>
+    <string name="delete_mentor_confirm">This action cannot be undone!\n\nAre you sure you want to delete this mentor?</string>
+    <string name="delete_phone_title">Delete Phone Number</string>
+    <string name="delete_phone_confirm">This action cannot be undone!\n\nAre you sure you want to delete this phone number?</string>
+    <string name="delete_email_title">Delete Email Address</string>
+    <string name="delete_email_confirm">This action cannot be undone!\n\nAre you sure you want to delete this email address?</string>
     <string name="save_error_title">Save Error</string>
     <string name="save_error_message">An unexpected error has occurred while saving the record to the database: %s</string>
     <string name="read_error_title">Read Error</string>
