@@ -33,13 +33,12 @@ public class TermListFragment extends Fragment {
         items = new ArrayList<>();
         View root = inflater.inflate(R.layout.fragment_term_list, container, false);
 
-        recycler_view_terms = root.findViewById(R.id.recycler_view_terms);
+        recycler_view_terms = root.findViewById(R.id.termsRecyclerView);
         recycler_view_terms.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recycler_view_terms.setLayoutManager(linearLayoutManager);
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recycler_view_terms.getLayoutManager();
         DividerItemDecoration decoration = new DividerItemDecoration(recycler_view_terms.getContext(), linearLayoutManager.getOrientation());
         recycler_view_terms.addItemDecoration(decoration);
-        FloatingActionButton fab = root.findViewById(R.id.button_terms_add);
+        FloatingActionButton fab = root.findViewById(R.id.addTermButton);
         fab.setOnClickListener(this::onNewTermClick);
 
         return root;

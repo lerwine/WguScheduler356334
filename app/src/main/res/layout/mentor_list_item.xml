@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_mentor_list_item_edit"
+        android:id="@+id/editMentorButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/colorAccent"
@@ -17,7 +17,7 @@
         app:srcCompat="@drawable/ic_edit_12" />
 
     <TextView
-        android:id="@+id/text_view_mentor_list_item_name"
+        android:id="@+id/mentorNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -29,7 +29,7 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_mentor_list_item_edit"
+        app:layout_constraintStart_toEndOf="@+id/editMentorButton"
         app:layout_constraintTop_toTopOf="parent" />
 
 

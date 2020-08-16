@@ -25,7 +25,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 public class MentorListFragment extends Fragment {
 
     private MentorListViewModel mentorListViewModel;
-    private RecyclerView recycler_view_mentors;
+    private RecyclerView mentorsRecyclerView;
     private List<MentorEntity> items;
     private MentorListAdapter adapter;
 
@@ -33,13 +33,12 @@ public class MentorListFragment extends Fragment {
         items = new ArrayList<>();
         View root = inflater.inflate(R.layout.fragment_mentor_list, container, false);
 
-        recycler_view_mentors = root.findViewById(R.id.recycler_view_mentors);
-        recycler_view_mentors.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recycler_view_mentors.setLayoutManager(linearLayoutManager);
-        DividerItemDecoration decoration = new DividerItemDecoration(recycler_view_mentors.getContext(), linearLayoutManager.getOrientation());
-        recycler_view_mentors.addItemDecoration(decoration);
-        FloatingActionButton fab = root.findViewById(R.id.button_mentors_add);
+        mentorsRecyclerView = root.findViewById(R.id.mentorsRecyclerView);
+        mentorsRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) mentorsRecyclerView.getLayoutManager();
+        DividerItemDecoration decoration = new DividerItemDecoration(mentorsRecyclerView.getContext(), linearLayoutManager.getOrientation());
+        mentorsRecyclerView.addItemDecoration(decoration);
+        FloatingActionButton fab = root.findViewById(R.id.addMentorButton);
         fab.setOnClickListener(this::onNewMentorClick);
 
         return root;
@@ -57,7 +56,7 @@ public class MentorListFragment extends Fragment {
         items.addAll(list);
         if (null == adapter) {
             adapter = new MentorListAdapter(items, getContext());
-            recycler_view_mentors.setAdapter(adapter);
+            mentorsRecyclerView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
         }

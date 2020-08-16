@@ -26,6 +26,9 @@ public interface TermDAO {
     @Insert
     Completable insertAll(List<TermEntity> terms);
 
+    @Insert
+    void insertAllItems(TermEntity... items);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<TermEntity> terms);
 
@@ -41,7 +44,13 @@ public interface TermDAO {
     @Query("SELECT * FROM terms ORDER BY [start], [end]")
     LiveData<List<TermEntity>> getAll();
 
+    @Query("SELECT * FROM terms")
+    List<TermEntity> getAllItems();
+
     @Query("SELECT COUNT(*) FROM terms")
     Single<Integer> getCount();
+
+    @Query("DELETE FROM courses")
+    Single<Integer> deleteAll();
 
 }

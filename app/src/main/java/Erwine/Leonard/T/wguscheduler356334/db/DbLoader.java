@@ -38,7 +38,7 @@ public class DbLoader {
 
     public DbLoader(Context context) {
         appDb = AppDb.getInstance(context);
-        scheduler = Schedulers.single();
+        scheduler = Schedulers.from(dataExecutor);
     }
 
     public static DbLoader getInstance(Context context) {
@@ -220,6 +220,29 @@ public class DbLoader {
 
     public Single<Integer> getAssessmentCount() {
         return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private void resetDb() {
+        appDb.clearAllTables();
+        for (String t : new String[]{
+                AppDb.TABLE_NAME_ASSESSMENTS,
+                AppDb.TABLE_NAME_COURSES,
+                AppDb.TABLE_NAME_TERMS,
+                AppDb.TABLE_NAME_MENTORS
+        }) {
+            appDb.query(String.format("UPDATE sqlite_sequence SET seq = 1 WHERE name = '%s'", t), null).close();
+        }
+    }
+
+    public Completable resetDatabase() {
+        return Completable.fromAction(this::resetDb).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable populateSampleData() {
+        return Completable.fromAction(() -> {
+            resetDb();
+            TermEntity.populateSampleData(appDb);
+        }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
 }

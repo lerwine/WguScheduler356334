@@ -25,6 +25,9 @@ public interface MentorDAO {
     @Insert
     Completable insertAll(List<MentorEntity> mentors);
 
+    @Insert
+    void insertAllItems(MentorEntity... items);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<MentorEntity> mentors);
 
@@ -40,7 +43,13 @@ public interface MentorDAO {
     @Query("SELECT * FROM mentors ORDER BY [name]")
     LiveData<List<MentorEntity>> getAll();
 
+    @Query("SELECT * FROM mentors")
+    List<MentorEntity> getAllItems();
+
     @Query("SELECT COUNT(*) FROM mentors")
     Single<Integer> getCount();
+
+    @Query("DELETE FROM mentors")
+    Single<Integer> deleteAll();
 
 }

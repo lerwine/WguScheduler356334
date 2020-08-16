@@ -77,9 +77,9 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            text_view_term_list_item_name = itemView.findViewById(R.id.text_view_term_list_item_name);
-            text_view_term_list_item_range = itemView.findViewById(R.id.text_view_term_list_item_range);
-            button_term_list_item_edit = itemView.findViewById(R.id.button_term_list_item_edit);
+            text_view_term_list_item_name = itemView.findViewById(R.id.termNameTextView);
+            text_view_term_list_item_range = itemView.findViewById(R.id.termRangeTextView);
+            button_term_list_item_edit = itemView.findViewById(R.id.editTermButton);
         }
 
     }

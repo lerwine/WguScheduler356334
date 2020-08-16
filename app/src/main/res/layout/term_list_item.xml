@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_term_list_item_edit"
+        android:id="@+id/editTermButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/colorAccent"
@@ -17,7 +17,7 @@
         app:srcCompat="@drawable/ic_edit_12" />
 
     <TextView
-        android:id="@+id/text_view_term_list_item_name"
+        android:id="@+id/termNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -27,13 +27,13 @@
         android:textColorHighlight="@color/colorPrimary"
         android:textColorLink="@color/colorAccent"
         android:textSize="@dimen/list_item_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/text_view_term_list_item_range"
+        app:layout_constraintBottom_toTopOf="@+id/termRangeTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_term_list_item_edit"
+        app:layout_constraintStart_toEndOf="@+id/editTermButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/text_view_term_list_item_range"
+        android:id="@+id/termRangeTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -42,7 +42,7 @@
         android:textColorLink="@color/colorAccent"
         android:textSize="@dimen/list_item_detail_text_size"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_term_list_item_edit"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_term_list_item_name" />
+        app:layout_constraintStart_toEndOf="@+id/editTermButton"
+        app:layout_constraintTop_toBottomOf="@+id/termNameTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

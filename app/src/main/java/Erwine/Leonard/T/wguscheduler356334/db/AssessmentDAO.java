@@ -20,6 +20,9 @@ public interface AssessmentDAO {
     @Insert
     Completable insert(AssessmentEntity assessment);
 
+    @Insert
+    void insertItem(AssessmentEntity item);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(AssessmentEntity assessment);
 
@@ -41,10 +44,16 @@ public interface AssessmentDAO {
     @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], [evaluationDate]")
     LiveData<List<AssessmentEntity>> getByCourseId(int courseId);
 
+    @Query("SELECT * FROM assessments WHERE courseId = :courseId")
+    List<AssessmentEntity> getItemsByCourseId(int courseId);
+
     @Query("SELECT * FROM assessments ORDER BY [goalDate], [evaluationDate]")
     LiveData<List<AssessmentEntity>> getAll();
 
     @Query("SELECT COUNT(*) FROM assessments")
     Single<Integer> getCount();
+
+    @Query("DELETE FROM assessments")
+    Single<Integer> deleteAll();
 
 }

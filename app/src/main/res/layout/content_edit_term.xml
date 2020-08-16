@@ -7,19 +7,19 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <TextView
-        android:id="@+id/text_view_term_name_label"
+        android:id="@+id/termNameLabelTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/nameOfTerm"
-        android:labelFor="@id/edit_text_term_name"
+        android:labelFor="@id/termNameEditText"
         android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-        app:layout_constraintBottom_toTopOf="@id/edit_text_term_name"
+        app:layout_constraintBottom_toTopOf="@id/termNameEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/edit_text_term_name"
+        android:id="@+id/termNameEditText"
         style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="match_parent"
         android:layout_height="32dp"
@@ -27,38 +27,38 @@
         android:inputType="textCapWords"
         android:maxLines="1"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/text_view_term_name_error"
+        app:layout_constraintBottom_toTopOf="@id/termNameErrorTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_name_label"
+        app:layout_constraintTop_toBottomOf="@id/termNameLabelTextView"
         tools:ignore="Autofill" />
 
     <TextView
-        android:id="@+id/text_view_term_name_error"
+        android:id="@+id/termNameErrorTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/required"
         android:textAppearance="@style/WGU.Scheduler.ErrorText"
-        app:layout_constraintBottom_toTopOf="@id/text_view_term_start_label"
+        app:layout_constraintBottom_toTopOf="@id/termStartLabelTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_text_term_name" />
+        app:layout_constraintTop_toBottomOf="@id/termNameEditText" />
 
     <TextView
-        android:id="@+id/text_view_term_start_label"
+        android:id="@+id/termStartLabelTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/control_margin"
         android:text="@string/startOfTerm"
-        android:labelFor="@id/edit_text_term_start"
+        android:labelFor="@id/termStartEditText"
         android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-        app:layout_constraintBottom_toTopOf="@id/edit_text_term_start"
+        app:layout_constraintBottom_toTopOf="@id/termStartEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_name_error" />
+        app:layout_constraintTop_toBottomOf="@id/termNameErrorTextView" />
 
     <EditText
-        android:id="@+id/edit_text_term_start"
+        android:id="@+id/termStartEditText"
         style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="match_parent"
         android:layout_height="32dp"
@@ -66,38 +66,38 @@
         android:focusable="false"
         android:inputType="date"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/text_view_term_start_error"
+        app:layout_constraintBottom_toTopOf="@id/termStartErrorTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_start_label"
+        app:layout_constraintTop_toBottomOf="@id/termStartLabelTextView"
         tools:ignore="Autofill" />
 
     <TextView
-        android:id="@+id/text_view_term_start_error"
+        android:id="@+id/termStartErrorTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/required"
         android:textAppearance="@style/WGU.Scheduler.ErrorText"
-        app:layout_constraintBottom_toTopOf="@id/text_view_term_end_label"
+        app:layout_constraintBottom_toTopOf="@id/termEndLabelTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_text_term_start" />
+        app:layout_constraintTop_toBottomOf="@id/termStartEditText" />
 
     <TextView
-        android:id="@+id/text_view_term_end_label"
+        android:id="@+id/termEndLabelTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/control_margin"
         android:text="@string/endOfTerm"
-        android:labelFor="@id/edit_text_term_end"
+        android:labelFor="@id/termEndEditText"
         android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-        app:layout_constraintBottom_toTopOf="@id/edit_text_term_end"
+        app:layout_constraintBottom_toTopOf="@id/termEndEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_start_error" />
+        app:layout_constraintTop_toBottomOf="@id/termStartErrorTextView" />
 
     <EditText
-        android:id="@+id/edit_text_term_end"
+        android:id="@+id/termEndEditText"
         style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="match_parent"
         android:layout_height="32dp"
@@ -105,38 +105,38 @@
         android:focusable="false"
         android:inputType="date"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/text_view_term_end_error"
+        app:layout_constraintBottom_toTopOf="@id/termEndErrorTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_end_label"
+        app:layout_constraintTop_toBottomOf="@id/termEndLabelTextView"
         tools:ignore="Autofill" />
 
     <TextView
-        android:id="@+id/text_view_term_end_error"
+        android:id="@+id/termEndErrorTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/required"
         android:textAppearance="@style/WGU.Scheduler.ErrorText"
-        app:layout_constraintBottom_toTopOf="@id/text_view_term_notes_label"
+        app:layout_constraintBottom_toTopOf="@id/termNotesLabelTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_text_term_end" />
+        app:layout_constraintTop_toBottomOf="@id/termEndEditText" />
 
     <TextView
-        android:id="@+id/text_view_term_notes_label"
+        android:id="@+id/termNotesLabelTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/control_margin"
-        android:labelFor="@id/edit_text_term_notes"
+        android:labelFor="@id/termNotesEditText"
         android:text="@string/notes"
         android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-        app:layout_constraintBottom_toTopOf="@id/edit_text_term_notes"
+        app:layout_constraintBottom_toTopOf="@id/termNotesEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_end_error" />
+        app:layout_constraintTop_toBottomOf="@id/termEndErrorTextView" />
 
     <EditText
-        android:id="@+id/edit_text_term_notes"
+        android:id="@+id/termNotesEditText"
         style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -146,6 +146,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_term_notes_label"
+        app:layout_constraintTop_toBottomOf="@id/termNotesLabelTextView"
         tools:ignore="Autofill" />
 </androidx.constraintlayout.widget.ConstraintLayout>

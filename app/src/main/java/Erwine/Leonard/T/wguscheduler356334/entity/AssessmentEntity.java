@@ -15,7 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 @Entity(tableName = AppDb.TABLE_NAME_ASSESSMENTS, indices = {
         @Index(value = AssessmentEntity.COLNAME_COURSE_ID, name = AssessmentEntity.INDEX_COURSE),
-        @Index(value = AssessmentEntity.COLNAME_CODE, name = AssessmentEntity.INDEX_CODE, unique = true)
+        @Index(value = AssessmentEntity.COLNAME_CODE, name = AssessmentEntity.INDEX_CODE)
 })
 public class AssessmentEntity {
 
@@ -30,44 +30,42 @@ public class AssessmentEntity {
     private int courseId;
     @ColumnInfo(name = COLNAME_CODE)
     private String code;
-    private String title;
     private AssessmentStatus status;
     private LocalDate goalDate;
     private LocalDate evaluationDate;
-    private boolean performanceAssessment;
+    private AssessmentType type;
     private String notes;
 
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes, LocalDate evaluationDate, int courseId,
+    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate, int courseId,
                             int id) {
-        this(code, title, status, goalDate, performanceAssessment, notes, evaluationDate, courseId);
+        this(code, status, goalDate, type, notes, evaluationDate, courseId);
         this.id = id;
     }
 
     @Ignore
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes, LocalDate evaluationDate, int courseId) {
-        this(code, title, status, goalDate, performanceAssessment, notes, evaluationDate);
+    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate, int courseId) {
+        this(code, status, goalDate, type, notes, evaluationDate);
         this.courseId = courseId;
     }
 
     @Ignore
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes, LocalDate evaluationDate) {
-        this(code, title, status, goalDate, performanceAssessment, notes);
+    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate) {
+        this(code, status, goalDate, type, notes);
         this.evaluationDate = evaluationDate;
     }
 
     @Ignore
-    public AssessmentEntity(String code, String title, AssessmentStatus status, LocalDate goalDate, boolean performanceAssessment, String notes) {
+    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes) {
         this.code = Values.asNonNullAndWsNormalized(code);
-        this.title = Values.asNonNullAndWsNormalized(title);
         this.status = (null == status) ? AssessmentStatus.NOT_STARTED : status;
         this.goalDate = goalDate;
-        this.performanceAssessment = performanceAssessment;
+        this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
         this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
     }
 
     @Ignore
     public AssessmentEntity() {
-        this(null, null, null, null, false, null);
+        this(null, null, null, null, null);
     }
 
     public Integer getId() {
@@ -90,14 +88,6 @@ public class AssessmentEntity {
         this.code = Values.asNonNullAndWsNormalized(code);
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = Values.asNonNullAndWsNormalized(title);
-    }
-
     public AssessmentStatus getStatus() {
         return status;
     }
@@ -114,12 +104,12 @@ public class AssessmentEntity {
         this.goalDate = goalDate;
     }
 
-    public boolean isPerformanceAssessment() {
-        return performanceAssessment;
+    public AssessmentType getType() {
+        return type;
     }
 
-    public void setPerformanceAssessment(boolean performanceAssessment) {
-        this.performanceAssessment = performanceAssessment;
+    public void setType(AssessmentType type) {
+        this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
     }
 
     public String getNotes() {
@@ -148,9 +138,8 @@ public class AssessmentEntity {
         }
         return null == that.id &&
                 courseId == that.courseId &&
-                performanceAssessment == that.performanceAssessment &&
+                type == that.type &&
                 code.equals(that.code) &&
-                title.equals(that.title) &&
                 status == that.status &&
                 Objects.equals(goalDate, that.goalDate) &&
                 Objects.equals(evaluationDate, that.evaluationDate) &&
@@ -162,7 +151,7 @@ public class AssessmentEntity {
         if (id > 0) {
             return id;
         }
-        return Objects.hash(id, courseId, code, title, status, goalDate, evaluationDate, performanceAssessment, notes);
+        return Objects.hash(id, courseId, code, status, goalDate, evaluationDate, type, notes);
     }
 
     @SuppressWarnings("NullableProblems")
@@ -172,11 +161,10 @@ public class AssessmentEntity {
                 "id=" + id +
                 ", courseId=" + courseId +
                 ", number='" + code + '\'' +
-                ", title='" + title + '\'' +
                 ", status=" + status +
                 ", goalDate=" + goalDate +
                 ", evaluationDate=" + evaluationDate +
-                ", performanceAssessment=" + performanceAssessment +
+                ", type=" + type +
                 ", notes='" + notes + '\'' +
                 '}';
     }

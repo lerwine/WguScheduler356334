@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_terms">
+    app:startDestination="@id/navigation_terms">
 
     <fragment
         android:id="@+id/navigation_terms"
@@ -22,4 +22,8 @@
         android:name="Erwine.Leonard.T.wguscheduler356334.ui.notification.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="Erwine.Leonard.T.wguscheduler356334.SettingsActivity.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

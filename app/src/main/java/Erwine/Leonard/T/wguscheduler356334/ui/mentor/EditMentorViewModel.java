@@ -7,8 +7,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Entity;
 
-import java.util.List;
-
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
@@ -41,15 +39,18 @@ public class EditMentorViewModel extends AndroidViewModel {
             entity.setPhoneNumbers(phoneNumbers);
             entity.setNotes(notes);
         }
-        return dbLoader.saveMentor(entity);
+        Completable result = dbLoader.saveMentor(entity);
+        return result;
     }
 
     public Single<MentorEntity> load(int id) {
-        return dbLoader.getMentorById(id).doAfterSuccess(liveData::postValue);
+        Single<MentorEntity> result = dbLoader.getMentorById(id).doAfterSuccess(liveData::postValue);
+        return result;
     }
 
     public Completable delete() {
-        return dbLoader.deleteMentor(liveData.getValue());
+        Completable result = dbLoader.deleteMentor(liveData.getValue());
+        return result;
     }
 
 }

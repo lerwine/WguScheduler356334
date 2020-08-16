@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="Erwine.Leonard.T.wguscheduler356334.MainActivity">
+    <item
+        android:id="@+id/action_manage_data"
+        android:orderInCategory="100"
+        android:title="@string/action_manage_data"
+        app:showAsAction="never" />
+</menu>

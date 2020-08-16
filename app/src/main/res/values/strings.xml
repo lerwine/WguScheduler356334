@@ -35,10 +35,42 @@
     <string name="no">No</string>
     <string name="discard_changes">Discard Changes</string>
     <string name="required">* Required</string>
+    <string name="phone_or_email_required">* Phone number or email address required</string>
     <string name="start_after_end">Start date cannot occur after the end date</string>
     <string name="notes">Notes</string>
-    <string name="title_activity_edit_mentor">EditMentorActivity</string>
+    <string name="title_activity_edit_mentor">Edit Mentor</string>
+    <string name="title_activity_new_mentor">Add New Term</string>
     <string name="mentor_name">Mentor Name</string>
     <string name="phone_number">Phone Number(s)</string>
     <string name="email_address">Email Address(es)</string>
+    <string name="title_activity_example_tab">ExampleTabActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="action_manage_data">Manage Data</string>
+    <string name="add_sample_data">Add Sample Data</string>
+    <string name="all_data_delete_warning">Warning! These options will delete all data stored by this app!</string>
+    <string name="add_sample_data_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
+    <string name="add_sample_data_error_title">Ad Sample Data Error</string>
+    <string name="add_sample_data_error_message">An unexpected error has occurred while populating sample data: %s</string>
+    <string name="reset_database">Reset Database</string>
+    <string name="reset_db_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
+    <string name="reset_db_error_title">Reset Database Error</string>
+    <string name="reset_db_error_message">An unexpected error has occurred while resetting the database: %s</string>
 </resources>

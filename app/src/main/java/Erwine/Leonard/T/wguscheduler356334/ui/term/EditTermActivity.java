@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +24,6 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 public class EditTermActivity extends AppCompatActivity {
@@ -52,7 +49,7 @@ public class EditTermActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_term);
-        Toolbar toolbar = findViewById(R.id.toolbar_term_edit);
+        Toolbar toolbar = findViewById(R.id.termEditToolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_two_tone_save_24);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -67,13 +64,13 @@ public class EditTermActivity extends AppCompatActivity {
                 endDate = LocalDate.ofEpochDay(v);
             }
         }
-        edit_text_term_name = findViewById(R.id.edit_text_term_name);
-        text_view_term_name_error = findViewById(R.id.text_view_term_name_error);
-        edit_text_term_start = findViewById(R.id.edit_text_term_start);
-        text_view_term_start_error = findViewById(R.id.text_view_term_start_error);
-        edit_text_term_end = findViewById(R.id.edit_text_term_end);
-        text_view_term_end_error = findViewById(R.id.text_view_term_end_error);
-        edit_text_term_notes = findViewById(R.id.edit_text_term_notes);
+        edit_text_term_name = findViewById(R.id.termNameEditText);
+        text_view_term_name_error = findViewById(R.id.termNameErrorTextView);
+        edit_text_term_start = findViewById(R.id.termStartEditText);
+        text_view_term_start_error = findViewById(R.id.termStartErrorTextView);
+        edit_text_term_end = findViewById(R.id.termEndEditText);
+        text_view_term_end_error = findViewById(R.id.termEndErrorTextView);
+        edit_text_term_notes = findViewById(R.id.termNotesEditText);
 
         itemViewModel = MainActivity.getViewModelFactory(getApplication()).create(EditTermViewModel.class);
         itemViewModel.getLiveData().observe(this, this::onTermEntityChanged);
@@ -118,7 +115,8 @@ public class EditTermActivity extends AppCompatActivity {
             menuItem.setVisible(false);
         }
         validateFields(edit_text_term_name.getText().toString(), startDate, endDate);
-        return super.onCreateOptionsMenu(menu);
+        boolean result = super.onCreateOptionsMenu(menu);
+        return result;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -135,7 +133,6 @@ public class EditTermActivity extends AppCompatActivity {
                         new AlertDialog.Builder(this).setTitle(R.string.delete_error_title)
                                 .setMessage(getString(R.string.delete_error_message, throwable.getMessage())).setCancelable(false).show()
                 );
-                finish();
             }).setNegativeButton(R.string.no, null).show();
         } else if (itemId == R.id.action_term_cancel) {
             finish();

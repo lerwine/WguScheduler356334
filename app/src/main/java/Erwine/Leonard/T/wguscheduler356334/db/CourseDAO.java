@@ -27,6 +27,9 @@ public interface CourseDAO {
     @Insert
     Completable insertAll(List<CourseEntity> list);
 
+    @Insert
+    void insertAllItems(CourseEntity... items);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<CourseEntity> list);
 
@@ -45,6 +48,9 @@ public interface CourseDAO {
     @Query("SELECT * FROM courses WHERE termId = :termId ORDER BY [expectedStart], [actualStart]")
     LiveData<List<CourseEntity>> getByTermId(int termId);
 
+    @Query("SELECT * FROM courses WHERE termId = :termId")
+    List<CourseEntity> getItemsByTermId(int termId);
+
     @Query("SELECT * FROM courses WHERE mentorId = :mentorId ORDER BY [expectedStart], [actualStart]")
     LiveData<List<CourseEntity>> getByMentorId(int mentorId);
 
@@ -53,5 +59,8 @@ public interface CourseDAO {
 
     @Query("SELECT COUNT(*) FROM courses")
     Single<Integer> getCount();
+
+    @Query("DELETE FROM courses")
+    Single<Integer> deleteAll();
 
 }

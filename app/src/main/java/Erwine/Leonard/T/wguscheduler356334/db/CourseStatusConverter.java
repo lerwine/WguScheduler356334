@@ -5,13 +5,13 @@ import androidx.room.TypeConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
 
 public class CourseStatusConverter {
+    private static final CourseStatus[] VALUES = CourseStatus.values();
 
     @TypeConverter
     public static CourseStatus toCourseStatus(Integer value) {
         if (null != value && value >= 0) {
-            CourseStatus[] values = CourseStatus.values();
-            if (value < values.length) {
-                return values[value];
+            if (value < VALUES.length) {
+                return VALUES[value];
             }
         }
         return CourseStatus.UNPLANNED;
