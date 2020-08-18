@@ -94,28 +94,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editMentorTabLayout">
-
-        <fragment
-            android:id="@+id/emailAddressesPagerItemFragment"
-            android:name="Erwine.Leonard.T.wguscheduler356334.ui.mentor.EmailAddressessFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/email_addresses_fragment" />
-
-        <fragment
-            android:id="@+id/phoneNumbersPagerItemFragment"
-            android:name="Erwine.Leonard.T.wguscheduler356334.ui.mentor.PhoneNumbersFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/phone_numbers_fragment" />
-
-        <fragment
-            android:id="@+id/notesFragment"
-            android:name="Erwine.Leonard.T.wguscheduler356334.ui.mentor.NotesFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout="@layout/notes_fragment" />
-
-    </androidx.viewpager.widget.ViewPager>
+        app:layout_constraintTop_toBottomOf="@+id/editMentorTabLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

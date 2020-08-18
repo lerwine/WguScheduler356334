@@ -12,52 +12,81 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 /**
  * A fragment representing a list of Items.
  */
 public class PhoneNumbersFragment extends Fragment {
 
-    private IndexedStringList phoneNumbersList;
+    public static final String ARGS_KEY = "phone-numbers";
+
+    private final LiveBoolean anyElementNonEmpty;
     private PhoneNumbersAdapter listAdapter;
     private RecyclerView phoneNumbersRecyclerView;
     private FloatingActionButton addPhoneNumberButton;
 
     public PhoneNumbersFragment() {
-        phoneNumbersList = new IndexedStringList();
+        anyElementNonEmpty = new LiveBoolean();
+    }
+
+    public synchronized String getText() {
+        PhoneNumbersAdapter adapter = listAdapter;
+        if (null != adapter) {
+            return adapter.getText();
+        }
+        Bundle args = getArguments();
+        return (null == args) ? "" : args.getString(ARGS_KEY, "");
+    }
+
+    public synchronized void setText(String text) {
+        PhoneNumbersAdapter adapter = listAdapter;
+        if (null != adapter) {
+            adapter.setText(text);
+        } else {
+            Bundle args = getArguments();
+            if (null == args) {
+                args = new Bundle();
+                args.putString(ARGS_KEY, text);
+                setArguments(args);
+            } else {
+                args.putString(ARGS_KEY, text);
+            }
+        }
     }
 
     public LiveData<Boolean> isAnyElementNonEmpty() {
-        return phoneNumbersList.isAnyElementNonEmpty();
+        return anyElementNonEmpty;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.phone_numbers_fragment, container, false);
         phoneNumbersRecyclerView = view.findViewById(R.id.phoneNumbersRecyclerView);
+        Bundle args = getArguments();
+        listAdapter = new PhoneNumbersAdapter((null == args) ? "" : args.getString(ARGS_KEY, ""));
+        phoneNumbersRecyclerView.setAdapter(listAdapter);
         addPhoneNumberButton = view.findViewById(R.id.addPhoneNumberButton);
         addPhoneNumberButton.setOnClickListener(this::onNewPhoneNumberClick);
         return view;
     }
 
-    public void setPhoneNumbers(String phoneNumbers) {
-        String[] lines = (null == phoneNumbers || phoneNumbers.isEmpty()) ? new String[0] : Values.REGEX_LINEBREAKN.split(phoneNumbers);
-        this.phoneNumbersList.clear();
-        this.phoneNumbersList.addValue(lines);
-        if (null == listAdapter) {
-            listAdapter = new PhoneNumbersAdapter(this.phoneNumbersList);
-            phoneNumbersRecyclerView.setAdapter(listAdapter);
-        } else {
-            listAdapter.notifyDataSetChanged();
-        }
+    private void onNewPhoneNumberClick(View view) {
+        this.listAdapter.addBlank();
     }
 
-    private void onNewPhoneNumberClick(View view) {
-        this.phoneNumbersList.addValue("");
-        listAdapter.notifyDataSetChanged();
+    private static class LiveBoolean extends LiveData<Boolean> {
+        private boolean currentValue = false;
+
+        private LiveBoolean() {
+            super(false);
+        }
+
+        private synchronized void updateValue(boolean value) {
+            if (value != currentValue) {
+                currentValue = value;
+                postValue(value);
+            }
+        }
     }
 
 }

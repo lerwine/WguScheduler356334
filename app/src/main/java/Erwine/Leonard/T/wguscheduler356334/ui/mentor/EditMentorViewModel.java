@@ -10,6 +10,7 @@ import androidx.room.Entity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -29,7 +30,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         return liveData;
     }
 
-    public Completable save(String name, String emailAddresses, String phoneNumbers, String notes) {
+    public Completable save(String name, IndexedStringList emailAddresses, IndexedStringList phoneNumbers, String notes) {
         MentorEntity entity = liveData.getValue();
         if (null == entity) {
             entity = new MentorEntity(name, notes, emailAddresses, phoneNumbers);

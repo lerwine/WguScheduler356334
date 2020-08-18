@@ -3,16 +3,26 @@ package Erwine.Leonard.T.wguscheduler356334.util;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
+import java.lang.ref.WeakReference;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class IndexedStringList extends AbstractList<IndexedStringList.Item> {
+import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveIntegerData;
+import Erwine.Leonard.T.wguscheduler356334.util.live.PostTrackingLiveData;
+
+public final class IndexedStringList extends AbstractList<IndexedStringList.Item> {
+
+    private final Observer<Item> contentChangeObserver;
 
     private final ArrayList<Item> backingList;
+    private final Observer<Item> emptytStateChangeObserver;
     private final LiveBoolean anyElementNonEmpty;
+    private ArrayList<WeakReference<Observer<IndexedStringList>>> changeObservers = new ArrayList<>();
 
     public IndexedStringList(Collection<String> content) {
         this();
@@ -23,36 +33,213 @@ public class IndexedStringList extends AbstractList<IndexedStringList.Item> {
             while (iterator.hasNext()) {
                 Item item = new Item(iterator.next());
                 if (backingList.add(item)) {
-                    item.number.updateValue(index);
-                    if (item.nonEmpty.currentValue) {
+                    item.observeContentChange(contentChangeObserver);
+                    item.observeEmptyChange(emptytStateChangeObserver);
+                    item.lineNumber.set(++index);
+                    if (!item.empty.currentValue) {
                         n = true;
                     }
                 }
             }
             if (n) {
-                anyElementNonEmpty.updateValue(true);
+                anyElementNonEmpty.set(true);
             }
         }
     }
 
     public IndexedStringList() {
         backingList = new ArrayList<>();
-        anyElementNonEmpty = new LiveBoolean();
+        anyElementNonEmpty = new LiveBoolean(false);
+        contentChangeObserver = item -> raiseListChanged();
+        emptytStateChangeObserver = item -> {
+            if (item.empty.currentValue) {
+                if (!backingList.stream().anyMatch(t -> !t.empty.currentValue)) {
+                    anyElementNonEmpty.set(false);
+                }
+            } else {
+                anyElementNonEmpty.set(true);
+            }
+        };
     }
 
-    public LiveData<Boolean> isAnyElementNonEmpty() {
+    public static IndexedStringList of(String lines) {
+        IndexedStringList list = new IndexedStringList();
+        list.setText(lines);
+        return list;
+    }
+
+    private static <T> void notifyAllObservers(T item, Iterator<Observer<T>> iterator) {
+        if (iterator.hasNext()) {
+            try {
+                iterator.next().onChanged(item);
+            } finally {
+                notifyAllObservers(item, iterator);
+            }
+        }
+    }
+
+    private static <T> boolean addObserver(Observer<T> observer, ArrayList<WeakReference<Observer<T>>> target) {
+        if (null == observer) {
+            return false;
+        }
+        Iterator<WeakReference<Observer<T>>> iterator = target.iterator();
+        while (iterator.hasNext()) {
+            Observer<T> o = iterator.next().get();
+            if (null == o)
+                iterator.remove();
+            else if (o == observer) {
+                return false;
+            }
+        }
+        target.add(new WeakReference<>(observer));
+        return true;
+    }
+
+    private static <T> boolean removeObserver(Observer<T> observer, ArrayList<WeakReference<Observer<T>>> target) {
+        if (null != observer) {
+
+        }
+        Iterator<WeakReference<Observer<T>>> iterator = target.iterator();
+        while (iterator.hasNext()) {
+            Observer<T> o = iterator.next().get();
+            if (null == o)
+                iterator.remove();
+            else if (o == observer) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static <T> ArrayList<Observer<T>> getObserverObjects(ArrayList<WeakReference<Observer<T>>> target) {
+        ArrayList<Observer<T>> result = new ArrayList<>();
+        Iterator<WeakReference<Observer<T>>> iterator = target.iterator();
+        while (iterator.hasNext()) {
+            Observer<T> o = iterator.next().get();
+            if (null == o) {
+                iterator.remove();
+            } else {
+                result.add(o);
+            }
+        }
+        return result;
+    }
+
+    private void raiseListChanged() {
+        if (!changeObservers.isEmpty()) {
+            ArrayList<Observer<IndexedStringList>> observers = getObserverObjects(changeObservers);
+            notifyAllObservers(this, observers.iterator());
+        }
+    }
+
+    public synchronized boolean observeListChange(Observer<IndexedStringList> observer) {
+        return addObserver(observer, changeObservers);
+    }
+
+    public synchronized boolean removeListChangeObserver(Observer<IndexedStringList> observer) {
+        return removeObserver(observer, changeObservers);
+    }
+
+    public boolean isAnyElementNonEmpty() {
+        return anyElementNonEmpty.currentValue;
+    }
+
+    public LiveData<Boolean> anyElementNonEmpty() {
         return anyElementNonEmpty;
+    }
+
+    public synchronized String getText() {
+        Iterator<String> iterator = backingList.stream().map(t -> t.normalizedValue.getPostedValue()).filter(t -> !t.isEmpty()).iterator();
+        if (iterator.hasNext()) {
+            String text = iterator.next();
+            if (iterator.hasNext()) {
+                StringBuilder sb = new StringBuilder(text);
+                do {
+                    sb.append("\n").append(iterator.next());
+                } while (iterator.hasNext());
+                return sb.toString();
+            }
+            return text;
+        }
+        return "";
+    }
+
+    public synchronized boolean setText(String text) {
+        if (null != text && !text.isEmpty()) {
+            Iterator<String> sourceIterator = Arrays.stream(Values.REGEX_LINEBREAKN.split(text)).map(Values::asNonNullAndWsNormalized).filter(t -> !t.isEmpty()).iterator();
+            int index = 0;
+            if (sourceIterator.hasNext()) {
+                if (backingList.isEmpty()) {
+                    do {
+                        Item item = new Item(sourceIterator.next());
+                        item.observeContentChange(contentChangeObserver);
+                        item.observeEmptyChange(emptytStateChangeObserver);
+                        item.lineNumber.set(++index);
+                        backingList.add(item);
+                    } while (sourceIterator.hasNext());
+                    raiseListChanged();
+                    return true;
+                }
+                Iterator<String> targetIterator = backingList.stream().map(t -> t.normalizedValue.getPostedValue()).iterator();
+                ArrayList<Item> list = new ArrayList<>();
+                do {
+                    String s = sourceIterator.next();
+                    Item item = new Item(s);
+                    item.lineNumber.set(++index);
+                    list.add(item);
+                    if (!targetIterator.hasNext() || !targetIterator.next().equals(s)) {
+                        clearImpl();
+                        list.forEach(t -> {
+                            t.observeContentChange(contentChangeObserver);
+                            t.observeEmptyChange(emptytStateChangeObserver);
+                        });
+                        backingList.addAll(list);
+                        while (sourceIterator.hasNext()) {
+                            item = new Item(sourceIterator.next());
+                            item.observeContentChange(contentChangeObserver);
+                            item.observeEmptyChange(emptytStateChangeObserver);
+                            item.lineNumber.set(++index);
+                            backingList.add(item);
+                            return true;
+                        }
+                    }
+                } while (sourceIterator.hasNext());
+                if (targetIterator.hasNext()) {
+                    clearImpl();
+                    list.forEach(t -> {
+                        t.observeContentChange(contentChangeObserver);
+                        t.observeEmptyChange(emptytStateChangeObserver);
+                    });
+                    backingList.addAll(list);
+                    raiseListChanged();
+                    return true;
+                }
+                return false;
+            }
+        }
+        if (!backingList.isEmpty()) {
+            if (backingList.size() == 1 && backingList.get(0).normalizedValue.getPostedValue().isEmpty()) {
+                return false;
+            }
+            clearImpl();
+        }
+        backingList.add(new Item(""));
+        raiseListChanged();
+        return true;
     }
 
     @Override
     public synchronized boolean add(Item item) {
-        if (null != item.number.getValue()) {
+        if (null != item.lineNumber.getValue()) {
             throw new IllegalStateException();
         }
         if (backingList.add(item)) {
-            item.number.updateValue(backingList.size());
-            if (item.nonEmpty.currentValue) {
-                anyElementNonEmpty.updateValue(true);
+            item.lineNumber.set(backingList.size());
+            item.observeContentChange(contentChangeObserver);
+            item.observeEmptyChange(emptytStateChangeObserver);
+            if (!item.empty.currentValue) {
+                anyElementNonEmpty.set(true);
             }
             return true;
         }
@@ -62,47 +249,36 @@ public class IndexedStringList extends AbstractList<IndexedStringList.Item> {
     public synchronized boolean addValue(String... value) {
         boolean result = false;
         boolean n = false;
+        int index = backingList.size();
         for (String v : value) {
             Item item = new Item(v);
             if (backingList.add(item)) {
-                item.number.updateValue(backingList.size());
-                item.nonEmpty.observeForever(this::onNonEmptyChanged);
-                if (item.nonEmpty.currentValue) {
+                item.lineNumber.set(++index);
+                item.observeContentChange(contentChangeObserver);
+                item.observeEmptyChange(emptytStateChangeObserver);
+                if (!item.empty.currentValue) {
                     n = true;
                 }
                 result = true;
             }
         }
         if (n) {
-            anyElementNonEmpty.updateValue(true);
+            anyElementNonEmpty.set(true);
+        }
+        if (result) {
+            raiseListChanged();
         }
         return result;
     }
 
     @Override
-    public synchronized void clear() {
-        if (backingList.isEmpty()) {
-            return;
-        }
-        backingList.forEach((t) -> {
-            t.nonEmpty.removeObserver(this::onNonEmptyChanged);
-            t.number.updateValue(null);
-        });
-        super.clear();
-        if (backingList.isEmpty()) {
-            anyElementNonEmpty.updateValue(false);
-        } else {
-            // Property will never happen, but just in case ...
-            boolean n = false;
-            for (int i = 0; i < backingList.size(); i++) {
-                Item v = backingList.get(i);
-                if (v.nonEmpty.currentValue) {
-                    n = true;
-                }
-                v.number.updateValue(i + 1);
-            }
-            anyElementNonEmpty.updateValue(n);
-        }
+    public Item set(int index, Item element) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void add(int index, Item element) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -111,69 +287,13 @@ public class IndexedStringList extends AbstractList<IndexedStringList.Item> {
     }
 
     @Override
-    public synchronized Item remove(int index) {
-        Item result = backingList.remove(index);
-        if (null != result) {
-            result.number.updateValue(null);
-            result.nonEmpty.removeObserver(this::onNonEmptyChanged);
-            if (result.nonEmpty.currentValue) {
-                boolean n = false;
-                for (int i = index; i < backingList.size(); i++) {
-                    Item v = backingList.get(i);
-                    if (v.nonEmpty.currentValue) {
-                        n = true;
-                    }
-                    v.number.updateValue(i + 1);
-                }
-                anyElementNonEmpty.updateValue(n);
-            } else {
-                for (int i = index; i < backingList.size(); i++) {
-                    backingList.get(i).number.updateValue(i + 1);
-                }
-            }
-        }
-        return result;
+    public boolean equals(@Nullable Object o) {
+        return super.equals(o);
     }
 
     @Override
-    public synchronized boolean remove(@Nullable Object o) {
-        if (o instanceof Item) {
-            Item item = (Item) o;
-            if (null != item.number.getValue()) {
-                int index = item.number.getValue() - 1;
-                if (index < backingList.size() && backingList.get(index) == item && null != (item = backingList.remove(index))) {
-                    item.number.updateValue(null);
-                    item.nonEmpty.removeObserver(this::onNonEmptyChanged);
-                    if (backingList.isEmpty()) {
-                        anyElementNonEmpty.updateValue(false);
-                    } else if (item.nonEmpty.currentValue) {
-                        boolean n = false;
-                        for (int i = index; i < backingList.size(); i++) {
-                            Item v = backingList.get(i);
-                            if (v.nonEmpty.currentValue) {
-                                n = true;
-                            }
-                            v.number.updateValue(i + 1);
-                        }
-                        anyElementNonEmpty.updateValue(n);
-                    } else {
-                        for (int i = index; i < backingList.size(); i++) {
-                            backingList.get(i).number.updateValue(i + 1);
-                        }
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void onNonEmptyChanged(Boolean value) {
-        if (value) {
-            anyElementNonEmpty.updateValue(true);
-        } else if (!backingList.stream().anyMatch((t) -> t.nonEmpty.currentValue)) {
-            anyElementNonEmpty.updateValue(false);
-        }
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override
@@ -186,79 +306,287 @@ public class IndexedStringList extends AbstractList<IndexedStringList.Item> {
         return backingList.isEmpty();
     }
 
+    private void clearImpl() {
+        backingList.forEach((t) -> {
+            t.removeContentChangeObserver(contentChangeObserver);
+            t.removeEmptyChangeObserver(emptytStateChangeObserver);
+            t.lineNumber.set(null);
+        });
+        super.clear();
+    }
+
+    @Override
+    public synchronized void clear() {
+        if (backingList.isEmpty()) {
+            return;
+        }
+        clearImpl();
+        if (backingList.isEmpty()) {
+            anyElementNonEmpty.set(false);
+        } else {
+            // Property will never happen, but just in case ...
+            boolean n = false;
+            for (int i = 0; i < backingList.size(); i++) {
+                Item v = backingList.get(i);
+                if (!v.empty.currentValue) {
+                    n = true;
+                }
+                v.observeContentChange(contentChangeObserver);
+                v.observeEmptyChange(emptytStateChangeObserver);
+                v.lineNumber.set(i + 1);
+            }
+            anyElementNonEmpty.set(n);
+        }
+        raiseListChanged();
+    }
+
+    @Override
+    public synchronized Item remove(int index) {
+        Item result = backingList.remove(index);
+        if (null != result) {
+            result.lineNumber.set(null);
+            result.removeContentChangeObserver(contentChangeObserver);
+            result.removeEmptyChangeObserver(emptytStateChangeObserver);
+            if (result.empty.currentValue) {
+                for (int i = index; i < backingList.size(); i++) {
+                    backingList.get(i).lineNumber.set(i + 1);
+                }
+            } else {
+                boolean n = false;
+                for (int i = index; i < backingList.size(); i++) {
+                    Item v = backingList.get(i);
+                    if (!v.empty.currentValue) {
+                        n = true;
+                    }
+                    v.lineNumber.set(i + 1);
+                }
+                anyElementNonEmpty.set(n);
+            }
+            raiseListChanged();
+        }
+        return result;
+    }
+
+    @Override
+    public synchronized boolean remove(@Nullable Object o) {
+        if (o instanceof Item) {
+            Item item = (Item) o;
+            if (null != item.lineNumber.getValue()) {
+                int index = item.lineNumber.getValue() - 1;
+                if (index < backingList.size() && backingList.get(index) == item && null != (item = backingList.remove(index))) {
+                    item.lineNumber.set(null);
+                    item.removeContentChangeObserver(contentChangeObserver);
+                    item.removeEmptyChangeObserver(emptytStateChangeObserver);
+                    if (backingList.isEmpty()) {
+                        anyElementNonEmpty.set(false);
+                    } else if (item.empty.currentValue) {
+                        for (int i = index; i < backingList.size(); i++) {
+                            backingList.get(i).lineNumber.set(i + 1);
+                        }
+                    } else {
+                        boolean n = false;
+                        for (int i = index; i < backingList.size(); i++) {
+                            Item v = backingList.get(i);
+                            if (!v.empty.currentValue) {
+                                n = true;
+                            }
+                            v.lineNumber.set(i + 1);
+                        }
+                        anyElementNonEmpty.set(n);
+                    }
+                    raiseListChanged();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private static class LiveBoolean extends LiveData<Boolean> {
         private boolean currentValue = false;
 
-        private LiveBoolean() {
-            super(false);
+        LiveBoolean(boolean initialValue) {
+            super(initialValue);
         }
 
-        private synchronized void updateValue(boolean value) {
+        private synchronized void set(boolean value) {
+            postValue(value);
+        }
+
+        private synchronized void setCurrentValue(boolean currentValue) {
+            this.currentValue = currentValue;
+        }
+
+        @Override
+        protected void setValue(Boolean value) {
+            setCurrentValue(value);
+            super.setValue(value);
+        }
+
+        @Override
+        protected synchronized void postValue(Boolean value) {
             if (value != currentValue) {
-                currentValue = value;
-                postValue(value);
+                this.currentValue = currentValue;
+                super.postValue(value);
             }
         }
     }
 
-    private static class NumberData extends LiveData<Integer> {
-        private NumberData() {
+    private static class NumberData extends OptionalLiveIntegerData {
+        private Integer currentValue;
+
+        NumberData() {
             super(null);
         }
 
-        private void updateValue(Integer value) {
+        private void set(Integer value) {
             postValue(value);
         }
+
     }
 
-    private static class ContentData extends MutableLiveData<String> {
-        private String currentValue;
-
-        private ContentData(String content) {
-            super(Values.asNonNullAndWsNormalized(content));
-            currentValue = getValue();
+    private static class StringData extends PostTrackingLiveData<String> {
+        StringData(String initialValue) {
+            super(Values.asNonNullAndWsNormalized(initialValue));
         }
 
-        @Override
-        public void postValue(String value) {
-            super.postValue(value);
-        }
-
-        @Override
-        public synchronized void setValue(String value) {
-            String n = Values.asNonNullAndWsNormalized(value);
-            if (!n.equals(currentValue)) {
-                currentValue = n;
-                super.setValue(n);
-            }
+        private void set(String value) {
+            postValue(Values.asNonNullAndWsNormalized(value));
         }
     }
 
     public static class Item {
-        private final NumberData number;
-        private final ContentData content;
-        private final LiveBoolean nonEmpty;
+        private final NumberData lineNumber;
+        private final MutableLiveData<String> rawValue;
+        private final StringData normalizedValue;
+        private final LiveBoolean empty;
+        private final ArrayList<WeakReference<Observer<Item>>> contentChangeObservers = new ArrayList<>();
+        private final ArrayList<WeakReference<Observer<Item>>> numberChangeObservers = new ArrayList<>();
+        private final ArrayList<WeakReference<Observer<Item>>> emptyChangeObservers = new ArrayList<>();
 
         public Item(String content) {
-            number = new NumberData();
-            this.content = new ContentData(content);
-            nonEmpty = new LiveBoolean();
-            onContentChanged(content);
-            this.content.observeForever(this::onContentChanged);
-            //noinspection ConstantConditions
-            onContentChanged(this.content.getValue());
+            lineNumber = new NumberData();
+            normalizedValue = new StringData(content);
+            empty = new LiveBoolean(normalizedValue.getPostedValue().isEmpty());
+            rawValue = new MutableLiveData<String>(content) {
+                private String postedValue;
+
+                private synchronized boolean checkSetValue(String value) {
+                    if (null == value) {
+                        if (null == postedValue) {
+                            return false;
+                        }
+                        normalizedValue.set("");
+                    } else if (null == postedValue || !postedValue.equals(value)) {
+                        normalizedValue.set(value);
+                    }
+                    return true;
+                }
+
+                @Override
+                public void setValue(String value) {
+                    if (checkSetValue(value)) {
+                        super.setValue(value);
+                    }
+                }
+
+                @Override
+                public synchronized void postValue(String value) {
+                    if (null == value) {
+                        if (null == postedValue) {
+                            return;
+                        }
+                        normalizedValue.set("");
+                    } else {
+                        if (null != postedValue && postedValue.equals(value)) {
+                            return;
+                        }
+                        normalizedValue.set(Values.asNonNullAndWsNormalized(value));
+                    }
+                    postedValue = value;
+                    super.postValue(value);
+                }
+            };
+            lineNumber.observeForever(t -> raiseLineNumberChanged());
+            normalizedValue.observeForever(t -> raiseContentChanged());
+            empty.observeForever(t -> raiseEmptyChanged());
         }
 
-        private void onContentChanged(String s) {
-            nonEmpty.updateValue(!s.isEmpty());
+        public Integer getLineNumber() {
+            return lineNumber.getValue();
         }
 
-        public LiveData<Integer> getNumber() {
-            return number;
+        public LiveData<Integer> lineNumber() {
+            return lineNumber;
         }
 
-        public MutableLiveData<String> getContent() {
-            return content;
+        public String getRawValue() {
+            return rawValue.getValue();
+        }
+
+        public MutableLiveData<String> rawValue() {
+            return rawValue;
+        }
+
+        public String getNormalizedValue() {
+            return normalizedValue.getValue();
+        }
+
+        public LiveData<String> normalizedValue() {
+            return normalizedValue;
+        }
+
+        public boolean isEmpty() {
+            return empty.getValue();
+        }
+
+        public LiveBoolean empty() {
+            return empty;
+        }
+
+        private void raiseContentChanged() {
+            if (!contentChangeObservers.isEmpty()) {
+                ArrayList<Observer<Item>> observers = getObserverObjects(contentChangeObservers);
+                notifyAllObservers(this, observers.iterator());
+            }
+        }
+
+        public synchronized boolean observeContentChange(Observer<Item> observer) {
+            return addObserver(observer, contentChangeObservers);
+        }
+
+        public synchronized boolean removeContentChangeObserver(Observer<Item> observer) {
+            return removeObserver(observer, contentChangeObservers);
+        }
+
+        private void raiseLineNumberChanged() {
+            if (!numberChangeObservers.isEmpty()) {
+                ArrayList<Observer<Item>> observers = getObserverObjects(numberChangeObservers);
+                notifyAllObservers(this, observers.iterator());
+            }
+        }
+
+        public synchronized boolean observeLineNumberChange(Observer<Item> observer) {
+            return addObserver(observer, numberChangeObservers);
+        }
+
+        public synchronized boolean removeLineNumberChangeObserver(Observer<Item> observer) {
+            return removeObserver(observer, numberChangeObservers);
+        }
+
+        private void raiseEmptyChanged() {
+            if (!emptyChangeObservers.isEmpty()) {
+                ArrayList<Observer<Item>> observers = getObserverObjects(emptyChangeObservers);
+                notifyAllObservers(this, observers.iterator());
+            }
+        }
+
+        public synchronized boolean observeEmptyChange(Observer<Item> observer) {
+            return addObserver(observer, emptyChangeObservers);
+        }
+
+        public synchronized boolean removeEmptyChangeObserver(Observer<Item> observer) {
+            return removeObserver(observer, emptyChangeObservers);
         }
 
     }

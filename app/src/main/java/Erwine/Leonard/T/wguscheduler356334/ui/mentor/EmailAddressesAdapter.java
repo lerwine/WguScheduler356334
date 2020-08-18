@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,10 +18,30 @@ import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
 import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAdapter.ViewHolder> {
+
     private final IndexedStringList mValues;
 
-    public EmailAddressesAdapter(IndexedStringList items) {
-        mValues = items;
+    public EmailAddressesAdapter(String text) {
+        mValues = new IndexedStringList();
+        if (null == text) {
+            mValues.addValue("");
+        } else {
+            mValues.addValue(Values.REGEX_LINEBREAKN.split(text));
+        }
+    }
+
+    public LiveData<Boolean> isAnyElementNonEmpty() {
+        return mValues.anyElementNonEmpty();
+    }
+
+    public String getText() {
+        return mValues.getText();
+    }
+
+    public synchronized void setText(String text) {
+        if (mValues.setText(text)) {
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -36,7 +57,7 @@ public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAd
         holder.deleteEmailButton.setOnClickListener(v -> {
             IndexedStringList.Item m = holder.item;
             if (null != m) {
-                Integer i = m.getNumber().getValue();
+                Integer i = m.getLineNumber();
                 if (null != i) {
                     mValues.remove(i);
                     notifyDataSetChanged();
@@ -48,6 +69,13 @@ public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAd
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public synchronized void addBlank() {
+        if (!mValues.isEmpty() && !mValues.get(mValues.size()).getNormalizedValue().isEmpty()) {
+            mValues.addValue("");
+            notifyDataSetChanged();
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -74,7 +102,7 @@ public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAd
         private void onContentChanged(String s) {
             IndexedStringList.Item i = item;
             if (null != i) {
-                i.getContent().postValue(s);
+                i.rawValue().postValue(s);
             }
         }
 
@@ -88,21 +116,21 @@ public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAd
                 if (this.item == item) {
                     return;
                 }
-                this.item.getNumber().removeObserver(numberChangedObserver);
+                this.item.lineNumber().removeObserver(numberChangedObserver);
                 this.item = item;
                 if (null == item) {
                     contentEditText.removeTextChangedListener(textChangedListener);
                     itemNumberTextView.setText("");
                 } else {
                     onContentChanged(contentEditText.getText().toString());
-                    item.getNumber().observeForever(numberChangedObserver);
-                    numberChangedObserver.onChanged(item.getNumber().getValue());
+                    item.lineNumber().observeForever(numberChangedObserver);
+                    numberChangedObserver.onChanged(item.getLineNumber());
                 }
             } else if (null != item) {
                 this.item = item;
-                item.getNumber().observeForever(numberChangedObserver);
-                numberChangedObserver.onChanged(item.getNumber().getValue());
-                String c = item.getContent().getValue();
+                item.lineNumber().observeForever(numberChangedObserver);
+                numberChangedObserver.onChanged(item.getLineNumber());
+                String c = item.getRawValue();
                 contentEditText.setText(c);
                 contentEditText.addTextChangedListener(textChangedListener);
             }
