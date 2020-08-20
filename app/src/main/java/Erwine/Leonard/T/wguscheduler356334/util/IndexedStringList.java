@@ -8,14 +8,16 @@ import androidx.lifecycle.Observer;
 import java.lang.ref.WeakReference;
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveIntegerData;
 import Erwine.Leonard.T.wguscheduler356334.util.live.PostTrackingLiveData;
 
 public final class IndexedStringList extends AbstractList<IndexedStringList.Item> {
+
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
 
     private final Observer<Item> contentChangeObserver;
 
@@ -167,55 +169,27 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
 
     public synchronized boolean setText(String text) {
         if (null != text && !text.isEmpty()) {
-            Iterator<String> sourceIterator = Arrays.stream(Values.REGEX_LINEBREAKN.split(text)).map(Values::asNonNullAndWsNormalized).filter(t -> !t.isEmpty()).iterator();
-            int index = 0;
-            if (sourceIterator.hasNext()) {
-                if (backingList.isEmpty()) {
-                    do {
-                        Item item = new Item(sourceIterator.next());
-                        item.observeContentChange(contentChangeObserver);
-                        item.observeEmptyChange(emptytStateChangeObserver);
-                        item.lineNumber.set(++index);
-                        backingList.add(item);
-                    } while (sourceIterator.hasNext());
-                    raiseListChanged();
-                    return true;
-                }
-                Iterator<String> targetIterator = backingList.stream().map(t -> t.normalizedValue.getPostedValue()).iterator();
-                ArrayList<Item> list = new ArrayList<>();
+            Iterator<String> sourceIterator = StringLineIterator.create(text, true, true);
+            String line = sourceIterator.next();
+            while (line.isEmpty() && sourceIterator.hasNext()) {
+                line = sourceIterator.next();
+            }
+            if (!line.isEmpty()) {
+                backingList.clear();
+                int index = 0;
                 do {
-                    String s = sourceIterator.next();
-                    Item item = new Item(s);
+                    Item item = new Item(line);
+                    item.observeContentChange(contentChangeObserver);
+                    item.observeEmptyChange(emptytStateChangeObserver);
                     item.lineNumber.set(++index);
-                    list.add(item);
-                    if (!targetIterator.hasNext() || !targetIterator.next().equals(s)) {
-                        clearImpl();
-                        list.forEach(t -> {
-                            t.observeContentChange(contentChangeObserver);
-                            t.observeEmptyChange(emptytStateChangeObserver);
-                        });
-                        backingList.addAll(list);
-                        while (sourceIterator.hasNext()) {
-                            item = new Item(sourceIterator.next());
-                            item.observeContentChange(contentChangeObserver);
-                            item.observeEmptyChange(emptytStateChangeObserver);
-                            item.lineNumber.set(++index);
-                            backingList.add(item);
-                            return true;
-                        }
+                    backingList.add(item);
+                    line = sourceIterator.next();
+                    while (line.isEmpty() && sourceIterator.hasNext()) {
+                        line = sourceIterator.next();
                     }
-                } while (sourceIterator.hasNext());
-                if (targetIterator.hasNext()) {
-                    clearImpl();
-                    list.forEach(t -> {
-                        t.observeContentChange(contentChangeObserver);
-                        t.observeEmptyChange(emptytStateChangeObserver);
-                    });
-                    backingList.addAll(list);
-                    raiseListChanged();
-                    return true;
-                }
-                return false;
+                } while (!line.isEmpty());
+                raiseListChanged();
+                return true;
             }
         }
         if (!backingList.isEmpty()) {
@@ -447,11 +421,11 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
 
     private static class StringData extends PostTrackingLiveData<String> {
         StringData(String initialValue) {
-            super(Values.asNonNullAndWsNormalized(initialValue));
+            super(SINGLE_LINE_NORMALIZER.apply(initialValue));
         }
 
         private void set(String value) {
-            postValue(Values.asNonNullAndWsNormalized(value));
+            postValue(SINGLE_LINE_NORMALIZER.apply(value));
         }
     }
 
@@ -501,7 +475,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                         if (null != postedValue && postedValue.equals(value)) {
                             return;
                         }
-                        normalizedValue.set(Values.asNonNullAndWsNormalized(value));
+                        normalizedValue.set(SINGLE_LINE_NORMALIZER.apply(value));
                     }
                     postedValue = value;
                     super.postValue(value);

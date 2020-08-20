@@ -9,9 +9,11 @@ import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer;
 
 @Entity(tableName = AppDb.TABLE_NAME_ASSESSMENTS, indices = {
         @Index(value = AssessmentEntity.COLNAME_COURSE_ID, name = AssessmentEntity.INDEX_COURSE),
@@ -23,6 +25,8 @@ public class AssessmentEntity {
     public static final String INDEX_CODE = "IDX_ASSESSMENT_CODE";
     public static final String COLNAME_COURSE_ID = "courseId";
     public static final String COLNAME_CODE = "code";
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
     @PrimaryKey(autoGenerate = true)
     private Integer id;
     @ForeignKey(entity = CourseEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
@@ -56,11 +60,11 @@ public class AssessmentEntity {
 
     @Ignore
     public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes) {
-        this.code = Values.asNonNullAndWsNormalized(code);
+        this.code = SINGLE_LINE_NORMALIZER.apply(code);
         this.status = (null == status) ? AssessmentStatus.NOT_STARTED : status;
         this.goalDate = goalDate;
         this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     @Ignore
@@ -85,7 +89,7 @@ public class AssessmentEntity {
     }
 
     public void setCode(String code) {
-        this.code = Values.asNonNullAndWsNormalized(code);
+        this.code = SINGLE_LINE_NORMALIZER.apply(code);
     }
 
     public AssessmentStatus getStatus() {
@@ -117,7 +121,7 @@ public class AssessmentEntity {
     }
 
     public void setNotes(String notes) {
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     public LocalDate getEvaluationDate() {

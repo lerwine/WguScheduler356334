@@ -13,11 +13,13 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.TermDAO;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer;
 
 @Entity(tableName = AppDb.TABLE_NAME_TERMS, indices = {
         @Index(value = TermEntity.COLNAME_NAME, name = TermEntity.INDEX_NAME, unique = true)
@@ -37,6 +39,8 @@ public class TermEntity {
     public static final String SAMPLE_TERM_8 = "Term 8";
     public static final String SAMPLE_TERM_9 = "Term 9";
     public static final String SAMPLE_TERM_10 = "Term 10";
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
@@ -56,10 +60,10 @@ public class TermEntity {
 
     @Ignore
     public TermEntity(String name, LocalDate start, LocalDate end, String notes) {
-        this.name = Values.asNonNullAndWsNormalized(name);
+        this.name = SINGLE_LINE_NORMALIZER.apply(name);
         this.start = start;
         this.end = end;
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     @Ignore
@@ -76,7 +80,7 @@ public class TermEntity {
     }
 
     public void setName(String name) {
-        this.name = Values.asNonNullAndWsNormalized(name);
+        this.name = SINGLE_LINE_NORMALIZER.apply(name);
     }
 
     public LocalDate getStart() {
@@ -100,7 +104,7 @@ public class TermEntity {
     }
 
     public void setNotes(String notes) {
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     @Ignore

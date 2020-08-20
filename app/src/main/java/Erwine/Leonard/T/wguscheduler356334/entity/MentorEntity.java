@@ -12,17 +12,21 @@ import androidx.room.PrimaryKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.MentorDAO;
 import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer;
 
 @Entity(tableName = AppDb.TABLE_NAME_MENTORS, indices = {
         @Index(value = MentorEntity.COLNAME_NAME, name = MentorEntity.INDEX_NAME, unique = true)
 })
 public class MentorEntity {
+
+    //<editor-fold defaultstate="collapsed" desc="Static Members" >
 
     public static final String INDEX_NAME = "IDX_MENTOR_NAME";
     public static final String COLNAME_ID = "id";
@@ -50,60 +54,8 @@ public class MentorEntity {
     public static final String SAMPLE_MENTOR_MALCOLM_WABARA = "Malcolm Wabara";
     public static final String SAMPLE_MENTOR_MARK_KINKEAD = "Mark Kinkead";
     public static final String SAMPLE_MENTOR_ALVARO_ESCOBAR = "Alvaro Escobar";
-
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COLNAME_ID)
-    private Integer id;
-    @ColumnInfo(name = COLNAME_NAME)
-    private String name;
-    private IndexedStringList phoneNumbers;
-    private IndexedStringList emailAddresses;
-    private String notes;
-    @Ignore
-    private LiveData<List<CourseEntity>> courses;
-
-    public MentorEntity(String name, String notes, IndexedStringList phoneNumbers, IndexedStringList emailAddresses, int id) {
-        this(name, notes, phoneNumbers, emailAddresses);
-        this.id = id;
-    }
-
-    @Ignore
-    public MentorEntity(String name, String notes, IndexedStringList phoneNumbers, IndexedStringList emailAddresses) {
-        this.name = Values.asNonNullAndWsNormalized(name);
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
-        this.phoneNumbers = phoneNumbers;
-        this.emailAddresses = emailAddresses;
-    }
-
-    @Ignore
-    public MentorEntity(String name, String notes) {
-        this(name, notes, null, null);
-    }
-
-    @Ignore
-    public MentorEntity() {
-        this(null, null, null, null);
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
-    }
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
 
     static HashMap<String, MentorEntity> populateSampleData(AppDb appDb) {
         MentorDAO dao = appDb.mentorDAO();
@@ -138,17 +90,127 @@ public class MentorEntity {
         return allMentors;
     }
 
-    public synchronized IndexedStringList getPhoneNumbers() {
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Fields">
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = COLNAME_ID)
+    private Integer id;
+    @ColumnInfo(name = COLNAME_NAME)
+    private String name;
+    private IndexedStringList phoneNumbers_obsolete;
+    @Ignore
+    private String primaryPhone;
+    private String phoneNumbers;
+    private IndexedStringList emailAddresses_obsolete;
+    @Ignore
+    private String primaryEmail;
+    private String emailAddresses;
+    private String notes;
+    @Ignore
+    private LiveData<List<CourseEntity>> courses;
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Constructors">
+
+    public MentorEntity(String name, String notes, IndexedStringList phoneNumbers_obsolete, IndexedStringList emailAddresses_obsolete, int id) {
+        this(name, notes, phoneNumbers_obsolete, emailAddresses_obsolete);
+        this.id = id;
+    }
+
+    @Ignore
+    public MentorEntity(String name, String notes, IndexedStringList phoneNumbers_obsolete, IndexedStringList emailAddresses_obsolete) {
+        this.name = SINGLE_LINE_NORMALIZER.apply(name);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
+        this.phoneNumbers_obsolete = phoneNumbers_obsolete;
+        this.emailAddresses_obsolete = emailAddresses_obsolete;
+    }
+
+    @Ignore
+    public MentorEntity(String name, String notes) {
+        this(name, notes, null, null);
+    }
+
+    @Ignore
+    public MentorEntity() {
+        this(null, null, null, null);
+    }
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Properties">
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
+    }
+
+    public String getPrimaryPhone() {
+        return primaryPhone;
+    }
+
+    public void setPrimaryPhone(String primaryPhone) {
+        this.primaryPhone = primaryPhone;
+    }
+
+    public String getPhoneNumbers() {
         return phoneNumbers;
     }
 
-    public synchronized void setPhoneNumbers(IndexedStringList phoneNumbers) {
+    public void setPhoneNumbers(String phoneNumbers) {
         this.phoneNumbers = phoneNumbers;
     }
 
-    public synchronized IndexedStringList getEmailAddresses() {
+    public synchronized IndexedStringList getPhoneNumbers_obsolete() {
+        return phoneNumbers_obsolete;
+    }
+
+    public synchronized void setPhoneNumbers_obsolete(IndexedStringList phoneNumbers_obsolete) {
+        this.phoneNumbers_obsolete = phoneNumbers_obsolete;
+    }
+
+    public String getPrimaryEmail() {
+        return primaryEmail;
+    }
+
+    public void setPrimaryEmail(String primaryEmail) {
+        this.primaryEmail = primaryEmail;
+    }
+
+    public String getEmailAddresses() {
         return emailAddresses;
     }
+
+    public void setEmailAddresses(String emailAddresses) {
+        this.emailAddresses = emailAddresses;
+    }
+
+    public synchronized IndexedStringList getEmailAddresses_obsolete() {
+        return emailAddresses_obsolete;
+    }
+
+    public synchronized void setEmailAddresses_obsolete(IndexedStringList emailAddresses_obsolete) {
+        this.emailAddresses_obsolete = emailAddresses_obsolete;
+    }
+
+    //</editor-fold>
 
     @Ignore
     public LiveData<List<CourseEntity>> getCourses(Context context) {
@@ -161,6 +223,8 @@ public class MentorEntity {
         return courses;
     }
 
+    //<editor-fold desc="Overrides">
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -171,8 +235,8 @@ public class MentorEntity {
         }
         return null == that.id &&
                 name.equals(that.name) &&
-                phoneNumbers.equals(that.phoneNumbers) &&
-                emailAddresses.equals(that.emailAddresses) &&
+                phoneNumbers_obsolete.equals(that.phoneNumbers_obsolete) &&
+                emailAddresses_obsolete.equals(that.emailAddresses_obsolete) &&
                 notes.equals(that.notes);
     }
 
@@ -181,7 +245,7 @@ public class MentorEntity {
         if (id > 0) {
             return id;
         }
-        return Objects.hash(id, name, notes, phoneNumbers, emailAddresses);
+        return Objects.hash(id, name, notes, phoneNumbers_obsolete, emailAddresses_obsolete);
     }
 
     @SuppressWarnings("NullableProblems")
@@ -190,14 +254,12 @@ public class MentorEntity {
         return "MentorEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", phoneNumbers=" + phoneNumbers +
-                ", emailAddresses=" + emailAddresses +
+                ", phoneNumbers=" + phoneNumbers_obsolete +
+                ", emailAddresses=" + emailAddresses_obsolete +
                 ", notes='" + notes + '\'' +
                 '}';
     }
 
-    public synchronized void setEmailAddresses(IndexedStringList emailAddresses) {
-        this.emailAddresses = emailAddresses;
-    }
+    //</editor-fold>
 
 }

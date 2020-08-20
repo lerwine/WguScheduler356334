@@ -75,12 +75,11 @@ public class EditMentorActivity extends AppCompatActivity {
             saveAndReturn();
             return true;
         } else if (itemId == R.id.action_mentor_delete) {
-            new AlertDialog.Builder(this).setTitle(R.string.delete_mentor_title).setMessage(R.string.delete_mentor_confirm).setPositiveButton(R.string.yes, (dialogInterface, i1) -> {
-                itemViewModel.delete().subscribe(this::finish, (throwable) ->
-                        new AlertDialog.Builder(this).setTitle(R.string.delete_error_title)
-                                .setMessage(getString(R.string.delete_error_message, throwable.getMessage())).setCancelable(false).show()
-                );
-            }).setNegativeButton(R.string.no, null).show();
+            new AlertDialog.Builder(this).setTitle(R.string.delete_mentor_title).setMessage(R.string.delete_mentor_confirm).setPositiveButton(R.string.yes,
+                    (dialogInterface, i1) -> itemViewModel.delete().subscribe(this::finish, (throwable) ->
+                            new AlertDialog.Builder(this).setTitle(R.string.delete_error_title)
+                                    .setMessage(getString(R.string.delete_error_message, throwable.getMessage())).setCancelable(false).show()
+                    )).setNegativeButton(R.string.no, null).show();
         } else if (itemId == R.id.action_mentor_cancel) {
             finish();
         }
@@ -156,8 +155,8 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onMentorEntityChanged(MentorEntity mentorEntity) {
         mentorNameEditText.setText(mentorEntity.getName());
-        emailAddresses = mentorEntity.getEmailAddresses();
-        phoneNumbers = mentorEntity.getPhoneNumbers();
+        emailAddresses = mentorEntity.getEmailAddresses_obsolete();
+        phoneNumbers = mentorEntity.getPhoneNumbers_obsolete();
         notes = mentorEntity.getNotes();
         View view = editMentorViewPager.getChildAt(editMentorViewPager.getCurrentItem());
         if (currentTabFragment instanceof EmailAddressessFragment) {
@@ -176,6 +175,7 @@ public class EditMentorActivity extends AppCompatActivity {
         }
 
         @Override
+        @NonNull
         public Fragment getItem(int position) throws IllegalArgumentException {
             Bundle args = new Bundle();
             switch (position) {

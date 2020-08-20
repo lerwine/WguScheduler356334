@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
+import Erwine.Leonard.T.wguscheduler356334.util.StringLineIterator;
 import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAdapter.ViewHolder> {
@@ -26,7 +28,16 @@ public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAd
         if (null == text) {
             mValues.addValue("");
         } else {
-            mValues.addValue(Values.REGEX_LINEBREAKN.split(text));
+            StringLineIterator iterator = StringLineIterator.create(text, true, true);
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+                if (!line.isEmpty()) {
+                    mValues.addValue(line);
+                }
+            }
+            if (mValues.isEmpty()) {
+                mValues.addValue("");
+            }
         }
     }
 
@@ -45,6 +56,7 @@ public class EmailAddressesAdapter extends RecyclerView.Adapter<EmailAddressesAd
     }
 
     @Override
+    @NonNull
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         LinearLayout view = (LinearLayout) inflater.inflate(R.layout.email_address_list_item, parent, false);

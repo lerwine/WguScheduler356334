@@ -14,12 +14,14 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentDAO;
 import Erwine.Leonard.T.wguscheduler356334.db.CourseDAO;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer;
 
 @Entity(tableName = AppDb.TABLE_NAME_COURSES, indices = {
         @Index(value = CourseEntity.COLNAME_TERM_ID, name = CourseEntity.INDEX_TERM),
@@ -35,6 +37,8 @@ public class CourseEntity {
     public static final String COLNAME_TERM_ID = "termId";
     public static final String COLNAME_MENTOR_ID = "mentorId";
     public static final String COLNAME_NUMBER = "number";
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
@@ -75,15 +79,15 @@ public class CourseEntity {
     @Ignore
     public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
                         LocalDate expectedEnd, LocalDate actualEnd, Integer competencyUnits, String notes) {
-        this.number = Values.asNonNullAndWsNormalized(number);
-        this.title = Values.asNonNullAndWsNormalized(title);
+        this.number = SINGLE_LINE_NORMALIZER.apply(number);
+        this.title = SINGLE_LINE_NORMALIZER.apply(title);
         this.status = (null == status) ? CourseStatus.UNPLANNED : status;
         this.expectedStart = expectedStart;
         this.actualStart = actualStart;
         this.expectedEnd = expectedEnd;
         this.actualEnd = actualEnd;
         this.competencyUnits = (null == competencyUnits) ? 0 : competencyUnits;
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     @Ignore
@@ -463,7 +467,7 @@ public class CourseEntity {
     }
 
     public void setNumber(String number) {
-        this.number = Values.asNonNullAndWsNormalized(title);
+        this.number = SINGLE_LINE_NORMALIZER.apply(title);
     }
 
     public String getTitle() {
@@ -471,7 +475,7 @@ public class CourseEntity {
     }
 
     public void setTitle(String title) {
-        this.title = Values.asNonNullAndWsNormalized(title);
+        this.title = SINGLE_LINE_NORMALIZER.apply(title);
     }
 
     public CourseStatus getStatus() {
@@ -527,7 +531,7 @@ public class CourseEntity {
     }
 
     public void setNotes(String notes) {
-        this.notes = Values.asNonNullAndWsNormalizedMultiLine(notes);
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     @Ignore

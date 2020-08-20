@@ -36,8 +36,8 @@ public class EditMentorViewModel extends AndroidViewModel {
             entity = new MentorEntity(name, notes, emailAddresses, phoneNumbers);
         } else {
             entity.setName(name);
-            entity.setEmailAddresses(emailAddresses);
-            entity.setPhoneNumbers(phoneNumbers);
+            entity.setEmailAddresses_obsolete(emailAddresses);
+            entity.setPhoneNumbers_obsolete(phoneNumbers);
             entity.setNotes(notes);
         }
         Completable result = dbLoader.saveMentor(entity);

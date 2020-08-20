@@ -1,6 +1,10 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
+import java.util.function.Function;
+
 public class NormalizedCharSequence implements java.io.Serializable, Comparable<String>, CharSequence {
+
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
 
     private final String normalizedValue;
 
@@ -23,7 +27,7 @@ public class NormalizedCharSequence implements java.io.Serializable, Comparable<
             };
         }
         String o = (source instanceof String) ? (String) source : source.toString();
-        String n = Values.asNonNullAndWsNormalized(o);
+        String n = SINGLE_LINE_NORMALIZER.apply(o);
         if (o.equals(n)) {
             return new NormalizedCharSequence(n);
         }
