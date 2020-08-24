@@ -111,22 +111,37 @@ public class StringLineIterator implements Iterator<String> {
         return nextIndex > -1;
     }
 
+    private boolean isLineSeparator(char c) {
+        switch (c) {
+            case '\r':
+            case '\n':
+                return true;
+            default:
+                int type = Character.getType(c);
+                return type == Character.LINE_SEPARATOR || type == Character.PARAGRAPH_SEPARATOR;
+        }
+    }
+
     @Override
     public final synchronized String next() {
         if (nextIndex < 0) {
             throw new NoSuchElementException();
         }
         startIndex = endIndex = nextIndex;
-        char c = source.charAt(endIndex);
-        while (Character.getType(c) != Character.LINE_SEPARATOR) {
-            if (++endIndex == source.length()) {
-                nextIndex = -1;
-                break;
-            }
-            c = source.charAt(endIndex);
-        }
-        if (nextIndex > -1 && (++nextIndex == source.length() || (c == '\r' && source.charAt(nextIndex) == '\n' && ++nextIndex == source.length()))) {
+        if (startIndex == source.length()) {
             nextIndex = -1;
+        } else {
+            char c = source.charAt(endIndex);
+            while (!isLineSeparator(c)) {
+                if (++endIndex == source.length()) {
+                    nextIndex = -1;
+                    break;
+                }
+                c = source.charAt(endIndex);
+            }
+            if (nextIndex > -1 && (nextIndex = endIndex + 1) < source.length() && c == '\r' && source.charAt(nextIndex) == '\n') {
+                nextIndex++;
+            }
         }
         return getResult();
     }

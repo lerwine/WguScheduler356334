@@ -80,7 +80,7 @@ public final class StringNormalizer {
         if (Character.isWhitespace(value.codePointAt(i))) {
             while (--i > -1) {
                 if (!Character.isWhitespace(value.codePointAt(i))) {
-                    return value.substring(0, i);
+                    return value.substring(0, i + 1);
                 }
             }
             return "";
