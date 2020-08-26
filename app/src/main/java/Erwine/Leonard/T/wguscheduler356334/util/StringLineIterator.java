@@ -31,16 +31,13 @@ public class StringLineIterator implements Iterator<String> {
                                 return "";
                             }
                         }
-                        int i = endIndex - 1;
-                        if (Character.isWhitespace(source.charAt(i))) {
-                            do {
-                                i--;
-                                if (i == startIndex) {
-                                    return "";
-                                }
-                            } while (Character.isWhitespace(source.charAt(i)));
-                            endIndex = i + 1;
+                        int i = i = endIndex;
+                        while (Character.isWhitespace(source.charAt(--i))) {
+                            if (i == startIndex) {
+                                return "";
+                            }
                         }
+                        endIndex = i + 1;
                         return (endIndex == source.length()) ? ((startIndex > 0) ? source.substring(startIndex) : source) : source.substring(startIndex, endIndex);
                     }
                 };
@@ -73,16 +70,13 @@ public class StringLineIterator implements Iterator<String> {
                         return "";
                     }
                     String source = getSource();
-                    int i = endIndex - 1;
-                    if (Character.isWhitespace(source.charAt(i))) {
-                        do {
-                            i--;
-                            if (i == startIndex) {
-                                return "";
-                            }
-                        } while (Character.isWhitespace(source.charAt(i)));
-                        endIndex = i + 1;
+                    int i = endIndex;
+                    while (Character.isWhitespace(source.charAt(--i))) {
+                        if (i == startIndex) {
+                            return "";
+                        }
                     }
+                    endIndex = i + 1;
                     return (endIndex == source.length()) ? ((startIndex > 0) ? source.substring(startIndex) : source) : source.substring(startIndex, endIndex);
                 }
             };
