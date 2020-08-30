@@ -40,6 +40,9 @@ public class TestHelper {
                 target.append("[CR]");
             }
             switch (c) {
+                case ' ':
+                    target.append("[SPACE]");
+                    break;
                 case '\t':
                     target.append("[TAB]");
                     break;
@@ -53,7 +56,7 @@ public class TestHelper {
                     target.append("[FF]");
                     break;
                 case '\u000B':
-                    target.append("[LS]");
+                    target.append("[VT]");
                     break;
                 case '\u00A0':
                     target.append("[NBSP]");
@@ -63,6 +66,9 @@ public class TestHelper {
                     break;
                 case '\u1680':
                     target.append("[OGHAM]");
+                    break;
+                case '\u2028':
+                    target.append("[LS]");
                     break;
                 case '\u2029':
                     target.append("[PS]");

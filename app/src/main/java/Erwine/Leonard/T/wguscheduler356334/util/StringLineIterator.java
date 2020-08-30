@@ -31,7 +31,7 @@ public class StringLineIterator implements Iterator<String> {
                                 return "";
                             }
                         }
-                        int i = i = endIndex;
+                        int i = endIndex;
                         while (Character.isWhitespace(source.charAt(--i))) {
                             if (i == startIndex) {
                                 return "";
@@ -105,17 +105,6 @@ public class StringLineIterator implements Iterator<String> {
         return nextIndex > -1;
     }
 
-    private boolean isLineSeparator(char c) {
-        switch (c) {
-            case '\r':
-            case '\n':
-                return true;
-            default:
-                int type = Character.getType(c);
-                return type == Character.LINE_SEPARATOR || type == Character.PARAGRAPH_SEPARATOR;
-        }
-    }
-
     @Override
     public final synchronized String next() {
         if (nextIndex < 0) {
@@ -126,7 +115,7 @@ public class StringLineIterator implements Iterator<String> {
             nextIndex = -1;
         } else {
             char c = source.charAt(endIndex);
-            while (!isLineSeparator(c)) {
+            while (!StringNormalizer.isLineSeparator(c)) {
                 if (++endIndex == source.length()) {
                     nextIndex = -1;
                     break;

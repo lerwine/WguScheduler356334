@@ -36,17 +36,39 @@ public final class StringNormalizer {
      */
     public static final int NORMALIZE_FLAG_REMOVE_BLANK_LINES = 0x20;
 
-    public static final Pattern PATTERN_LINEBREAK = Pattern.compile("\\r\\n?|\\n");
+    public static final Pattern PATTERN_LINEBREAK = Pattern.compile("\\r\\n?|[\\n\\f\\u0085\\u2028\\u2029]");
 
-    public static final Pattern PATTERN_LINEBREAK_MULTIPLE = Pattern.compile("[\\r\\n]+([^\\S\\r\\n]+[\\r\\n]+)*");
+    public static final Pattern PATTERN_LINEBREAK_MULTIPLE = Pattern.compile("[\\r\\n\\f\\u0085\\u2028\\u2029]+([^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+[\\r\\n\\f\\u0085\\u2028\\u2029]+)*");
 
-    public static final Pattern NON_NORMAL_WHITESPACE = Pattern.compile(" \\s+|[^ \\S]\\s*");
+    public static final Pattern NON_NORMAL_WHITESPACE = Pattern.compile(" [\\s\\u1680\\u0085\\u2028\\u2029]+|([\\u1680\\u0085\\u2028\\u2029]|[^ \\S])[\\s\\u1680\\u0085\\u2028\\u2029]*");
 
-    public static final Pattern NEWLINE_SURROUNDING_WHITESPACE = Pattern.compile("([^\\S\\r\\n]+)?([\\r\\n]+([^\\S\\r\\n]+[\\r\\n]+)*)([^\\S\\r\\n]+)?");
+    public static final Pattern NEWLINE_SURROUNDING_WHITESPACE = Pattern.compile("((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)?([\\r\\n\\f\\u0085\\u2028\\u2029]+((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+[\\r\\n\\f\\u0085\\u2028\\u2029]+)*)((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)?");
 
     private static final HashMap<Integer, Function<String, String>> NORMALIZER_MAP = new HashMap<>();
 
     private static final HashMap<Integer, Function<String, String>> STRING_NORMALIZER_MAP = new HashMap<>();
+
+    public static boolean isLineSeparator(char c) {
+        switch (c) {
+            case '\r':
+            case '\n':
+            case '\f':
+            case '\u0085':
+                return true;
+            default:
+                int type = Character.getType(c);
+                return type == Character.LINE_SEPARATOR || type == Character.PARAGRAPH_SEPARATOR;
+        }
+    }
+
+    public static boolean isWhiteSpaceOrLineSeparator(char c) {
+        switch (c) {
+            case '\u0085':
+                return true;
+            default:
+                return Character.isWhitespace(c);
+        }
+    }
 
     private StringNormalizer() {
     }
@@ -60,9 +82,9 @@ public final class StringNormalizer {
             return value;
         }
 
-        if (Character.isWhitespace(value.codePointAt(0))) {
+        if (isWhiteSpaceOrLineSeparator(value.charAt(0))) {
             for (int i = 1; i < value.length(); i++) {
-                if (!Character.isWhitespace(value.codePointAt(i))) {
+                if (!isWhiteSpaceOrLineSeparator(value.charAt(i))) {
                     return value.substring(i);
                 }
             }
@@ -77,9 +99,9 @@ public final class StringNormalizer {
         }
         int i = value.length() - 1;
 
-        if (Character.isWhitespace(value.codePointAt(i))) {
+        if (isWhiteSpaceOrLineSeparator(value.charAt(i))) {
             while (--i > -1) {
-                if (!Character.isWhitespace(value.codePointAt(i))) {
+                if (!isWhiteSpaceOrLineSeparator(value.charAt(i))) {
                     return value.substring(0, i + 1);
                 }
             }
@@ -88,7 +110,7 @@ public final class StringNormalizer {
         return value;
     }
 
-    public static final Function<String, String> getNormalizer(StringNormalizationOption... options) {
+    public static Function<String, String> getNormalizer(StringNormalizationOption... options) {
         int flags = StringNormalizationOption.toFlags(options);
         synchronized (NORMALIZER_MAP) {
             if (NORMALIZER_MAP.containsKey(flags)) {
@@ -101,6 +123,7 @@ public final class StringNormalizer {
                 if ((flags & NORMALIZE_FLAG_TRIM_START) != 0) {
                     if ((flags & NORMALIZE_FLAG_TRIM_END) != 0) {
                         if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
+                            // FIXME: String::trim does not work for \u0080
                             normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, String::trim, matcher -> {
                                 String s = matcher.group(2);
                                 if (null != s || null != (s = matcher.group(1))) {
@@ -109,6 +132,7 @@ public final class StringNormalizer {
                                 return " ";
                             }, nullToEmpty);
                         } else {
+                            // FIXME: String::trim does not work for \u0080
                             normalizer = staticReplacer(NON_NORMAL_WHITESPACE, String::trim, " ", nullToEmpty);
                         }
                     } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
@@ -280,7 +304,7 @@ public final class StringNormalizer {
             if (!iterator.hasNext()) {
                 return normalizeLine.apply(v);
             }
-            StringBuilder sb = new StringBuilder(v);
+            StringBuilder sb = new StringBuilder(normalizeLine.apply(v));
             do {
                 sb.append("\n").append(normalizeLine.apply(iterator.next()));
             } while (iterator.hasNext());
