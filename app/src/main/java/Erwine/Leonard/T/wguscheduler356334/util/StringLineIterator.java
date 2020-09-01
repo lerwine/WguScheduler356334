@@ -115,7 +115,7 @@ public class StringLineIterator implements Iterator<String> {
             nextIndex = -1;
         } else {
             char c = source.charAt(endIndex);
-            while (!StringNormalizer.isLineSeparator(c)) {
+            while (!StringHelper.isLineSeparator(c)) {
                 if (++endIndex == source.length()) {
                     nextIndex = -1;
                     break;

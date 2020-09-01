@@ -18,8 +18,8 @@ import java.util.function.Function;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.TermDAO;
+import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
-import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer;
 
 @Entity(tableName = AppDb.TABLE_NAME_TERMS, indices = {
         @Index(value = TermEntity.COLNAME_NAME, name = TermEntity.INDEX_NAME, unique = true)
@@ -39,8 +39,8 @@ public class TermEntity {
     public static final String SAMPLE_TERM_8 = "Term 8";
     public static final String SAMPLE_TERM_9 = "Term 9";
     public static final String SAMPLE_TERM_10 = "Term 10";
-    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
-    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)

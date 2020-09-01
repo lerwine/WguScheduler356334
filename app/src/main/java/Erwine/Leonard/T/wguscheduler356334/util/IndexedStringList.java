@@ -17,7 +17,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.live.PostTrackingLiveData;
 
 public final class IndexedStringList extends AbstractList<IndexedStringList.Item> {
 
-    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
 
     private final Observer<Item> contentChangeObserver;
 

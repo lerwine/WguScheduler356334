@@ -1,8 +1,52 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.function.Supplier;
+
 public class TestHelper {
     private TestHelper() {
     }
+
+    public static <T> Supplier<T> createReIterator(Collection<T> source) {
+        return new Supplier<T>() {
+            private Iterator<T> iterator = source.iterator();
+
+            @Override
+            public T get() {
+                T result = iterator.next();
+                if (!iterator.hasNext())
+                    iterator = source.iterator();
+                return result;
+            }
+        };
+    }
+
+    public static <T> ArrayList<T> combineCollections(Collection<T> a, Collection<T> b) {
+        ArrayList<T> result = new ArrayList<T>();
+        result.addAll(a);
+        result.addAll(b);
+        return result;
+    }
+
+    public static <T> ArrayList<T> combineCollections(Collection<T> a, T[] b) {
+        ArrayList<T> result = new ArrayList<T>();
+        result.addAll(a);
+        Collections.addAll(result, b);
+        return result;
+    }
+
+    public static <T> ArrayList<T> combineCollections(T[] a, Collection<T> b) {
+        return combineCollections(Arrays.asList(a), b);
+    }
+
+    public static <T> ArrayList<T> combineCollections(T[] a, T[] b) {
+        return combineCollections(Arrays.asList(a), b);
+    }
+
 
     public static StringBuilder appendStringDescription(StringBuilder target, String value) {
         if (null == value) {
@@ -27,7 +71,19 @@ public class TestHelper {
         return sb.toString();
     }
 
-    private static void appendStringDescriptionImpl(StringBuilder target, String value) {
+    public static String toStringDescription(StringBuilder value) {
+        if (null == value) {
+            return "[null]";
+        }
+        if (value.length() == 0) {
+            return "[empty]";
+        }
+        StringBuilder sb = new StringBuilder();
+        appendStringDescriptionImpl(sb, value);
+        return sb.toString();
+    }
+
+    private static void appendStringDescriptionImpl(StringBuilder target, CharSequence value) {
         boolean cr = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);

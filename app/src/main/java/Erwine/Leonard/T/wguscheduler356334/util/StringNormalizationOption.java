@@ -1,11 +1,11 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
-import static Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer.NORMALIZE_FLAG_LEAVE_WHITESPACE;
-import static Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer.NORMALIZE_FLAG_PASS_NULL_VALUE;
-import static Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer.NORMALIZE_FLAG_REMOVE_BLANK_LINES;
-import static Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer.NORMALIZE_FLAG_SINGLE_LINE;
-import static Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer.NORMALIZE_FLAG_TRIM_END;
-import static Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer.NORMALIZE_FLAG_TRIM_START;
+import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FLAG_LEAVE_BLANK_LINES;
+import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FLAG_LEAVE_WHITESPACE;
+import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FLAG_NO_TRIM_END;
+import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FLAG_NO_TRIM_START;
+import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FLAG_PASS_NULL_VALUE;
+import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FLAG_SINGLE_LINE;
 
 public enum StringNormalizationOption {
     /**
@@ -13,17 +13,17 @@ public enum StringNormalizationOption {
      */
     PASS_NULL_VALUE(NORMALIZE_FLAG_PASS_NULL_VALUE),
     /**
-     * Remove whitespace from beginning and end of line. Equivalent to {@link #TRIM_START} and {@link #TRIM_END}.
+     * Do not remove whitespace from beginning and end of line. Equivalent to <code>{@link #NO_TRIM_START} | {@link #NO_TRIM_END}</code>.
      */
-    TRIM(NORMALIZE_FLAG_TRIM_START | NORMALIZE_FLAG_TRIM_END),
+    NO_TRIM(NORMALIZE_FLAG_NO_TRIM_START | NORMALIZE_FLAG_NO_TRIM_END),
     /**
-     * Remove whitespace at beginning of line.
+     * Do not remove whitespace at beginning of line.
      */
-    TRIM_START(NORMALIZE_FLAG_TRIM_START),
+    NO_TRIM_START(NORMALIZE_FLAG_NO_TRIM_START),
     /**
-     * Remove whitespace at end of line.
+     * Do not remove whitespace at end of line.
      */
-    TRIM_END(NORMALIZE_FLAG_TRIM_END),
+    NO_TRIM_END(NORMALIZE_FLAG_NO_TRIM_END),
     /**
      * Replace line breaks with a space. This option takes precedence over other options.
      */
@@ -33,9 +33,9 @@ public enum StringNormalizationOption {
      */
     LEAVE_WHITESPACE(NORMALIZE_FLAG_LEAVE_WHITESPACE),
     /**
-     * Remove blank lines. Ignored when {@link #SINGLE_LINE} is present.
+     * Do not remove blank lines. Ignored when {@link #SINGLE_LINE} is present.
      */
-    REMOVE_BLANK_LINES(NORMALIZE_FLAG_REMOVE_BLANK_LINES);
+    LEAVE_BLANK_LINES(NORMALIZE_FLAG_LEAVE_BLANK_LINES);
 
     private final int flag;
 

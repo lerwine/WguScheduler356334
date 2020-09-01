@@ -6,9 +6,9 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class StringNormalizer {
+public final class StringHelper {
     /**
-     * Do not replace null with empty string.
+     * No special options.
      */
     public static final int NORMALIZE_FLAG_DEFAULT = 0x00;
     /**
@@ -16,13 +16,13 @@ public final class StringNormalizer {
      */
     public static final int NORMALIZE_FLAG_PASS_NULL_VALUE = 0x01;
     /**
-     * Remove whitespace at beginning of line.
+     * Do not remove whitespace at beginning of line.
      */
-    public static final int NORMALIZE_FLAG_TRIM_START = 0x02;
+    public static final int NORMALIZE_FLAG_NO_TRIM_START = 0x02;
     /**
-     * Remove whitespace at end of line.
+     * Do not remove whitespace at end of line.
      */
-    public static final int NORMALIZE_FLAG_TRIM_END = 0x04;
+    public static final int NORMALIZE_FLAG_NO_TRIM_END = 0x04;
     /**
      * Replace line breaks with a space. This option takes precedence over other options.
      */
@@ -32,9 +32,9 @@ public final class StringNormalizer {
      */
     public static final int NORMALIZE_FLAG_LEAVE_WHITESPACE = 0x10;
     /**
-     * Remove blank lines. Ignored when {@link #NORMALIZE_FLAG_SINGLE_LINE} is present.
+     * Do not remove blank lines. Ignored when {@link #NORMALIZE_FLAG_SINGLE_LINE} is present.
      */
-    public static final int NORMALIZE_FLAG_REMOVE_BLANK_LINES = 0x20;
+    public static final int NORMALIZE_FLAG_LEAVE_BLANK_LINES = 0x20;
 
     public static final Pattern PATTERN_LINEBREAK = Pattern.compile("\\r\\n?|[\\n\\f\\u0085\\u2028\\u2029]");
 
@@ -70,7 +70,7 @@ public final class StringNormalizer {
         }
     }
 
-    private StringNormalizer() {
+    private StringHelper() {
     }
 
     public static String normalizeString(String value, StringNormalizationOption... options) {
@@ -120,8 +120,8 @@ public final class StringNormalizer {
             Function<String, String> normalizer;
             boolean nullToEmpty = (flags & NORMALIZE_FLAG_PASS_NULL_VALUE) == 0;
             if ((flags & NORMALIZE_FLAG_SINGLE_LINE) != 0) {
-                if ((flags & NORMALIZE_FLAG_TRIM_START) != 0) {
-                    if ((flags & NORMALIZE_FLAG_TRIM_END) != 0) {
+                if ((flags & NORMALIZE_FLAG_NO_TRIM_START) == 0) {
+                    if ((flags & NORMALIZE_FLAG_NO_TRIM_END) == 0) {
                         if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
                             // FIXME: String::trim does not work for \u0080
                             normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, String::trim, matcher -> {
@@ -136,7 +136,7 @@ public final class StringNormalizer {
                             normalizer = staticReplacer(NON_NORMAL_WHITESPACE, String::trim, " ", nullToEmpty);
                         }
                     } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                        normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, StringNormalizer::trimStart, matcher -> {
+                        normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, StringHelper::trimStart, matcher -> {
                             String s = matcher.group(2);
                             if (null != s || null != (s = matcher.group(1))) {
                                 return s;
@@ -144,11 +144,11 @@ public final class StringNormalizer {
                             return " ";
                         }, nullToEmpty);
                     } else {
-                        normalizer = staticReplacer(NON_NORMAL_WHITESPACE, StringNormalizer::trimStart, " ", nullToEmpty);
+                        normalizer = staticReplacer(NON_NORMAL_WHITESPACE, StringHelper::trimStart, " ", nullToEmpty);
                     }
-                } else if ((flags & NORMALIZE_FLAG_TRIM_END) != 0) {
+                } else if ((flags & NORMALIZE_FLAG_NO_TRIM_END) == 0) {
                     if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                        normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, StringNormalizer::trimEnd, matcher -> {
+                        normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, StringHelper::trimEnd, matcher -> {
                             String s = matcher.group(2);
                             if (null != s || null != (s = matcher.group(1))) {
                                 return s;
@@ -156,7 +156,7 @@ public final class StringNormalizer {
                             return " ";
                         }, nullToEmpty);
                     } else {
-                        normalizer = staticReplacer(NON_NORMAL_WHITESPACE, StringNormalizer::trimEnd, " ", nullToEmpty);
+                        normalizer = staticReplacer(NON_NORMAL_WHITESPACE, StringHelper::trimEnd, " ", nullToEmpty);
                     }
                 } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
                     normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, matcher -> {
@@ -170,12 +170,12 @@ public final class StringNormalizer {
                     normalizer = staticReplacer(NON_NORMAL_WHITESPACE, " ", nullToEmpty);
                 }
             } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                normalizer = lineByLineReplacer(nullToEmpty, (flags & NORMALIZE_FLAG_REMOVE_BLANK_LINES) != 0, (flags & NORMALIZE_FLAG_TRIM_START) != 0,
-                        (flags & NORMALIZE_FLAG_TRIM_END) != 0);
+                normalizer = lineByLineReplacer(nullToEmpty, (flags & NORMALIZE_FLAG_LEAVE_BLANK_LINES) == 0, (flags & NORMALIZE_FLAG_NO_TRIM_START) == 0,
+                        (flags & NORMALIZE_FLAG_NO_TRIM_END) == 0);
             } else {
                 normalizer = lineByLineReplacer(line -> NON_NORMAL_WHITESPACE.matcher(line).replaceAll(" "), nullToEmpty,
-                        (flags & NORMALIZE_FLAG_REMOVE_BLANK_LINES) != 0, (flags & NORMALIZE_FLAG_TRIM_START) != 0,
-                        (flags & NORMALIZE_FLAG_TRIM_END) != 0);
+                        (flags & NORMALIZE_FLAG_LEAVE_BLANK_LINES) == 0, (flags & NORMALIZE_FLAG_NO_TRIM_START) == 0,
+                        (flags & NORMALIZE_FLAG_NO_TRIM_END) == 0);
             }
             NORMALIZER_MAP.put(flags, normalizer);
             return normalizer;
@@ -278,21 +278,21 @@ public final class StringNormalizer {
         if (omitEmptyLines) {
             return applyWhenNotNullOrEmpty(s -> {
                 StringLineIterator iterator = StringLineIterator.create(s, trimStart, trimEnd);
-                String v = iterator.next();
+                String v = normalizeLine.apply(iterator.next());
                 while (v.isEmpty()) {
                     if (!iterator.hasNext()) {
                         return "";
                     }
-                    v = iterator.next();
+                    v = normalizeLine.apply(iterator.next());
                 }
                 if (!iterator.hasNext()) {
-                    return normalizeLine.apply(v);
+                    return v;
                 }
                 StringBuilder sb = new StringBuilder(v);
                 do {
-                    v = iterator.next();
+                    v = normalizeLine.apply(iterator.next());
                     if (!v.isEmpty()) {
-                        sb.append("\n").append(normalizeLine.apply(v));
+                        sb.append("\n").append(v);
                     }
                 } while (iterator.hasNext());
                 return sb.toString();
@@ -300,11 +300,11 @@ public final class StringNormalizer {
         }
         return applyWhenNotNullOrEmpty(s -> {
             StringLineIterator iterator = StringLineIterator.create(s, trimStart, trimEnd);
-            String v = iterator.next();
+            String v = normalizeLine.apply(iterator.next());
             if (!iterator.hasNext()) {
-                return normalizeLine.apply(v);
+                return v;
             }
-            StringBuilder sb = new StringBuilder(normalizeLine.apply(v));
+            StringBuilder sb = new StringBuilder(v);
             do {
                 sb.append("\n").append(normalizeLine.apply(iterator.next()));
             } while (iterator.hasNext());

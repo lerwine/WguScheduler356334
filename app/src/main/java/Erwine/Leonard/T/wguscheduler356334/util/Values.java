@@ -84,7 +84,7 @@ public class Values {
      * @return The {@code value} with white space normalized if not null; otherwise, an empty {@link String}.
      */
     public static String asNonNullAndWsNormalizedMultiLine(String value) {
-        return StringNormalizer.normalizeString(value, StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
+        return StringHelper.normalizeString(value);
     }
 
 //    public static String asWsNormalizedStringLines(String value) {

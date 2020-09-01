@@ -18,8 +18,8 @@ import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.MentorDAO;
 import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
+import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
-import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizer;
 
 @Entity(tableName = AppDb.TABLE_NAME_MENTORS, indices = {
         @Index(value = MentorEntity.COLNAME_NAME, name = MentorEntity.INDEX_NAME, unique = true)
@@ -54,8 +54,8 @@ public class MentorEntity {
     public static final String SAMPLE_MENTOR_MALCOLM_WABARA = "Malcolm Wabara";
     public static final String SAMPLE_MENTOR_MARK_KINKEAD = "Mark Kinkead";
     public static final String SAMPLE_MENTOR_ALVARO_ESCOBAR = "Alvaro Escobar";
-    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
-    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES);
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
 
     static HashMap<String, MentorEntity> populateSampleData(AppDb appDb) {
         MentorDAO dao = appDb.mentorDAO();

@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 public class NormalizedCharSequence implements java.io.Serializable, Comparable<String>, CharSequence {
 
-    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringNormalizer.getNormalizer(StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
 
     private final String normalizedValue;
 
