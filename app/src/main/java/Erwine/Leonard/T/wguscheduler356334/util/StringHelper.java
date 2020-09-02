@@ -6,6 +6,9 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Helper class for manipulating and validating string values.
+ */
 public final class StringHelper {
     /**
      * No special options.
@@ -40,13 +43,26 @@ public final class StringHelper {
 
     public static final Pattern PATTERN_LINEBREAK_MULTIPLE = Pattern.compile("[\\r\\n\\f\\u0085\\u2028\\u2029]+([^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+[\\r\\n\\f\\u0085\\u2028\\u2029]+)*");
 
-    public static final Pattern NON_NORMAL_WHITESPACE = Pattern.compile(" [\\s\\u1680\\u0085\\u2028\\u2029]+|([\\u1680\\u0085\\u2028\\u2029]|[^ \\S])[\\s\\u1680\\u0085\\u2028\\u2029]*");
+    public static final Pattern NON_NORMAL_WHITESPACES = Pattern.compile(" [\\s\\u1680\\u0085\\u2028\\u2029]+|([\\u1680\\u0085\\u2028\\u2029]|[^ \\S])[\\s\\u1680\\u0085\\u2028\\u2029]*");
 
-    public static final Pattern NEWLINE_SURROUNDING_WHITESPACE = Pattern.compile("((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)?([\\r\\n\\f\\u0085\\u2028\\u2029]+((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+[\\r\\n\\f\\u0085\\u2028\\u2029]+)*)((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)?");
+    /**
+     * Matches 1 or more newline characters that are either adjacent or separated only by whitespace and optionally includes preceding and/or following whitespace.
+     * Group 1: Optional - 1 or more whitespaces preceding lines that are empty or only have whitespace characters;
+     * Group 2: Optional - 1 or more whitespaces between line breaks;
+     * Group 3: Optional - 1 or more whitespaces following lines that are empty or only have whitespace characters;
+     */
+    public static final Pattern NEWLINES_AND_SURROUNDING_WHITESPACE = Pattern.compile(
+            "((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)?" +
+                    "(?:[\\r\\n\\f\\u0085\\u2028\\u2029]+(?:((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)[\\r\\n\\f\\u0085\\u2028\\u2029]+)*)" +
+                    "((?:\\u1680+|[^\\S\\r\\n\\f\\u0085\\u2028\\u2029]+)+)?"
+    );
 
     private static final HashMap<Integer, Function<String, String>> NORMALIZER_MAP = new HashMap<>();
 
     private static final HashMap<Integer, Function<String, String>> STRING_NORMALIZER_MAP = new HashMap<>();
+
+    private StringHelper() {
+    }
 
     public static boolean isLineSeparator(char c) {
         switch (c) {
@@ -70,13 +86,36 @@ public final class StringHelper {
         }
     }
 
-    private StringHelper() {
-    }
-
+    /**
+     * Normalizes a string value. See {@link StringNormalizationOption} for details of default behavior.
+     *
+     * @param value   The string value to be normalized.
+     * @param options Normalization options.
+     * @return The normalized string value.
+     */
     public static String normalizeString(String value, StringNormalizationOption... options) {
         return getNormalizer(options).apply(value);
     }
 
+    /**
+     * Trims whitespace from the beginning and end of a string. This is different from {@link String#trim()} in that additional non-printable characters are treated as whitespace characters.
+     *
+     * @param value The string value to be trimmed.
+     * @return The string value with the leading and trailing whitespace removed.
+     */
+    public static String trim(String value) {
+        if (null != value && !value.isEmpty() && !(value = trimStart(value)).isEmpty()) {
+            return trimEnd(value);
+        }
+        return value;
+    }
+
+    /**
+     * Trims whitespace from the beginning of a string.
+     *
+     * @param value The string value to be trimmed.
+     * @return The string value with the leading whitespace removed.
+     */
     public static String trimStart(String value) {
         if (null == value || value.isEmpty()) {
             return value;
@@ -93,6 +132,12 @@ public final class StringHelper {
         return value;
     }
 
+    /**
+     * Trims whitespace from the end of a string.
+     *
+     * @param value The string value to be trimmed.
+     * @return The string value with the trailing whitespace removed.
+     */
     public static String trimEnd(String value) {
         if (null == value || value.isEmpty()) {
             return value;
@@ -110,6 +155,12 @@ public final class StringHelper {
         return value;
     }
 
+    /**
+     * Gets a {@link Function} that can be used to normalize strings. See {@link StringNormalizationOption} for details of the default behavior.
+     *
+     * @param options Options that can be used to customize the behavior of the normalization function.
+     * @return A {@link Function} that can be used to normalize strings.
+     */
     public static Function<String, String> getNormalizer(StringNormalizationOption... options) {
         int flags = StringNormalizationOption.toFlags(options);
         synchronized (NORMALIZER_MAP) {
@@ -123,57 +174,66 @@ public final class StringHelper {
                 if ((flags & NORMALIZE_FLAG_NO_TRIM_START) == 0) {
                     if ((flags & NORMALIZE_FLAG_NO_TRIM_END) == 0) {
                         if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                            // FIXME: String::trim does not work for \u0080
-                            normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, String::trim, matcher -> {
-                                String s = matcher.group(2);
-                                if (null != s || null != (s = matcher.group(1))) {
+                            // Mode: Single-Line; Trim: Both; Whitespace: Leave
+                            normalizer = matcherReplacer(NEWLINES_AND_SURROUNDING_WHITESPACE, StringHelper::trim, matcher -> {
+                                String s = matcher.group(3);
+                                if (null != s || null != (s = matcher.group(1)) || null != (s = matcher.group(2))) {
                                     return s;
                                 }
                                 return " ";
                             }, nullToEmpty);
                         } else {
-                            // FIXME: String::trim does not work for \u0080
-                            normalizer = staticReplacer(NON_NORMAL_WHITESPACE, String::trim, " ", nullToEmpty);
+                            // Mode: Single-Line; Trim: Both; Whitespace: Normalize
+                            normalizer = staticReplacer(NON_NORMAL_WHITESPACES, StringHelper::trim, " ", nullToEmpty);
                         }
                     } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                        normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, StringHelper::trimStart, matcher -> {
-                            String s = matcher.group(2);
-                            if (null != s || null != (s = matcher.group(1))) {
+                        // Mode: Single-Line; Trim: Start; Whitespace: Leave
+                        normalizer = matcherReplacer(NEWLINES_AND_SURROUNDING_WHITESPACE, StringHelper::trimStart, matcher -> {
+                            String s = matcher.group(3);
+                            if (null != s || null != (s = matcher.group(1)) || null != (s = matcher.group(2))) {
                                 return s;
                             }
                             return " ";
                         }, nullToEmpty);
                     } else {
-                        normalizer = staticReplacer(NON_NORMAL_WHITESPACE, StringHelper::trimStart, " ", nullToEmpty);
+                        // Mode: Single-Line; Trim: Start; Whitespace: Normalize
+                        normalizer = staticReplacer(NON_NORMAL_WHITESPACES, StringHelper::trimStart, " ", nullToEmpty);
                     }
                 } else if ((flags & NORMALIZE_FLAG_NO_TRIM_END) == 0) {
                     if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                        normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, StringHelper::trimEnd, matcher -> {
-                            String s = matcher.group(2);
-                            if (null != s || null != (s = matcher.group(1))) {
+                        // Mode: Single-Line; Trim: End; Whitespace: Leave
+                        normalizer = matcherReplacer(NEWLINES_AND_SURROUNDING_WHITESPACE, StringHelper::trimEnd, matcher -> {
+                            String s = matcher.group(3);
+                            if (null != s || null != (s = matcher.group(1)) || null != (s = matcher.group(2))) {
                                 return s;
                             }
                             return " ";
                         }, nullToEmpty);
                     } else {
-                        normalizer = staticReplacer(NON_NORMAL_WHITESPACE, StringHelper::trimEnd, " ", nullToEmpty);
+                        // Mode: Single-Line; Trim: End; Whitespace: Normalize
+                        normalizer = staticReplacer(NON_NORMAL_WHITESPACES, StringHelper::trimEnd, " ", nullToEmpty);
                     }
+
                 } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
-                    normalizer = matcherReplacer(NEWLINE_SURROUNDING_WHITESPACE, matcher -> {
-                        String s = matcher.group(2);
-                        if (null != s || null != (s = matcher.group(1))) {
+                    // Mode: Single-Line; Trim: None; Whitespace: Leave
+                    normalizer = matcherReplacer(NEWLINES_AND_SURROUNDING_WHITESPACE, matcher -> {
+                        String s = matcher.group(3);
+                        if (null != s || null != (s = matcher.group(1)) || null != (s = matcher.group(2))) {
                             return s;
                         }
                         return " ";
                     }, nullToEmpty);
                 } else {
-                    normalizer = staticReplacer(NON_NORMAL_WHITESPACE, " ", nullToEmpty);
+                    // Mode: Single-Line; Trim: None; Whitespace: Normalize
+                    normalizer = staticReplacer(NON_NORMAL_WHITESPACES, " ", nullToEmpty);
                 }
             } else if ((flags & NORMALIZE_FLAG_LEAVE_WHITESPACE) != 0) {
+                // Mode: Multi-Line; Blank Lines: ?; Trim: ?; Whitespace: Keep
                 normalizer = lineByLineReplacer(nullToEmpty, (flags & NORMALIZE_FLAG_LEAVE_BLANK_LINES) == 0, (flags & NORMALIZE_FLAG_NO_TRIM_START) == 0,
                         (flags & NORMALIZE_FLAG_NO_TRIM_END) == 0);
             } else {
-                normalizer = lineByLineReplacer(line -> NON_NORMAL_WHITESPACE.matcher(line).replaceAll(" "), nullToEmpty,
+                // Mode: Multi-Line; Blank Lines: ?; Trim: ?; Whitespace: Normalize
+                normalizer = lineByLineReplacer(line -> NON_NORMAL_WHITESPACES.matcher(line).replaceAll(" "), nullToEmpty,
                         (flags & NORMALIZE_FLAG_LEAVE_BLANK_LINES) == 0, (flags & NORMALIZE_FLAG_NO_TRIM_START) == 0,
                         (flags & NORMALIZE_FLAG_NO_TRIM_END) == 0);
             }

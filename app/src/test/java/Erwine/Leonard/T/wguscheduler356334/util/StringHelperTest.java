@@ -17,16 +17,11 @@ import static org.junit.Assert.assertNull;
 @SuppressWarnings({"ConstantConditions", "StreamToLoop"})
 public class StringHelperTest {
 
-    //    public static final String TAB = "\t";
-//    public static final String CR = "\r";
-//    public static final String LF = "\n";
-//    public static final String LS = "\u2028";
-//    public static final String PS = "\u2029";
     private static final List<Character> WHITESPACE_CHARACTERS = Collections.unmodifiableList(Arrays.asList(' ', '\t', '\u000B', '\u1680'));
     private static final List<Character> LINE_SEPARATOR_CHARACTERS = Collections.unmodifiableList(Arrays.asList('\r', '\n', '\f', '\u0085', '\u2028', '\u2029'));
     private static final List<String> SINGLE_LINE_SEPARATOR_SEQ = Collections.unmodifiableList(Arrays.asList("\r\n", "\r", "\n", "\f", "\u0085", "\u2028", "\u2029"));
     private static final List<String> DOUBLE_LINE_SEPARATOR_SEQ = Collections.unmodifiableList(Arrays.asList(
-            "\r\n", "\r\n\r", "\r\n\n", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029",
+            "\r\n\r\n", "\r\n\r", "\r\n\n", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029",
             "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
             "\n\r\n", "\n\r", "\n\n", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
             "\f\r\n", "\f\r", "\f\n", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029",
@@ -1143,7 +1138,7 @@ public class StringHelperTest {
     }
 
     /**
-     * Default options.
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: Both; Whitespace: Normalize.
      * Was: StringNormalizationOption.TRIM, StringNormalizationOption.REMOVE_BLANK_LINES
      */
     @Test
@@ -1602,205 +1597,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer00_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer();
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ",
-                        "\r\n ", "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test", "Test", "Test ", " Test", " Test ", "  Test  ", " \n Test", "\n Test ", "\n Test \n", " \n Test \n ", " \r\n Test", "\r\n Test ",
-                        "\r\n Test \r\n", " \r\n Test \r\n ", " \r Test", "\r Test ", "\r Test \r", " \r Test \r ", " \f Test", "\f Test ", "\f Test \f", " \f Test \f ",
-                        " \u0085 Test", "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ", " \u2028 Test", "\u2028 Test ", "\u2028 Test \u2028",
-                        " \u2028 Test \u2028 ", " \u2029 Test", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "Test\t", "\tTest", "\tTest\t", "\t\tTest\t\t",
-                        "\t\n\tTest", "\n\tTest\t", "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\t\r\n\tTest", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t",
-                        "\t\r\tTest", "\r\tTest\t", "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\t\f\tTest", "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\t\u0085\tTest",
-                        "\u0085\tTest\t", "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\t\u2028\tTest", "\u2028\tTest\t", "\u2028\tTest\t\u2028",
-                        "\t\u2028\tTest\t\u2028\t", "\t\u2029\tTest", "\u2029\tTest\t", "\u2029\tTest\t\u2029", "\t\u2029\tTest\t\u2029\t", "Test\u1680", "\u1680Test",
-                        "\u1680Test\u1680", "\u1680\u1680Test\u1680\u1680", "\u1680\n\u1680Test", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n",
-                        "\u1680\n\u1680Test\u1680\n\u1680", "\u1680\r\n\u1680Test", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n",
-                        "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\u1680\r\u1680Test", "\r\u1680Test\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680",
-                        "\u1680\f\u1680Test", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f", "\u1680\f\u1680Test\u1680\f\u1680", "\u1680\u0085\u1680Test",
-                        "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u1680\u2028\u1680Test",
-                        "\u2028\u1680Test\u1680", "\u2028\u1680Test\u1680\u2028", "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u1680\u2029\u1680Test",
-                        "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029", "\u1680\u2029\u1680Test\u1680\u2029\u1680", "\nTest", "\nTest\n", "\r\nTest",
-                        "\r\nTest\r\n", "\rTest", "\rTest\r", "\fTest", "\fTest\f", "\u0085Test", "\u0085Test\u0085", "\u2028Test", "\u2028Test\u2028", "\u2029Test",
-                        "\u2029Test\u2029", "Test\n\n", "\n\nTest", "\n\nTest\n\n", "Test\n\r\n", "\n\r\nTest", "\n\r\nTest\n\r\n", "Test\n\r", "\n\rTest", "\n\rTest\n\r",
-                        "Test\n\f", "\n\fTest", "\n\fTest\n\f", "Test\n\u0085", "\n\u0085Test", "\n\u0085Test\n\u0085", "Test\n\u2028", "\n\u2028Test",
-                        "\n\u2028Test\n\u2028", "Test\n\u2029", "\n\u2029Test", "\n\u2029Test\n\u2029", "Test\r\n\n", "\r\n\nTest", "\r\n\nTest\r\n\n", "Test\r\n\r\n",
-                        "\r\n\r\nTest", "\r\n\r\nTest\r\n\r\n", "Test\r\n\r", "\r\n\rTest", "\r\n\rTest\r\n\r", "Test\r\n\f", "\r\n\fTest", "\r\n\fTest\r\n\f",
-                        "Test\r\n\u0085", "\r\n\u0085Test", "\r\n\u0085Test\r\n\u0085", "Test\r\n\u2028", "\r\n\u2028Test", "\r\n\u2028Test\r\n\u2028", "Test\r\n\u2029",
-                        "\r\n\u2029Test", "\r\n\u2029Test\r\n\u2029", "Test\r\r\n", "\r\r\nTest", "\r\r\nTest\r\r\n", "Test\r\r", "\r\rTest", "\r\rTest\r\r", "Test\r\f",
-                        "\r\fTest", "\r\fTest\r\f", "Test\r\u0085", "\r\u0085Test", "\r\u0085Test\r\u0085", "Test\r\u2028", "\r\u2028Test", "\r\u2028Test\r\u2028",
-                        "Test\r\u2029", "\r\u2029Test", "\r\u2029Test\r\u2029", "Test\f\n", "\f\nTest", "\f\nTest\f\n", "Test\f\r\n", "\f\r\nTest", "\f\r\nTest\f\r\n",
-                        "Test\f\r", "\f\rTest", "\f\rTest\f\r", "Test\f\f", "\f\fTest", "\f\fTest\f\f", "Test\f\u0085", "\f\u0085Test", "\f\u0085Test\f\u0085",
-                        "Test\f\u2028", "\f\u2028Test", "\f\u2028Test\f\u2028", "Test\f\u2029", "\f\u2029Test", "\f\u2029Test\f\u2029", "Test\u0085\n", "\u0085\nTest",
-                        "\u0085\nTest\u0085\n", "Test\u0085\r\n", "\u0085\r\nTest", "\u0085\r\nTest\u0085\r\n", "Test\u0085\r", "\u0085\rTest", "\u0085\rTest\u0085\r",
-                        "Test\u0085\f", "\u0085\fTest", "\u0085\fTest\u0085\f", "Test\u0085\u0085", "\u0085\u0085Test", "\u0085\u0085Test\u0085\u0085", "Test\u0085\u2028",
-                        "\u0085\u2028Test", "\u0085\u2028Test\u0085\u2028", "Test\u0085\u2029", "\u0085\u2029Test", "\u0085\u2029Test\u0085\u2029", "Test\u2028\n",
-                        "\u2028\nTest", "\u2028\nTest\u2028\n", "Test\u2028\r\n", "\u2028\r\nTest", "\u2028\r\nTest\u2028\r\n", "Test\u2028\r", "\u2028\rTest",
-                        "\u2028\rTest\u2028\r", "Test\u2028\f", "\u2028\fTest", "\u2028\fTest\u2028\f", "Test\u2028\u0085", "\u2028\u0085Test",
-                        "\u2028\u0085Test\u2028\u0085", "Test\u2028\u2028", "\u2028\u2028Test", "\u2028\u2028Test\u2028\u2028", "Test\u2028\u2029", "\u2028\u2029Test",
-                        "\u2028\u2029Test\u2028\u2029", "Test\u2029\n", "\u2029\nTest", "\u2029\nTest\u2029\n", "Test\u2029\r\n", "\u2029\r\nTest",
-                        "\u2029\r\nTest\u2029\r\n", "Test\u2029\r", "\u2029\rTest", "\u2029\rTest\u2029\r", "Test\u2029\f", "\u2029\fTest", "\u2029\fTest\u2029\f",
-                        "Test\u2029\u0085", "\u2029\u0085Test", "\u2029\u0085Test\u2029\u0085", "Test\u2029\u2028", "\u2029\u2028Test", "\u2029\u2028Test\u2029\u2028",
-                        "Test\u2029\u2029", "\u2029\u2029Test", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\u00A0 ", " \u00A0", " \u00A0 ", "  \u00A0  ", " \n \u00A0", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ",
-                        " \r\n \u00A0", "\r\n \u00A0 ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", " \r \u00A0", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", " \f \u00A0",
-                        "\f \u00A0 ", "\f \u00A0 \f", " \f \u00A0 \f ", " \u0085 \u00A0", "\u0085 \u00A0 ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ",
-                        " \u2028 \u00A0", "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", " \u2029 \u00A0", "\u2029 \u00A0 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\u00A0\t", "\t\u00A0", "\t\u00A0\t", "\t\t\u00A0\t\t", "\t\n\t\u00A0", "\n\t\u00A0\t", "\n\t\u00A0\t\n",
-                        "\t\n\t\u00A0\t\n\t", "\t\r\n\t\u00A0", "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\t\r\t\u00A0", "\r\t\u00A0\t",
-                        "\r\t\u00A0\t\r", "\t\r\t\u00A0\t\r\t", "\t\f\t\u00A0", "\f\t\u00A0\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\t\u0085\t\u00A0",
-                        "\u0085\t\u00A0\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\t\u2028\t\u00A0", "\u2028\t\u00A0\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\t\u2029\t\u00A0", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\u00A0\u1680",
-                        "\u1680\u00A0", "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\u1680\n\u1680\u00A0", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n",
-                        "\u1680\n\u1680\u00A0\u1680\n\u1680", "\u1680\r\n\u1680\u00A0", "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n",
-                        "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\u1680\r\u1680\u00A0", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\u1680\f\u1680\u00A0", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u1680\u0085\u1680\u00A0", "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u1680\u2028\u1680\u00A0", "\u2028\u1680\u00A0\u1680", "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680",
-                        "\u1680\u2029\u1680\u00A0", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029", "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680", "\n\u00A0",
-                        "\n\u00A0\n", "\r\n\u00A0", "\r\n\u00A0\r\n", "\r\u00A0", "\r\u00A0\r", "\f\u00A0", "\f\u00A0\f", "\u0085\u00A0", "\u0085\u00A0\u0085",
-                        "\u2028\u00A0", "\u2028\u00A0\u2028", "\u2029\u00A0", "\u2029\u00A0\u2029", "\u00A0\n\n", "\n\n\u00A0", "\n\n\u00A0\n\n", "\u00A0\n\r\n",
-                        "\n\r\n\u00A0", "\n\r\n\u00A0\n\r\n", "\u00A0\n\r", "\n\r\u00A0", "\n\r\u00A0\n\r", "\u00A0\n\f", "\n\f\u00A0", "\n\f\u00A0\n\f", "\u00A0\n\u0085",
-                        "\n\u0085\u00A0", "\n\u0085\u00A0\n\u0085", "\u00A0\n\u2028", "\n\u2028\u00A0", "\n\u2028\u00A0\n\u2028", "\u00A0\n\u2029", "\n\u2029\u00A0",
-                        "\n\u2029\u00A0\n\u2029", "\u00A0\r\n\n", "\r\n\n\u00A0", "\r\n\n\u00A0\r\n\n", "\u00A0\r\n\r\n", "\r\n\r\n\u00A0", "\r\n\r\n\u00A0\r\n\r\n",
-                        "\u00A0\r\n\r", "\r\n\r\u00A0", "\r\n\r\u00A0\r\n\r", "\u00A0\r\n\f", "\r\n\f\u00A0", "\r\n\f\u00A0\r\n\f", "\u00A0\r\n\u0085", "\r\n\u0085\u00A0",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\r\n\u2028\u00A0", "\r\n\u2028\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\r\n\u2029\u00A0",
-                        "\r\n\u2029\u00A0\r\n\u2029", "\u00A0\r\r\n", "\r\r\n\u00A0", "\r\r\n\u00A0\r\r\n", "\u00A0\r\r", "\r\r\u00A0", "\r\r\u00A0\r\r", "\u00A0\r\f",
-                        "\r\f\u00A0", "\r\f\u00A0\r\f", "\u00A0\r\u0085", "\r\u0085\u00A0", "\r\u0085\u00A0\r\u0085", "\u00A0\r\u2028", "\r\u2028\u00A0",
-                        "\r\u2028\u00A0\r\u2028", "\u00A0\r\u2029", "\r\u2029\u00A0", "\r\u2029\u00A0\r\u2029", "\u00A0\f\n", "\f\n\u00A0", "\f\n\u00A0\f\n", "\u00A0\f\r\n",
-                        "\f\r\n\u00A0", "\f\r\n\u00A0\f\r\n", "\u00A0\f\r", "\f\r\u00A0", "\f\r\u00A0\f\r", "\u00A0\f\f", "\f\f\u00A0", "\f\f\u00A0\f\f", "\u00A0\f\u0085",
-                        "\f\u0085\u00A0", "\f\u0085\u00A0\f\u0085", "\u00A0\f\u2028", "\f\u2028\u00A0", "\f\u2028\u00A0\f\u2028", "\u00A0\f\u2029", "\f\u2029\u00A0",
-                        "\f\u2029\u00A0\f\u2029", "\u00A0\u0085\n", "\u0085\n\u00A0", "\u0085\n\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u0085\r\n\u00A0",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u0085\r\u00A0", "\u0085\r\u00A0\u0085\r", "\u00A0\u0085\f", "\u0085\f\u00A0",
-                        "\u0085\f\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u0085\u0085\u00A0", "\u0085\u0085\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u0085\u2028\u00A0",
-                        "\u0085\u2028\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u0085\u2029\u00A0", "\u0085\u2029\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u2028\n\u00A0",
-                        "\u2028\n\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u2028\r\n\u00A0", "\u2028\r\n\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u2028\r\u00A0",
-                        "\u2028\r\u00A0\u2028\r", "\u00A0\u2028\f", "\u2028\f\u00A0", "\u2028\f\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u2028\u0085\u00A0",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u2028\u2028\u00A0", "\u2028\u2028\u00A0\u2028\u2028", "\u00A0\u2028\u2029",
-                        "\u2028\u2029\u00A0", "\u2028\u2029\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u2029\n\u00A0", "\u2029\n\u00A0\u2029\n", "\u00A0\u2029\r\n",
-                        "\u2029\r\n\u00A0", "\u2029\r\n\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u2029\r\u00A0", "\u2029\r\u00A0\u2029\r", "\u00A0\u2029\f", "\u2029\f\u00A0",
-                        "\u2029\f\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u2029\u0085\u00A0", "\u2029\u0085\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u2029\u2028\u00A0",
-                        "\u2029\u2028\u00A0\u2029\u2028", "\u00A0\u2029\u2029", "\u2029\u2029\u00A0", "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData("Test\nData", " Test \n Data", "Test \n Data ", " Test \r\n Data", "Test \r\n Data ", " Test \r Data", "Test \r Data ", " Test \f Data",
-                        "Test \f Data ", " Test \u0085 Data", "Test \u0085 Data ", " Test \u2028 Data", "Test \u2028 Data ", " Test \u2029 Data", "Test \u2029 Data ",
-                        "\tTest\t\n\tData", "Test\t\n\tData\t", "\tTest\t\r\n\tData", "Test\t\r\n\tData\t", "\tTest\t\r\tData", "Test\t\r\tData\t", "\tTest\t\f\tData",
-                        "Test\t\f\tData\t", "\tTest\t\u0085\tData", "Test\t\u0085\tData\t", "\tTest\t\u2028\tData", "Test\t\u2028\tData\t", "\tTest\t\u2029\tData",
-                        "Test\t\u2029\tData\t", "\u1680Test\u1680\n\u1680Data", "Test\u1680\n\u1680Data\u1680", "\u1680Test\u1680\r\n\u1680Data",
-                        "Test\u1680\r\n\u1680Data\u1680", "\u1680Test\u1680\r\u1680Data", "Test\u1680\r\u1680Data\u1680", "\u1680Test\u1680\f\u1680Data",
-                        "Test\u1680\f\u1680Data\u1680", "\u1680Test\u1680\u0085\u1680Data", "Test\u1680\u0085\u1680Data\u1680", "\u1680Test\u1680\u2028\u1680Data",
-                        "Test\u1680\u2028\u1680Data\u1680", "\u1680Test\u1680\u2029\u1680Data", "Test\u1680\u2029\u1680Data\u1680", "Test\nData", "Test\r\nData",
-                        "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData",
-                        "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData",
-                        "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data",
-                        "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data",
-                        "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data",
-                        "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data",
-                        "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData",
-                        "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData("\u00A0\n_", " \u00A0 \n _", "\u00A0 \n _ ", " \u00A0 \r\n _", "\u00A0 \r\n _ ", " \u00A0 \r _", "\u00A0 \r _ ", " \u00A0 \f _",
-                        "\u00A0 \f _ ", " \u00A0 \u0085 _", "\u00A0 \u0085 _ ", " \u00A0 \u2028 _", "\u00A0 \u2028 _ ", " \u00A0 \u2029 _", "\u00A0 \u2029 _ ",
-                        "\t\u00A0\t\n\t_", "\u00A0\t\n\t_\t", "\t\u00A0\t\r\n\t_", "\u00A0\t\r\n\t_\t", "\t\u00A0\t\r\t_", "\u00A0\t\r\t_\t", "\t\u00A0\t\f\t_",
-                        "\u00A0\t\f\t_\t", "\t\u00A0\t\u0085\t_", "\u00A0\t\u0085\t_\t", "\t\u00A0\t\u2028\t_", "\u00A0\t\u2028\t_\t", "\t\u00A0\t\u2029\t_",
-                        "\u00A0\t\u2029\t_\t", "\u1680\u00A0\u1680\n\u1680_", "\u00A0\u1680\n\u1680_\u1680", "\u1680\u00A0\u1680\r\n\u1680_",
-                        "\u00A0\u1680\r\n\u1680_\u1680", "\u1680\u00A0\u1680\r\u1680_", "\u00A0\u1680\r\u1680_\u1680", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u00A0\u1680\f\u1680_\u1680", "\u1680\u00A0\u1680\u0085\u1680_", "\u00A0\u1680\u0085\u1680_\u1680", "\u1680\u00A0\u1680\u2028\u1680_",
-                        "\u00A0\u1680\u2028\u1680_\u1680", "\u1680\u00A0\u1680\u2029\u1680_", "\u00A0\u1680\u2029\u1680_\u1680", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_",
-                        "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_",
-                        "\u00A0\n\u2028_", "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_",
-                        "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_",
-                        "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_",
-                        "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_",
-                        "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_",
-                        "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: End; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM_START}</code>
      * Was: StringNormalizationOption.TRIM_END, StringNormalizationOption.REMOVE_BLANK_LINES
      */
@@ -1825,6 +1623,7 @@ public class StringHelperTest {
         for (char ws1 : WHITESPACE_CHARACTERS) {
             source = Character.toString(ws1);
             String description = TestHelper.toStringDescription(source);
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -1833,6 +1632,7 @@ public class StringHelperTest {
             for (char ws2 : WHITESPACE_CHARACTERS) {
                 source = Character.toString(ws1) + ws2;
                 description = TestHelper.toStringDescription(source);
+                expected = "";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -1870,6 +1670,7 @@ public class StringHelperTest {
                 for (String nws1 : allNws1) {
                     source = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
+                    expected = " " + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -1878,6 +1679,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2 + nws2 + ws2 + ws1;
                         description = TestHelper.toStringDescription(source);
+                        expected = " " + nws1 + " " + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -1889,6 +1691,7 @@ public class StringHelperTest {
         for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -1927,6 +1730,7 @@ public class StringHelperTest {
         for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -2119,7 +1923,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = nws1 + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n" + ws + nws2;
+                        expected = nws1 + "\n" + " " + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -2212,7 +2016,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = nws1 + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n" + ws + nws2;
+                        expected = nws1 + "\n " + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -2261,207 +2065,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer02_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ",
-                        "\r\n ", "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test", "Test", "Test ", "Test\t", "Test\u1680", "\nTest", "\nTest\n", "\r\nTest", "\r\nTest\r\n", "\rTest", "\rTest\r", "\fTest",
-                        "\fTest\f", "\u0085Test", "\u0085Test\u0085", "\u2028Test", "\u2028Test\u2028", "\u2029Test", "\u2029Test\u2029", "Test\n\n", "\n\nTest",
-                        "\n\nTest\n\n", "Test\n\r\n", "\n\r\nTest", "\n\r\nTest\n\r\n", "Test\n\r", "\n\rTest", "\n\rTest\n\r", "Test\n\f", "\n\fTest", "\n\fTest\n\f",
-                        "Test\n\u0085", "\n\u0085Test", "\n\u0085Test\n\u0085", "Test\n\u2028", "\n\u2028Test", "\n\u2028Test\n\u2028", "Test\n\u2029", "\n\u2029Test",
-                        "\n\u2029Test\n\u2029", "Test\r\n\n", "\r\n\nTest", "\r\n\nTest\r\n\n", "Test\r\n\r\n", "\r\n\r\nTest", "\r\n\r\nTest\r\n\r\n", "Test\r\n\r",
-                        "\r\n\rTest", "\r\n\rTest\r\n\r", "Test\r\n\f", "\r\n\fTest", "\r\n\fTest\r\n\f", "Test\r\n\u0085", "\r\n\u0085Test", "\r\n\u0085Test\r\n\u0085",
-                        "Test\r\n\u2028", "\r\n\u2028Test", "\r\n\u2028Test\r\n\u2028", "Test\r\n\u2029", "\r\n\u2029Test", "\r\n\u2029Test\r\n\u2029", "Test\r\r\n",
-                        "\r\r\nTest", "\r\r\nTest\r\r\n", "Test\r\r", "\r\rTest", "\r\rTest\r\r", "Test\r\f", "\r\fTest", "\r\fTest\r\f", "Test\r\u0085", "\r\u0085Test",
-                        "\r\u0085Test\r\u0085", "Test\r\u2028", "\r\u2028Test", "\r\u2028Test\r\u2028", "Test\r\u2029", "\r\u2029Test", "\r\u2029Test\r\u2029", "Test\f\n",
-                        "\f\nTest", "\f\nTest\f\n", "Test\f\r\n", "\f\r\nTest", "\f\r\nTest\f\r\n", "Test\f\r", "\f\rTest", "\f\rTest\f\r", "Test\f\f", "\f\fTest",
-                        "\f\fTest\f\f", "Test\f\u0085", "\f\u0085Test", "\f\u0085Test\f\u0085", "Test\f\u2028", "\f\u2028Test", "\f\u2028Test\f\u2028", "Test\f\u2029",
-                        "\f\u2029Test", "\f\u2029Test\f\u2029", "Test\u0085\n", "\u0085\nTest", "\u0085\nTest\u0085\n", "Test\u0085\r\n", "\u0085\r\nTest",
-                        "\u0085\r\nTest\u0085\r\n", "Test\u0085\r", "\u0085\rTest", "\u0085\rTest\u0085\r", "Test\u0085\f", "\u0085\fTest", "\u0085\fTest\u0085\f",
-                        "Test\u0085\u0085", "\u0085\u0085Test", "\u0085\u0085Test\u0085\u0085", "Test\u0085\u2028", "\u0085\u2028Test", "\u0085\u2028Test\u0085\u2028",
-                        "Test\u0085\u2029", "\u0085\u2029Test", "\u0085\u2029Test\u0085\u2029", "Test\u2028\n", "\u2028\nTest", "\u2028\nTest\u2028\n", "Test\u2028\r\n",
-                        "\u2028\r\nTest", "\u2028\r\nTest\u2028\r\n", "Test\u2028\r", "\u2028\rTest", "\u2028\rTest\u2028\r", "Test\u2028\f", "\u2028\fTest",
-                        "\u2028\fTest\u2028\f", "Test\u2028\u0085", "\u2028\u0085Test", "\u2028\u0085Test\u2028\u0085", "Test\u2028\u2028", "\u2028\u2028Test",
-                        "\u2028\u2028Test\u2028\u2028", "Test\u2028\u2029", "\u2028\u2029Test", "\u2028\u2029Test\u2028\u2029", "Test\u2029\n", "\u2029\nTest",
-                        "\u2029\nTest\u2029\n", "Test\u2029\r\n", "\u2029\r\nTest", "\u2029\r\nTest\u2029\r\n", "Test\u2029\r", "\u2029\rTest", "\u2029\rTest\u2029\r",
-                        "Test\u2029\f", "\u2029\fTest", "\u2029\fTest\u2029\f", "Test\u2029\u0085", "\u2029\u0085Test", "\u2029\u0085Test\u2029\u0085", "Test\u2029\u2028",
-                        "\u2029\u2028Test", "\u2029\u2028Test\u2029\u2028", "Test\u2029\u2029", "\u2029\u2029Test", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\u00A0 ", "\u00A0\t", "\u00A0\u1680", "\n\u00A0", "\n\u00A0\n", "\r\n\u00A0", "\r\n\u00A0\r\n", "\r\u00A0",
-                        "\r\u00A0\r", "\f\u00A0", "\f\u00A0\f", "\u0085\u00A0", "\u0085\u00A0\u0085", "\u2028\u00A0", "\u2028\u00A0\u2028", "\u2029\u00A0",
-                        "\u2029\u00A0\u2029", "\u00A0\n\n", "\n\n\u00A0", "\n\n\u00A0\n\n", "\u00A0\n\r\n", "\n\r\n\u00A0", "\n\r\n\u00A0\n\r\n", "\u00A0\n\r", "\n\r\u00A0",
-                        "\n\r\u00A0\n\r", "\u00A0\n\f", "\n\f\u00A0", "\n\f\u00A0\n\f", "\u00A0\n\u0085", "\n\u0085\u00A0", "\n\u0085\u00A0\n\u0085", "\u00A0\n\u2028",
-                        "\n\u2028\u00A0", "\n\u2028\u00A0\n\u2028", "\u00A0\n\u2029", "\n\u2029\u00A0", "\n\u2029\u00A0\n\u2029", "\u00A0\r\n\n", "\r\n\n\u00A0",
-                        "\r\n\n\u00A0\r\n\n", "\u00A0\r\n\r\n", "\r\n\r\n\u00A0", "\r\n\r\n\u00A0\r\n\r\n", "\u00A0\r\n\r", "\r\n\r\u00A0", "\r\n\r\u00A0\r\n\r",
-                        "\u00A0\r\n\f", "\r\n\f\u00A0", "\r\n\f\u00A0\r\n\f", "\u00A0\r\n\u0085", "\r\n\u0085\u00A0", "\r\n\u0085\u00A0\r\n\u0085", "\u00A0\r\n\u2028",
-                        "\r\n\u2028\u00A0", "\r\n\u2028\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\r\n\u2029\u00A0", "\r\n\u2029\u00A0\r\n\u2029", "\u00A0\r\r\n",
-                        "\r\r\n\u00A0", "\r\r\n\u00A0\r\r\n", "\u00A0\r\r", "\r\r\u00A0", "\r\r\u00A0\r\r", "\u00A0\r\f", "\r\f\u00A0", "\r\f\u00A0\r\f", "\u00A0\r\u0085",
-                        "\r\u0085\u00A0", "\r\u0085\u00A0\r\u0085", "\u00A0\r\u2028", "\r\u2028\u00A0", "\r\u2028\u00A0\r\u2028", "\u00A0\r\u2029", "\r\u2029\u00A0",
-                        "\r\u2029\u00A0\r\u2029", "\u00A0\f\n", "\f\n\u00A0", "\f\n\u00A0\f\n", "\u00A0\f\r\n", "\f\r\n\u00A0", "\f\r\n\u00A0\f\r\n", "\u00A0\f\r",
-                        "\f\r\u00A0", "\f\r\u00A0\f\r", "\u00A0\f\f", "\f\f\u00A0", "\f\f\u00A0\f\f", "\u00A0\f\u0085", "\f\u0085\u00A0", "\f\u0085\u00A0\f\u0085",
-                        "\u00A0\f\u2028", "\f\u2028\u00A0", "\f\u2028\u00A0\f\u2028", "\u00A0\f\u2029", "\f\u2029\u00A0", "\f\u2029\u00A0\f\u2029", "\u00A0\u0085\n",
-                        "\u0085\n\u00A0", "\u0085\n\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u0085\r\n\u00A0", "\u0085\r\n\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u0085\r\u00A0",
-                        "\u0085\r\u00A0\u0085\r", "\u00A0\u0085\f", "\u0085\f\u00A0", "\u0085\f\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u0085\u0085\u00A0",
-                        "\u0085\u0085\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u0085\u2028\u00A0", "\u0085\u2028\u00A0\u0085\u2028", "\u00A0\u0085\u2029",
-                        "\u0085\u2029\u00A0", "\u0085\u2029\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u2028\n\u00A0", "\u2028\n\u00A0\u2028\n", "\u00A0\u2028\r\n",
-                        "\u2028\r\n\u00A0", "\u2028\r\n\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u2028\r\u00A0", "\u2028\r\u00A0\u2028\r", "\u00A0\u2028\f", "\u2028\f\u00A0",
-                        "\u2028\f\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u2028\u0085\u00A0", "\u2028\u0085\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u2028\u2028\u00A0",
-                        "\u2028\u2028\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u2028\u2029\u00A0", "\u2028\u2029\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u2029\n\u00A0",
-                        "\u2029\n\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u2029\r\n\u00A0", "\u2029\r\n\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u2029\r\u00A0",
-                        "\u2029\r\u00A0\u2029\r", "\u00A0\u2029\f", "\u2029\f\u00A0", "\u2029\f\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u2029\u0085\u00A0",
-                        "\u2029\u0085\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u2029\u2028\u00A0", "\u2029\u2028\u00A0\u2029\u2028", "\u00A0\u2029\u2029",
-                        "\u2029\u2029\u00A0", "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData(" Test", " Test", " Test ", "  Test  ", " \n Test", "\n Test ", "\n Test \n", " \n Test \n ", " \r\n Test", "\r\n Test ", "\r\n Test \r\n",
-                        " \r\n Test \r\n ", " \r Test", "\r Test ", "\r Test \r", " \r Test \r ", " \f Test", "\f Test ", "\f Test \f", " \f Test \f ", " \u0085 Test",
-                        "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ", " \u2028 Test", "\u2028 Test ", "\u2028 Test \u2028", " \u2028 Test \u2028 ",
-                        " \u2029 Test", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "\tTest", "\tTest\t", "\t\tTest\t\t", "\t\n\tTest", "\n\tTest\t",
-                        "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\t\r\n\tTest", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\t\r\tTest", "\r\tTest\t",
-                        "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\t\f\tTest", "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\t\u0085\tTest", "\u0085\tTest\t",
-                        "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\t\u2028\tTest", "\u2028\tTest\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t",
-                        "\t\u2029\tTest", "\u2029\tTest\t", "\u2029\tTest\t\u2029", "\t\u2029\tTest\t\u2029\t", "\u1680Test", "\u1680Test\u1680",
-                        "\u1680\u1680Test\u1680\u1680", "\u1680\n\u1680Test", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n", "\u1680\n\u1680Test\u1680\n\u1680",
-                        "\u1680\r\n\u1680Test", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n", "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\u1680\r\u1680Test",
-                        "\r\u1680Test\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\u1680\f\u1680Test", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f",
-                        "\u1680\f\u1680Test\u1680\f\u1680", "\u1680\u0085\u1680Test", "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085",
-                        "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u1680\u2028\u1680Test", "\u2028\u1680Test\u1680", "\u2028\u1680Test\u1680\u2028",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u1680\u2029\u1680Test", "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029",
-                        "\u1680\u2029\u1680Test\u1680\u2029\u1680"),
-                new TestData(" Test\n Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test\n Data", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData("Test\nData", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data",
-                        "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData",
-                        "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData",
-                        "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData",
-                        "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData",
-                        "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData",
-                        "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData",
-                        "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData(" \u00A0", " \u00A0", " \u00A0 ", "  \u00A0  ", " \n \u00A0", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ", " \r\n \u00A0",
-                        "\r\n \u00A0 ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", " \r \u00A0", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", " \f \u00A0", "\f \u00A0 ",
-                        "\f \u00A0 \f", " \f \u00A0 \f ", " \u0085 \u00A0", "\u0085 \u00A0 ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", " \u2028 \u00A0",
-                        "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", " \u2029 \u00A0", "\u2029 \u00A0 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\t\u00A0", "\t\u00A0\t", "\t\t\u00A0\t\t", "\t\n\t\u00A0", "\n\t\u00A0\t", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t",
-                        "\t\r\n\t\u00A0", "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\t\r\t\u00A0", "\r\t\u00A0\t", "\r\t\u00A0\t\r",
-                        "\t\r\t\u00A0\t\r\t", "\t\f\t\u00A0", "\f\t\u00A0\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\t\u0085\t\u00A0", "\u0085\t\u00A0\t",
-                        "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\t\u2028\t\u00A0", "\u2028\t\u00A0\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\t\u2029\t\u00A0", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\u1680\u00A0",
-                        "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\u1680\n\u1680\u00A0", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n",
-                        "\u1680\n\u1680\u00A0\u1680\n\u1680", "\u1680\r\n\u1680\u00A0", "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n",
-                        "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\u1680\r\u1680\u00A0", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\u1680\f\u1680\u00A0", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u1680\u0085\u1680\u00A0", "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u1680\u2028\u1680\u00A0", "\u2028\u1680\u00A0\u1680", "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680",
-                        "\u1680\u2029\u1680\u00A0", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029", "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680"),
-                new TestData(" \u00A0\n _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _", " \u00A0 \u2029 _",
-                        "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_",
-                        "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0\n _", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ",
-                        "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t",
-                        "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680"),
-                new TestData("\u00A0\n_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_",
-                        "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_",
-                        "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_",
-                        "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_",
-                        "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_",
-                        "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_",
-                        "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_",
-                        "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: Start; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM_END}</code>
      * Was: StringNormalizationOption.TRIM_START, StringNormalizationOption.REMOVE_BLANK_LINES
      */
@@ -2533,7 +2138,7 @@ public class StringHelperTest {
                 for (String nws1 : allNws1) {
                     source = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1;
+                    expected = nws1 + " ";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -2542,7 +2147,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2 + nws2 + ws2 + ws1;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + " " + nws2;
+                        expected = nws1 + " " + nws2 + " ";
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -2707,7 +2312,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nws1 + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + ws;
+                expected = nws1 + " ";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -2756,6 +2361,7 @@ public class StringHelperTest {
 
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -2763,7 +2369,7 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = " " + nws1;
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -2771,7 +2377,6 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -2929,207 +2534,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer04_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_END);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_END, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ",
-                        "\r\n ", "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test", "Test", " Test", " \n Test", " \r\n Test", " \r Test", " \f Test", " \u0085 Test", " \u2028 Test", " \u2029 Test", "\tTest",
-                        "\t\n\tTest", "\t\r\n\tTest", "\t\r\tTest", "\t\f\tTest", "\t\u0085\tTest", "\t\u2028\tTest", "\t\u2029\tTest", "\u1680Test", "\u1680\n\u1680Test",
-                        "\u1680\r\n\u1680Test", "\u1680\r\u1680Test", "\u1680\f\u1680Test", "\u1680\u0085\u1680Test", "\u1680\u2028\u1680Test", "\u1680\u2029\u1680Test",
-                        "\nTest", "\nTest\n", "\r\nTest", "\r\nTest\r\n", "\rTest", "\rTest\r", "\fTest", "\fTest\f", "\u0085Test", "\u0085Test\u0085", "\u2028Test",
-                        "\u2028Test\u2028", "\u2029Test", "\u2029Test\u2029", "Test\n\n", "\n\nTest", "\n\nTest\n\n", "Test\n\r\n", "\n\r\nTest", "\n\r\nTest\n\r\n",
-                        "Test\n\r", "\n\rTest", "\n\rTest\n\r", "Test\n\f", "\n\fTest", "\n\fTest\n\f", "Test\n\u0085", "\n\u0085Test", "\n\u0085Test\n\u0085",
-                        "Test\n\u2028", "\n\u2028Test", "\n\u2028Test\n\u2028", "Test\n\u2029", "\n\u2029Test", "\n\u2029Test\n\u2029", "Test\r\n\n", "\r\n\nTest",
-                        "\r\n\nTest\r\n\n", "Test\r\n\r\n", "\r\n\r\nTest", "\r\n\r\nTest\r\n\r\n", "Test\r\n\r", "\r\n\rTest", "\r\n\rTest\r\n\r", "Test\r\n\f",
-                        "\r\n\fTest", "\r\n\fTest\r\n\f", "Test\r\n\u0085", "\r\n\u0085Test", "\r\n\u0085Test\r\n\u0085", "Test\r\n\u2028", "\r\n\u2028Test",
-                        "\r\n\u2028Test\r\n\u2028", "Test\r\n\u2029", "\r\n\u2029Test", "\r\n\u2029Test\r\n\u2029", "Test\r\r\n", "\r\r\nTest", "\r\r\nTest\r\r\n",
-                        "Test\r\r", "\r\rTest", "\r\rTest\r\r", "Test\r\f", "\r\fTest", "\r\fTest\r\f", "Test\r\u0085", "\r\u0085Test", "\r\u0085Test\r\u0085",
-                        "Test\r\u2028", "\r\u2028Test", "\r\u2028Test\r\u2028", "Test\r\u2029", "\r\u2029Test", "\r\u2029Test\r\u2029", "Test\f\n", "\f\nTest",
-                        "\f\nTest\f\n", "Test\f\r\n", "\f\r\nTest", "\f\r\nTest\f\r\n", "Test\f\r", "\f\rTest", "\f\rTest\f\r", "Test\f\f", "\f\fTest", "\f\fTest\f\f",
-                        "Test\f\u0085", "\f\u0085Test", "\f\u0085Test\f\u0085", "Test\f\u2028", "\f\u2028Test", "\f\u2028Test\f\u2028", "Test\f\u2029", "\f\u2029Test",
-                        "\f\u2029Test\f\u2029", "Test\u0085\n", "\u0085\nTest", "\u0085\nTest\u0085\n", "Test\u0085\r\n", "\u0085\r\nTest", "\u0085\r\nTest\u0085\r\n",
-                        "Test\u0085\r", "\u0085\rTest", "\u0085\rTest\u0085\r", "Test\u0085\f", "\u0085\fTest", "\u0085\fTest\u0085\f", "Test\u0085\u0085",
-                        "\u0085\u0085Test", "\u0085\u0085Test\u0085\u0085", "Test\u0085\u2028", "\u0085\u2028Test", "\u0085\u2028Test\u0085\u2028", "Test\u0085\u2029",
-                        "\u0085\u2029Test", "\u0085\u2029Test\u0085\u2029", "Test\u2028\n", "\u2028\nTest", "\u2028\nTest\u2028\n", "Test\u2028\r\n", "\u2028\r\nTest",
-                        "\u2028\r\nTest\u2028\r\n", "Test\u2028\r", "\u2028\rTest", "\u2028\rTest\u2028\r", "Test\u2028\f", "\u2028\fTest", "\u2028\fTest\u2028\f",
-                        "Test\u2028\u0085", "\u2028\u0085Test", "\u2028\u0085Test\u2028\u0085", "Test\u2028\u2028", "\u2028\u2028Test", "\u2028\u2028Test\u2028\u2028",
-                        "Test\u2028\u2029", "\u2028\u2029Test", "\u2028\u2029Test\u2028\u2029", "Test\u2029\n", "\u2029\nTest", "\u2029\nTest\u2029\n", "Test\u2029\r\n",
-                        "\u2029\r\nTest", "\u2029\r\nTest\u2029\r\n", "Test\u2029\r", "\u2029\rTest", "\u2029\rTest\u2029\r", "Test\u2029\f", "\u2029\fTest",
-                        "\u2029\fTest\u2029\f", "Test\u2029\u0085", "\u2029\u0085Test", "\u2029\u0085Test\u2029\u0085", "Test\u2029\u2028", "\u2029\u2028Test",
-                        "\u2029\u2028Test\u2029\u2028", "Test\u2029\u2029", "\u2029\u2029Test", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", " \u00A0", " \n \u00A0", " \r\n \u00A0", " \r \u00A0", " \f \u00A0", " \u0085 \u00A0", " \u2028 \u00A0",
-                        " \u2029 \u00A0", "\t\u00A0", "\t\n\t\u00A0", "\t\r\n\t\u00A0", "\t\r\t\u00A0", "\t\f\t\u00A0", "\t\u0085\t\u00A0", "\t\u2028\t\u00A0",
-                        "\t\u2029\t\u00A0", "\u1680\u00A0", "\u1680\n\u1680\u00A0", "\u1680\r\n\u1680\u00A0", "\u1680\r\u1680\u00A0", "\u1680\f\u1680\u00A0",
-                        "\u1680\u0085\u1680\u00A0", "\u1680\u2028\u1680\u00A0", "\u1680\u2029\u1680\u00A0", "\n\u00A0", "\n\u00A0\n", "\r\n\u00A0", "\r\n\u00A0\r\n",
-                        "\r\u00A0", "\r\u00A0\r", "\f\u00A0", "\f\u00A0\f", "\u0085\u00A0", "\u0085\u00A0\u0085", "\u2028\u00A0", "\u2028\u00A0\u2028", "\u2029\u00A0",
-                        "\u2029\u00A0\u2029", "\u00A0\n\n", "\n\n\u00A0", "\n\n\u00A0\n\n", "\u00A0\n\r\n", "\n\r\n\u00A0", "\n\r\n\u00A0\n\r\n", "\u00A0\n\r", "\n\r\u00A0",
-                        "\n\r\u00A0\n\r", "\u00A0\n\f", "\n\f\u00A0", "\n\f\u00A0\n\f", "\u00A0\n\u0085", "\n\u0085\u00A0", "\n\u0085\u00A0\n\u0085", "\u00A0\n\u2028",
-                        "\n\u2028\u00A0", "\n\u2028\u00A0\n\u2028", "\u00A0\n\u2029", "\n\u2029\u00A0", "\n\u2029\u00A0\n\u2029", "\u00A0\r\n\n", "\r\n\n\u00A0",
-                        "\r\n\n\u00A0\r\n\n", "\u00A0\r\n\r\n", "\r\n\r\n\u00A0", "\r\n\r\n\u00A0\r\n\r\n", "\u00A0\r\n\r", "\r\n\r\u00A0", "\r\n\r\u00A0\r\n\r",
-                        "\u00A0\r\n\f", "\r\n\f\u00A0", "\r\n\f\u00A0\r\n\f", "\u00A0\r\n\u0085", "\r\n\u0085\u00A0", "\r\n\u0085\u00A0\r\n\u0085", "\u00A0\r\n\u2028",
-                        "\r\n\u2028\u00A0", "\r\n\u2028\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\r\n\u2029\u00A0", "\r\n\u2029\u00A0\r\n\u2029", "\u00A0\r\r\n",
-                        "\r\r\n\u00A0", "\r\r\n\u00A0\r\r\n", "\u00A0\r\r", "\r\r\u00A0", "\r\r\u00A0\r\r", "\u00A0\r\f", "\r\f\u00A0", "\r\f\u00A0\r\f", "\u00A0\r\u0085",
-                        "\r\u0085\u00A0", "\r\u0085\u00A0\r\u0085", "\u00A0\r\u2028", "\r\u2028\u00A0", "\r\u2028\u00A0\r\u2028", "\u00A0\r\u2029", "\r\u2029\u00A0",
-                        "\r\u2029\u00A0\r\u2029", "\u00A0\f\n", "\f\n\u00A0", "\f\n\u00A0\f\n", "\u00A0\f\r\n", "\f\r\n\u00A0", "\f\r\n\u00A0\f\r\n", "\u00A0\f\r",
-                        "\f\r\u00A0", "\f\r\u00A0\f\r", "\u00A0\f\f", "\f\f\u00A0", "\f\f\u00A0\f\f", "\u00A0\f\u0085", "\f\u0085\u00A0", "\f\u0085\u00A0\f\u0085",
-                        "\u00A0\f\u2028", "\f\u2028\u00A0", "\f\u2028\u00A0\f\u2028", "\u00A0\f\u2029", "\f\u2029\u00A0", "\f\u2029\u00A0\f\u2029", "\u00A0\u0085\n",
-                        "\u0085\n\u00A0", "\u0085\n\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u0085\r\n\u00A0", "\u0085\r\n\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u0085\r\u00A0",
-                        "\u0085\r\u00A0\u0085\r", "\u00A0\u0085\f", "\u0085\f\u00A0", "\u0085\f\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u0085\u0085\u00A0",
-                        "\u0085\u0085\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u0085\u2028\u00A0", "\u0085\u2028\u00A0\u0085\u2028", "\u00A0\u0085\u2029",
-                        "\u0085\u2029\u00A0", "\u0085\u2029\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u2028\n\u00A0", "\u2028\n\u00A0\u2028\n", "\u00A0\u2028\r\n",
-                        "\u2028\r\n\u00A0", "\u2028\r\n\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u2028\r\u00A0", "\u2028\r\u00A0\u2028\r", "\u00A0\u2028\f", "\u2028\f\u00A0",
-                        "\u2028\f\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u2028\u0085\u00A0", "\u2028\u0085\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u2028\u2028\u00A0",
-                        "\u2028\u2028\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u2028\u2029\u00A0", "\u2028\u2029\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u2029\n\u00A0",
-                        "\u2029\n\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u2029\r\n\u00A0", "\u2029\r\n\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u2029\r\u00A0",
-                        "\u2029\r\u00A0\u2029\r", "\u00A0\u2029\f", "\u2029\f\u00A0", "\u2029\f\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u2029\u0085\u00A0",
-                        "\u2029\u0085\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u2029\u2028\u00A0", "\u2029\u2028\u00A0\u2029\u2028", "\u00A0\u2029\u2029",
-                        "\u2029\u2029\u00A0", "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData("Test ", "Test ", " Test ", "  Test  ", "\n Test ", "\n Test \n", " \n Test \n ", "\r\n Test ", "\r\n Test \r\n", " \r\n Test \r\n ",
-                        "\r Test ", "\r Test \r", " \r Test \r ", "\f Test ", "\f Test \f", " \f Test \f ", "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ",
-                        "\u2028 Test ", "\u2028 Test \u2028", " \u2028 Test \u2028 ", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "Test\t", "\tTest\t",
-                        "\t\tTest\t\t", "\n\tTest\t", "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\r\tTest\t",
-                        "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\u0085\tTest\t", "\u0085\tTest\t\u0085",
-                        "\t\u0085\tTest\t\u0085\t", "\u2028\tTest\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t", "\u2029\tTest\t", "\u2029\tTest\t\u2029",
-                        "\t\u2029\tTest\t\u2029\t", "Test\u1680", "\u1680Test\u1680", "\u1680\u1680Test\u1680\u1680", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n",
-                        "\u1680\n\u1680Test\u1680\n\u1680", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n", "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\r\u1680Test\u1680",
-                        "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f", "\u1680\f\u1680Test\u1680\f\u1680",
-                        "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u2028\u1680Test\u1680",
-                        "\u2028\u1680Test\u1680\u2028", "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029",
-                        "\u1680\u2029\u1680Test\u1680\u2029\u1680"),
-                new TestData("Test \nData", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test \nData ", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData("Test\nData", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data",
-                        "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData",
-                        "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData",
-                        "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData",
-                        "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData",
-                        "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData",
-                        "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData",
-                        "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData("\u00A0 ", "\u00A0 ", " \u00A0 ", "  \u00A0  ", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ", "\r\n \u00A0 ", "\r\n \u00A0 \r\n",
-                        " \r\n \u00A0 \r\n ", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", "\f \u00A0 ", "\f \u00A0 \f", " \f \u00A0 \f ", "\u0085 \u00A0 ",
-                        "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", "\u2029 \u00A0 ",
-                        "\u2029 \u00A0 \u2029", " \u2029 \u00A0 \u2029 ", "\u00A0\t", "\t\u00A0\t", "\t\t\u00A0\t\t", "\n\t\u00A0\t", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t",
-                        "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\r\t\u00A0\t", "\r\t\u00A0\t\r", "\t\r\t\u00A0\t\r\t", "\f\t\u00A0\t",
-                        "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\u0085\t\u00A0\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\u2028\t\u00A0\t",
-                        "\u2028\t\u00A0\t\u2028", "\t\u2028\t\u00A0\t\u2028\t", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\u00A0\u1680",
-                        "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n", "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680", "\u2028\u1680\u00A0\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029",
-                        "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680"),
-                new TestData("\u00A0 \n_", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _", " \u00A0 \u2029 _",
-                        "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_",
-                        "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0 \n_ ", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ",
-                        "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t",
-                        "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680"),
-                new TestData("\u00A0\n_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_",
-                        "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_",
-                        "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_",
-                        "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_",
-                        "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_",
-                        "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_",
-                        "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_",
-                        "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: None; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM}</code>
      * Was: StringNormalizationOption.REMOVE_BLANK_LINES
      */
@@ -3163,6 +2569,7 @@ public class StringHelperTest {
             for (char ws2 : WHITESPACE_CHARACTERS) {
                 source = Character.toString(ws1) + ws2;
                 description = TestHelper.toStringDescription(source);
+                expected = " ";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -3611,212 +3018,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer06_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029"),
-                new TestData("Test", "Test", "\nTest", "\nTest\n", "\r\nTest", "\r\nTest\r\n", "\rTest", "\rTest\r", "\fTest", "\fTest\f", "\u0085Test",
-                        "\u0085Test\u0085", "\u2028Test", "\u2028Test\u2028", "\u2029Test", "\u2029Test\u2029", "Test\n\n", "\n\nTest", "\n\nTest\n\n", "Test\n\r\n",
-                        "\n\r\nTest", "\n\r\nTest\n\r\n", "Test\n\r", "\n\rTest", "\n\rTest\n\r", "Test\n\f", "\n\fTest", "\n\fTest\n\f", "Test\n\u0085", "\n\u0085Test",
-                        "\n\u0085Test\n\u0085", "Test\n\u2028", "\n\u2028Test", "\n\u2028Test\n\u2028", "Test\n\u2029", "\n\u2029Test", "\n\u2029Test\n\u2029", "Test\r\n\n",
-                        "\r\n\nTest", "\r\n\nTest\r\n\n", "Test\r\n\r\n", "\r\n\r\nTest", "\r\n\r\nTest\r\n\r\n", "Test\r\n\r", "\r\n\rTest", "\r\n\rTest\r\n\r",
-                        "Test\r\n\f", "\r\n\fTest", "\r\n\fTest\r\n\f", "Test\r\n\u0085", "\r\n\u0085Test", "\r\n\u0085Test\r\n\u0085", "Test\r\n\u2028", "\r\n\u2028Test",
-                        "\r\n\u2028Test\r\n\u2028", "Test\r\n\u2029", "\r\n\u2029Test", "\r\n\u2029Test\r\n\u2029", "Test\r\r\n", "\r\r\nTest", "\r\r\nTest\r\r\n",
-                        "Test\r\r", "\r\rTest", "\r\rTest\r\r", "Test\r\f", "\r\fTest", "\r\fTest\r\f", "Test\r\u0085", "\r\u0085Test", "\r\u0085Test\r\u0085",
-                        "Test\r\u2028", "\r\u2028Test", "\r\u2028Test\r\u2028", "Test\r\u2029", "\r\u2029Test", "\r\u2029Test\r\u2029", "Test\f\n", "\f\nTest",
-                        "\f\nTest\f\n", "Test\f\r\n", "\f\r\nTest", "\f\r\nTest\f\r\n", "Test\f\r", "\f\rTest", "\f\rTest\f\r", "Test\f\f", "\f\fTest", "\f\fTest\f\f",
-                        "Test\f\u0085", "\f\u0085Test", "\f\u0085Test\f\u0085", "Test\f\u2028", "\f\u2028Test", "\f\u2028Test\f\u2028", "Test\f\u2029", "\f\u2029Test",
-                        "\f\u2029Test\f\u2029", "Test\u0085\n", "\u0085\nTest", "\u0085\nTest\u0085\n", "Test\u0085\r\n", "\u0085\r\nTest", "\u0085\r\nTest\u0085\r\n",
-                        "Test\u0085\r", "\u0085\rTest", "\u0085\rTest\u0085\r", "Test\u0085\f", "\u0085\fTest", "\u0085\fTest\u0085\f", "Test\u0085\u0085",
-                        "\u0085\u0085Test", "\u0085\u0085Test\u0085\u0085", "Test\u0085\u2028", "\u0085\u2028Test", "\u0085\u2028Test\u0085\u2028", "Test\u0085\u2029",
-                        "\u0085\u2029Test", "\u0085\u2029Test\u0085\u2029", "Test\u2028\n", "\u2028\nTest", "\u2028\nTest\u2028\n", "Test\u2028\r\n", "\u2028\r\nTest",
-                        "\u2028\r\nTest\u2028\r\n", "Test\u2028\r", "\u2028\rTest", "\u2028\rTest\u2028\r", "Test\u2028\f", "\u2028\fTest", "\u2028\fTest\u2028\f",
-                        "Test\u2028\u0085", "\u2028\u0085Test", "\u2028\u0085Test\u2028\u0085", "Test\u2028\u2028", "\u2028\u2028Test", "\u2028\u2028Test\u2028\u2028",
-                        "Test\u2028\u2029", "\u2028\u2029Test", "\u2028\u2029Test\u2028\u2029", "Test\u2029\n", "\u2029\nTest", "\u2029\nTest\u2029\n", "Test\u2029\r\n",
-                        "\u2029\r\nTest", "\u2029\r\nTest\u2029\r\n", "Test\u2029\r", "\u2029\rTest", "\u2029\rTest\u2029\r", "Test\u2029\f", "\u2029\fTest",
-                        "\u2029\fTest\u2029\f", "Test\u2029\u0085", "\u2029\u0085Test", "\u2029\u0085Test\u2029\u0085", "Test\u2029\u2028", "\u2029\u2028Test",
-                        "\u2029\u2028Test\u2029\u2028", "Test\u2029\u2029", "\u2029\u2029Test", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\n\u00A0", "\n\u00A0\n", "\r\n\u00A0", "\r\n\u00A0\r\n", "\r\u00A0", "\r\u00A0\r", "\f\u00A0", "\f\u00A0\f",
-                        "\u0085\u00A0", "\u0085\u00A0\u0085", "\u2028\u00A0", "\u2028\u00A0\u2028", "\u2029\u00A0", "\u2029\u00A0\u2029", "\u00A0\n\n", "\n\n\u00A0",
-                        "\n\n\u00A0\n\n", "\u00A0\n\r\n", "\n\r\n\u00A0", "\n\r\n\u00A0\n\r\n", "\u00A0\n\r", "\n\r\u00A0", "\n\r\u00A0\n\r", "\u00A0\n\f", "\n\f\u00A0",
-                        "\n\f\u00A0\n\f", "\u00A0\n\u0085", "\n\u0085\u00A0", "\n\u0085\u00A0\n\u0085", "\u00A0\n\u2028", "\n\u2028\u00A0", "\n\u2028\u00A0\n\u2028",
-                        "\u00A0\n\u2029", "\n\u2029\u00A0", "\n\u2029\u00A0\n\u2029", "\u00A0\r\n\n", "\r\n\n\u00A0", "\r\n\n\u00A0\r\n\n", "\u00A0\r\n\r\n",
-                        "\r\n\r\n\u00A0", "\r\n\r\n\u00A0\r\n\r\n", "\u00A0\r\n\r", "\r\n\r\u00A0", "\r\n\r\u00A0\r\n\r", "\u00A0\r\n\f", "\r\n\f\u00A0",
-                        "\r\n\f\u00A0\r\n\f", "\u00A0\r\n\u0085", "\r\n\u0085\u00A0", "\r\n\u0085\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\r\n\u2028\u00A0",
-                        "\r\n\u2028\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\r\n\u2029\u00A0", "\r\n\u2029\u00A0\r\n\u2029", "\u00A0\r\r\n", "\r\r\n\u00A0",
-                        "\r\r\n\u00A0\r\r\n", "\u00A0\r\r", "\r\r\u00A0", "\r\r\u00A0\r\r", "\u00A0\r\f", "\r\f\u00A0", "\r\f\u00A0\r\f", "\u00A0\r\u0085", "\r\u0085\u00A0",
-                        "\r\u0085\u00A0\r\u0085", "\u00A0\r\u2028", "\r\u2028\u00A0", "\r\u2028\u00A0\r\u2028", "\u00A0\r\u2029", "\r\u2029\u00A0", "\r\u2029\u00A0\r\u2029",
-                        "\u00A0\f\n", "\f\n\u00A0", "\f\n\u00A0\f\n", "\u00A0\f\r\n", "\f\r\n\u00A0", "\f\r\n\u00A0\f\r\n", "\u00A0\f\r", "\f\r\u00A0", "\f\r\u00A0\f\r",
-                        "\u00A0\f\f", "\f\f\u00A0", "\f\f\u00A0\f\f", "\u00A0\f\u0085", "\f\u0085\u00A0", "\f\u0085\u00A0\f\u0085", "\u00A0\f\u2028", "\f\u2028\u00A0",
-                        "\f\u2028\u00A0\f\u2028", "\u00A0\f\u2029", "\f\u2029\u00A0", "\f\u2029\u00A0\f\u2029", "\u00A0\u0085\n", "\u0085\n\u00A0", "\u0085\n\u00A0\u0085\n",
-                        "\u00A0\u0085\r\n", "\u0085\r\n\u00A0", "\u0085\r\n\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u0085\r\u00A0", "\u0085\r\u00A0\u0085\r", "\u00A0\u0085\f",
-                        "\u0085\f\u00A0", "\u0085\f\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u0085\u0085\u00A0", "\u0085\u0085\u00A0\u0085\u0085", "\u00A0\u0085\u2028",
-                        "\u0085\u2028\u00A0", "\u0085\u2028\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u0085\u2029\u00A0", "\u0085\u2029\u00A0\u0085\u2029",
-                        "\u00A0\u2028\n", "\u2028\n\u00A0", "\u2028\n\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u2028\r\n\u00A0", "\u2028\r\n\u00A0\u2028\r\n", "\u00A0\u2028\r",
-                        "\u2028\r\u00A0", "\u2028\r\u00A0\u2028\r", "\u00A0\u2028\f", "\u2028\f\u00A0", "\u2028\f\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u2028\u0085\u00A0",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u2028\u2028\u00A0", "\u2028\u2028\u00A0\u2028\u2028", "\u00A0\u2028\u2029",
-                        "\u2028\u2029\u00A0", "\u2028\u2029\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u2029\n\u00A0", "\u2029\n\u00A0\u2029\n", "\u00A0\u2029\r\n",
-                        "\u2029\r\n\u00A0", "\u2029\r\n\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u2029\r\u00A0", "\u2029\r\u00A0\u2029\r", "\u00A0\u2029\f", "\u2029\f\u00A0",
-                        "\u2029\f\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u2029\u0085\u00A0", "\u2029\u0085\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u2029\u2028\u00A0",
-                        "\u2029\u2028\u00A0\u2029\u2028", "\u00A0\u2029\u2029", "\u2029\u2029\u00A0", "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData(" ", " ", "  ", " \t", " \u1680", "\n ", "\n \n", "\r\n ", "\r\n \r\n", "\r ", "\r \r", "\f ", "\f \f", "\u0085 ", "\u0085 \u0085",
-                        "\u2028 ", "\u2028 \u2028", "\u2029 ", "\u2029 \u2029", "\n\n ", "\n\n \n\n", "\n\r\n ", "\n\r\n \n\r\n", "\n\r ", "\n\r \n\r", "\n\f ", "\n\f \n\f",
-                        "\n\u0085 ", "\n\u0085 \n\u0085", "\n\u2028 ", "\n\u2028 \n\u2028", "\n\u2029 ", "\n\u2029 \n\u2029", "\r\n\n ", "\r\n\n \r\n\n", "\r\n\r\n ",
-                        "\r\n\r\n \r\n\r\n", "\r\n\r ", "\r\n\r \r\n\r", "\r\n\f ", "\r\n\f \r\n\f", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", "\r\r\n ", "\r\r\n \r\r\n", "\r\r ", "\r\r \r\r", "\r\f ", "\r\f \r\f", "\r\u0085 ",
-                        "\r\u0085 \r\u0085", "\r\u2028 ", "\r\u2028 \r\u2028", "\r\u2029 ", "\r\u2029 \r\u2029", "\f\n ", "\f\n \f\n", "\f\r\n ", "\f\r\n \f\r\n", "\f\r ",
-                        "\f\r \f\r", "\f\f ", "\f\f \f\f", "\f\u0085 ", "\f\u0085 \f\u0085", "\f\u2028 ", "\f\u2028 \f\u2028", "\f\u2029 ", "\f\u2029 \f\u2029", "\u0085\n ",
-                        "\u0085\n \u0085\n", "\u0085\r\n ", "\u0085\r\n \u0085\r\n", "\u0085\r ", "\u0085\r \u0085\r", "\u0085\f ", "\u0085\f \u0085\f", "\u0085\u0085 ",
-                        "\u0085\u0085 \u0085\u0085", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", "\u0085\u2029 ", "\u0085\u2029 \u0085\u2029", "\u2028\n ",
-                        "\u2028\n \u2028\n", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", "\u2028\r ", "\u2028\r \u2028\r", "\u2028\f ", "\u2028\f \u2028\f", "\u2028\u0085 ",
-                        "\u2028\u0085 \u2028\u0085", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", "\u2029\n ",
-                        "\u2029\n \u2029\n", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", "\u2029\r ", "\u2029\r \u2029\r", "\u2029\f ", "\u2029\f \u2029\f", "\u2029\u0085 ",
-                        "\u2029\u0085 \u2029\u0085", "\u2029\u2028 ", "\u2029\u2028 \u2029\u2028", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t",
-                        "\t\u1680", "\n\t", "\n\t\n", "\r\n\t", "\r\n\t\r\n", "\r\t", "\r\t\r", "\f\t", "\f\t\f", "\u0085\t", "\u0085\t\u0085", "\u2028\t", "\u2028\t\u2028",
-                        "\u2029\t", "\u2029\t\u2029", "\n\n\t", "\n\n\t\n\n", "\n\r\n\t", "\n\r\n\t\n\r\n", "\n\r\t", "\n\r\t\n\r", "\n\f\t", "\n\f\t\n\f", "\n\u0085\t",
-                        "\n\u0085\t\n\u0085", "\n\u2028\t", "\n\u2028\t\n\u2028", "\n\u2029\t", "\n\u2029\t\n\u2029", "\r\n\n\t", "\r\n\n\t\r\n\n", "\r\n\r\n\t",
-                        "\r\n\r\n\t\r\n\r\n", "\r\n\r\t", "\r\n\r\t\r\n\r", "\r\n\f\t", "\r\n\f\t\r\n\f", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\r\n\u2028\t",
-                        "\r\n\u2028\t\r\n\u2028", "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\r\r\n\t", "\r\r\n\t\r\r\n", "\r\r\t", "\r\r\t\r\r", "\r\f\t", "\r\f\t\r\f",
-                        "\r\u0085\t", "\r\u0085\t\r\u0085", "\r\u2028\t", "\r\u2028\t\r\u2028", "\r\u2029\t", "\r\u2029\t\r\u2029", "\f\n\t", "\f\n\t\f\n", "\f\r\n\t",
-                        "\f\r\n\t\f\r\n", "\f\r\t", "\f\r\t\f\r", "\f\f\t", "\f\f\t\f\f", "\f\u0085\t", "\f\u0085\t\f\u0085", "\f\u2028\t", "\f\u2028\t\f\u2028",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\u0085\n\t", "\u0085\n\t\u0085\n", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n", "\u0085\r\t", "\u0085\r\t\u0085\r",
-                        "\u0085\f\t", "\u0085\f\t\u0085\f", "\u0085\u0085\t", "\u0085\u0085\t\u0085\u0085", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\u2028\n\t", "\u2028\n\t\u2028\n", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n", "\u2028\r\t", "\u2028\r\t\u2028\r",
-                        "\u2028\f\t", "\u2028\f\t\u2028\f", "\u2028\u0085\t", "\u2028\u0085\t\u2028\u0085", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\u2029\n\t", "\u2029\n\t\u2029\n", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n", "\u2029\r\t", "\u2029\r\t\u2029\r",
-                        "\u2029\f\t", "\u2029\f\t\u2029\f", "\u2029\u0085\t", "\u2029\u0085\t\u2029\u0085", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\n\u1680", "\n\u1680\n", "\r\n\u1680", "\r\n\u1680\r\n", "\r\u1680",
-                        "\r\u1680\r", "\f\u1680", "\f\u1680\f", "\u0085\u1680", "\u0085\u1680\u0085", "\u2028\u1680", "\u2028\u1680\u2028", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\n\n\u1680", "\n\n\u1680\n\n", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n", "\n\r\u1680", "\n\r\u1680\n\r", "\n\f\u1680",
-                        "\n\f\u1680\n\f", "\n\u0085\u1680", "\n\u0085\u1680\n\u0085", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\n\u2029\u1680", "\n\u2029\u1680\n\u2029",
-                        "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\r\n\r\n\u1680", "\r\n\r\n\u1680\r\n\r\n", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\r\n\f\u1680",
-                        "\r\n\f\u1680\r\n\f", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\r\n\u2028\u1680", "\r\n\u2028\u1680\r\n\u2028", "\r\n\u2029\u1680",
-                        "\r\n\u2029\u1680\r\n\u2029", "\r\r\n\u1680", "\r\r\n\u1680\r\r\n", "\r\r\u1680", "\r\r\u1680\r\r", "\r\f\u1680", "\r\f\u1680\r\f", "\r\u0085\u1680",
-                        "\r\u0085\u1680\r\u0085", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\f\n\u1680", "\f\n\u1680\f\n",
-                        "\f\r\n\u1680", "\f\r\n\u1680\f\r\n", "\f\r\u1680", "\f\r\u1680\f\r", "\f\f\u1680", "\f\f\u1680\f\f", "\f\u0085\u1680", "\f\u0085\u1680\f\u0085",
-                        "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u0085\f\u1680", "\u0085\f\u1680\u0085\f",
-                        "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u2028\r\n\u1680", "\u2028\r\n\u1680\u2028\r\n", "\u2028\r\u1680",
-                        "\u2028\r\u1680\u2028\r", "\u2028\f\u1680", "\u2028\f\u1680\u2028\f", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680\u2028\u2028", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n",
-                        "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u2029\u2028\u1680", "\u2029\u2028\u1680\u2029\u2028", "\u2029\u2029\u1680",
-                        "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData(" \n ", " \n ", " \r\n ", " \r ", " \f ", " \u0085 ", " \u2028 ", " \u2029 ", " \n\n ", " \n\r\n ", " \n\r ", " \n\f ", " \n\u0085 ",
-                        " \n\u2028 ", " \n\u2029 ", " \r\n\n ", " \r\n\r\n ", " \r\n\r ", " \r\n\f ", " \r\n\u0085 ", " \r\n\u2028 ", " \r\n\u2029 ", " \r\r\n ", " \r\r ",
-                        " \r\f ", " \r\u0085 ", " \r\u2028 ", " \r\u2029 ", " \f\n ", " \f\r\n ", " \f\r ", " \f\f ", " \f\u0085 ", " \f\u2028 ", " \f\u2029 ", " \u0085\n ",
-                        " \u0085\r\n ", " \u0085\r ", " \u0085\f ", " \u0085\u0085 ", " \u0085\u2028 ", " \u0085\u2029 ", " \u2028\n ", " \u2028\r\n ", " \u2028\r ",
-                        " \u2028\f ", " \u2028\u0085 ", " \u2028\u2028 ", " \u2028\u2029 ", " \u2029\n ", " \u2029\r\n ", " \u2029\r ", " \u2029\f ", " \u2029\u0085 ",
-                        " \u2029\u2028 ", " \u2029\u2029 ", "\t\n\t", "\t\r\n\t", "\t\r\t", "\t\f\t", "\t\u0085\t", "\t\u2028\t", "\t\u2029\t", "\t\n\n\t", "\t\n\r\n\t",
-                        "\t\n\r\t", "\t\n\f\t", "\t\n\u0085\t", "\t\n\u2028\t", "\t\n\u2029\t", "\t\r\n\n\t", "\t\r\n\r\n\t", "\t\r\n\r\t", "\t\r\n\f\t", "\t\r\n\u0085\t",
-                        "\t\r\n\u2028\t", "\t\r\n\u2029\t", "\t\r\r\n\t", "\t\r\r\t", "\t\r\f\t", "\t\r\u0085\t", "\t\r\u2028\t", "\t\r\u2029\t", "\t\f\n\t", "\t\f\r\n\t",
-                        "\t\f\r\t", "\t\f\f\t", "\t\f\u0085\t", "\t\f\u2028\t", "\t\f\u2029\t", "\t\u0085\n\t", "\t\u0085\r\n\t", "\t\u0085\r\t", "\t\u0085\f\t",
-                        "\t\u0085\u0085\t", "\t\u0085\u2028\t", "\t\u0085\u2029\t", "\t\u2028\n\t", "\t\u2028\r\n\t", "\t\u2028\r\t", "\t\u2028\f\t", "\t\u2028\u0085\t",
-                        "\t\u2028\u2028\t", "\t\u2028\u2029\t", "\t\u2029\n\t", "\t\u2029\r\n\t", "\t\u2029\r\t", "\t\u2029\f\t", "\t\u2029\u0085\t", "\t\u2029\u2028\t",
-                        "\t\u2029\u2029\t", "\u1680\n\u1680", "\u1680\r\n\u1680", "\u1680\r\u1680", "\u1680\f\u1680", "\u1680\u0085\u1680", "\u1680\u2028\u1680",
-                        "\u1680\u2029\u1680", "\u1680\n\n\u1680", "\u1680\n\r\n\u1680", "\u1680\n\r\u1680", "\u1680\n\f\u1680", "\u1680\n\u0085\u1680",
-                        "\u1680\n\u2028\u1680", "\u1680\n\u2029\u1680", "\u1680\r\n\n\u1680", "\u1680\r\n\r\n\u1680", "\u1680\r\n\r\u1680", "\u1680\r\n\f\u1680",
-                        "\u1680\r\n\u0085\u1680", "\u1680\r\n\u2028\u1680", "\u1680\r\n\u2029\u1680", "\u1680\r\r\n\u1680", "\u1680\r\r\u1680", "\u1680\r\f\u1680",
-                        "\u1680\r\u0085\u1680", "\u1680\r\u2028\u1680", "\u1680\r\u2029\u1680", "\u1680\f\n\u1680", "\u1680\f\r\n\u1680", "\u1680\f\r\u1680",
-                        "\u1680\f\f\u1680", "\u1680\f\u0085\u1680", "\u1680\f\u2028\u1680", "\u1680\f\u2029\u1680", "\u1680\u0085\n\u1680", "\u1680\u0085\r\n\u1680",
-                        "\u1680\u0085\r\u1680", "\u1680\u0085\f\u1680", "\u1680\u0085\u0085\u1680", "\u1680\u0085\u2028\u1680", "\u1680\u0085\u2029\u1680",
-                        "\u1680\u2028\n\u1680", "\u1680\u2028\r\n\u1680", "\u1680\u2028\r\u1680", "\u1680\u2028\f\u1680", "\u1680\u2028\u0085\u1680",
-                        "\u1680\u2028\u2028\u1680", "\u1680\u2028\u2029\u1680", "\u1680\u2029\n\u1680", "\u1680\u2029\r\n\u1680", "\u1680\u2029\r\u1680",
-                        "\u1680\u2029\f\u1680", "\u1680\u2029\u0085\u1680", "\u1680\u2029\u2028\u1680", "\u1680\u2029\u2029\u1680"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData("Test ", "Test ", "Test\t", "Test\u1680"),
-                new TestData(" Test", " Test", "\tTest", "\u1680Test"),
-                new TestData(" Test ", " Test ", "  Test  ", "\n Test ", "\n Test \n", "\r\n Test ", "\r\n Test \r\n", "\r Test ", "\r Test \r", "\f Test ",
-                        "\f Test \f", "\u0085 Test ", "\u0085 Test \u0085", "\u2028 Test ", "\u2028 Test \u2028", "\u2029 Test ", "\u2029 Test \u2029", "\tTest\t",
-                        "\t\tTest\t\t", "\n\tTest\t", "\n\tTest\t\n", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\r\tTest\t", "\r\tTest\t\r", "\f\tTest\t", "\f\tTest\t\f",
-                        "\u0085\tTest\t", "\u0085\tTest\t\u0085", "\u2028\tTest\t", "\u2028\tTest\t\u2028", "\u2029\tTest\t", "\u2029\tTest\t\u2029", "\u1680Test\u1680",
-                        "\u1680\u1680Test\u1680\u1680", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n",
-                        "\r\u1680Test\u1680", "\r\u1680Test\u1680\r", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f", "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085",
-                        "\u2028\u1680Test\u1680", "\u2028\u1680Test\u1680\u2028", "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029"),
-                new TestData(" Test \n Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test \n Data ", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData(" \n Test", " \n Test", " \r\n Test", " \r Test", " \f Test", " \u0085 Test", " \u2028 Test", " \u2029 Test", "\t\n\tTest", "\t\r\n\tTest",
-                        "\t\r\tTest", "\t\f\tTest", "\t\u0085\tTest", "\t\u2028\tTest", "\t\u2029\tTest", "\u1680\n\u1680Test", "\u1680\r\n\u1680Test", "\u1680\r\u1680Test",
-                        "\u1680\f\u1680Test", "\u1680\u0085\u1680Test", "\u1680\u2028\u1680Test", "\u1680\u2029\u1680Test"),
-                new TestData(" \n Test \n ", " \n Test \n ", " \r\n Test \r\n ", " \r Test \r ", " \f Test \f ", " \u0085 Test \u0085 ", " \u2028 Test \u2028 ",
-                        " \u2029 Test \u2029 ", "\t\n\tTest\t\n\t", "\t\r\n\tTest\t\r\n\t", "\t\r\tTest\t\r\t", "\t\f\tTest\t\f\t", "\t\u0085\tTest\t\u0085\t",
-                        "\t\u2028\tTest\t\u2028\t", "\t\u2029\tTest\t\u2029\t", "\u1680\n\u1680Test\u1680\n\u1680", "\u1680\r\n\u1680Test\u1680\r\n\u1680",
-                        "\u1680\r\u1680Test\u1680\r\u1680", "\u1680\f\u1680Test\u1680\f\u1680", "\u1680\u0085\u1680Test\u1680\u0085\u1680",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u1680\u2029\u1680Test\u1680\u2029\u1680"),
-                new TestData("Test\nData", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data",
-                        "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData",
-                        "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData",
-                        "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData",
-                        "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData",
-                        "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData",
-                        "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData",
-                        "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData("\u00A0 ", "\u00A0 ", "\u00A0\t", "\u00A0\u1680"),
-                new TestData(" \u00A0", " \u00A0", "\t\u00A0", "\u1680\u00A0"),
-                new TestData(" \u00A0 ", " \u00A0 ", "  \u00A0  ", "\n \u00A0 ", "\n \u00A0 \n", "\r\n \u00A0 ", "\r\n \u00A0 \r\n", "\r \u00A0 ", "\r \u00A0 \r",
-                        "\f \u00A0 ", "\f \u00A0 \f", "\u0085 \u00A0 ", "\u0085 \u00A0 \u0085", "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", "\u2029 \u00A0 ",
-                        "\u2029 \u00A0 \u2029", "\t\u00A0\t", "\t\t\u00A0\t\t", "\n\t\u00A0\t", "\n\t\u00A0\t\n", "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\r\t\u00A0\t",
-                        "\r\t\u00A0\t\r", "\f\t\u00A0\t", "\f\t\u00A0\t\f", "\u0085\t\u00A0\t", "\u0085\t\u00A0\t\u0085", "\u2028\t\u00A0\t", "\u2028\t\u00A0\t\u2028",
-                        "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\n\u1680\u00A0\u1680",
-                        "\n\u1680\u00A0\u1680\n", "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u2028\u1680\u00A0\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029"),
-                new TestData(" \u00A0 \n _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _",
-                        " \u00A0 \u2029 _", "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_",
-                        "\t\u00A0\t\u2029\t_", "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0 \n _ ", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ",
-                        "\u00A0 \u2029 _ ", "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t",
-                        "\u00A0\t\u2029\t_\t", "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680"),
-                new TestData(" \n \u00A0", " \n \u00A0", " \r\n \u00A0", " \r \u00A0", " \f \u00A0", " \u0085 \u00A0", " \u2028 \u00A0", " \u2029 \u00A0",
-                        "\t\n\t\u00A0", "\t\r\n\t\u00A0", "\t\r\t\u00A0", "\t\f\t\u00A0", "\t\u0085\t\u00A0", "\t\u2028\t\u00A0", "\t\u2029\t\u00A0", "\u1680\n\u1680\u00A0",
-                        "\u1680\r\n\u1680\u00A0", "\u1680\r\u1680\u00A0", "\u1680\f\u1680\u00A0", "\u1680\u0085\u1680\u00A0", "\u1680\u2028\u1680\u00A0",
-                        "\u1680\u2029\u1680\u00A0"),
-                new TestData(" \n \u00A0 \n ", " \n \u00A0 \n ", " \r\n \u00A0 \r\n ", " \r \u00A0 \r ", " \f \u00A0 \f ", " \u0085 \u00A0 \u0085 ",
-                        " \u2028 \u00A0 \u2028 ", " \u2029 \u00A0 \u2029 ", "\t\n\t\u00A0\t\n\t", "\t\r\n\t\u00A0\t\r\n\t", "\t\r\t\u00A0\t\r\t", "\t\f\t\u00A0\t\f\t",
-                        "\t\u0085\t\u00A0\t\u0085\t", "\t\u2028\t\u00A0\t\u2028\t", "\t\u2029\t\u00A0\t\u2029\t", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\u1680\r\u1680\u00A0\u1680\r\u1680", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680"),
-                new TestData("\u00A0\n_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_",
-                        "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_",
-                        "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_",
-                        "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_",
-                        "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_",
-                        "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_",
-                        "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_",
-                        "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Single-Line; Trim: Both; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#SINGLE_LINE}</code>
      * Was: StringNormalizationOption.TRIM, StringNormalizationOption.SINGLE_LINE
      * Now: StringNormalizationOption.SINGLE_LINE
@@ -3859,6 +3062,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
+                    expected = "";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -4274,205 +3478,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer08_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ",
-                        "\r\n ", "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test", "Test", "Test ", " Test", " Test ", "  Test  ", " \n Test", "\n Test ", "\n Test \n", " \n Test \n ", " \r\n Test", "\r\n Test ",
-                        "\r\n Test \r\n", " \r\n Test \r\n ", " \r Test", "\r Test ", "\r Test \r", " \r Test \r ", " \f Test", "\f Test ", "\f Test \f", " \f Test \f ",
-                        " \u0085 Test", "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ", " \u2028 Test", "\u2028 Test ", "\u2028 Test \u2028",
-                        " \u2028 Test \u2028 ", " \u2029 Test", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "Test\t", "\tTest", "\tTest\t", "\t\tTest\t\t",
-                        "\t\n\tTest", "\n\tTest\t", "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\t\r\n\tTest", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t",
-                        "\t\r\tTest", "\r\tTest\t", "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\t\f\tTest", "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\t\u0085\tTest",
-                        "\u0085\tTest\t", "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\t\u2028\tTest", "\u2028\tTest\t", "\u2028\tTest\t\u2028",
-                        "\t\u2028\tTest\t\u2028\t", "\t\u2029\tTest", "\u2029\tTest\t", "\u2029\tTest\t\u2029", "\t\u2029\tTest\t\u2029\t", "Test\u1680", "\u1680Test",
-                        "\u1680Test\u1680", "\u1680\u1680Test\u1680\u1680", "\u1680\n\u1680Test", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n",
-                        "\u1680\n\u1680Test\u1680\n\u1680", "\u1680\r\n\u1680Test", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n",
-                        "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\u1680\r\u1680Test", "\r\u1680Test\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680",
-                        "\u1680\f\u1680Test", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f", "\u1680\f\u1680Test\u1680\f\u1680", "\u1680\u0085\u1680Test",
-                        "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u1680\u2028\u1680Test",
-                        "\u2028\u1680Test\u1680", "\u2028\u1680Test\u1680\u2028", "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u1680\u2029\u1680Test",
-                        "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029", "\u1680\u2029\u1680Test\u1680\u2029\u1680", "\nTest", "\nTest\n", "\r\nTest",
-                        "\r\nTest\r\n", "\rTest", "\rTest\r", "\fTest", "\fTest\f", "\u0085Test", "\u0085Test\u0085", "\u2028Test", "\u2028Test\u2028", "\u2029Test",
-                        "\u2029Test\u2029", "Test\n\n", "\n\nTest", "\n\nTest\n\n", "Test\n\r\n", "\n\r\nTest", "\n\r\nTest\n\r\n", "Test\n\r", "\n\rTest", "\n\rTest\n\r",
-                        "Test\n\f", "\n\fTest", "\n\fTest\n\f", "Test\n\u0085", "\n\u0085Test", "\n\u0085Test\n\u0085", "Test\n\u2028", "\n\u2028Test",
-                        "\n\u2028Test\n\u2028", "Test\n\u2029", "\n\u2029Test", "\n\u2029Test\n\u2029", "Test\r\n\n", "\r\n\nTest", "\r\n\nTest\r\n\n", "Test\r\n\r\n",
-                        "\r\n\r\nTest", "\r\n\r\nTest\r\n\r\n", "Test\r\n\r", "\r\n\rTest", "\r\n\rTest\r\n\r", "Test\r\n\f", "\r\n\fTest", "\r\n\fTest\r\n\f",
-                        "Test\r\n\u0085", "\r\n\u0085Test", "\r\n\u0085Test\r\n\u0085", "Test\r\n\u2028", "\r\n\u2028Test", "\r\n\u2028Test\r\n\u2028", "Test\r\n\u2029",
-                        "\r\n\u2029Test", "\r\n\u2029Test\r\n\u2029", "Test\r\r\n", "\r\r\nTest", "\r\r\nTest\r\r\n", "Test\r\r", "\r\rTest", "\r\rTest\r\r", "Test\r\f",
-                        "\r\fTest", "\r\fTest\r\f", "Test\r\u0085", "\r\u0085Test", "\r\u0085Test\r\u0085", "Test\r\u2028", "\r\u2028Test", "\r\u2028Test\r\u2028",
-                        "Test\r\u2029", "\r\u2029Test", "\r\u2029Test\r\u2029", "Test\f\n", "\f\nTest", "\f\nTest\f\n", "Test\f\r\n", "\f\r\nTest", "\f\r\nTest\f\r\n",
-                        "Test\f\r", "\f\rTest", "\f\rTest\f\r", "Test\f\f", "\f\fTest", "\f\fTest\f\f", "Test\f\u0085", "\f\u0085Test", "\f\u0085Test\f\u0085",
-                        "Test\f\u2028", "\f\u2028Test", "\f\u2028Test\f\u2028", "Test\f\u2029", "\f\u2029Test", "\f\u2029Test\f\u2029", "Test\u0085\n", "\u0085\nTest",
-                        "\u0085\nTest\u0085\n", "Test\u0085\r\n", "\u0085\r\nTest", "\u0085\r\nTest\u0085\r\n", "Test\u0085\r", "\u0085\rTest", "\u0085\rTest\u0085\r",
-                        "Test\u0085\f", "\u0085\fTest", "\u0085\fTest\u0085\f", "Test\u0085\u0085", "\u0085\u0085Test", "\u0085\u0085Test\u0085\u0085", "Test\u0085\u2028",
-                        "\u0085\u2028Test", "\u0085\u2028Test\u0085\u2028", "Test\u0085\u2029", "\u0085\u2029Test", "\u0085\u2029Test\u0085\u2029", "Test\u2028\n",
-                        "\u2028\nTest", "\u2028\nTest\u2028\n", "Test\u2028\r\n", "\u2028\r\nTest", "\u2028\r\nTest\u2028\r\n", "Test\u2028\r", "\u2028\rTest",
-                        "\u2028\rTest\u2028\r", "Test\u2028\f", "\u2028\fTest", "\u2028\fTest\u2028\f", "Test\u2028\u0085", "\u2028\u0085Test",
-                        "\u2028\u0085Test\u2028\u0085", "Test\u2028\u2028", "\u2028\u2028Test", "\u2028\u2028Test\u2028\u2028", "Test\u2028\u2029", "\u2028\u2029Test",
-                        "\u2028\u2029Test\u2028\u2029", "Test\u2029\n", "\u2029\nTest", "\u2029\nTest\u2029\n", "Test\u2029\r\n", "\u2029\r\nTest",
-                        "\u2029\r\nTest\u2029\r\n", "Test\u2029\r", "\u2029\rTest", "\u2029\rTest\u2029\r", "Test\u2029\f", "\u2029\fTest", "\u2029\fTest\u2029\f",
-                        "Test\u2029\u0085", "\u2029\u0085Test", "\u2029\u0085Test\u2029\u0085", "Test\u2029\u2028", "\u2029\u2028Test", "\u2029\u2028Test\u2029\u2028",
-                        "Test\u2029\u2029", "\u2029\u2029Test", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\u00A0 ", " \u00A0", " \u00A0 ", "  \u00A0  ", " \n \u00A0", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ",
-                        " \r\n \u00A0", "\r\n \u00A0 ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", " \r \u00A0", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", " \f \u00A0",
-                        "\f \u00A0 ", "\f \u00A0 \f", " \f \u00A0 \f ", " \u0085 \u00A0", "\u0085 \u00A0 ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ",
-                        " \u2028 \u00A0", "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", " \u2029 \u00A0", "\u2029 \u00A0 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\u00A0\t", "\t\u00A0", "\t\u00A0\t", "\t\t\u00A0\t\t", "\t\n\t\u00A0", "\n\t\u00A0\t", "\n\t\u00A0\t\n",
-                        "\t\n\t\u00A0\t\n\t", "\t\r\n\t\u00A0", "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\t\r\t\u00A0", "\r\t\u00A0\t",
-                        "\r\t\u00A0\t\r", "\t\r\t\u00A0\t\r\t", "\t\f\t\u00A0", "\f\t\u00A0\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\t\u0085\t\u00A0",
-                        "\u0085\t\u00A0\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\t\u2028\t\u00A0", "\u2028\t\u00A0\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\t\u2029\t\u00A0", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\u00A0\u1680",
-                        "\u1680\u00A0", "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\u1680\n\u1680\u00A0", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n",
-                        "\u1680\n\u1680\u00A0\u1680\n\u1680", "\u1680\r\n\u1680\u00A0", "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n",
-                        "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\u1680\r\u1680\u00A0", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\u1680\f\u1680\u00A0", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u1680\u0085\u1680\u00A0", "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u1680\u2028\u1680\u00A0", "\u2028\u1680\u00A0\u1680", "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680",
-                        "\u1680\u2029\u1680\u00A0", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029", "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680", "\n\u00A0",
-                        "\n\u00A0\n", "\r\n\u00A0", "\r\n\u00A0\r\n", "\r\u00A0", "\r\u00A0\r", "\f\u00A0", "\f\u00A0\f", "\u0085\u00A0", "\u0085\u00A0\u0085",
-                        "\u2028\u00A0", "\u2028\u00A0\u2028", "\u2029\u00A0", "\u2029\u00A0\u2029", "\u00A0\n\n", "\n\n\u00A0", "\n\n\u00A0\n\n", "\u00A0\n\r\n",
-                        "\n\r\n\u00A0", "\n\r\n\u00A0\n\r\n", "\u00A0\n\r", "\n\r\u00A0", "\n\r\u00A0\n\r", "\u00A0\n\f", "\n\f\u00A0", "\n\f\u00A0\n\f", "\u00A0\n\u0085",
-                        "\n\u0085\u00A0", "\n\u0085\u00A0\n\u0085", "\u00A0\n\u2028", "\n\u2028\u00A0", "\n\u2028\u00A0\n\u2028", "\u00A0\n\u2029", "\n\u2029\u00A0",
-                        "\n\u2029\u00A0\n\u2029", "\u00A0\r\n\n", "\r\n\n\u00A0", "\r\n\n\u00A0\r\n\n", "\u00A0\r\n\r\n", "\r\n\r\n\u00A0", "\r\n\r\n\u00A0\r\n\r\n",
-                        "\u00A0\r\n\r", "\r\n\r\u00A0", "\r\n\r\u00A0\r\n\r", "\u00A0\r\n\f", "\r\n\f\u00A0", "\r\n\f\u00A0\r\n\f", "\u00A0\r\n\u0085", "\r\n\u0085\u00A0",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\r\n\u2028\u00A0", "\r\n\u2028\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\r\n\u2029\u00A0",
-                        "\r\n\u2029\u00A0\r\n\u2029", "\u00A0\r\r\n", "\r\r\n\u00A0", "\r\r\n\u00A0\r\r\n", "\u00A0\r\r", "\r\r\u00A0", "\r\r\u00A0\r\r", "\u00A0\r\f",
-                        "\r\f\u00A0", "\r\f\u00A0\r\f", "\u00A0\r\u0085", "\r\u0085\u00A0", "\r\u0085\u00A0\r\u0085", "\u00A0\r\u2028", "\r\u2028\u00A0",
-                        "\r\u2028\u00A0\r\u2028", "\u00A0\r\u2029", "\r\u2029\u00A0", "\r\u2029\u00A0\r\u2029", "\u00A0\f\n", "\f\n\u00A0", "\f\n\u00A0\f\n", "\u00A0\f\r\n",
-                        "\f\r\n\u00A0", "\f\r\n\u00A0\f\r\n", "\u00A0\f\r", "\f\r\u00A0", "\f\r\u00A0\f\r", "\u00A0\f\f", "\f\f\u00A0", "\f\f\u00A0\f\f", "\u00A0\f\u0085",
-                        "\f\u0085\u00A0", "\f\u0085\u00A0\f\u0085", "\u00A0\f\u2028", "\f\u2028\u00A0", "\f\u2028\u00A0\f\u2028", "\u00A0\f\u2029", "\f\u2029\u00A0",
-                        "\f\u2029\u00A0\f\u2029", "\u00A0\u0085\n", "\u0085\n\u00A0", "\u0085\n\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u0085\r\n\u00A0",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u0085\r\u00A0", "\u0085\r\u00A0\u0085\r", "\u00A0\u0085\f", "\u0085\f\u00A0",
-                        "\u0085\f\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u0085\u0085\u00A0", "\u0085\u0085\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u0085\u2028\u00A0",
-                        "\u0085\u2028\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u0085\u2029\u00A0", "\u0085\u2029\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u2028\n\u00A0",
-                        "\u2028\n\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u2028\r\n\u00A0", "\u2028\r\n\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u2028\r\u00A0",
-                        "\u2028\r\u00A0\u2028\r", "\u00A0\u2028\f", "\u2028\f\u00A0", "\u2028\f\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u2028\u0085\u00A0",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u2028\u2028\u00A0", "\u2028\u2028\u00A0\u2028\u2028", "\u00A0\u2028\u2029",
-                        "\u2028\u2029\u00A0", "\u2028\u2029\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u2029\n\u00A0", "\u2029\n\u00A0\u2029\n", "\u00A0\u2029\r\n",
-                        "\u2029\r\n\u00A0", "\u2029\r\n\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u2029\r\u00A0", "\u2029\r\u00A0\u2029\r", "\u00A0\u2029\f", "\u2029\f\u00A0",
-                        "\u2029\f\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u2029\u0085\u00A0", "\u2029\u0085\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u2029\u2028\u00A0",
-                        "\u2029\u2028\u00A0\u2029\u2028", "\u00A0\u2029\u2029", "\u2029\u2029\u00A0", "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", " Test \n Data", "Test \n Data ", " Test \r\n Data", "Test \r\n Data ", " Test \r Data",
-                        "Test \r Data ", " Test \f Data", "Test \f Data ", " Test \u0085 Data", "Test \u0085 Data ", " Test \u2028 Data", "Test \u2028 Data ",
-                        " Test \u2029 Data", "Test \u2029 Data ", "Test\tData", "Test\t\tData", "\tTest\t\n\tData", "Test\t\n\tData\t", "\tTest\t\r\n\tData",
-                        "Test\t\r\n\tData\t", "\tTest\t\r\tData", "Test\t\r\tData\t", "\tTest\t\f\tData", "Test\t\f\tData\t", "\tTest\t\u0085\tData", "Test\t\u0085\tData\t",
-                        "\tTest\t\u2028\tData", "Test\t\u2028\tData\t", "\tTest\t\u2029\tData", "Test\t\u2029\tData\t", "Test\u1680Data", "Test\u1680\u1680Data",
-                        "\u1680Test\u1680\n\u1680Data", "Test\u1680\n\u1680Data\u1680", "\u1680Test\u1680\r\n\u1680Data", "Test\u1680\r\n\u1680Data\u1680",
-                        "\u1680Test\u1680\r\u1680Data", "Test\u1680\r\u1680Data\u1680", "\u1680Test\u1680\f\u1680Data", "Test\u1680\f\u1680Data\u1680",
-                        "\u1680Test\u1680\u0085\u1680Data", "Test\u1680\u0085\u1680Data\u1680", "\u1680Test\u1680\u2028\u1680Data", "Test\u1680\u2028\u1680Data\u1680",
-                        "\u1680Test\u1680\u2029\u1680Data", "Test\u1680\u2029\u1680Data\u1680", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data",
-                        "Test\u2028Data", "Test\u2029Data", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data",
-                        "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data",
-                        "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData",
-                        "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData",
-                        "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data",
-                        "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data",
-                        "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data",
-                        "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", " \u00A0 \n _", "\u00A0 \n _ ", " \u00A0 \r\n _", "\u00A0 \r\n _ ", " \u00A0 \r _", "\u00A0 \r _ ",
-                        " \u00A0 \f _", "\u00A0 \f _ ", " \u00A0 \u0085 _", "\u00A0 \u0085 _ ", " \u00A0 \u2028 _", "\u00A0 \u2028 _ ", " \u00A0 \u2029 _",
-                        "\u00A0 \u2029 _ ", "\u00A0\t_", "\u00A0\t\t_", "\t\u00A0\t\n\t_", "\u00A0\t\n\t_\t", "\t\u00A0\t\r\n\t_", "\u00A0\t\r\n\t_\t", "\t\u00A0\t\r\t_",
-                        "\u00A0\t\r\t_\t", "\t\u00A0\t\f\t_", "\u00A0\t\f\t_\t", "\t\u00A0\t\u0085\t_", "\u00A0\t\u0085\t_\t", "\t\u00A0\t\u2028\t_", "\u00A0\t\u2028\t_\t",
-                        "\t\u00A0\t\u2029\t_", "\u00A0\t\u2029\t_\t", "\u00A0\u1680_", "\u00A0\u1680\u1680_", "\u1680\u00A0\u1680\n\u1680_", "\u00A0\u1680\n\u1680_\u1680",
-                        "\u1680\u00A0\u1680\r\n\u1680_", "\u00A0\u1680\r\n\u1680_\u1680", "\u1680\u00A0\u1680\r\u1680_", "\u00A0\u1680\r\u1680_\u1680",
-                        "\u1680\u00A0\u1680\f\u1680_", "\u00A0\u1680\f\u1680_\u1680", "\u1680\u00A0\u1680\u0085\u1680_", "\u00A0\u1680\u0085\u1680_\u1680",
-                        "\u1680\u00A0\u1680\u2028\u1680_", "\u00A0\u1680\u2028\u1680_\u1680", "\u1680\u00A0\u1680\u2029\u1680_", "\u00A0\u1680\u2029\u1680_\u1680",
-                        "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_", "\u00A0\n\r\n_",
-                        "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_",
-                        "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_",
-                        "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_", "\u00A0\f\u2028_",
-                        "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_",
-                        "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_",
-                        "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_",
-                        "\u00A0\u2029\u2029_")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String d = TestHelper.toStringDescription(u);
-                String a = target1.apply(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Single-Line; Trim: End; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM_START} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      * Was: StringNormalizationOption.TRIM_END, StringNormalizationOption.SINGLE_LINE
      */
@@ -4608,6 +3615,7 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
+                expected = " " + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -4624,6 +3632,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
+                    expected = " " + nws1 + " " + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -4741,7 +3750,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = " " + nws1 + " " + nws2 + " ";
+                        expected = " " + nws1 + " " + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -4759,207 +3768,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer0A_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START, StringNormalizationOption.SINGLE_LINE);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START, StringNormalizationOption.SINGLE_LINE, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ",
-                        "\r\n ", "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test", "Test", "Test ", "Test\t", "Test\u1680", "Test\n\n", "Test\n\r\n", "Test\n\r", "Test\n\f", "Test\n\u0085", "Test\n\u2028",
-                        "Test\n\u2029", "Test\r\n\n", "Test\r\n\r\n", "Test\r\n\r", "Test\r\n\f", "Test\r\n\u0085", "Test\r\n\u2028", "Test\r\n\u2029", "Test\r\r\n",
-                        "Test\r\r", "Test\r\f", "Test\r\u0085", "Test\r\u2028", "Test\r\u2029", "Test\f\n", "Test\f\r\n", "Test\f\r", "Test\f\f", "Test\f\u0085",
-                        "Test\f\u2028", "Test\f\u2029", "Test\u0085\n", "Test\u0085\r\n", "Test\u0085\r", "Test\u0085\f", "Test\u0085\u0085", "Test\u0085\u2028",
-                        "Test\u0085\u2029", "Test\u2028\n", "Test\u2028\r\n", "Test\u2028\r", "Test\u2028\f", "Test\u2028\u0085", "Test\u2028\u2028", "Test\u2028\u2029",
-                        "Test\u2029\n", "Test\u2029\r\n", "Test\u2029\r", "Test\u2029\f", "Test\u2029\u0085", "Test\u2029\u2028", "Test\u2029\u2029"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\u00A0 ", "\u00A0\t", "\u00A0\u1680", "\u00A0\n\n", "\u00A0\n\r\n", "\u00A0\n\r", "\u00A0\n\f", "\u00A0\n\u0085",
-                        "\u00A0\n\u2028", "\u00A0\n\u2029", "\u00A0\r\n\n", "\u00A0\r\n\r\n", "\u00A0\r\n\r", "\u00A0\r\n\f", "\u00A0\r\n\u0085", "\u00A0\r\n\u2028",
-                        "\u00A0\r\n\u2029", "\u00A0\r\r\n", "\u00A0\r\r", "\u00A0\r\f", "\u00A0\r\u0085", "\u00A0\r\u2028", "\u00A0\r\u2029", "\u00A0\f\n", "\u00A0\f\r\n",
-                        "\u00A0\f\r", "\u00A0\f\f", "\u00A0\f\u0085", "\u00A0\f\u2028", "\u00A0\f\u2029", "\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u00A0\u0085\r",
-                        "\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u00A0\u2028\r",
-                        "\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u00A0\u2029\r",
-                        "\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u00A0\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ",
-                        "Test \u2028 Data ", "Test \u2029 Data ", "Test\tData", "Test\t\tData", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t",
-                        "Test\t\f\tData\t", "Test\t\u0085\tData\t", "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680Data", "Test\u1680\u1680Data",
-                        "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680", "Test\u1680\f\u1680Data\u1680",
-                        "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680", "Test\nData", "Test\r\nData",
-                        "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData",
-                        "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData",
-                        "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data",
-                        "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data",
-                        "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data",
-                        "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data",
-                        "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData",
-                        "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData(" Test", " Test", " Test ", "  Test  ", " \n Test", "\n Test ", "\n Test \n", " \n Test \n ", " \r\n Test", "\r\n Test ", "\r\n Test \r\n",
-                        " \r\n Test \r\n ", " \r Test", "\r Test ", "\r Test \r", " \r Test \r ", " \f Test", "\f Test ", "\f Test \f", " \f Test \f ", " \u0085 Test",
-                        "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ", " \u2028 Test", "\u2028 Test ", "\u2028 Test \u2028", " \u2028 Test \u2028 ",
-                        " \u2029 Test", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "\tTest", "\tTest\t", "\t\tTest\t\t", "\t\n\tTest", "\n\tTest\t",
-                        "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\t\r\n\tTest", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\t\r\tTest", "\r\tTest\t",
-                        "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\t\f\tTest", "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\t\u0085\tTest", "\u0085\tTest\t",
-                        "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\t\u2028\tTest", "\u2028\tTest\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t",
-                        "\t\u2029\tTest", "\u2029\tTest\t", "\u2029\tTest\t\u2029", "\t\u2029\tTest\t\u2029\t", "\u1680Test", "\u1680Test\u1680",
-                        "\u1680\u1680Test\u1680\u1680", "\u1680\n\u1680Test", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n", "\u1680\n\u1680Test\u1680\n\u1680",
-                        "\u1680\r\n\u1680Test", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n", "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\u1680\r\u1680Test",
-                        "\r\u1680Test\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\u1680\f\u1680Test", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f",
-                        "\u1680\f\u1680Test\u1680\f\u1680", "\u1680\u0085\u1680Test", "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085",
-                        "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u1680\u2028\u1680Test", "\u2028\u1680Test\u1680", "\u2028\u1680Test\u1680\u2028",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u1680\u2029\u1680Test", "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029",
-                        "\u1680\u2029\u1680Test\u1680\u2029\u1680", "\nTest", "\nTest\n", "\r\nTest", "\r\nTest\r\n", "\rTest", "\rTest\r", "\fTest", "\fTest\f",
-                        "\u0085Test", "\u0085Test\u0085", "\u2028Test", "\u2028Test\u2028", "\u2029Test", "\u2029Test\u2029", "\n\nTest", "\n\nTest\n\n", "\n\r\nTest",
-                        "\n\r\nTest\n\r\n", "\n\rTest", "\n\rTest\n\r", "\n\fTest", "\n\fTest\n\f", "\n\u0085Test", "\n\u0085Test\n\u0085", "\n\u2028Test",
-                        "\n\u2028Test\n\u2028", "\n\u2029Test", "\n\u2029Test\n\u2029", "\r\n\nTest", "\r\n\nTest\r\n\n", "\r\n\r\nTest", "\r\n\r\nTest\r\n\r\n",
-                        "\r\n\rTest", "\r\n\rTest\r\n\r", "\r\n\fTest", "\r\n\fTest\r\n\f", "\r\n\u0085Test", "\r\n\u0085Test\r\n\u0085", "\r\n\u2028Test",
-                        "\r\n\u2028Test\r\n\u2028", "\r\n\u2029Test", "\r\n\u2029Test\r\n\u2029", "\r\r\nTest", "\r\r\nTest\r\r\n", "\r\rTest", "\r\rTest\r\r", "\r\fTest",
-                        "\r\fTest\r\f", "\r\u0085Test", "\r\u0085Test\r\u0085", "\r\u2028Test", "\r\u2028Test\r\u2028", "\r\u2029Test", "\r\u2029Test\r\u2029", "\f\nTest",
-                        "\f\nTest\f\n", "\f\r\nTest", "\f\r\nTest\f\r\n", "\f\rTest", "\f\rTest\f\r", "\f\fTest", "\f\fTest\f\f", "\f\u0085Test", "\f\u0085Test\f\u0085",
-                        "\f\u2028Test", "\f\u2028Test\f\u2028", "\f\u2029Test", "\f\u2029Test\f\u2029", "\u0085\nTest", "\u0085\nTest\u0085\n", "\u0085\r\nTest",
-                        "\u0085\r\nTest\u0085\r\n", "\u0085\rTest", "\u0085\rTest\u0085\r", "\u0085\fTest", "\u0085\fTest\u0085\f", "\u0085\u0085Test",
-                        "\u0085\u0085Test\u0085\u0085", "\u0085\u2028Test", "\u0085\u2028Test\u0085\u2028", "\u0085\u2029Test", "\u0085\u2029Test\u0085\u2029",
-                        "\u2028\nTest", "\u2028\nTest\u2028\n", "\u2028\r\nTest", "\u2028\r\nTest\u2028\r\n", "\u2028\rTest", "\u2028\rTest\u2028\r", "\u2028\fTest",
-                        "\u2028\fTest\u2028\f", "\u2028\u0085Test", "\u2028\u0085Test\u2028\u0085", "\u2028\u2028Test", "\u2028\u2028Test\u2028\u2028", "\u2028\u2029Test",
-                        "\u2028\u2029Test\u2028\u2029", "\u2029\nTest", "\u2029\nTest\u2029\n", "\u2029\r\nTest", "\u2029\r\nTest\u2029\r\n", "\u2029\rTest",
-                        "\u2029\rTest\u2029\r", "\u2029\fTest", "\u2029\fTest\u2029\f", "\u2029\u0085Test", "\u2029\u0085Test\u2029\u0085", "\u2029\u2028Test",
-                        "\u2029\u2028Test\u2029\u2028", "\u2029\u2029Test", "\u2029\u2029Test\u2029\u2029"),
-                new TestData(" Test Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ",
-                        "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t",
-                        "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t", "\u00A0\u1680_", "\u00A0\u1680\u1680_", "\u00A0\u1680\n\u1680_\u1680",
-                        "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680", "\u00A0\u1680\u0085\u1680_\u1680",
-                        "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_",
-                        "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_",
-                        "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_",
-                        "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_",
-                        "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_",
-                        "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_",
-                        "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_",
-                        "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData(" \u00A0", " \u00A0", " \u00A0 ", "  \u00A0  ", " \n \u00A0", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ", " \r\n \u00A0",
-                        "\r\n \u00A0 ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", " \r \u00A0", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", " \f \u00A0", "\f \u00A0 ",
-                        "\f \u00A0 \f", " \f \u00A0 \f ", " \u0085 \u00A0", "\u0085 \u00A0 ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", " \u2028 \u00A0",
-                        "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", " \u2029 \u00A0", "\u2029 \u00A0 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\t\u00A0", "\t\u00A0\t", "\t\t\u00A0\t\t", "\t\n\t\u00A0", "\n\t\u00A0\t", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t",
-                        "\t\r\n\t\u00A0", "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\t\r\t\u00A0", "\r\t\u00A0\t", "\r\t\u00A0\t\r",
-                        "\t\r\t\u00A0\t\r\t", "\t\f\t\u00A0", "\f\t\u00A0\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\t\u0085\t\u00A0", "\u0085\t\u00A0\t",
-                        "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\t\u2028\t\u00A0", "\u2028\t\u00A0\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\t\u2029\t\u00A0", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\u1680\u00A0",
-                        "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\u1680\n\u1680\u00A0", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n",
-                        "\u1680\n\u1680\u00A0\u1680\n\u1680", "\u1680\r\n\u1680\u00A0", "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n",
-                        "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\u1680\r\u1680\u00A0", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\u1680\f\u1680\u00A0", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u1680\u0085\u1680\u00A0", "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u1680\u2028\u1680\u00A0", "\u2028\u1680\u00A0\u1680", "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680",
-                        "\u1680\u2029\u1680\u00A0", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029", "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680", "\n\u00A0",
-                        "\n\u00A0\n", "\r\n\u00A0", "\r\n\u00A0\r\n", "\r\u00A0", "\r\u00A0\r", "\f\u00A0", "\f\u00A0\f", "\u0085\u00A0", "\u0085\u00A0\u0085",
-                        "\u2028\u00A0", "\u2028\u00A0\u2028", "\u2029\u00A0", "\u2029\u00A0\u2029", "\n\n\u00A0", "\n\n\u00A0\n\n", "\n\r\n\u00A0", "\n\r\n\u00A0\n\r\n",
-                        "\n\r\u00A0", "\n\r\u00A0\n\r", "\n\f\u00A0", "\n\f\u00A0\n\f", "\n\u0085\u00A0", "\n\u0085\u00A0\n\u0085", "\n\u2028\u00A0",
-                        "\n\u2028\u00A0\n\u2028", "\n\u2029\u00A0", "\n\u2029\u00A0\n\u2029", "\r\n\n\u00A0", "\r\n\n\u00A0\r\n\n", "\r\n\r\n\u00A0",
-                        "\r\n\r\n\u00A0\r\n\r\n", "\r\n\r\u00A0", "\r\n\r\u00A0\r\n\r", "\r\n\f\u00A0", "\r\n\f\u00A0\r\n\f", "\r\n\u0085\u00A0",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\r\n\u2028\u00A0", "\r\n\u2028\u00A0\r\n\u2028", "\r\n\u2029\u00A0", "\r\n\u2029\u00A0\r\n\u2029", "\r\r\n\u00A0",
-                        "\r\r\n\u00A0\r\r\n", "\r\r\u00A0", "\r\r\u00A0\r\r", "\r\f\u00A0", "\r\f\u00A0\r\f", "\r\u0085\u00A0", "\r\u0085\u00A0\r\u0085", "\r\u2028\u00A0",
-                        "\r\u2028\u00A0\r\u2028", "\r\u2029\u00A0", "\r\u2029\u00A0\r\u2029", "\f\n\u00A0", "\f\n\u00A0\f\n", "\f\r\n\u00A0", "\f\r\n\u00A0\f\r\n",
-                        "\f\r\u00A0", "\f\r\u00A0\f\r", "\f\f\u00A0", "\f\f\u00A0\f\f", "\f\u0085\u00A0", "\f\u0085\u00A0\f\u0085", "\f\u2028\u00A0",
-                        "\f\u2028\u00A0\f\u2028", "\f\u2029\u00A0", "\f\u2029\u00A0\f\u2029", "\u0085\n\u00A0", "\u0085\n\u00A0\u0085\n", "\u0085\r\n\u00A0",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u0085\r\u00A0", "\u0085\r\u00A0\u0085\r", "\u0085\f\u00A0", "\u0085\f\u00A0\u0085\f", "\u0085\u0085\u00A0",
-                        "\u0085\u0085\u00A0\u0085\u0085", "\u0085\u2028\u00A0", "\u0085\u2028\u00A0\u0085\u2028", "\u0085\u2029\u00A0", "\u0085\u2029\u00A0\u0085\u2029",
-                        "\u2028\n\u00A0", "\u2028\n\u00A0\u2028\n", "\u2028\r\n\u00A0", "\u2028\r\n\u00A0\u2028\r\n", "\u2028\r\u00A0", "\u2028\r\u00A0\u2028\r",
-                        "\u2028\f\u00A0", "\u2028\f\u00A0\u2028\f", "\u2028\u0085\u00A0", "\u2028\u0085\u00A0\u2028\u0085", "\u2028\u2028\u00A0",
-                        "\u2028\u2028\u00A0\u2028\u2028", "\u2028\u2029\u00A0", "\u2028\u2029\u00A0\u2028\u2029", "\u2029\n\u00A0", "\u2029\n\u00A0\u2029\n",
-                        "\u2029\r\n\u00A0", "\u2029\r\n\u00A0\u2029\r\n", "\u2029\r\u00A0", "\u2029\r\u00A0\u2029\r", "\u2029\f\u00A0", "\u2029\f\u00A0\u2029\f",
-                        "\u2029\u0085\u00A0", "\u2029\u0085\u00A0\u2029\u0085", "\u2029\u2028\u00A0", "\u2029\u2028\u00A0\u2029\u2028", "\u2029\u2029\u00A0",
-                        "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData(" \u00A0 _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _", " \u00A0 \u2029 _",
-                        "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_",
-                        "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Single-Line; Trim: Start; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM_END} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      * Was: StringNormalizationOption.TRIM_START, StringNormalizationOption.SINGLE_LINE
      */
@@ -5086,7 +3896,7 @@ public class StringHelperTest {
             for (String nl : allNlSeq) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = " " + nws1;
+                expected = nws1 + " ";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -5094,6 +3904,7 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -5110,7 +3921,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = " " + nws1 + " " + nws2 + " ";
+                    expected = nws1 + " " + nws2 + " ";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -5246,205 +4057,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer0C_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_END, StringNormalizationOption.SINGLE_LINE);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_END, StringNormalizationOption.SINGLE_LINE, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029",
-                        "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029",
-                        "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085",
-                        "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n",
-                        "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ",
-                        "\r\n ", "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test", "Test", " Test", " \n Test", " \r\n Test", " \r Test", " \f Test", " \u0085 Test", " \u2028 Test", " \u2029 Test", "\tTest",
-                        "\t\n\tTest", "\t\r\n\tTest", "\t\r\tTest", "\t\f\tTest", "\t\u0085\tTest", "\t\u2028\tTest", "\t\u2029\tTest", "\u1680Test", "\u1680\n\u1680Test",
-                        "\u1680\r\n\u1680Test", "\u1680\r\u1680Test", "\u1680\f\u1680Test", "\u1680\u0085\u1680Test", "\u1680\u2028\u1680Test", "\u1680\u2029\u1680Test",
-                        "\nTest", "\r\nTest", "\rTest", "\fTest", "\u0085Test", "\u2028Test", "\u2029Test", "\n\nTest", "\n\r\nTest", "\n\rTest", "\n\fTest", "\n\u0085Test",
-                        "\n\u2028Test", "\n\u2029Test", "\r\n\nTest", "\r\n\r\nTest", "\r\n\rTest", "\r\n\fTest", "\r\n\u0085Test", "\r\n\u2028Test", "\r\n\u2029Test",
-                        "\r\r\nTest", "\r\rTest", "\r\fTest", "\r\u0085Test", "\r\u2028Test", "\r\u2029Test", "\f\nTest", "\f\r\nTest", "\f\rTest", "\f\fTest",
-                        "\f\u0085Test", "\f\u2028Test", "\f\u2029Test", "\u0085\nTest", "\u0085\r\nTest", "\u0085\rTest", "\u0085\fTest", "\u0085\u0085Test",
-                        "\u0085\u2028Test", "\u0085\u2029Test", "\u2028\nTest", "\u2028\r\nTest", "\u2028\rTest", "\u2028\fTest", "\u2028\u0085Test", "\u2028\u2028Test",
-                        "\u2028\u2029Test", "\u2029\nTest", "\u2029\r\nTest", "\u2029\rTest", "\u2029\fTest", "\u2029\u0085Test", "\u2029\u2028Test", "\u2029\u2029Test"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", " \u00A0", " \n \u00A0", " \r\n \u00A0", " \r \u00A0", " \f \u00A0", " \u0085 \u00A0", " \u2028 \u00A0",
-                        " \u2029 \u00A0", "\t\u00A0", "\t\n\t\u00A0", "\t\r\n\t\u00A0", "\t\r\t\u00A0", "\t\f\t\u00A0", "\t\u0085\t\u00A0", "\t\u2028\t\u00A0",
-                        "\t\u2029\t\u00A0", "\u1680\u00A0", "\u1680\n\u1680\u00A0", "\u1680\r\n\u1680\u00A0", "\u1680\r\u1680\u00A0", "\u1680\f\u1680\u00A0",
-                        "\u1680\u0085\u1680\u00A0", "\u1680\u2028\u1680\u00A0", "\u1680\u2029\u1680\u00A0", "\n\u00A0", "\r\n\u00A0", "\r\u00A0", "\f\u00A0", "\u0085\u00A0",
-                        "\u2028\u00A0", "\u2029\u00A0", "\n\n\u00A0", "\n\r\n\u00A0", "\n\r\u00A0", "\n\f\u00A0", "\n\u0085\u00A0", "\n\u2028\u00A0", "\n\u2029\u00A0",
-                        "\r\n\n\u00A0", "\r\n\r\n\u00A0", "\r\n\r\u00A0", "\r\n\f\u00A0", "\r\n\u0085\u00A0", "\r\n\u2028\u00A0", "\r\n\u2029\u00A0", "\r\r\n\u00A0",
-                        "\r\r\u00A0", "\r\f\u00A0", "\r\u0085\u00A0", "\r\u2028\u00A0", "\r\u2029\u00A0", "\f\n\u00A0", "\f\r\n\u00A0", "\f\r\u00A0", "\f\f\u00A0",
-                        "\f\u0085\u00A0", "\f\u2028\u00A0", "\f\u2029\u00A0", "\u0085\n\u00A0", "\u0085\r\n\u00A0", "\u0085\r\u00A0", "\u0085\f\u00A0", "\u0085\u0085\u00A0",
-                        "\u0085\u2028\u00A0", "\u0085\u2029\u00A0", "\u2028\n\u00A0", "\u2028\r\n\u00A0", "\u2028\r\u00A0", "\u2028\f\u00A0", "\u2028\u0085\u00A0",
-                        "\u2028\u2028\u00A0", "\u2028\u2029\u00A0", "\u2029\n\u00A0", "\u2029\r\n\u00A0", "\u2029\r\u00A0", "\u2029\f\u00A0", "\u2029\u0085\u00A0",
-                        "\u2029\u2028\u00A0", "\u2029\u2029\u00A0"),
-                new TestData("Test Data", "Test Data", "Test  Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data",
-                        " Test \u2028 Data", " Test \u2029 Data", "Test\tData", "Test\t\tData", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData",
-                        "\tTest\t\f\tData", "\tTest\t\u0085\tData", "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "Test\u1680Data", "Test\u1680\u1680Data",
-                        "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data", "\u1680Test\u1680\f\u1680Data",
-                        "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data", "Test\nData", "Test\r\nData",
-                        "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData",
-                        "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData",
-                        "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data",
-                        "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data",
-                        "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data",
-                        "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data",
-                        "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData",
-                        "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("Test ", "Test ", " Test ", "  Test  ", "\n Test ", "\n Test \n", " \n Test \n ", "\r\n Test ", "\r\n Test \r\n", " \r\n Test \r\n ",
-                        "\r Test ", "\r Test \r", " \r Test \r ", "\f Test ", "\f Test \f", " \f Test \f ", "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ",
-                        "\u2028 Test ", "\u2028 Test \u2028", " \u2028 Test \u2028 ", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "Test\t", "\tTest\t",
-                        "\t\tTest\t\t", "\n\tTest\t", "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\r\tTest\t",
-                        "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\u0085\tTest\t", "\u0085\tTest\t\u0085",
-                        "\t\u0085\tTest\t\u0085\t", "\u2028\tTest\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t", "\u2029\tTest\t", "\u2029\tTest\t\u2029",
-                        "\t\u2029\tTest\t\u2029\t", "Test\u1680", "\u1680Test\u1680", "\u1680\u1680Test\u1680\u1680", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n",
-                        "\u1680\n\u1680Test\u1680\n\u1680", "\r\n\u1680Test\u1680", "\r\n\u1680Test\u1680\r\n", "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\r\u1680Test\u1680",
-                        "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\f\u1680Test\u1680", "\f\u1680Test\u1680\f", "\u1680\f\u1680Test\u1680\f\u1680",
-                        "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u2028\u1680Test\u1680",
-                        "\u2028\u1680Test\u1680\u2028", "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029",
-                        "\u1680\u2029\u1680Test\u1680\u2029\u1680", "\nTest\n", "\r\nTest\r\n", "\rTest\r", "\fTest\f", "\u0085Test\u0085", "\u2028Test\u2028",
-                        "\u2029Test\u2029", "Test\n\n", "\n\nTest\n\n", "Test\n\r\n", "\n\r\nTest\n\r\n", "Test\n\r", "\n\rTest\n\r", "Test\n\f", "\n\fTest\n\f",
-                        "Test\n\u0085", "\n\u0085Test\n\u0085", "Test\n\u2028", "\n\u2028Test\n\u2028", "Test\n\u2029", "\n\u2029Test\n\u2029", "Test\r\n\n",
-                        "\r\n\nTest\r\n\n", "Test\r\n\r\n", "\r\n\r\nTest\r\n\r\n", "Test\r\n\r", "\r\n\rTest\r\n\r", "Test\r\n\f", "\r\n\fTest\r\n\f", "Test\r\n\u0085",
-                        "\r\n\u0085Test\r\n\u0085", "Test\r\n\u2028", "\r\n\u2028Test\r\n\u2028", "Test\r\n\u2029", "\r\n\u2029Test\r\n\u2029", "Test\r\r\n",
-                        "\r\r\nTest\r\r\n", "Test\r\r", "\r\rTest\r\r", "Test\r\f", "\r\fTest\r\f", "Test\r\u0085", "\r\u0085Test\r\u0085", "Test\r\u2028",
-                        "\r\u2028Test\r\u2028", "Test\r\u2029", "\r\u2029Test\r\u2029", "Test\f\n", "\f\nTest\f\n", "Test\f\r\n", "\f\r\nTest\f\r\n", "Test\f\r",
-                        "\f\rTest\f\r", "Test\f\f", "\f\fTest\f\f", "Test\f\u0085", "\f\u0085Test\f\u0085", "Test\f\u2028", "\f\u2028Test\f\u2028", "Test\f\u2029",
-                        "\f\u2029Test\f\u2029", "Test\u0085\n", "\u0085\nTest\u0085\n", "Test\u0085\r\n", "\u0085\r\nTest\u0085\r\n", "Test\u0085\r", "\u0085\rTest\u0085\r",
-                        "Test\u0085\f", "\u0085\fTest\u0085\f", "Test\u0085\u0085", "\u0085\u0085Test\u0085\u0085", "Test\u0085\u2028", "\u0085\u2028Test\u0085\u2028",
-                        "Test\u0085\u2029", "\u0085\u2029Test\u0085\u2029", "Test\u2028\n", "\u2028\nTest\u2028\n", "Test\u2028\r\n", "\u2028\r\nTest\u2028\r\n",
-                        "Test\u2028\r", "\u2028\rTest\u2028\r", "Test\u2028\f", "\u2028\fTest\u2028\f", "Test\u2028\u0085", "\u2028\u0085Test\u2028\u0085",
-                        "Test\u2028\u2028", "\u2028\u2028Test\u2028\u2028", "Test\u2028\u2029", "\u2028\u2029Test\u2028\u2029", "Test\u2029\n", "\u2029\nTest\u2029\n",
-                        "Test\u2029\r\n", "\u2029\r\nTest\u2029\r\n", "Test\u2029\r", "\u2029\rTest\u2029\r", "Test\u2029\f", "\u2029\fTest\u2029\f", "Test\u2029\u0085",
-                        "\u2029\u0085Test\u2029\u0085", "Test\u2029\u2028", "\u2029\u2028Test\u2029\u2028", "Test\u2029\u2029", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("Test Data ", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _",
-                        " \u00A0 \u2028 _", " \u00A0 \u2029 _", "\u00A0\t_", "\u00A0\t\t_", "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_",
-                        "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_", "\u1680\u00A0\u1680\n\u1680_",
-                        "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_", "\u1680\u00A0\u1680\u0085\u1680_",
-                        "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_",
-                        "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_",
-                        "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_",
-                        "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_",
-                        "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_",
-                        "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_",
-                        "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_",
-                        "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData("\u00A0 ", "\u00A0 ", " \u00A0 ", "  \u00A0  ", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ", "\r\n \u00A0 ", "\r\n \u00A0 \r\n",
-                        " \r\n \u00A0 \r\n ", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", "\f \u00A0 ", "\f \u00A0 \f", " \f \u00A0 \f ", "\u0085 \u00A0 ",
-                        "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", "\u2029 \u00A0 ",
-                        "\u2029 \u00A0 \u2029", " \u2029 \u00A0 \u2029 ", "\u00A0\t", "\t\u00A0\t", "\t\t\u00A0\t\t", "\n\t\u00A0\t", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t",
-                        "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\r\t\u00A0\t", "\r\t\u00A0\t\r", "\t\r\t\u00A0\t\r\t", "\f\t\u00A0\t",
-                        "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\u0085\t\u00A0\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\u2028\t\u00A0\t",
-                        "\u2028\t\u00A0\t\u2028", "\t\u2028\t\u00A0\t\u2028\t", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\u00A0\u1680",
-                        "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n", "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680", "\u2028\u1680\u00A0\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029",
-                        "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680", "\n\u00A0\n", "\r\n\u00A0\r\n", "\r\u00A0\r", "\f\u00A0\f", "\u0085\u00A0\u0085", "\u2028\u00A0\u2028",
-                        "\u2029\u00A0\u2029", "\u00A0\n\n", "\n\n\u00A0\n\n", "\u00A0\n\r\n", "\n\r\n\u00A0\n\r\n", "\u00A0\n\r", "\n\r\u00A0\n\r", "\u00A0\n\f",
-                        "\n\f\u00A0\n\f", "\u00A0\n\u0085", "\n\u0085\u00A0\n\u0085", "\u00A0\n\u2028", "\n\u2028\u00A0\n\u2028", "\u00A0\n\u2029", "\n\u2029\u00A0\n\u2029",
-                        "\u00A0\r\n\n", "\r\n\n\u00A0\r\n\n", "\u00A0\r\n\r\n", "\r\n\r\n\u00A0\r\n\r\n", "\u00A0\r\n\r", "\r\n\r\u00A0\r\n\r", "\u00A0\r\n\f",
-                        "\r\n\f\u00A0\r\n\f", "\u00A0\r\n\u0085", "\r\n\u0085\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\r\n\u2028\u00A0\r\n\u2028", "\u00A0\r\n\u2029",
-                        "\r\n\u2029\u00A0\r\n\u2029", "\u00A0\r\r\n", "\r\r\n\u00A0\r\r\n", "\u00A0\r\r", "\r\r\u00A0\r\r", "\u00A0\r\f", "\r\f\u00A0\r\f", "\u00A0\r\u0085",
-                        "\r\u0085\u00A0\r\u0085", "\u00A0\r\u2028", "\r\u2028\u00A0\r\u2028", "\u00A0\r\u2029", "\r\u2029\u00A0\r\u2029", "\u00A0\f\n", "\f\n\u00A0\f\n",
-                        "\u00A0\f\r\n", "\f\r\n\u00A0\f\r\n", "\u00A0\f\r", "\f\r\u00A0\f\r", "\u00A0\f\f", "\f\f\u00A0\f\f", "\u00A0\f\u0085", "\f\u0085\u00A0\f\u0085",
-                        "\u00A0\f\u2028", "\f\u2028\u00A0\f\u2028", "\u00A0\f\u2029", "\f\u2029\u00A0\f\u2029", "\u00A0\u0085\n", "\u0085\n\u00A0\u0085\n",
-                        "\u00A0\u0085\r\n", "\u0085\r\n\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u0085\r\u00A0\u0085\r", "\u00A0\u0085\f", "\u0085\f\u00A0\u0085\f",
-                        "\u00A0\u0085\u0085", "\u0085\u0085\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u0085\u2028\u00A0\u0085\u2028", "\u00A0\u0085\u2029",
-                        "\u0085\u2029\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u2028\n\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u2028\r\n\u00A0\u2028\r\n", "\u00A0\u2028\r",
-                        "\u2028\r\u00A0\u2028\r", "\u00A0\u2028\f", "\u2028\f\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u2028\u0085\u00A0\u2028\u0085", "\u00A0\u2028\u2028",
-                        "\u2028\u2028\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u2028\u2029\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u2029\n\u00A0\u2029\n",
-                        "\u00A0\u2029\r\n", "\u2029\r\n\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u2029\r\u00A0\u2029\r", "\u00A0\u2029\f", "\u2029\f\u00A0\u2029\f",
-                        "\u00A0\u2029\u0085", "\u2029\u0085\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u2029\u2028\u00A0\u2029\u2028", "\u00A0\u2029\u2029",
-                        "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData("\u00A0 _ ", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ",
-                        "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t",
-                        "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Single-Line; Trim: None; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      * Was: StringNormalizationOption.SINGLE_LINE
      */
@@ -5571,7 +4185,7 @@ public class StringHelperTest {
             for (String nl : allNlSeq) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = " " + nws1;
+                expected = nws1 + " ";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -5579,7 +4193,7 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + " ";
+                expected = " " + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -5733,209 +4347,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer0E_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM, StringNormalizationOption.SINGLE_LINE);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM, StringNormalizationOption.SINGLE_LINE, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", ""),
-                new TestData("Test", "Test"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0"),
-                new TestData(" ", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029", "\r\n\n",
-                        "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085", "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029", "\f\n",
-                        "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028", "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085", "\u0085\u2028",
-                        "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r", "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n", "\u2029\r\n",
-                        "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028", "\u2029\u2029", " ", "  ", " \t", " \u1680", " \n ", "\n ", "\n \n", " \r\n ", "\r\n ",
-                        "\r\n \r\n", " \r ", "\r ", "\r \r", " \f ", "\f ", "\f \f", " \u0085 ", "\u0085 ", "\u0085 \u0085", " \u2028 ", "\u2028 ", "\u2028 \u2028",
-                        " \u2029 ", "\u2029 ", "\u2029 \u2029", " \n\n ", "\n\n ", "\n\n \n\n", " \n\r\n ", "\n\r\n ", "\n\r\n \n\r\n", " \n\r ", "\n\r ", "\n\r \n\r",
-                        " \n\f ", "\n\f ", "\n\f \n\f", " \n\u0085 ", "\n\u0085 ", "\n\u0085 \n\u0085", " \n\u2028 ", "\n\u2028 ", "\n\u2028 \n\u2028", " \n\u2029 ",
-                        "\n\u2029 ", "\n\u2029 \n\u2029", " \r\n\n ", "\r\n\n ", "\r\n\n \r\n\n", " \r\n\r\n ", "\r\n\r\n ", "\r\n\r\n \r\n\r\n", " \r\n\r ", "\r\n\r ",
-                        "\r\n\r \r\n\r", " \r\n\f ", "\r\n\f ", "\r\n\f \r\n\f", " \r\n\u0085 ", "\r\n\u0085 ", "\r\n\u0085 \r\n\u0085", " \r\n\u2028 ", "\r\n\u2028 ",
-                        "\r\n\u2028 \r\n\u2028", " \r\n\u2029 ", "\r\n\u2029 ", "\r\n\u2029 \r\n\u2029", " \r\r\n ", "\r\r\n ", "\r\r\n \r\r\n", " \r\r ", "\r\r ",
-                        "\r\r \r\r", " \r\f ", "\r\f ", "\r\f \r\f", " \r\u0085 ", "\r\u0085 ", "\r\u0085 \r\u0085", " \r\u2028 ", "\r\u2028 ", "\r\u2028 \r\u2028",
-                        " \r\u2029 ", "\r\u2029 ", "\r\u2029 \r\u2029", " \f\n ", "\f\n ", "\f\n \f\n", " \f\r\n ", "\f\r\n ", "\f\r\n \f\r\n", " \f\r ", "\f\r ",
-                        "\f\r \f\r", " \f\f ", "\f\f ", "\f\f \f\f", " \f\u0085 ", "\f\u0085 ", "\f\u0085 \f\u0085", " \f\u2028 ", "\f\u2028 ", "\f\u2028 \f\u2028",
-                        " \f\u2029 ", "\f\u2029 ", "\f\u2029 \f\u2029", " \u0085\n ", "\u0085\n ", "\u0085\n \u0085\n", " \u0085\r\n ", "\u0085\r\n ",
-                        "\u0085\r\n \u0085\r\n", " \u0085\r ", "\u0085\r ", "\u0085\r \u0085\r", " \u0085\f ", "\u0085\f ", "\u0085\f \u0085\f", " \u0085\u0085 ",
-                        "\u0085\u0085 ", "\u0085\u0085 \u0085\u0085", " \u0085\u2028 ", "\u0085\u2028 ", "\u0085\u2028 \u0085\u2028", " \u0085\u2029 ", "\u0085\u2029 ",
-                        "\u0085\u2029 \u0085\u2029", " \u2028\n ", "\u2028\n ", "\u2028\n \u2028\n", " \u2028\r\n ", "\u2028\r\n ", "\u2028\r\n \u2028\r\n", " \u2028\r ",
-                        "\u2028\r ", "\u2028\r \u2028\r", " \u2028\f ", "\u2028\f ", "\u2028\f \u2028\f", " \u2028\u0085 ", "\u2028\u0085 ", "\u2028\u0085 \u2028\u0085",
-                        " \u2028\u2028 ", "\u2028\u2028 ", "\u2028\u2028 \u2028\u2028", " \u2028\u2029 ", "\u2028\u2029 ", "\u2028\u2029 \u2028\u2029", " \u2029\n ",
-                        "\u2029\n ", "\u2029\n \u2029\n", " \u2029\r\n ", "\u2029\r\n ", "\u2029\r\n \u2029\r\n", " \u2029\r ", "\u2029\r ", "\u2029\r \u2029\r",
-                        " \u2029\f ", "\u2029\f ", "\u2029\f \u2029\f", " \u2029\u0085 ", "\u2029\u0085 ", "\u2029\u0085 \u2029\u0085", " \u2029\u2028 ", "\u2029\u2028 ",
-                        "\u2029\u2028 \u2029\u2028", " \u2029\u2029 ", "\u2029\u2029 ", "\u2029\u2029 \u2029\u2029", "\t", "\t ", "\t\t", "\t\u1680", "\t\n\t", "\n\t",
-                        "\n\t\n", "\t\r\n\t", "\r\n\t", "\r\n\t\r\n", "\t\r\t", "\r\t", "\r\t\r", "\t\f\t", "\f\t", "\f\t\f", "\t\u0085\t", "\u0085\t", "\u0085\t\u0085",
-                        "\t\u2028\t", "\u2028\t", "\u2028\t\u2028", "\t\u2029\t", "\u2029\t", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\n\n\t\n\n", "\t\n\r\n\t", "\n\r\n\t",
-                        "\n\r\n\t\n\r\n", "\t\n\r\t", "\n\r\t", "\n\r\t\n\r", "\t\n\f\t", "\n\f\t", "\n\f\t\n\f", "\t\n\u0085\t", "\n\u0085\t", "\n\u0085\t\n\u0085",
-                        "\t\n\u2028\t", "\n\u2028\t", "\n\u2028\t\n\u2028", "\t\n\u2029\t", "\n\u2029\t", "\n\u2029\t\n\u2029", "\t\r\n\n\t", "\r\n\n\t", "\r\n\n\t\r\n\n",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\r\n\r\n\t\r\n\r\n", "\t\r\n\r\t", "\r\n\r\t", "\r\n\r\t\r\n\r", "\t\r\n\f\t", "\r\n\f\t", "\r\n\f\t\r\n\f",
-                        "\t\r\n\u0085\t", "\r\n\u0085\t", "\r\n\u0085\t\r\n\u0085", "\t\r\n\u2028\t", "\r\n\u2028\t", "\r\n\u2028\t\r\n\u2028", "\t\r\n\u2029\t",
-                        "\r\n\u2029\t", "\r\n\u2029\t\r\n\u2029", "\t\r\r\n\t", "\r\r\n\t", "\r\r\n\t\r\r\n", "\t\r\r\t", "\r\r\t", "\r\r\t\r\r", "\t\r\f\t", "\r\f\t",
-                        "\r\f\t\r\f", "\t\r\u0085\t", "\r\u0085\t", "\r\u0085\t\r\u0085", "\t\r\u2028\t", "\r\u2028\t", "\r\u2028\t\r\u2028", "\t\r\u2029\t", "\r\u2029\t",
-                        "\r\u2029\t\r\u2029", "\t\f\n\t", "\f\n\t", "\f\n\t\f\n", "\t\f\r\n\t", "\f\r\n\t", "\f\r\n\t\f\r\n", "\t\f\r\t", "\f\r\t", "\f\r\t\f\r", "\t\f\f\t",
-                        "\f\f\t", "\f\f\t\f\f", "\t\f\u0085\t", "\f\u0085\t", "\f\u0085\t\f\u0085", "\t\f\u2028\t", "\f\u2028\t", "\f\u2028\t\f\u2028", "\t\f\u2029\t",
-                        "\f\u2029\t", "\f\u2029\t\f\u2029", "\t\u0085\n\t", "\u0085\n\t", "\u0085\n\t\u0085\n", "\t\u0085\r\n\t", "\u0085\r\n\t", "\u0085\r\n\t\u0085\r\n",
-                        "\t\u0085\r\t", "\u0085\r\t", "\u0085\r\t\u0085\r", "\t\u0085\f\t", "\u0085\f\t", "\u0085\f\t\u0085\f", "\t\u0085\u0085\t", "\u0085\u0085\t",
-                        "\u0085\u0085\t\u0085\u0085", "\t\u0085\u2028\t", "\u0085\u2028\t", "\u0085\u2028\t\u0085\u2028", "\t\u0085\u2029\t", "\u0085\u2029\t",
-                        "\u0085\u2029\t\u0085\u2029", "\t\u2028\n\t", "\u2028\n\t", "\u2028\n\t\u2028\n", "\t\u2028\r\n\t", "\u2028\r\n\t", "\u2028\r\n\t\u2028\r\n",
-                        "\t\u2028\r\t", "\u2028\r\t", "\u2028\r\t\u2028\r", "\t\u2028\f\t", "\u2028\f\t", "\u2028\f\t\u2028\f", "\t\u2028\u0085\t", "\u2028\u0085\t",
-                        "\u2028\u0085\t\u2028\u0085", "\t\u2028\u2028\t", "\u2028\u2028\t", "\u2028\u2028\t\u2028\u2028", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\u2028\u2029\t\u2028\u2029", "\t\u2029\n\t", "\u2029\n\t", "\u2029\n\t\u2029\n", "\t\u2029\r\n\t", "\u2029\r\n\t", "\u2029\r\n\t\u2029\r\n",
-                        "\t\u2029\r\t", "\u2029\r\t", "\u2029\r\t\u2029\r", "\t\u2029\f\t", "\u2029\f\t", "\u2029\f\t\u2029\f", "\t\u2029\u0085\t", "\u2029\u0085\t",
-                        "\u2029\u0085\t\u2029\u0085", "\t\u2029\u2028\t", "\u2029\u2028\t", "\u2029\u2028\t\u2029\u2028", "\t\u2029\u2029\t", "\u2029\u2029\t",
-                        "\u2029\u2029\t\u2029\u2029", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680", "\u1680\n\u1680", "\n\u1680", "\n\u1680\n", "\u1680\r\n\u1680",
-                        "\r\n\u1680", "\r\n\u1680\r\n", "\u1680\r\u1680", "\r\u1680", "\r\u1680\r", "\u1680\f\u1680", "\f\u1680", "\f\u1680\f", "\u1680\u0085\u1680",
-                        "\u0085\u1680", "\u0085\u1680\u0085", "\u1680\u2028\u1680", "\u2028\u1680", "\u2028\u1680\u2028", "\u1680\u2029\u1680", "\u2029\u1680",
-                        "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\n\n\u1680\n\n", "\u1680\n\r\n\u1680", "\n\r\n\u1680", "\n\r\n\u1680\n\r\n",
-                        "\u1680\n\r\u1680", "\n\r\u1680", "\n\r\u1680\n\r", "\u1680\n\f\u1680", "\n\f\u1680", "\n\f\u1680\n\f", "\u1680\n\u0085\u1680", "\n\u0085\u1680",
-                        "\n\u0085\u1680\n\u0085", "\u1680\n\u2028\u1680", "\n\u2028\u1680", "\n\u2028\u1680\n\u2028", "\u1680\n\u2029\u1680", "\n\u2029\u1680",
-                        "\n\u2029\u1680\n\u2029", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\r\n\n\u1680\r\n\n", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\r\n\r\n\u1680\r\n\r\n", "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\r\n\r\u1680\r\n\r", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\r\n\f\u1680\r\n\f",
-                        "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\r\n\u0085\u1680\r\n\u0085", "\u1680\r\n\u2028\u1680", "\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680\r\n\u2028", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\r\n\u2029\u1680\r\n\u2029", "\u1680\r\r\n\u1680", "\r\r\n\u1680",
-                        "\r\r\n\u1680\r\r\n", "\u1680\r\r\u1680", "\r\r\u1680", "\r\r\u1680\r\r", "\u1680\r\f\u1680", "\r\f\u1680", "\r\f\u1680\r\f", "\u1680\r\u0085\u1680",
-                        "\r\u0085\u1680", "\r\u0085\u1680\r\u0085", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\r\u2028\u1680\r\u2028", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\r\u2029\u1680\r\u2029", "\u1680\f\n\u1680", "\f\n\u1680", "\f\n\u1680\f\n", "\u1680\f\r\n\u1680", "\f\r\n\u1680",
-                        "\f\r\n\u1680\f\r\n", "\u1680\f\r\u1680", "\f\r\u1680", "\f\r\u1680\f\r", "\u1680\f\f\u1680", "\f\f\u1680", "\f\f\u1680\f\f", "\u1680\f\u0085\u1680",
-                        "\f\u0085\u1680", "\f\u0085\u1680\f\u0085", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\f\u2028\u1680\f\u2028", "\u1680\f\u2029\u1680",
-                        "\f\u2029\u1680", "\f\u2029\u1680\f\u2029", "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u0085\n\u1680\u0085\n", "\u1680\u0085\r\n\u1680",
-                        "\u0085\r\n\u1680", "\u0085\r\n\u1680\u0085\r\n", "\u1680\u0085\r\u1680", "\u0085\r\u1680", "\u0085\r\u1680\u0085\r", "\u1680\u0085\f\u1680",
-                        "\u0085\f\u1680", "\u0085\f\u1680\u0085\f", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u0085\u0085\u1680\u0085\u0085",
-                        "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680", "\u0085\u2028\u1680\u0085\u2028", "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u2028\n\u1680\u2028\n", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u2028\r\n\u1680\u2028\r\n", "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u2028\r\u1680\u2028\r", "\u1680\u2028\f\u1680", "\u2028\f\u1680",
-                        "\u2028\f\u1680\u2028\f", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680", "\u2028\u0085\u1680\u2028\u0085", "\u1680\u2028\u2028\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2028\u1680\u2028\u2028", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u2028\u2029\u1680\u2028\u2029",
-                        "\u1680\u2029\n\u1680", "\u2029\n\u1680", "\u2029\n\u1680\u2029\n", "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u2029\r\n\u1680\u2029\r\n",
-                        "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u2029\r\u1680\u2029\r", "\u1680\u2029\f\u1680", "\u2029\f\u1680", "\u2029\f\u1680\u2029\f",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u2029\u0085\u1680\u2029\u0085", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680",
-                        "\u2029\u2028\u1680\u2029\u2028", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680", "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data", "Test\nData",
-                        "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data", "Test\n\nData", "Test\n\r\nData", "Test\n\rData",
-                        "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data", "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData",
-                        "Test\r\n\u0085Data", "Test\r\n\u2028Data", "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data",
-                        "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData", "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data",
-                        "Test\f\u2029Data", "Test\u0085\nData", "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data",
-                        "Test\u0085\u2029Data", "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data",
-                        "Test\u2028\u2028Data", "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData",
-                        "Test\u2029\u0085Data", "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("Test ", "Test ", "Test\t", "Test\u1680", "Test\n\n", "Test\n\r\n", "Test\n\r", "Test\n\f", "Test\n\u0085", "Test\n\u2028", "Test\n\u2029",
-                        "Test\r\n\n", "Test\r\n\r\n", "Test\r\n\r", "Test\r\n\f", "Test\r\n\u0085", "Test\r\n\u2028", "Test\r\n\u2029", "Test\r\r\n", "Test\r\r", "Test\r\f",
-                        "Test\r\u0085", "Test\r\u2028", "Test\r\u2029", "Test\f\n", "Test\f\r\n", "Test\f\r", "Test\f\f", "Test\f\u0085", "Test\f\u2028", "Test\f\u2029",
-                        "Test\u0085\n", "Test\u0085\r\n", "Test\u0085\r", "Test\u0085\f", "Test\u0085\u0085", "Test\u0085\u2028", "Test\u0085\u2029", "Test\u2028\n",
-                        "Test\u2028\r\n", "Test\u2028\r", "Test\u2028\f", "Test\u2028\u0085", "Test\u2028\u2028", "Test\u2028\u2029", "Test\u2029\n", "Test\u2029\r\n",
-                        "Test\u2029\r", "Test\u2029\f", "Test\u2029\u0085", "Test\u2029\u2028", "Test\u2029\u2029"),
-                new TestData(" Test", " Test", " \n Test", " \r\n Test", " \r Test", " \f Test", " \u0085 Test", " \u2028 Test", " \u2029 Test", "\tTest", "\t\n\tTest",
-                        "\t\r\n\tTest", "\t\r\tTest", "\t\f\tTest", "\t\u0085\tTest", "\t\u2028\tTest", "\t\u2029\tTest", "\u1680Test", "\u1680\n\u1680Test",
-                        "\u1680\r\n\u1680Test", "\u1680\r\u1680Test", "\u1680\f\u1680Test", "\u1680\u0085\u1680Test", "\u1680\u2028\u1680Test", "\u1680\u2029\u1680Test",
-                        "\nTest", "\r\nTest", "\rTest", "\fTest", "\u0085Test", "\u2028Test", "\u2029Test", "\n\nTest", "\n\r\nTest", "\n\rTest", "\n\fTest", "\n\u0085Test",
-                        "\n\u2028Test", "\n\u2029Test", "\r\n\nTest", "\r\n\r\nTest", "\r\n\rTest", "\r\n\fTest", "\r\n\u0085Test", "\r\n\u2028Test", "\r\n\u2029Test",
-                        "\r\r\nTest", "\r\rTest", "\r\fTest", "\r\u0085Test", "\r\u2028Test", "\r\u2029Test", "\f\nTest", "\f\r\nTest", "\f\rTest", "\f\fTest",
-                        "\f\u0085Test", "\f\u2028Test", "\f\u2029Test", "\u0085\nTest", "\u0085\r\nTest", "\u0085\rTest", "\u0085\fTest", "\u0085\u0085Test",
-                        "\u0085\u2028Test", "\u0085\u2029Test", "\u2028\nTest", "\u2028\r\nTest", "\u2028\rTest", "\u2028\fTest", "\u2028\u0085Test", "\u2028\u2028Test",
-                        "\u2028\u2029Test", "\u2029\nTest", "\u2029\r\nTest", "\u2029\rTest", "\u2029\fTest", "\u2029\u0085Test", "\u2029\u2028Test", "\u2029\u2029Test"),
-                new TestData(" Test ", " Test ", "  Test  ", "\n Test ", "\n Test \n", " \n Test \n ", "\r\n Test ", "\r\n Test \r\n", " \r\n Test \r\n ", "\r Test ",
-                        "\r Test \r", " \r Test \r ", "\f Test ", "\f Test \f", " \f Test \f ", "\u0085 Test ", "\u0085 Test \u0085", " \u0085 Test \u0085 ", "\u2028 Test ",
-                        "\u2028 Test \u2028", " \u2028 Test \u2028 ", "\u2029 Test ", "\u2029 Test \u2029", " \u2029 Test \u2029 ", "\tTest\t", "\t\tTest\t\t", "\n\tTest\t",
-                        "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\r\n\tTest\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\r\tTest\t", "\r\tTest\t\r", "\t\r\tTest\t\r\t",
-                        "\f\tTest\t", "\f\tTest\t\f", "\t\f\tTest\t\f\t", "\u0085\tTest\t", "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\u2028\tTest\t",
-                        "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t", "\u2029\tTest\t", "\u2029\tTest\t\u2029", "\t\u2029\tTest\t\u2029\t", "\u1680Test\u1680",
-                        "\u1680\u1680Test\u1680\u1680", "\n\u1680Test\u1680", "\n\u1680Test\u1680\n", "\u1680\n\u1680Test\u1680\n\u1680", "\r\n\u1680Test\u1680",
-                        "\r\n\u1680Test\u1680\r\n", "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\r\u1680Test\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680",
-                        "\f\u1680Test\u1680", "\f\u1680Test\u1680\f", "\u1680\f\u1680Test\u1680\f\u1680", "\u0085\u1680Test\u1680", "\u0085\u1680Test\u1680\u0085",
-                        "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u2028\u1680Test\u1680", "\u2028\u1680Test\u1680\u2028", "\u1680\u2028\u1680Test\u1680\u2028\u1680",
-                        "\u2029\u1680Test\u1680", "\u2029\u1680Test\u1680\u2029", "\u1680\u2029\u1680Test\u1680\u2029\u1680", "\nTest\n", "\r\nTest\r\n", "\rTest\r",
-                        "\fTest\f", "\u0085Test\u0085", "\u2028Test\u2028", "\u2029Test\u2029", "\n\nTest\n\n", "\n\r\nTest\n\r\n", "\n\rTest\n\r", "\n\fTest\n\f",
-                        "\n\u0085Test\n\u0085", "\n\u2028Test\n\u2028", "\n\u2029Test\n\u2029", "\r\n\nTest\r\n\n", "\r\n\r\nTest\r\n\r\n", "\r\n\rTest\r\n\r",
-                        "\r\n\fTest\r\n\f", "\r\n\u0085Test\r\n\u0085", "\r\n\u2028Test\r\n\u2028", "\r\n\u2029Test\r\n\u2029", "\r\r\nTest\r\r\n", "\r\rTest\r\r",
-                        "\r\fTest\r\f", "\r\u0085Test\r\u0085", "\r\u2028Test\r\u2028", "\r\u2029Test\r\u2029", "\f\nTest\f\n", "\f\r\nTest\f\r\n", "\f\rTest\f\r",
-                        "\f\fTest\f\f", "\f\u0085Test\f\u0085", "\f\u2028Test\f\u2028", "\f\u2029Test\f\u2029", "\u0085\nTest\u0085\n", "\u0085\r\nTest\u0085\r\n",
-                        "\u0085\rTest\u0085\r", "\u0085\fTest\u0085\f", "\u0085\u0085Test\u0085\u0085", "\u0085\u2028Test\u0085\u2028", "\u0085\u2029Test\u0085\u2029",
-                        "\u2028\nTest\u2028\n", "\u2028\r\nTest\u2028\r\n", "\u2028\rTest\u2028\r", "\u2028\fTest\u2028\f", "\u2028\u0085Test\u2028\u0085",
-                        "\u2028\u2028Test\u2028\u2028", "\u2028\u2029Test\u2028\u2029", "\u2029\nTest\u2029\n", "\u2029\r\nTest\u2029\r\n", "\u2029\rTest\u2029\r",
-                        "\u2029\fTest\u2029\f", "\u2029\u0085Test\u2029\u0085", "\u2029\u2028Test\u2029\u2028", "\u2029\u2029Test\u2029\u2029"),
-                new TestData(" Test Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test Data ", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_", "\u00A0\n_", "\u00A0\r\n_",
-                        "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_",
-                        "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_", "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_",
-                        "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_", "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_",
-                        "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_", "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_",
-                        "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_", "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_",
-                        "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_", "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_",
-                        "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_", "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData("\u00A0 ", "\u00A0 ", "\u00A0\t", "\u00A0\u1680", "\u00A0\n\n", "\u00A0\n\r\n", "\u00A0\n\r", "\u00A0\n\f", "\u00A0\n\u0085",
-                        "\u00A0\n\u2028", "\u00A0\n\u2029", "\u00A0\r\n\n", "\u00A0\r\n\r\n", "\u00A0\r\n\r", "\u00A0\r\n\f", "\u00A0\r\n\u0085", "\u00A0\r\n\u2028",
-                        "\u00A0\r\n\u2029", "\u00A0\r\r\n", "\u00A0\r\r", "\u00A0\r\f", "\u00A0\r\u0085", "\u00A0\r\u2028", "\u00A0\r\u2029", "\u00A0\f\n", "\u00A0\f\r\n",
-                        "\u00A0\f\r", "\u00A0\f\f", "\u00A0\f\u0085", "\u00A0\f\u2028", "\u00A0\f\u2029", "\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u00A0\u0085\r",
-                        "\u00A0\u0085\f", "\u00A0\u0085\u0085", "\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u00A0\u2028\r",
-                        "\u00A0\u2028\f", "\u00A0\u2028\u0085", "\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u00A0\u2029\r",
-                        "\u00A0\u2029\f", "\u00A0\u2029\u0085", "\u00A0\u2029\u2028", "\u00A0\u2029\u2029"),
-                new TestData(" \u00A0", " \u00A0", " \n \u00A0", " \r\n \u00A0", " \r \u00A0", " \f \u00A0", " \u0085 \u00A0", " \u2028 \u00A0", " \u2029 \u00A0",
-                        "\t\u00A0", "\t\n\t\u00A0", "\t\r\n\t\u00A0", "\t\r\t\u00A0", "\t\f\t\u00A0", "\t\u0085\t\u00A0", "\t\u2028\t\u00A0", "\t\u2029\t\u00A0",
-                        "\u1680\u00A0", "\u1680\n\u1680\u00A0", "\u1680\r\n\u1680\u00A0", "\u1680\r\u1680\u00A0", "\u1680\f\u1680\u00A0", "\u1680\u0085\u1680\u00A0",
-                        "\u1680\u2028\u1680\u00A0", "\u1680\u2029\u1680\u00A0", "\n\u00A0", "\r\n\u00A0", "\r\u00A0", "\f\u00A0", "\u0085\u00A0", "\u2028\u00A0",
-                        "\u2029\u00A0", "\n\n\u00A0", "\n\r\n\u00A0", "\n\r\u00A0", "\n\f\u00A0", "\n\u0085\u00A0", "\n\u2028\u00A0", "\n\u2029\u00A0", "\r\n\n\u00A0",
-                        "\r\n\r\n\u00A0", "\r\n\r\u00A0", "\r\n\f\u00A0", "\r\n\u0085\u00A0", "\r\n\u2028\u00A0", "\r\n\u2029\u00A0", "\r\r\n\u00A0", "\r\r\u00A0",
-                        "\r\f\u00A0", "\r\u0085\u00A0", "\r\u2028\u00A0", "\r\u2029\u00A0", "\f\n\u00A0", "\f\r\n\u00A0", "\f\r\u00A0", "\f\f\u00A0", "\f\u0085\u00A0",
-                        "\f\u2028\u00A0", "\f\u2029\u00A0", "\u0085\n\u00A0", "\u0085\r\n\u00A0", "\u0085\r\u00A0", "\u0085\f\u00A0", "\u0085\u0085\u00A0",
-                        "\u0085\u2028\u00A0", "\u0085\u2029\u00A0", "\u2028\n\u00A0", "\u2028\r\n\u00A0", "\u2028\r\u00A0", "\u2028\f\u00A0", "\u2028\u0085\u00A0",
-                        "\u2028\u2028\u00A0", "\u2028\u2029\u00A0", "\u2029\n\u00A0", "\u2029\r\n\u00A0", "\u2029\r\u00A0", "\u2029\f\u00A0", "\u2029\u0085\u00A0",
-                        "\u2029\u2028\u00A0", "\u2029\u2029\u00A0"),
-                new TestData(" \u00A0 ", " \u00A0 ", "  \u00A0  ", "\n \u00A0 ", "\n \u00A0 \n", " \n \u00A0 \n ", "\r\n \u00A0 ", "\r\n \u00A0 \r\n",
-                        " \r\n \u00A0 \r\n ", "\r \u00A0 ", "\r \u00A0 \r", " \r \u00A0 \r ", "\f \u00A0 ", "\f \u00A0 \f", " \f \u00A0 \f ", "\u0085 \u00A0 ",
-                        "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", "\u2028 \u00A0 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", "\u2029 \u00A0 ",
-                        "\u2029 \u00A0 \u2029", " \u2029 \u00A0 \u2029 ", "\t\u00A0\t", "\t\t\u00A0\t\t", "\n\t\u00A0\t", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t",
-                        "\r\n\t\u00A0\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\r\t\u00A0\t", "\r\t\u00A0\t\r", "\t\r\t\u00A0\t\r\t", "\f\t\u00A0\t",
-                        "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\u0085\t\u00A0\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\u2028\t\u00A0\t",
-                        "\u2028\t\u00A0\t\u2028", "\t\u2028\t\u00A0\t\u2028\t", "\u2029\t\u00A0\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t",
-                        "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680", "\n\u1680\u00A0\u1680", "\n\u1680\u00A0\u1680\n", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\r\n\u1680\u00A0\u1680", "\r\n\u1680\u00A0\u1680\r\n", "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\r\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680\r",
-                        "\u1680\r\u1680\u00A0\u1680\r\u1680", "\f\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u0085\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680", "\u2028\u1680\u00A0\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u2029\u1680\u00A0\u1680", "\u2029\u1680\u00A0\u1680\u2029",
-                        "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680", "\n\u00A0\n", "\r\n\u00A0\r\n", "\r\u00A0\r", "\f\u00A0\f", "\u0085\u00A0\u0085", "\u2028\u00A0\u2028",
-                        "\u2029\u00A0\u2029", "\n\n\u00A0\n\n", "\n\r\n\u00A0\n\r\n", "\n\r\u00A0\n\r", "\n\f\u00A0\n\f", "\n\u0085\u00A0\n\u0085", "\n\u2028\u00A0\n\u2028",
-                        "\n\u2029\u00A0\n\u2029", "\r\n\n\u00A0\r\n\n", "\r\n\r\n\u00A0\r\n\r\n", "\r\n\r\u00A0\r\n\r", "\r\n\f\u00A0\r\n\f", "\r\n\u0085\u00A0\r\n\u0085",
-                        "\r\n\u2028\u00A0\r\n\u2028", "\r\n\u2029\u00A0\r\n\u2029", "\r\r\n\u00A0\r\r\n", "\r\r\u00A0\r\r", "\r\f\u00A0\r\f", "\r\u0085\u00A0\r\u0085",
-                        "\r\u2028\u00A0\r\u2028", "\r\u2029\u00A0\r\u2029", "\f\n\u00A0\f\n", "\f\r\n\u00A0\f\r\n", "\f\r\u00A0\f\r", "\f\f\u00A0\f\f",
-                        "\f\u0085\u00A0\f\u0085", "\f\u2028\u00A0\f\u2028", "\f\u2029\u00A0\f\u2029", "\u0085\n\u00A0\u0085\n", "\u0085\r\n\u00A0\u0085\r\n",
-                        "\u0085\r\u00A0\u0085\r", "\u0085\f\u00A0\u0085\f", "\u0085\u0085\u00A0\u0085\u0085", "\u0085\u2028\u00A0\u0085\u2028",
-                        "\u0085\u2029\u00A0\u0085\u2029", "\u2028\n\u00A0\u2028\n", "\u2028\r\n\u00A0\u2028\r\n", "\u2028\r\u00A0\u2028\r", "\u2028\f\u00A0\u2028\f",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u2028\u2028\u00A0\u2028\u2028", "\u2028\u2029\u00A0\u2028\u2029", "\u2029\n\u00A0\u2029\n",
-                        "\u2029\r\n\u00A0\u2029\r\n", "\u2029\r\u00A0\u2029\r", "\u2029\f\u00A0\u2029\f", "\u2029\u0085\u00A0\u2029\u0085", "\u2029\u2028\u00A0\u2029\u2028",
-                        "\u2029\u2029\u00A0\u2029\u2029"),
-                new TestData(" \u00A0 _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _", " \u00A0 \u2029 _",
-                        "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_",
-                        "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0 _ ", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ",
-                        "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t",
-                        "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String d = TestHelper.toStringDescription(u);
-                String a = target1.apply(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: Both; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#LEAVE_WHITESPACE}</code>
      */
     @Test
@@ -5976,7 +4389,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n";
+                    expected = "";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -5984,7 +4397,6 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -5993,7 +4405,7 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n";
+                    expected = "";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6001,7 +4413,6 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6031,7 +4442,7 @@ public class StringHelperTest {
         for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -6040,7 +4451,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n";
+                expected = "";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6055,7 +4466,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6063,7 +4473,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6073,7 +4482,7 @@ public class StringHelperTest {
         for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -6082,7 +4491,6 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6097,7 +4505,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6123,7 +4530,7 @@ public class StringHelperTest {
             for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6131,7 +4538,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6148,7 +4554,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1 + "\n" + nws2 + "\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6158,7 +4563,7 @@ public class StringHelperTest {
             for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6166,7 +4571,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6175,7 +4579,7 @@ public class StringHelperTest {
                 for (String nws2 : allNws2) {
                     source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n" + nws2;
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6183,7 +4587,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1 + "\n\n" + nws2 + "\n\n";
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6217,7 +4621,6 @@ public class StringHelperTest {
 
                     source = ws + nws1 + ws + nws2 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + ws + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6226,7 +4629,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n";
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6248,7 +4651,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6300,7 +4702,6 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6308,7 +4709,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n" + nws1 + ws + nws2 + "\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6318,7 +4719,7 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n";
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6340,7 +4741,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6363,7 +4763,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = nws1 + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2;
+                        expected = nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6392,7 +4792,6 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n\n\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6400,7 +4799,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n\n" + nws1 + ws + nws2 + "\n\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6412,6 +4811,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: End; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#NO_TRIM_START}</code>
      */
     @Test
@@ -6452,7 +4852,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n";
+                    expected = "";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6460,7 +4860,6 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6469,7 +4868,6 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6477,7 +4875,6 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6507,7 +4904,7 @@ public class StringHelperTest {
         for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -6516,7 +4913,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n";
+                expected = "";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6531,7 +4928,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6539,7 +4935,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6550,7 +4945,7 @@ public class StringHelperTest {
         for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -6559,7 +4954,6 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6574,7 +4968,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6582,7 +4975,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n\n\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6602,7 +4994,7 @@ public class StringHelperTest {
             for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6610,7 +5002,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6627,7 +5018,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1 + "\n" + nws2 + "\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6637,7 +5027,7 @@ public class StringHelperTest {
             for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6645,7 +5035,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -6654,7 +5043,7 @@ public class StringHelperTest {
                 for (String nws2 : allNws2) {
                     source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n" + nws2;
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6662,7 +5051,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1 + "\n\n" + nws2 + "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6706,7 +5094,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n";
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6721,7 +5109,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1;
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6736,7 +5124,7 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = ws + nws1 + "\n";
+                    expected = ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6744,7 +5132,7 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + ws + nws1;
+                    expected = ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6769,7 +5157,7 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2;
+                        expected = nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6785,7 +5173,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n" + nws1 + ws + nws2 + "\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6793,7 +5181,7 @@ public class StringHelperTest {
 
                         source = ws + nws1 + nl + nws2 + ws;
                         description = TestHelper.toStringDescription(source);
-                        expected = ws + nws1 + "\n" + nws2 + ws;
+                        expected = ws + nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6803,7 +5191,7 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n";
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6811,7 +5199,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6819,7 +5206,6 @@ public class StringHelperTest {
 
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6827,7 +5213,7 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = ws + nws1 + "\n\n";
+                    expected = ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6835,7 +5221,6 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6843,7 +5228,7 @@ public class StringHelperTest {
 
                     source = ws + nl + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1;
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6852,7 +5237,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = nws1 + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + ws + nws2;
+                        expected = nws1 + "\n" + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6860,7 +5245,7 @@ public class StringHelperTest {
 
                         source = nws1 + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2;
+                        expected = nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6868,7 +5253,6 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n\n\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6876,7 +5260,7 @@ public class StringHelperTest {
 
                         source = nws1 + ws + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + ws + nws2;
+                        expected = nws1 + "\n" + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6884,7 +5268,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n\n" + nws1 + ws + nws2 + "\n\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6892,7 +5276,7 @@ public class StringHelperTest {
 
                         source = ws + nws1 + nl + nws2 + ws;
                         description = TestHelper.toStringDescription(source);
-                        expected = ws + nws1 + "\n\n" + nws2 + ws;
+                        expected = ws + nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -6904,6 +5288,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: Start; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#NO_TRIM_END}</code>
      */
     @Test
@@ -6944,7 +5329,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n";
+                    expected = "";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6952,7 +5337,6 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6961,7 +5345,7 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = Character.toString(ws2) + ws1 + nl + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n";
+                    expected = "";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6969,7 +5353,6 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -6999,7 +5382,7 @@ public class StringHelperTest {
         for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -7008,7 +5391,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n";
+                expected = "";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7023,7 +5406,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7031,7 +5413,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7041,7 +5422,7 @@ public class StringHelperTest {
         for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -7050,7 +5431,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n";
+                expected = "";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7072,7 +5453,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7091,7 +5471,7 @@ public class StringHelperTest {
             for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7099,7 +5479,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7116,7 +5495,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1 + "\n" + nws2 + "\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7126,7 +5504,7 @@ public class StringHelperTest {
             for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7134,7 +5512,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7143,7 +5520,7 @@ public class StringHelperTest {
                 for (String nws2 : allNws2) {
                     source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n" + nws2;
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7151,7 +5528,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1 + "\n\n" + nws2 + "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7195,7 +5571,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + ws + "\n";
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7203,7 +5579,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1 + ws;
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7211,7 +5587,7 @@ public class StringHelperTest {
 
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n";
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7219,7 +5595,6 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7227,7 +5602,6 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7259,7 +5633,7 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2;
+                        expected = nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7275,7 +5649,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n" + nws1 + ws + nws2 + "\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7293,7 +5667,7 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + ws + "\n\n";
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7301,7 +5675,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1 + ws;
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7309,7 +5683,7 @@ public class StringHelperTest {
 
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n";
+                    expected = nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7317,7 +5691,6 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7325,7 +5698,6 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7341,7 +5713,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = nws1 + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2;
+                        expected = nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7349,7 +5721,7 @@ public class StringHelperTest {
 
                         source = nws1 + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + ws + "\n\n" + nws2;
+                        expected = nws1 + ws + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7357,7 +5729,7 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n\n\n" + nws2;
+                        expected = nws1 + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7365,7 +5737,7 @@ public class StringHelperTest {
 
                         source = nws1 + ws + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + ws + "\n\n" + nws2;
+                        expected = nws1 + ws + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7373,7 +5745,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n\n" + nws1 + ws + nws2 + "\n\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7381,7 +5753,7 @@ public class StringHelperTest {
 
                         source = ws + nws1 + nl + nws2 + ws;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + nws2 + ws;
+                        expected = nws1 + "\n" + nws2 + ws;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7393,6 +5765,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Multi-Line; Blank Lines: Omit; Trim: None; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#NO_TRIM}</code>
      */
     @Test
@@ -7441,7 +5814,7 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + ws2 + ws1 + "\n";
+                    expected = Character.toString(ws2) + ws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7458,7 +5831,7 @@ public class StringHelperTest {
 
                     source = nl + ws2 + ws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + ws2 + ws1 + "\n";
+                    expected = Character.toString(ws2) + ws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7488,7 +5861,7 @@ public class StringHelperTest {
         for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -7497,7 +5870,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + ws;
+                expected = Character.toString(ws);
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7505,7 +5878,6 @@ public class StringHelperTest {
 
                 source = ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = ws + "\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7513,7 +5885,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + ws + "\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7521,7 +5892,7 @@ public class StringHelperTest {
 
                 source = nl + ws + nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + ws + "\n" + ws + "\n";
+                expected = ws + "\n" + ws;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7531,7 +5902,7 @@ public class StringHelperTest {
         for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
             source = nl;
             String description = TestHelper.toStringDescription(source);
-            expected = "\n\n";
+            expected = "";
             actual = target1.apply(source);
             assertEquals(description, expected, actual);
             actual = target2.apply(source);
@@ -7540,7 +5911,7 @@ public class StringHelperTest {
             for (char ws : WHITESPACE_CHARACTERS) {
                 source = nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n" + ws;
+                expected = Character.toString(ws);
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7548,7 +5919,6 @@ public class StringHelperTest {
 
                 source = ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = ws + "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7556,7 +5926,6 @@ public class StringHelperTest {
 
                 source = nl + ws + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n" + ws + "\n\n";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7564,7 +5933,7 @@ public class StringHelperTest {
 
                 source = ws + nl + ws;
                 description = TestHelper.toStringDescription(source);
-                expected = ws + "\n\n" + ws;
+                expected = ws + "\n" + ws;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7583,7 +5952,7 @@ public class StringHelperTest {
             for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7591,7 +5960,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7608,7 +5976,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1 + "\n" + nws2 + "\n";
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7618,7 +5986,7 @@ public class StringHelperTest {
             for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                 source = nws1 + nl;
                 description = TestHelper.toStringDescription(source);
-                expected = nws1 + "\n\n";
+                expected = nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7626,7 +5994,6 @@ public class StringHelperTest {
 
                 source = nl + nws1;
                 description = TestHelper.toStringDescription(source);
-                expected = "\n\n" + nws1;
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -7635,7 +6002,7 @@ public class StringHelperTest {
                 for (String nws2 : allNws2) {
                     source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n" + nws2;
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7643,7 +6010,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + nl + nws2 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1 + "\n\n" + nws2 + "\n\n";
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7687,7 +6054,7 @@ public class StringHelperTest {
                 for (String nl : SINGLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + ws + "\n";
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7695,7 +6062,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7711,7 +6077,7 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = ws + nws1 + "\n";
+                    expected = ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7719,7 +6085,6 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n" + ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7768,7 +6133,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n" + nws1 + ws + nws2 + "\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7786,7 +6151,7 @@ public class StringHelperTest {
                 for (String nl : DOUBLE_LINE_SEPARATOR_SEQ) {
                     source = nws1 + ws + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + ws + "\n\n";
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7794,7 +6159,6 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7802,7 +6166,7 @@ public class StringHelperTest {
 
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + "\n\n" + ws;
+                    expected = nws1 + "\n" + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7810,7 +6174,7 @@ public class StringHelperTest {
 
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = ws + nws1 + "\n\n";
+                    expected = ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7818,7 +6182,6 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = "\n\n" + ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7826,7 +6189,7 @@ public class StringHelperTest {
 
                     source = ws + nl + nws1;
                     description = TestHelper.toStringDescription(source);
-                    expected = ws + "\n\n" + nws1;
+                    expected = ws + "\n" + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -7835,7 +6198,7 @@ public class StringHelperTest {
                     for (String nws2 : allNws2) {
                         source = nws1 + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + ws + nws2;
+                        expected = nws1 + "\n" + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7843,7 +6206,7 @@ public class StringHelperTest {
 
                         source = nws1 + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + ws + "\n\n" + nws2;
+                        expected = nws1 + ws + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7851,7 +6214,7 @@ public class StringHelperTest {
 
                         source = nws1 + nl + ws + nl + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + "\n\n" + ws + "\n\n" + nws2;
+                        expected = nws1 + "\n" + ws + "\n" + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7859,7 +6222,7 @@ public class StringHelperTest {
 
                         source = nws1 + ws + nl + ws + nws2;
                         description = TestHelper.toStringDescription(source);
-                        expected = nws1 + ws + "\n\n" + ws + nws2;
+                        expected = nws1 + ws + "\n" + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7867,7 +6230,7 @@ public class StringHelperTest {
 
                         source = nl + nws1 + ws + nws2 + nl;
                         description = TestHelper.toStringDescription(source);
-                        expected = "\n\n" + nws1 + ws + nws2 + "\n\n";
+                        expected = nws1 + ws + nws2;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7875,7 +6238,7 @@ public class StringHelperTest {
 
                         source = ws + nws1 + nl + nws2 + ws;
                         description = TestHelper.toStringDescription(source);
-                        expected = ws + nws1 + "\n\n" + nws2 + ws;
+                        expected = ws + nws1 + "\n" + nws2 + ws;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -7887,6 +6250,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Single-Line; Trim: Both; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      */
     @Test
@@ -8171,6 +6535,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Single-Line; Trim: End; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#NO_TRIM_START} | @link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      */
     @Test
@@ -8460,6 +6825,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Single-Line; Trim: Start; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#NO_TRIM_END} | @link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      */
     @Test
@@ -8493,6 +6859,7 @@ public class StringHelperTest {
             for (char ws2 : WHITESPACE_CHARACTERS) {
                 source = Character.toString(ws1) + ws2;
                 description = TestHelper.toStringDescription(source);
+                expected = "";
                 actual = target1.apply(source);
                 assertEquals(description, expected, actual);
                 actual = target2.apply(source);
@@ -8662,7 +7029,7 @@ public class StringHelperTest {
 
                     source = nl + nws1 + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = " " + nws1 + ws;
+                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -8670,7 +7037,6 @@ public class StringHelperTest {
 
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + ws;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -8751,6 +7117,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Single-Line; Trim: None; Whitespace: Leave.
      * <code>{@link StringNormalizationOption#NO_TRIM} | @link StringNormalizationOption#LEAVE_WHITESPACE} | {@link StringNormalizationOption#SINGLE_LINE}</code>
      */
     @Test
@@ -8807,18 +7174,18 @@ public class StringHelperTest {
                     assertEquals(description, expected, actual);
                 }
                 for (String nws1 : allNws1) {
-                    source = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2;
+                    source = ws2 + ws1 + nws1 + ws1 + ws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2;
+                    expected = ws2 + ws1 + nws1 + ws1 + ws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
                     assertEquals(description, expected, actual);
 
                     for (String nws2 : allNws2) {
-                        source = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2 + nws2 + ws2 + ws1;
+                        source = ws2 + ws1 + nws1 + ws1 + ws2 + nws2 + ws2 + ws1;
                         description = TestHelper.toStringDescription(source);
-                        expected = Character.toString(ws2) + ws1 + nws1 + ws1 + ws2 + nws2 + ws2 + ws1;
+                        expected = ws2 + ws1 + nws1 + ws1 + ws2 + nws2 + ws2 + ws1;
                         actual = target1.apply(source);
                         assertEquals(description, expected, actual);
                         actual = target2.apply(source);
@@ -8955,13 +7322,6 @@ public class StringHelperTest {
                     actual = target2.apply(source);
                     assertEquals(description, expected, actual);
 
-                    source = nl + nws1 + ws;
-                    description = TestHelper.toStringDescription(source);
-                    actual = target1.apply(source);
-                    assertEquals(description, expected, actual);
-                    actual = target2.apply(source);
-                    assertEquals(description, expected, actual);
-
                     source = nws1 + nl + ws;
                     description = TestHelper.toStringDescription(source);
                     actual = target1.apply(source);
@@ -8969,9 +7329,17 @@ public class StringHelperTest {
                     actual = target2.apply(source);
                     assertEquals(description, expected, actual);
 
+                    source = nl + nws1 + ws;
+                    description = TestHelper.toStringDescription(source);
+                    expected = " " + nws1 + ws;
+                    actual = target1.apply(source);
+                    assertEquals(description, expected, actual);
+                    actual = target2.apply(source);
+                    assertEquals(description, expected, actual);
+
                     source = ws + nws1 + nl;
                     description = TestHelper.toStringDescription(source);
-                    expected = ws + nws1;
+                    expected = ws + nws1 + " ";
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -8979,6 +7347,7 @@ public class StringHelperTest {
 
                     source = nl + ws + nws1;
                     description = TestHelper.toStringDescription(source);
+                    expected = ws + nws1;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -9043,6 +7412,7 @@ public class StringHelperTest {
     }
 
     /**
+     * Mode: Multi-Line; Blank Lines: Leave; Trim: Both; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#LEAVE_BLANK_LINES}</code>
      * Was: StringNormalizationOption.TRIM
      */
@@ -9246,9 +7616,9 @@ public class StringHelperTest {
                 assertEquals(description, expected, actual);
 
                 for (String nws2 : allNws2) {
-                    source = nws1 + "\n" + nws2;
+                    source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + nl + nws2;
+                    expected = nws1 + "\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -9283,7 +7653,7 @@ public class StringHelperTest {
                 for (String nws2 : allNws2) {
                     source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    source = nws1 + "\n\n" + nws2;
+                    expected = nws1 + "\n\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -9518,216 +7888,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer20_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.LEAVE_BLANK_LINES);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.LEAVE_BLANK_LINES, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", " ", "  ", " \t", " \u1680", "\t", "\t ", "\t\t", "\t\u1680", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680"),
-                new TestData("Test", "Test", "Test ", " Test", " Test ", "  Test  ", "Test\t", "\tTest", "\tTest\t", "\t\tTest\t\t", "Test\u1680", "\u1680Test",
-                        "\u1680Test\u1680", "\u1680\u1680Test\u1680\u1680"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\u00A0 ", " \u00A0", " \u00A0 ", "  \u00A0  ", "\u00A0\t", "\t\u00A0", "\t\u00A0\t", "\t\t\u00A0\t\t", "\u00A0\u1680",
-                        "\u1680\u00A0", "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680"),
-                new TestData("\n", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", " \n ", "\n ", " \r\n ", "\r\n ", " \r ", "\r ", " \f ", "\f ", " \u0085 ",
-                        "\u0085 ", " \u2028 ", "\u2028 ", " \u2029 ", "\u2029 ", "\t\n\t", "\n\t", "\t\r\n\t", "\r\n\t", "\t\r\t", "\r\t", "\t\f\t", "\f\t", "\t\u0085\t",
-                        "\u0085\t", "\t\u2028\t", "\u2028\t", "\t\u2029\t", "\u2029\t", "\u1680\n\u1680", "\n\u1680", "\u1680\r\n\u1680", "\r\n\u1680", "\u1680\r\u1680",
-                        "\r\u1680", "\u1680\f\u1680", "\f\u1680", "\u1680\u0085\u1680", "\u0085\u1680", "\u1680\u2028\u1680", "\u2028\u1680", "\u1680\u2029\u1680",
-                        "\u2029\u1680"),
-                new TestData("\n\n", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029", "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085",
-                        "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029", "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028",
-                        "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085", "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r",
-                        "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n", "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028",
-                        "\u2029\u2029", "\n \n", "\r\n \r\n", "\r \r", "\f \f", "\u0085 \u0085", "\u2028 \u2028", "\u2029 \u2029", " \n\n ", "\n\n ", " \n\r\n ", "\n\r\n ",
-                        " \n\r ", "\n\r ", " \n\f ", "\n\f ", " \n\u0085 ", "\n\u0085 ", " \n\u2028 ", "\n\u2028 ", " \n\u2029 ", "\n\u2029 ", " \r\n\n ", "\r\n\n ",
-                        " \r\n\r\n ", "\r\n\r\n ", " \r\n\r ", "\r\n\r ", " \r\n\f ", "\r\n\f ", " \r\n\u0085 ", "\r\n\u0085 ", " \r\n\u2028 ", "\r\n\u2028 ",
-                        " \r\n\u2029 ", "\r\n\u2029 ", " \r\r\n ", "\r\r\n ", " \r\r ", "\r\r ", " \r\f ", "\r\f ", " \r\u0085 ", "\r\u0085 ", " \r\u2028 ", "\r\u2028 ",
-                        " \r\u2029 ", "\r\u2029 ", " \f\n ", "\f\n ", " \f\r\n ", "\f\r\n ", " \f\r ", "\f\r ", " \f\f ", "\f\f ", " \f\u0085 ", "\f\u0085 ", " \f\u2028 ",
-                        "\f\u2028 ", " \f\u2029 ", "\f\u2029 ", " \u0085\n ", "\u0085\n ", " \u0085\r\n ", "\u0085\r\n ", " \u0085\r ", "\u0085\r ", " \u0085\f ",
-                        "\u0085\f ", " \u0085\u0085 ", "\u0085\u0085 ", " \u0085\u2028 ", "\u0085\u2028 ", " \u0085\u2029 ", "\u0085\u2029 ", " \u2028\n ", "\u2028\n ",
-                        " \u2028\r\n ", "\u2028\r\n ", " \u2028\r ", "\u2028\r ", " \u2028\f ", "\u2028\f ", " \u2028\u0085 ", "\u2028\u0085 ", " \u2028\u2028 ",
-                        "\u2028\u2028 ", " \u2028\u2029 ", "\u2028\u2029 ", " \u2029\n ", "\u2029\n ", " \u2029\r\n ", "\u2029\r\n ", " \u2029\r ", "\u2029\r ",
-                        " \u2029\f ", "\u2029\f ", " \u2029\u0085 ", "\u2029\u0085 ", " \u2029\u2028 ", "\u2029\u2028 ", " \u2029\u2029 ", "\u2029\u2029 ", "\n\t\n",
-                        "\r\n\t\r\n", "\r\t\r", "\f\t\f", "\u0085\t\u0085", "\u2028\t\u2028", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\t\n\r\n\t", "\n\r\n\t", "\t\n\r\t",
-                        "\n\r\t", "\t\n\f\t", "\n\f\t", "\t\n\u0085\t", "\n\u0085\t", "\t\n\u2028\t", "\n\u2028\t", "\t\n\u2029\t", "\n\u2029\t", "\t\r\n\n\t", "\r\n\n\t",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\t\r\n\r\t", "\r\n\r\t", "\t\r\n\f\t", "\r\n\f\t", "\t\r\n\u0085\t", "\r\n\u0085\t", "\t\r\n\u2028\t", "\r\n\u2028\t",
-                        "\t\r\n\u2029\t", "\r\n\u2029\t", "\t\r\r\n\t", "\r\r\n\t", "\t\r\r\t", "\r\r\t", "\t\r\f\t", "\r\f\t", "\t\r\u0085\t", "\r\u0085\t", "\t\r\u2028\t",
-                        "\r\u2028\t", "\t\r\u2029\t", "\r\u2029\t", "\t\f\n\t", "\f\n\t", "\t\f\r\n\t", "\f\r\n\t", "\t\f\r\t", "\f\r\t", "\t\f\f\t", "\f\f\t",
-                        "\t\f\u0085\t", "\f\u0085\t", "\t\f\u2028\t", "\f\u2028\t", "\t\f\u2029\t", "\f\u2029\t", "\t\u0085\n\t", "\u0085\n\t", "\t\u0085\r\n\t",
-                        "\u0085\r\n\t", "\t\u0085\r\t", "\u0085\r\t", "\t\u0085\f\t", "\u0085\f\t", "\t\u0085\u0085\t", "\u0085\u0085\t", "\t\u0085\u2028\t",
-                        "\u0085\u2028\t", "\t\u0085\u2029\t", "\u0085\u2029\t", "\t\u2028\n\t", "\u2028\n\t", "\t\u2028\r\n\t", "\u2028\r\n\t", "\t\u2028\r\t", "\u2028\r\t",
-                        "\t\u2028\f\t", "\u2028\f\t", "\t\u2028\u0085\t", "\u2028\u0085\t", "\t\u2028\u2028\t", "\u2028\u2028\t", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\t\u2029\n\t", "\u2029\n\t", "\t\u2029\r\n\t", "\u2029\r\n\t", "\t\u2029\r\t", "\u2029\r\t", "\t\u2029\f\t", "\u2029\f\t", "\t\u2029\u0085\t",
-                        "\u2029\u0085\t", "\t\u2029\u2028\t", "\u2029\u2028\t", "\t\u2029\u2029\t", "\u2029\u2029\t", "\n\u1680\n", "\r\n\u1680\r\n", "\r\u1680\r",
-                        "\f\u1680\f", "\u0085\u1680\u0085", "\u2028\u1680\u2028", "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\u1680\n\r\n\u1680",
-                        "\n\r\n\u1680", "\u1680\n\r\u1680", "\n\r\u1680", "\u1680\n\f\u1680", "\n\f\u1680", "\u1680\n\u0085\u1680", "\n\u0085\u1680", "\u1680\n\u2028\u1680",
-                        "\n\u2028\u1680", "\u1680\n\u2029\u1680", "\n\u2029\u1680", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\u1680\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\u1680\r\r\n\u1680", "\r\r\n\u1680", "\u1680\r\r\u1680", "\r\r\u1680",
-                        "\u1680\r\f\u1680", "\r\f\u1680", "\u1680\r\u0085\u1680", "\r\u0085\u1680", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\u1680\f\n\u1680", "\f\n\u1680", "\u1680\f\r\n\u1680", "\f\r\n\u1680", "\u1680\f\r\u1680", "\f\r\u1680", "\u1680\f\f\u1680",
-                        "\f\f\u1680", "\u1680\f\u0085\u1680", "\f\u0085\u1680", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\u1680\f\u2029\u1680", "\f\u2029\u1680",
-                        "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u1680\u0085\r\n\u1680", "\u0085\r\n\u1680", "\u1680\u0085\r\u1680", "\u0085\r\u1680",
-                        "\u1680\u0085\f\u1680", "\u0085\f\u1680", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680",
-                        "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u1680\u2028\f\u1680", "\u2028\f\u1680", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680",
-                        "\u1680\u2028\u2028\u1680", "\u2028\u2028\u1680", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u1680\u2029\n\u1680", "\u2029\n\u1680",
-                        "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u1680\u2029\f\u1680", "\u2029\f\u1680",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680"),
-                new TestData("\n\n\n\n", "\n\n \n\n", "\n\r\n \n\r\n", "\n\r \n\r", "\n\f \n\f", "\n\u0085 \n\u0085", "\n\u2028 \n\u2028", "\n\u2029 \n\u2029",
-                        "\r\n\n \r\n\n", "\r\n\r\n \r\n\r\n", "\r\n\r \r\n\r", "\r\n\f \r\n\f", "\r\n\u0085 \r\n\u0085", "\r\n\u2028 \r\n\u2028", "\r\n\u2029 \r\n\u2029",
-                        "\r\r\n \r\r\n", "\r\r \r\r", "\r\f \r\f", "\r\u0085 \r\u0085", "\r\u2028 \r\u2028", "\r\u2029 \r\u2029", "\f\n \f\n", "\f\r\n \f\r\n", "\f\r \f\r",
-                        "\f\f \f\f", "\f\u0085 \f\u0085", "\f\u2028 \f\u2028", "\f\u2029 \f\u2029", "\u0085\n \u0085\n", "\u0085\r\n \u0085\r\n", "\u0085\r \u0085\r",
-                        "\u0085\f \u0085\f", "\u0085\u0085 \u0085\u0085", "\u0085\u2028 \u0085\u2028", "\u0085\u2029 \u0085\u2029", "\u2028\n \u2028\n",
-                        "\u2028\r\n \u2028\r\n", "\u2028\r \u2028\r", "\u2028\f \u2028\f", "\u2028\u0085 \u2028\u0085", "\u2028\u2028 \u2028\u2028",
-                        "\u2028\u2029 \u2028\u2029", "\u2029\n \u2029\n", "\u2029\r\n \u2029\r\n", "\u2029\r \u2029\r", "\u2029\f \u2029\f", "\u2029\u0085 \u2029\u0085",
-                        "\u2029\u2028 \u2029\u2028", "\u2029\u2029 \u2029\u2029", "\n\n\t\n\n", "\n\r\n\t\n\r\n", "\n\r\t\n\r", "\n\f\t\n\f", "\n\u0085\t\n\u0085",
-                        "\n\u2028\t\n\u2028", "\n\u2029\t\n\u2029", "\r\n\n\t\r\n\n", "\r\n\r\n\t\r\n\r\n", "\r\n\r\t\r\n\r", "\r\n\f\t\r\n\f", "\r\n\u0085\t\r\n\u0085",
-                        "\r\n\u2028\t\r\n\u2028", "\r\n\u2029\t\r\n\u2029", "\r\r\n\t\r\r\n", "\r\r\t\r\r", "\r\f\t\r\f", "\r\u0085\t\r\u0085", "\r\u2028\t\r\u2028",
-                        "\r\u2029\t\r\u2029", "\f\n\t\f\n", "\f\r\n\t\f\r\n", "\f\r\t\f\r", "\f\f\t\f\f", "\f\u0085\t\f\u0085", "\f\u2028\t\f\u2028", "\f\u2029\t\f\u2029",
-                        "\u0085\n\t\u0085\n", "\u0085\r\n\t\u0085\r\n", "\u0085\r\t\u0085\r", "\u0085\f\t\u0085\f", "\u0085\u0085\t\u0085\u0085",
-                        "\u0085\u2028\t\u0085\u2028", "\u0085\u2029\t\u0085\u2029", "\u2028\n\t\u2028\n", "\u2028\r\n\t\u2028\r\n", "\u2028\r\t\u2028\r",
-                        "\u2028\f\t\u2028\f", "\u2028\u0085\t\u2028\u0085", "\u2028\u2028\t\u2028\u2028", "\u2028\u2029\t\u2028\u2029", "\u2029\n\t\u2029\n",
-                        "\u2029\r\n\t\u2029\r\n", "\u2029\r\t\u2029\r", "\u2029\f\t\u2029\f", "\u2029\u0085\t\u2029\u0085", "\u2029\u2028\t\u2029\u2028",
-                        "\u2029\u2029\t\u2029\u2029", "\n\n\u1680\n\n", "\n\r\n\u1680\n\r\n", "\n\r\u1680\n\r", "\n\f\u1680\n\f", "\n\u0085\u1680\n\u0085",
-                        "\n\u2028\u1680\n\u2028", "\n\u2029\u1680\n\u2029", "\r\n\n\u1680\r\n\n", "\r\n\r\n\u1680\r\n\r\n", "\r\n\r\u1680\r\n\r", "\r\n\f\u1680\r\n\f",
-                        "\r\n\u0085\u1680\r\n\u0085", "\r\n\u2028\u1680\r\n\u2028", "\r\n\u2029\u1680\r\n\u2029", "\r\r\n\u1680\r\r\n", "\r\r\u1680\r\r", "\r\f\u1680\r\f",
-                        "\r\u0085\u1680\r\u0085", "\r\u2028\u1680\r\u2028", "\r\u2029\u1680\r\u2029", "\f\n\u1680\f\n", "\f\r\n\u1680\f\r\n", "\f\r\u1680\f\r",
-                        "\f\f\u1680\f\f", "\f\u0085\u1680\f\u0085", "\f\u2028\u1680\f\u2028", "\f\u2029\u1680\f\u2029", "\u0085\n\u1680\u0085\n",
-                        "\u0085\r\n\u1680\u0085\r\n", "\u0085\r\u1680\u0085\r", "\u0085\f\u1680\u0085\f", "\u0085\u0085\u1680\u0085\u0085", "\u0085\u2028\u1680\u0085\u2028",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u2028\n\u1680\u2028\n", "\u2028\r\n\u1680\u2028\r\n", "\u2028\r\u1680\u2028\r", "\u2028\f\u1680\u2028\f",
-                        "\u2028\u0085\u1680\u2028\u0085", "\u2028\u2028\u1680\u2028\u2028", "\u2028\u2029\u1680\u2028\u2029", "\u2029\n\u1680\u2029\n",
-                        "\u2029\r\n\u1680\u2029\r\n", "\u2029\r\u1680\u2029\r", "\u2029\f\u1680\u2029\f", "\u2029\u0085\u1680\u2029\u0085", "\u2029\u2028\u1680\u2029\u2028",
-                        "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData("Test\nData", " Test \n Data", "Test \n Data ", " Test \r\n Data", "Test \r\n Data ", " Test \r Data", "Test \r Data ", " Test \f Data",
-                        "Test \f Data ", " Test \u0085 Data", "Test \u0085 Data ", " Test \u2028 Data", "Test \u2028 Data ", " Test \u2029 Data", "Test \u2029 Data ",
-                        "\tTest\t\n\tData", "Test\t\n\tData\t", "\tTest\t\r\n\tData", "Test\t\r\n\tData\t", "\tTest\t\r\tData", "Test\t\r\tData\t", "\tTest\t\f\tData",
-                        "Test\t\f\tData\t", "\tTest\t\u0085\tData", "Test\t\u0085\tData\t", "\tTest\t\u2028\tData", "Test\t\u2028\tData\t", "\tTest\t\u2029\tData",
-                        "Test\t\u2029\tData\t", "\u1680Test\u1680\n\u1680Data", "Test\u1680\n\u1680Data\u1680", "\u1680Test\u1680\r\n\u1680Data",
-                        "Test\u1680\r\n\u1680Data\u1680", "\u1680Test\u1680\r\u1680Data", "Test\u1680\r\u1680Data\u1680", "\u1680Test\u1680\f\u1680Data",
-                        "Test\u1680\f\u1680Data\u1680", "\u1680Test\u1680\u0085\u1680Data", "Test\u1680\u0085\u1680Data\u1680", "\u1680Test\u1680\u2028\u1680Data",
-                        "Test\u1680\u2028\u1680Data\u1680", "\u1680Test\u1680\u2029\u1680Data", "Test\u1680\u2029\u1680Data\u1680", "Test\nData", "Test\r\nData",
-                        "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data"),
-                new TestData("\nTest", " \n Test", "\n Test ", " \r\n Test", "\r\n Test ", " \r Test", "\r Test ", " \f Test", "\f Test ", " \u0085 Test",
-                        "\u0085 Test ", " \u2028 Test", "\u2028 Test ", " \u2029 Test", "\u2029 Test ", "\t\n\tTest", "\n\tTest\t", "\t\r\n\tTest", "\r\n\tTest\t",
-                        "\t\r\tTest", "\r\tTest\t", "\t\f\tTest", "\f\tTest\t", "\t\u0085\tTest", "\u0085\tTest\t", "\t\u2028\tTest", "\u2028\tTest\t", "\t\u2029\tTest",
-                        "\u2029\tTest\t", "\u1680\n\u1680Test", "\n\u1680Test\u1680", "\u1680\r\n\u1680Test", "\r\n\u1680Test\u1680", "\u1680\r\u1680Test",
-                        "\r\u1680Test\u1680", "\u1680\f\u1680Test", "\f\u1680Test\u1680", "\u1680\u0085\u1680Test", "\u0085\u1680Test\u1680", "\u1680\u2028\u1680Test",
-                        "\u2028\u1680Test\u1680", "\u1680\u2029\u1680Test", "\u2029\u1680Test\u1680", "\nTest", "\r\nTest", "\rTest", "\fTest", "\u0085Test", "\u2028Test",
-                        "\u2029Test"),
-                new TestData("\nTest\n", "\n Test \n", " \n Test \n ", "\r\n Test \r\n", " \r\n Test \r\n ", "\r Test \r", " \r Test \r ", "\f Test \f", " \f Test \f ",
-                        "\u0085 Test \u0085", " \u0085 Test \u0085 ", "\u2028 Test \u2028", " \u2028 Test \u2028 ", "\u2029 Test \u2029", " \u2029 Test \u2029 ",
-                        "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\f\tTest\t\f",
-                        "\t\f\tTest\t\f\t", "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t", "\u2029\tTest\t\u2029",
-                        "\t\u2029\tTest\t\u2029\t", "\n\u1680Test\u1680\n", "\u1680\n\u1680Test\u1680\n\u1680", "\r\n\u1680Test\u1680\r\n",
-                        "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\f\u1680Test\u1680\f",
-                        "\u1680\f\u1680Test\u1680\f\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u2028\u1680Test\u1680\u2028",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u2029\u1680Test\u1680\u2029", "\u1680\u2029\u1680Test\u1680\u2029\u1680", "\nTest\n", "\r\nTest\r\n",
-                        "\rTest\r", "\fTest\f", "\u0085Test\u0085", "\u2028Test\u2028", "\u2029Test\u2029"),
-                new TestData("Test\n\nData", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data",
-                        "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data",
-                        "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData",
-                        "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData",
-                        "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data",
-                        "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data",
-                        "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data",
-                        "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("Test\n\n", "Test\n\n", "Test\n\r\n", "Test\n\r", "Test\n\f", "Test\n\u0085", "Test\n\u2028", "Test\n\u2029", "Test\r\n\n", "Test\r\n\r\n",
-                        "Test\r\n\r", "Test\r\n\f", "Test\r\n\u0085", "Test\r\n\u2028", "Test\r\n\u2029", "Test\r\r\n", "Test\r\r", "Test\r\f", "Test\r\u0085",
-                        "Test\r\u2028", "Test\r\u2029", "Test\f\n", "Test\f\r\n", "Test\f\r", "Test\f\f", "Test\f\u0085", "Test\f\u2028", "Test\f\u2029", "Test\u0085\n",
-                        "Test\u0085\r\n", "Test\u0085\r", "Test\u0085\f", "Test\u0085\u0085", "Test\u0085\u2028", "Test\u0085\u2029", "Test\u2028\n", "Test\u2028\r\n",
-                        "Test\u2028\r", "Test\u2028\f", "Test\u2028\u0085", "Test\u2028\u2028", "Test\u2028\u2029", "Test\u2029\n", "Test\u2029\r\n", "Test\u2029\r",
-                        "Test\u2029\f", "Test\u2029\u0085", "Test\u2029\u2028", "Test\u2029\u2029"),
-                new TestData("\n\nTest", "\n\nTest", "\n\r\nTest", "\n\rTest", "\n\fTest", "\n\u0085Test", "\n\u2028Test", "\n\u2029Test", "\r\n\nTest", "\r\n\r\nTest",
-                        "\r\n\rTest", "\r\n\fTest", "\r\n\u0085Test", "\r\n\u2028Test", "\r\n\u2029Test", "\r\r\nTest", "\r\rTest", "\r\fTest", "\r\u0085Test",
-                        "\r\u2028Test", "\r\u2029Test", "\f\nTest", "\f\r\nTest", "\f\rTest", "\f\fTest", "\f\u0085Test", "\f\u2028Test", "\f\u2029Test", "\u0085\nTest",
-                        "\u0085\r\nTest", "\u0085\rTest", "\u0085\fTest", "\u0085\u0085Test", "\u0085\u2028Test", "\u0085\u2029Test", "\u2028\nTest", "\u2028\r\nTest",
-                        "\u2028\rTest", "\u2028\fTest", "\u2028\u0085Test", "\u2028\u2028Test", "\u2028\u2029Test", "\u2029\nTest", "\u2029\r\nTest", "\u2029\rTest",
-                        "\u2029\fTest", "\u2029\u0085Test", "\u2029\u2028Test", "\u2029\u2029Test"),
-                new TestData("\n\nTest\n\n", "\n\nTest\n\n", "\n\r\nTest\n\r\n", "\n\rTest\n\r", "\n\fTest\n\f", "\n\u0085Test\n\u0085", "\n\u2028Test\n\u2028",
-                        "\n\u2029Test\n\u2029", "\r\n\nTest\r\n\n", "\r\n\r\nTest\r\n\r\n", "\r\n\rTest\r\n\r", "\r\n\fTest\r\n\f", "\r\n\u0085Test\r\n\u0085",
-                        "\r\n\u2028Test\r\n\u2028", "\r\n\u2029Test\r\n\u2029", "\r\r\nTest\r\r\n", "\r\rTest\r\r", "\r\fTest\r\f", "\r\u0085Test\r\u0085",
-                        "\r\u2028Test\r\u2028", "\r\u2029Test\r\u2029", "\f\nTest\f\n", "\f\r\nTest\f\r\n", "\f\rTest\f\r", "\f\fTest\f\f", "\f\u0085Test\f\u0085",
-                        "\f\u2028Test\f\u2028", "\f\u2029Test\f\u2029", "\u0085\nTest\u0085\n", "\u0085\r\nTest\u0085\r\n", "\u0085\rTest\u0085\r", "\u0085\fTest\u0085\f",
-                        "\u0085\u0085Test\u0085\u0085", "\u0085\u2028Test\u0085\u2028", "\u0085\u2029Test\u0085\u2029", "\u2028\nTest\u2028\n", "\u2028\r\nTest\u2028\r\n",
-                        "\u2028\rTest\u2028\r", "\u2028\fTest\u2028\f", "\u2028\u0085Test\u2028\u0085", "\u2028\u2028Test\u2028\u2028", "\u2028\u2029Test\u2028\u2029",
-                        "\u2029\nTest\u2029\n", "\u2029\r\nTest\u2029\r\n", "\u2029\rTest\u2029\r", "\u2029\fTest\u2029\f", "\u2029\u0085Test\u2029\u0085",
-                        "\u2029\u2028Test\u2029\u2028", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData("\u00A0\n_", " \u00A0 \n _", "\u00A0 \n _ ", " \u00A0 \r\n _", "\u00A0 \r\n _ ", " \u00A0 \r _", "\u00A0 \r _ ", " \u00A0 \f _",
-                        "\u00A0 \f _ ", " \u00A0 \u0085 _", "\u00A0 \u0085 _ ", " \u00A0 \u2028 _", "\u00A0 \u2028 _ ", " \u00A0 \u2029 _", "\u00A0 \u2029 _ ",
-                        "\t\u00A0\t\n\t_", "\u00A0\t\n\t_\t", "\t\u00A0\t\r\n\t_", "\u00A0\t\r\n\t_\t", "\t\u00A0\t\r\t_", "\u00A0\t\r\t_\t", "\t\u00A0\t\f\t_",
-                        "\u00A0\t\f\t_\t", "\t\u00A0\t\u0085\t_", "\u00A0\t\u0085\t_\t", "\t\u00A0\t\u2028\t_", "\u00A0\t\u2028\t_\t", "\t\u00A0\t\u2029\t_",
-                        "\u00A0\t\u2029\t_\t", "\u1680\u00A0\u1680\n\u1680_", "\u00A0\u1680\n\u1680_\u1680", "\u1680\u00A0\u1680\r\n\u1680_",
-                        "\u00A0\u1680\r\n\u1680_\u1680", "\u1680\u00A0\u1680\r\u1680_", "\u00A0\u1680\r\u1680_\u1680", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u00A0\u1680\f\u1680_\u1680", "\u1680\u00A0\u1680\u0085\u1680_", "\u00A0\u1680\u0085\u1680_\u1680", "\u1680\u00A0\u1680\u2028\u1680_",
-                        "\u00A0\u1680\u2028\u1680_\u1680", "\u1680\u00A0\u1680\u2029\u1680_", "\u00A0\u1680\u2029\u1680_\u1680", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_",
-                        "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_"),
-                new TestData("\n\u00A0", " \n \u00A0", "\n \u00A0 ", " \r\n \u00A0", "\r\n \u00A0 ", " \r \u00A0", "\r \u00A0 ", " \f \u00A0", "\f \u00A0 ",
-                        " \u0085 \u00A0", "\u0085 \u00A0 ", " \u2028 \u00A0", "\u2028 \u00A0 ", " \u2029 \u00A0", "\u2029 \u00A0 ", "\t\n\t\u00A0", "\n\t\u00A0\t",
-                        "\t\r\n\t\u00A0", "\r\n\t\u00A0\t", "\t\r\t\u00A0", "\r\t\u00A0\t", "\t\f\t\u00A0", "\f\t\u00A0\t", "\t\u0085\t\u00A0", "\u0085\t\u00A0\t",
-                        "\t\u2028\t\u00A0", "\u2028\t\u00A0\t", "\t\u2029\t\u00A0", "\u2029\t\u00A0\t", "\u1680\n\u1680\u00A0", "\n\u1680\u00A0\u1680",
-                        "\u1680\r\n\u1680\u00A0", "\r\n\u1680\u00A0\u1680", "\u1680\r\u1680\u00A0", "\r\u1680\u00A0\u1680", "\u1680\f\u1680\u00A0", "\f\u1680\u00A0\u1680",
-                        "\u1680\u0085\u1680\u00A0", "\u0085\u1680\u00A0\u1680", "\u1680\u2028\u1680\u00A0", "\u2028\u1680\u00A0\u1680", "\u1680\u2029\u1680\u00A0",
-                        "\u2029\u1680\u00A0\u1680", "\n\u00A0", "\r\n\u00A0", "\r\u00A0", "\f\u00A0", "\u0085\u00A0", "\u2028\u00A0", "\u2029\u00A0"),
-                new TestData("\n\u00A0\n", "\n \u00A0 \n", " \n \u00A0 \n ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", "\r \u00A0 \r", " \r \u00A0 \r ", "\f \u00A0 \f",
-                        " \f \u00A0 \f ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\r\t\u00A0\t\r",
-                        "\t\r\t\u00A0\t\r\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\n\u1680\u00A0\u1680\n", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\r\n\u1680\u00A0\u1680\r\n", "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\r\u1680\u00A0\u1680\r", "\u1680\r\u1680\u00A0\u1680\r\u1680",
-                        "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u2029\u1680\u00A0\u1680\u2029",
-                        "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680", "\n\u00A0\n", "\r\n\u00A0\r\n", "\r\u00A0\r", "\f\u00A0\f", "\u0085\u00A0\u0085", "\u2028\u00A0\u2028",
-                        "\u2029\u00A0\u2029"),
-                new TestData("\u00A0\n\n_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_",
-                        "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_",
-                        "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_",
-                        "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_",
-                        "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_",
-                        "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_",
-                        "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData("\u00A0\n\n", "\u00A0\n\n", "\u00A0\n\r\n", "\u00A0\n\r", "\u00A0\n\f", "\u00A0\n\u0085", "\u00A0\n\u2028", "\u00A0\n\u2029",
-                        "\u00A0\r\n\n", "\u00A0\r\n\r\n", "\u00A0\r\n\r", "\u00A0\r\n\f", "\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\u00A0\r\r\n",
-                        "\u00A0\r\r", "\u00A0\r\f", "\u00A0\r\u0085", "\u00A0\r\u2028", "\u00A0\r\u2029", "\u00A0\f\n", "\u00A0\f\r\n", "\u00A0\f\r", "\u00A0\f\f",
-                        "\u00A0\f\u0085", "\u00A0\f\u2028", "\u00A0\f\u2029", "\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u00A0\u0085\f", "\u00A0\u0085\u0085",
-                        "\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u00A0\u2028\f", "\u00A0\u2028\u0085",
-                        "\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u00A0\u2029\f", "\u00A0\u2029\u0085",
-                        "\u00A0\u2029\u2028", "\u00A0\u2029\u2029"),
-                new TestData("\n\n\u00A0", "\n\n\u00A0", "\n\r\n\u00A0", "\n\r\u00A0", "\n\f\u00A0", "\n\u0085\u00A0", "\n\u2028\u00A0", "\n\u2029\u00A0",
-                        "\r\n\n\u00A0", "\r\n\r\n\u00A0", "\r\n\r\u00A0", "\r\n\f\u00A0", "\r\n\u0085\u00A0", "\r\n\u2028\u00A0", "\r\n\u2029\u00A0", "\r\r\n\u00A0",
-                        "\r\r\u00A0", "\r\f\u00A0", "\r\u0085\u00A0", "\r\u2028\u00A0", "\r\u2029\u00A0", "\f\n\u00A0", "\f\r\n\u00A0", "\f\r\u00A0", "\f\f\u00A0",
-                        "\f\u0085\u00A0", "\f\u2028\u00A0", "\f\u2029\u00A0", "\u0085\n\u00A0", "\u0085\r\n\u00A0", "\u0085\r\u00A0", "\u0085\f\u00A0", "\u0085\u0085\u00A0",
-                        "\u0085\u2028\u00A0", "\u0085\u2029\u00A0", "\u2028\n\u00A0", "\u2028\r\n\u00A0", "\u2028\r\u00A0", "\u2028\f\u00A0", "\u2028\u0085\u00A0",
-                        "\u2028\u2028\u00A0", "\u2028\u2029\u00A0", "\u2029\n\u00A0", "\u2029\r\n\u00A0", "\u2029\r\u00A0", "\u2029\f\u00A0", "\u2029\u0085\u00A0",
-                        "\u2029\u2028\u00A0", "\u2029\u2029\u00A0"),
-                new TestData("\n\n\u00A0\n\n", "\n\n\u00A0\n\n", "\n\r\n\u00A0\n\r\n", "\n\r\u00A0\n\r", "\n\f\u00A0\n\f", "\n\u0085\u00A0\n\u0085",
-                        "\n\u2028\u00A0\n\u2028", "\n\u2029\u00A0\n\u2029", "\r\n\n\u00A0\r\n\n", "\r\n\r\n\u00A0\r\n\r\n", "\r\n\r\u00A0\r\n\r", "\r\n\f\u00A0\r\n\f",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\r\n\u2028\u00A0\r\n\u2028", "\r\n\u2029\u00A0\r\n\u2029", "\r\r\n\u00A0\r\r\n", "\r\r\u00A0\r\r", "\r\f\u00A0\r\f",
-                        "\r\u0085\u00A0\r\u0085", "\r\u2028\u00A0\r\u2028", "\r\u2029\u00A0\r\u2029", "\f\n\u00A0\f\n", "\f\r\n\u00A0\f\r\n", "\f\r\u00A0\f\r",
-                        "\f\f\u00A0\f\f", "\f\u0085\u00A0\f\u0085", "\f\u2028\u00A0\f\u2028", "\f\u2029\u00A0\f\u2029", "\u0085\n\u00A0\u0085\n",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u0085\r\u00A0\u0085\r", "\u0085\f\u00A0\u0085\f", "\u0085\u0085\u00A0\u0085\u0085", "\u0085\u2028\u00A0\u0085\u2028",
-                        "\u0085\u2029\u00A0\u0085\u2029", "\u2028\n\u00A0\u2028\n", "\u2028\r\n\u00A0\u2028\r\n", "\u2028\r\u00A0\u2028\r", "\u2028\f\u00A0\u2028\f",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u2028\u2028\u00A0\u2028\u2028", "\u2028\u2029\u00A0\u2028\u2029", "\u2029\n\u00A0\u2029\n",
-                        "\u2029\r\n\u00A0\u2029\r\n", "\u2029\r\u00A0\u2029\r", "\u2029\f\u00A0\u2029\f", "\u2029\u0085\u00A0\u2029\u0085", "\u2029\u2028\u00A0\u2029\u2028",
-                        "\u2029\u2029\u00A0\u2029\u2029")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Leave; Trim: End; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM_START} | {@link StringNormalizationOption#LEAVE_BLANK_LINES}</code>
      * Was: StringNormalizationOption.TRIM_END
      */
@@ -9966,9 +8128,9 @@ public class StringHelperTest {
                 assertEquals(description, expected, actual);
 
                 for (String nws2 : allNws2) {
-                    source = nws1 + "\n\n" + nws2;
+                    source = nws1 + nl + nws2;
                     description = TestHelper.toStringDescription(source);
-                    expected = nws1 + nl + nws2;
+                    expected = nws1 + "\n\n" + nws2;
                     actual = target1.apply(source);
                     assertEquals(description, expected, actual);
                     actual = target2.apply(source);
@@ -10217,219 +8379,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer22_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START, StringNormalizationOption.LEAVE_BLANK_LINES);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START, StringNormalizationOption.LEAVE_BLANK_LINES, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", " ", "  ", " \t", " \u1680", "\t", "\t ", "\t\t", "\t\u1680", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680"),
-                new TestData("Test", "Test", "Test ", "Test\t", "Test\u1680"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", "\u00A0 ", "\u00A0\t", "\u00A0\u1680"),
-                new TestData("\n", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", " \n ", "\n ", " \r\n ", "\r\n ", " \r ", "\r ", " \f ", "\f ", " \u0085 ",
-                        "\u0085 ", " \u2028 ", "\u2028 ", " \u2029 ", "\u2029 ", "\t\n\t", "\n\t", "\t\r\n\t", "\r\n\t", "\t\r\t", "\r\t", "\t\f\t", "\f\t", "\t\u0085\t",
-                        "\u0085\t", "\t\u2028\t", "\u2028\t", "\t\u2029\t", "\u2029\t", "\u1680\n\u1680", "\n\u1680", "\u1680\r\n\u1680", "\r\n\u1680", "\u1680\r\u1680",
-                        "\r\u1680", "\u1680\f\u1680", "\f\u1680", "\u1680\u0085\u1680", "\u0085\u1680", "\u1680\u2028\u1680", "\u2028\u1680", "\u1680\u2029\u1680",
-                        "\u2029\u1680"),
-                new TestData("\n\n", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029", "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085",
-                        "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029", "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028",
-                        "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085", "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r",
-                        "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n", "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028",
-                        "\u2029\u2029", "\n \n", "\r\n \r\n", "\r \r", "\f \f", "\u0085 \u0085", "\u2028 \u2028", "\u2029 \u2029", " \n\n ", "\n\n ", " \n\r\n ", "\n\r\n ",
-                        " \n\r ", "\n\r ", " \n\f ", "\n\f ", " \n\u0085 ", "\n\u0085 ", " \n\u2028 ", "\n\u2028 ", " \n\u2029 ", "\n\u2029 ", " \r\n\n ", "\r\n\n ",
-                        " \r\n\r\n ", "\r\n\r\n ", " \r\n\r ", "\r\n\r ", " \r\n\f ", "\r\n\f ", " \r\n\u0085 ", "\r\n\u0085 ", " \r\n\u2028 ", "\r\n\u2028 ",
-                        " \r\n\u2029 ", "\r\n\u2029 ", " \r\r\n ", "\r\r\n ", " \r\r ", "\r\r ", " \r\f ", "\r\f ", " \r\u0085 ", "\r\u0085 ", " \r\u2028 ", "\r\u2028 ",
-                        " \r\u2029 ", "\r\u2029 ", " \f\n ", "\f\n ", " \f\r\n ", "\f\r\n ", " \f\r ", "\f\r ", " \f\f ", "\f\f ", " \f\u0085 ", "\f\u0085 ", " \f\u2028 ",
-                        "\f\u2028 ", " \f\u2029 ", "\f\u2029 ", " \u0085\n ", "\u0085\n ", " \u0085\r\n ", "\u0085\r\n ", " \u0085\r ", "\u0085\r ", " \u0085\f ",
-                        "\u0085\f ", " \u0085\u0085 ", "\u0085\u0085 ", " \u0085\u2028 ", "\u0085\u2028 ", " \u0085\u2029 ", "\u0085\u2029 ", " \u2028\n ", "\u2028\n ",
-                        " \u2028\r\n ", "\u2028\r\n ", " \u2028\r ", "\u2028\r ", " \u2028\f ", "\u2028\f ", " \u2028\u0085 ", "\u2028\u0085 ", " \u2028\u2028 ",
-                        "\u2028\u2028 ", " \u2028\u2029 ", "\u2028\u2029 ", " \u2029\n ", "\u2029\n ", " \u2029\r\n ", "\u2029\r\n ", " \u2029\r ", "\u2029\r ",
-                        " \u2029\f ", "\u2029\f ", " \u2029\u0085 ", "\u2029\u0085 ", " \u2029\u2028 ", "\u2029\u2028 ", " \u2029\u2029 ", "\u2029\u2029 ", "\n\t\n",
-                        "\r\n\t\r\n", "\r\t\r", "\f\t\f", "\u0085\t\u0085", "\u2028\t\u2028", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\t\n\r\n\t", "\n\r\n\t", "\t\n\r\t",
-                        "\n\r\t", "\t\n\f\t", "\n\f\t", "\t\n\u0085\t", "\n\u0085\t", "\t\n\u2028\t", "\n\u2028\t", "\t\n\u2029\t", "\n\u2029\t", "\t\r\n\n\t", "\r\n\n\t",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\t\r\n\r\t", "\r\n\r\t", "\t\r\n\f\t", "\r\n\f\t", "\t\r\n\u0085\t", "\r\n\u0085\t", "\t\r\n\u2028\t", "\r\n\u2028\t",
-                        "\t\r\n\u2029\t", "\r\n\u2029\t", "\t\r\r\n\t", "\r\r\n\t", "\t\r\r\t", "\r\r\t", "\t\r\f\t", "\r\f\t", "\t\r\u0085\t", "\r\u0085\t", "\t\r\u2028\t",
-                        "\r\u2028\t", "\t\r\u2029\t", "\r\u2029\t", "\t\f\n\t", "\f\n\t", "\t\f\r\n\t", "\f\r\n\t", "\t\f\r\t", "\f\r\t", "\t\f\f\t", "\f\f\t",
-                        "\t\f\u0085\t", "\f\u0085\t", "\t\f\u2028\t", "\f\u2028\t", "\t\f\u2029\t", "\f\u2029\t", "\t\u0085\n\t", "\u0085\n\t", "\t\u0085\r\n\t",
-                        "\u0085\r\n\t", "\t\u0085\r\t", "\u0085\r\t", "\t\u0085\f\t", "\u0085\f\t", "\t\u0085\u0085\t", "\u0085\u0085\t", "\t\u0085\u2028\t",
-                        "\u0085\u2028\t", "\t\u0085\u2029\t", "\u0085\u2029\t", "\t\u2028\n\t", "\u2028\n\t", "\t\u2028\r\n\t", "\u2028\r\n\t", "\t\u2028\r\t", "\u2028\r\t",
-                        "\t\u2028\f\t", "\u2028\f\t", "\t\u2028\u0085\t", "\u2028\u0085\t", "\t\u2028\u2028\t", "\u2028\u2028\t", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\t\u2029\n\t", "\u2029\n\t", "\t\u2029\r\n\t", "\u2029\r\n\t", "\t\u2029\r\t", "\u2029\r\t", "\t\u2029\f\t", "\u2029\f\t", "\t\u2029\u0085\t",
-                        "\u2029\u0085\t", "\t\u2029\u2028\t", "\u2029\u2028\t", "\t\u2029\u2029\t", "\u2029\u2029\t", "\n\u1680\n", "\r\n\u1680\r\n", "\r\u1680\r",
-                        "\f\u1680\f", "\u0085\u1680\u0085", "\u2028\u1680\u2028", "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\u1680\n\r\n\u1680",
-                        "\n\r\n\u1680", "\u1680\n\r\u1680", "\n\r\u1680", "\u1680\n\f\u1680", "\n\f\u1680", "\u1680\n\u0085\u1680", "\n\u0085\u1680", "\u1680\n\u2028\u1680",
-                        "\n\u2028\u1680", "\u1680\n\u2029\u1680", "\n\u2029\u1680", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\u1680\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\u1680\r\r\n\u1680", "\r\r\n\u1680", "\u1680\r\r\u1680", "\r\r\u1680",
-                        "\u1680\r\f\u1680", "\r\f\u1680", "\u1680\r\u0085\u1680", "\r\u0085\u1680", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\u1680\f\n\u1680", "\f\n\u1680", "\u1680\f\r\n\u1680", "\f\r\n\u1680", "\u1680\f\r\u1680", "\f\r\u1680", "\u1680\f\f\u1680",
-                        "\f\f\u1680", "\u1680\f\u0085\u1680", "\f\u0085\u1680", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\u1680\f\u2029\u1680", "\f\u2029\u1680",
-                        "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u1680\u0085\r\n\u1680", "\u0085\r\n\u1680", "\u1680\u0085\r\u1680", "\u0085\r\u1680",
-                        "\u1680\u0085\f\u1680", "\u0085\f\u1680", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680",
-                        "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u1680\u2028\f\u1680", "\u2028\f\u1680", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680",
-                        "\u1680\u2028\u2028\u1680", "\u2028\u2028\u1680", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u1680\u2029\n\u1680", "\u2029\n\u1680",
-                        "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u1680\u2029\f\u1680", "\u2029\f\u1680",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680"),
-                new TestData("\n\n\n\n", "\n\n \n\n", "\n\r\n \n\r\n", "\n\r \n\r", "\n\f \n\f", "\n\u0085 \n\u0085", "\n\u2028 \n\u2028", "\n\u2029 \n\u2029",
-                        "\r\n\n \r\n\n", "\r\n\r\n \r\n\r\n", "\r\n\r \r\n\r", "\r\n\f \r\n\f", "\r\n\u0085 \r\n\u0085", "\r\n\u2028 \r\n\u2028", "\r\n\u2029 \r\n\u2029",
-                        "\r\r\n \r\r\n", "\r\r \r\r", "\r\f \r\f", "\r\u0085 \r\u0085", "\r\u2028 \r\u2028", "\r\u2029 \r\u2029", "\f\n \f\n", "\f\r\n \f\r\n", "\f\r \f\r",
-                        "\f\f \f\f", "\f\u0085 \f\u0085", "\f\u2028 \f\u2028", "\f\u2029 \f\u2029", "\u0085\n \u0085\n", "\u0085\r\n \u0085\r\n", "\u0085\r \u0085\r",
-                        "\u0085\f \u0085\f", "\u0085\u0085 \u0085\u0085", "\u0085\u2028 \u0085\u2028", "\u0085\u2029 \u0085\u2029", "\u2028\n \u2028\n",
-                        "\u2028\r\n \u2028\r\n", "\u2028\r \u2028\r", "\u2028\f \u2028\f", "\u2028\u0085 \u2028\u0085", "\u2028\u2028 \u2028\u2028",
-                        "\u2028\u2029 \u2028\u2029", "\u2029\n \u2029\n", "\u2029\r\n \u2029\r\n", "\u2029\r \u2029\r", "\u2029\f \u2029\f", "\u2029\u0085 \u2029\u0085",
-                        "\u2029\u2028 \u2029\u2028", "\u2029\u2029 \u2029\u2029", "\n\n\t\n\n", "\n\r\n\t\n\r\n", "\n\r\t\n\r", "\n\f\t\n\f", "\n\u0085\t\n\u0085",
-                        "\n\u2028\t\n\u2028", "\n\u2029\t\n\u2029", "\r\n\n\t\r\n\n", "\r\n\r\n\t\r\n\r\n", "\r\n\r\t\r\n\r", "\r\n\f\t\r\n\f", "\r\n\u0085\t\r\n\u0085",
-                        "\r\n\u2028\t\r\n\u2028", "\r\n\u2029\t\r\n\u2029", "\r\r\n\t\r\r\n", "\r\r\t\r\r", "\r\f\t\r\f", "\r\u0085\t\r\u0085", "\r\u2028\t\r\u2028",
-                        "\r\u2029\t\r\u2029", "\f\n\t\f\n", "\f\r\n\t\f\r\n", "\f\r\t\f\r", "\f\f\t\f\f", "\f\u0085\t\f\u0085", "\f\u2028\t\f\u2028", "\f\u2029\t\f\u2029",
-                        "\u0085\n\t\u0085\n", "\u0085\r\n\t\u0085\r\n", "\u0085\r\t\u0085\r", "\u0085\f\t\u0085\f", "\u0085\u0085\t\u0085\u0085",
-                        "\u0085\u2028\t\u0085\u2028", "\u0085\u2029\t\u0085\u2029", "\u2028\n\t\u2028\n", "\u2028\r\n\t\u2028\r\n", "\u2028\r\t\u2028\r",
-                        "\u2028\f\t\u2028\f", "\u2028\u0085\t\u2028\u0085", "\u2028\u2028\t\u2028\u2028", "\u2028\u2029\t\u2028\u2029", "\u2029\n\t\u2029\n",
-                        "\u2029\r\n\t\u2029\r\n", "\u2029\r\t\u2029\r", "\u2029\f\t\u2029\f", "\u2029\u0085\t\u2029\u0085", "\u2029\u2028\t\u2029\u2028",
-                        "\u2029\u2029\t\u2029\u2029", "\n\n\u1680\n\n", "\n\r\n\u1680\n\r\n", "\n\r\u1680\n\r", "\n\f\u1680\n\f", "\n\u0085\u1680\n\u0085",
-                        "\n\u2028\u1680\n\u2028", "\n\u2029\u1680\n\u2029", "\r\n\n\u1680\r\n\n", "\r\n\r\n\u1680\r\n\r\n", "\r\n\r\u1680\r\n\r", "\r\n\f\u1680\r\n\f",
-                        "\r\n\u0085\u1680\r\n\u0085", "\r\n\u2028\u1680\r\n\u2028", "\r\n\u2029\u1680\r\n\u2029", "\r\r\n\u1680\r\r\n", "\r\r\u1680\r\r", "\r\f\u1680\r\f",
-                        "\r\u0085\u1680\r\u0085", "\r\u2028\u1680\r\u2028", "\r\u2029\u1680\r\u2029", "\f\n\u1680\f\n", "\f\r\n\u1680\f\r\n", "\f\r\u1680\f\r",
-                        "\f\f\u1680\f\f", "\f\u0085\u1680\f\u0085", "\f\u2028\u1680\f\u2028", "\f\u2029\u1680\f\u2029", "\u0085\n\u1680\u0085\n",
-                        "\u0085\r\n\u1680\u0085\r\n", "\u0085\r\u1680\u0085\r", "\u0085\f\u1680\u0085\f", "\u0085\u0085\u1680\u0085\u0085", "\u0085\u2028\u1680\u0085\u2028",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u2028\n\u1680\u2028\n", "\u2028\r\n\u1680\u2028\r\n", "\u2028\r\u1680\u2028\r", "\u2028\f\u1680\u2028\f",
-                        "\u2028\u0085\u1680\u2028\u0085", "\u2028\u2028\u1680\u2028\u2028", "\u2028\u2029\u1680\u2028\u2029", "\u2029\n\u1680\u2029\n",
-                        "\u2029\r\n\u1680\u2029\r\n", "\u2029\r\u1680\u2029\r", "\u2029\f\u1680\u2029\f", "\u2029\u0085\u1680\u2029\u0085", "\u2029\u2028\u1680\u2029\u2028",
-                        "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData(" Test", " Test", " Test ", "  Test  ", "\tTest", "\tTest\t", "\t\tTest\t\t", "\u1680Test", "\u1680Test\u1680",
-                        "\u1680\u1680Test\u1680\u1680"),
-                new TestData(" Test\n Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test\n Data", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData("\n Test", " \n Test", "\n Test ", " \r\n Test", "\r\n Test ", " \r Test", "\r Test ", " \f Test", "\f Test ", " \u0085 Test",
-                        "\u0085 Test ", " \u2028 Test", "\u2028 Test ", " \u2029 Test", "\u2029 Test ", "\t\n\tTest", "\n\tTest\t", "\t\r\n\tTest", "\r\n\tTest\t",
-                        "\t\r\tTest", "\r\tTest\t", "\t\f\tTest", "\f\tTest\t", "\t\u0085\tTest", "\u0085\tTest\t", "\t\u2028\tTest", "\u2028\tTest\t", "\t\u2029\tTest",
-                        "\u2029\tTest\t", "\u1680\n\u1680Test", "\n\u1680Test\u1680", "\u1680\r\n\u1680Test", "\r\n\u1680Test\u1680", "\u1680\r\u1680Test",
-                        "\r\u1680Test\u1680", "\u1680\f\u1680Test", "\f\u1680Test\u1680", "\u1680\u0085\u1680Test", "\u0085\u1680Test\u1680", "\u1680\u2028\u1680Test",
-                        "\u2028\u1680Test\u1680", "\u1680\u2029\u1680Test", "\u2029\u1680Test\u1680"),
-                new TestData("\n Test\n", "\n Test \n", " \n Test \n ", "\r\n Test \r\n", " \r\n Test \r\n ", "\r Test \r", " \r Test \r ", "\f Test \f", " \f Test \f ",
-                        "\u0085 Test \u0085", " \u0085 Test \u0085 ", "\u2028 Test \u2028", " \u2028 Test \u2028 ", "\u2029 Test \u2029", " \u2029 Test \u2029 ",
-                        "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\f\tTest\t\f",
-                        "\t\f\tTest\t\f\t", "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t", "\u2029\tTest\t\u2029",
-                        "\t\u2029\tTest\t\u2029\t", "\n\u1680Test\u1680\n", "\u1680\n\u1680Test\u1680\n\u1680", "\r\n\u1680Test\u1680\r\n",
-                        "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\f\u1680Test\u1680\f",
-                        "\u1680\f\u1680Test\u1680\f\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u2028\u1680Test\u1680\u2028",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u2029\u1680Test\u1680\u2029", "\u1680\u2029\u1680Test\u1680\u2029\u1680"),
-                new TestData("Test\nData", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data"),
-                new TestData("\nTest", "\nTest", "\r\nTest", "\rTest", "\fTest", "\u0085Test", "\u2028Test", "\u2029Test"),
-                new TestData("\nTest\n", "\nTest\n", "\r\nTest\r\n", "\rTest\r", "\fTest\f", "\u0085Test\u0085", "\u2028Test\u2028", "\u2029Test\u2029"),
-                new TestData("Test\n\nData", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data",
-                        "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data",
-                        "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData",
-                        "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData",
-                        "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data",
-                        "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data",
-                        "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data",
-                        "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("Test\n\n", "Test\n\n", "Test\n\r\n", "Test\n\r", "Test\n\f", "Test\n\u0085", "Test\n\u2028", "Test\n\u2029", "Test\r\n\n", "Test\r\n\r\n",
-                        "Test\r\n\r", "Test\r\n\f", "Test\r\n\u0085", "Test\r\n\u2028", "Test\r\n\u2029", "Test\r\r\n", "Test\r\r", "Test\r\f", "Test\r\u0085",
-                        "Test\r\u2028", "Test\r\u2029", "Test\f\n", "Test\f\r\n", "Test\f\r", "Test\f\f", "Test\f\u0085", "Test\f\u2028", "Test\f\u2029", "Test\u0085\n",
-                        "Test\u0085\r\n", "Test\u0085\r", "Test\u0085\f", "Test\u0085\u0085", "Test\u0085\u2028", "Test\u0085\u2029", "Test\u2028\n", "Test\u2028\r\n",
-                        "Test\u2028\r", "Test\u2028\f", "Test\u2028\u0085", "Test\u2028\u2028", "Test\u2028\u2029", "Test\u2029\n", "Test\u2029\r\n", "Test\u2029\r",
-                        "Test\u2029\f", "Test\u2029\u0085", "Test\u2029\u2028", "Test\u2029\u2029"),
-                new TestData("\n\nTest", "\n\nTest", "\n\r\nTest", "\n\rTest", "\n\fTest", "\n\u0085Test", "\n\u2028Test", "\n\u2029Test", "\r\n\nTest", "\r\n\r\nTest",
-                        "\r\n\rTest", "\r\n\fTest", "\r\n\u0085Test", "\r\n\u2028Test", "\r\n\u2029Test", "\r\r\nTest", "\r\rTest", "\r\fTest", "\r\u0085Test",
-                        "\r\u2028Test", "\r\u2029Test", "\f\nTest", "\f\r\nTest", "\f\rTest", "\f\fTest", "\f\u0085Test", "\f\u2028Test", "\f\u2029Test", "\u0085\nTest",
-                        "\u0085\r\nTest", "\u0085\rTest", "\u0085\fTest", "\u0085\u0085Test", "\u0085\u2028Test", "\u0085\u2029Test", "\u2028\nTest", "\u2028\r\nTest",
-                        "\u2028\rTest", "\u2028\fTest", "\u2028\u0085Test", "\u2028\u2028Test", "\u2028\u2029Test", "\u2029\nTest", "\u2029\r\nTest", "\u2029\rTest",
-                        "\u2029\fTest", "\u2029\u0085Test", "\u2029\u2028Test", "\u2029\u2029Test"),
-                new TestData("\n\nTest\n\n", "\n\nTest\n\n", "\n\r\nTest\n\r\n", "\n\rTest\n\r", "\n\fTest\n\f", "\n\u0085Test\n\u0085", "\n\u2028Test\n\u2028",
-                        "\n\u2029Test\n\u2029", "\r\n\nTest\r\n\n", "\r\n\r\nTest\r\n\r\n", "\r\n\rTest\r\n\r", "\r\n\fTest\r\n\f", "\r\n\u0085Test\r\n\u0085",
-                        "\r\n\u2028Test\r\n\u2028", "\r\n\u2029Test\r\n\u2029", "\r\r\nTest\r\r\n", "\r\rTest\r\r", "\r\fTest\r\f", "\r\u0085Test\r\u0085",
-                        "\r\u2028Test\r\u2028", "\r\u2029Test\r\u2029", "\f\nTest\f\n", "\f\r\nTest\f\r\n", "\f\rTest\f\r", "\f\fTest\f\f", "\f\u0085Test\f\u0085",
-                        "\f\u2028Test\f\u2028", "\f\u2029Test\f\u2029", "\u0085\nTest\u0085\n", "\u0085\r\nTest\u0085\r\n", "\u0085\rTest\u0085\r", "\u0085\fTest\u0085\f",
-                        "\u0085\u0085Test\u0085\u0085", "\u0085\u2028Test\u0085\u2028", "\u0085\u2029Test\u0085\u2029", "\u2028\nTest\u2028\n", "\u2028\r\nTest\u2028\r\n",
-                        "\u2028\rTest\u2028\r", "\u2028\fTest\u2028\f", "\u2028\u0085Test\u2028\u0085", "\u2028\u2028Test\u2028\u2028", "\u2028\u2029Test\u2028\u2029",
-                        "\u2029\nTest\u2029\n", "\u2029\r\nTest\u2029\r\n", "\u2029\rTest\u2029\r", "\u2029\fTest\u2029\f", "\u2029\u0085Test\u2029\u0085",
-                        "\u2029\u2028Test\u2029\u2028", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData(" \u00A0", " \u00A0", " \u00A0 ", "  \u00A0  ", "\t\u00A0", "\t\u00A0\t", "\t\t\u00A0\t\t", "\u1680\u00A0", "\u1680\u00A0\u1680",
-                        "\u1680\u1680\u00A0\u1680\u1680"),
-                new TestData(" \u00A0\n _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _", " \u00A0 \u2029 _",
-                        "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_",
-                        "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0\n _", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ",
-                        "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t",
-                        "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680"),
-                new TestData("\n \u00A0", " \n \u00A0", "\n \u00A0 ", " \r\n \u00A0", "\r\n \u00A0 ", " \r \u00A0", "\r \u00A0 ", " \f \u00A0", "\f \u00A0 ",
-                        " \u0085 \u00A0", "\u0085 \u00A0 ", " \u2028 \u00A0", "\u2028 \u00A0 ", " \u2029 \u00A0", "\u2029 \u00A0 ", "\t\n\t\u00A0", "\n\t\u00A0\t",
-                        "\t\r\n\t\u00A0", "\r\n\t\u00A0\t", "\t\r\t\u00A0", "\r\t\u00A0\t", "\t\f\t\u00A0", "\f\t\u00A0\t", "\t\u0085\t\u00A0", "\u0085\t\u00A0\t",
-                        "\t\u2028\t\u00A0", "\u2028\t\u00A0\t", "\t\u2029\t\u00A0", "\u2029\t\u00A0\t", "\u1680\n\u1680\u00A0", "\n\u1680\u00A0\u1680",
-                        "\u1680\r\n\u1680\u00A0", "\r\n\u1680\u00A0\u1680", "\u1680\r\u1680\u00A0", "\r\u1680\u00A0\u1680", "\u1680\f\u1680\u00A0", "\f\u1680\u00A0\u1680",
-                        "\u1680\u0085\u1680\u00A0", "\u0085\u1680\u00A0\u1680", "\u1680\u2028\u1680\u00A0", "\u2028\u1680\u00A0\u1680", "\u1680\u2029\u1680\u00A0",
-                        "\u2029\u1680\u00A0\u1680"),
-                new TestData("\n \u00A0\n", "\n \u00A0 \n", " \n \u00A0 \n ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", "\r \u00A0 \r", " \r \u00A0 \r ", "\f \u00A0 \f",
-                        " \f \u00A0 \f ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\r\t\u00A0\t\r",
-                        "\t\r\t\u00A0\t\r\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\n\u1680\u00A0\u1680\n", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\r\n\u1680\u00A0\u1680\r\n", "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\r\u1680\u00A0\u1680\r", "\u1680\r\u1680\u00A0\u1680\r\u1680",
-                        "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u2029\u1680\u00A0\u1680\u2029",
-                        "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680"),
-                new TestData("\u00A0\n_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_"),
-                new TestData("\n\u00A0", "\n\u00A0", "\r\n\u00A0", "\r\u00A0", "\f\u00A0", "\u0085\u00A0", "\u2028\u00A0", "\u2029\u00A0"),
-                new TestData("\n\u00A0\n", "\n\u00A0\n", "\r\n\u00A0\r\n", "\r\u00A0\r", "\f\u00A0\f", "\u0085\u00A0\u0085", "\u2028\u00A0\u2028", "\u2029\u00A0\u2029"),
-                new TestData("\u00A0\n\n_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_",
-                        "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_",
-                        "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_",
-                        "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_",
-                        "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_",
-                        "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_",
-                        "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData("\u00A0\n\n", "\u00A0\n\n", "\u00A0\n\r\n", "\u00A0\n\r", "\u00A0\n\f", "\u00A0\n\u0085", "\u00A0\n\u2028", "\u00A0\n\u2029",
-                        "\u00A0\r\n\n", "\u00A0\r\n\r\n", "\u00A0\r\n\r", "\u00A0\r\n\f", "\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\u00A0\r\r\n",
-                        "\u00A0\r\r", "\u00A0\r\f", "\u00A0\r\u0085", "\u00A0\r\u2028", "\u00A0\r\u2029", "\u00A0\f\n", "\u00A0\f\r\n", "\u00A0\f\r", "\u00A0\f\f",
-                        "\u00A0\f\u0085", "\u00A0\f\u2028", "\u00A0\f\u2029", "\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u00A0\u0085\f", "\u00A0\u0085\u0085",
-                        "\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u00A0\u2028\f", "\u00A0\u2028\u0085",
-                        "\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u00A0\u2029\f", "\u00A0\u2029\u0085",
-                        "\u00A0\u2029\u2028", "\u00A0\u2029\u2029"),
-                new TestData("\n\n\u00A0", "\n\n\u00A0", "\n\r\n\u00A0", "\n\r\u00A0", "\n\f\u00A0", "\n\u0085\u00A0", "\n\u2028\u00A0", "\n\u2029\u00A0",
-                        "\r\n\n\u00A0", "\r\n\r\n\u00A0", "\r\n\r\u00A0", "\r\n\f\u00A0", "\r\n\u0085\u00A0", "\r\n\u2028\u00A0", "\r\n\u2029\u00A0", "\r\r\n\u00A0",
-                        "\r\r\u00A0", "\r\f\u00A0", "\r\u0085\u00A0", "\r\u2028\u00A0", "\r\u2029\u00A0", "\f\n\u00A0", "\f\r\n\u00A0", "\f\r\u00A0", "\f\f\u00A0",
-                        "\f\u0085\u00A0", "\f\u2028\u00A0", "\f\u2029\u00A0", "\u0085\n\u00A0", "\u0085\r\n\u00A0", "\u0085\r\u00A0", "\u0085\f\u00A0", "\u0085\u0085\u00A0",
-                        "\u0085\u2028\u00A0", "\u0085\u2029\u00A0", "\u2028\n\u00A0", "\u2028\r\n\u00A0", "\u2028\r\u00A0", "\u2028\f\u00A0", "\u2028\u0085\u00A0",
-                        "\u2028\u2028\u00A0", "\u2028\u2029\u00A0", "\u2029\n\u00A0", "\u2029\r\n\u00A0", "\u2029\r\u00A0", "\u2029\f\u00A0", "\u2029\u0085\u00A0",
-                        "\u2029\u2028\u00A0", "\u2029\u2029\u00A0"),
-                new TestData("\n\n\u00A0\n\n", "\n\n\u00A0\n\n", "\n\r\n\u00A0\n\r\n", "\n\r\u00A0\n\r", "\n\f\u00A0\n\f", "\n\u0085\u00A0\n\u0085",
-                        "\n\u2028\u00A0\n\u2028", "\n\u2029\u00A0\n\u2029", "\r\n\n\u00A0\r\n\n", "\r\n\r\n\u00A0\r\n\r\n", "\r\n\r\u00A0\r\n\r", "\r\n\f\u00A0\r\n\f",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\r\n\u2028\u00A0\r\n\u2028", "\r\n\u2029\u00A0\r\n\u2029", "\r\r\n\u00A0\r\r\n", "\r\r\u00A0\r\r", "\r\f\u00A0\r\f",
-                        "\r\u0085\u00A0\r\u0085", "\r\u2028\u00A0\r\u2028", "\r\u2029\u00A0\r\u2029", "\f\n\u00A0\f\n", "\f\r\n\u00A0\f\r\n", "\f\r\u00A0\f\r",
-                        "\f\f\u00A0\f\f", "\f\u0085\u00A0\f\u0085", "\f\u2028\u00A0\f\u2028", "\f\u2029\u00A0\f\u2029", "\u0085\n\u00A0\u0085\n",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u0085\r\u00A0\u0085\r", "\u0085\f\u00A0\u0085\f", "\u0085\u0085\u00A0\u0085\u0085", "\u0085\u2028\u00A0\u0085\u2028",
-                        "\u0085\u2029\u00A0\u0085\u2029", "\u2028\n\u00A0\u2028\n", "\u2028\r\n\u00A0\u2028\r\n", "\u2028\r\u00A0\u2028\r", "\u2028\f\u00A0\u2028\f",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u2028\u2028\u00A0\u2028\u2028", "\u2028\u2029\u00A0\u2028\u2029", "\u2029\n\u00A0\u2029\n",
-                        "\u2029\r\n\u00A0\u2029\r\n", "\u2029\r\u00A0\u2029\r", "\u2029\f\u00A0\u2029\f", "\u2029\u0085\u00A0\u2029\u0085", "\u2029\u2028\u00A0\u2029\u2028",
-                        "\u2029\u2029\u00A0\u2029\u2029")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String a = target1.apply(u);
-                String d = TestHelper.toStringDescription(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Leave; Trim: Start; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM_END} | {@link StringNormalizationOption#LEAVE_BLANK_LINES}</code>
      * Was: StringNormalizationOption.TRIM_START
      */
@@ -10918,219 +8869,8 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer24_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_END, StringNormalizationOption.LEAVE_BLANK_LINES);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_END, StringNormalizationOption.LEAVE_BLANK_LINES, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", "", " ", "  ", " \t", " \u1680", "\t", "\t ", "\t\t", "\t\u1680", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680"),
-                new TestData("Test", "Test", " Test", "\tTest", "\u1680Test"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0", " \u00A0", "\t\u00A0", "\u1680\u00A0"),
-                new TestData("\n", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029", " \n ", "\n ", " \r\n ", "\r\n ", " \r ", "\r ", " \f ", "\f ", " \u0085 ",
-                        "\u0085 ", " \u2028 ", "\u2028 ", " \u2029 ", "\u2029 ", "\t\n\t", "\n\t", "\t\r\n\t", "\r\n\t", "\t\r\t", "\r\t", "\t\f\t", "\f\t", "\t\u0085\t",
-                        "\u0085\t", "\t\u2028\t", "\u2028\t", "\t\u2029\t", "\u2029\t", "\u1680\n\u1680", "\n\u1680", "\u1680\r\n\u1680", "\r\n\u1680", "\u1680\r\u1680",
-                        "\r\u1680", "\u1680\f\u1680", "\f\u1680", "\u1680\u0085\u1680", "\u0085\u1680", "\u1680\u2028\u1680", "\u2028\u1680", "\u1680\u2029\u1680",
-                        "\u2029\u1680"),
-                new TestData("\n\n", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029", "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085",
-                        "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029", "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028",
-                        "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085", "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r",
-                        "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n", "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028",
-                        "\u2029\u2029", "\n \n", "\r\n \r\n", "\r \r", "\f \f", "\u0085 \u0085", "\u2028 \u2028", "\u2029 \u2029", " \n\n ", "\n\n ", " \n\r\n ", "\n\r\n ",
-                        " \n\r ", "\n\r ", " \n\f ", "\n\f ", " \n\u0085 ", "\n\u0085 ", " \n\u2028 ", "\n\u2028 ", " \n\u2029 ", "\n\u2029 ", " \r\n\n ", "\r\n\n ",
-                        " \r\n\r\n ", "\r\n\r\n ", " \r\n\r ", "\r\n\r ", " \r\n\f ", "\r\n\f ", " \r\n\u0085 ", "\r\n\u0085 ", " \r\n\u2028 ", "\r\n\u2028 ",
-                        " \r\n\u2029 ", "\r\n\u2029 ", " \r\r\n ", "\r\r\n ", " \r\r ", "\r\r ", " \r\f ", "\r\f ", " \r\u0085 ", "\r\u0085 ", " \r\u2028 ", "\r\u2028 ",
-                        " \r\u2029 ", "\r\u2029 ", " \f\n ", "\f\n ", " \f\r\n ", "\f\r\n ", " \f\r ", "\f\r ", " \f\f ", "\f\f ", " \f\u0085 ", "\f\u0085 ", " \f\u2028 ",
-                        "\f\u2028 ", " \f\u2029 ", "\f\u2029 ", " \u0085\n ", "\u0085\n ", " \u0085\r\n ", "\u0085\r\n ", " \u0085\r ", "\u0085\r ", " \u0085\f ",
-                        "\u0085\f ", " \u0085\u0085 ", "\u0085\u0085 ", " \u0085\u2028 ", "\u0085\u2028 ", " \u0085\u2029 ", "\u0085\u2029 ", " \u2028\n ", "\u2028\n ",
-                        " \u2028\r\n ", "\u2028\r\n ", " \u2028\r ", "\u2028\r ", " \u2028\f ", "\u2028\f ", " \u2028\u0085 ", "\u2028\u0085 ", " \u2028\u2028 ",
-                        "\u2028\u2028 ", " \u2028\u2029 ", "\u2028\u2029 ", " \u2029\n ", "\u2029\n ", " \u2029\r\n ", "\u2029\r\n ", " \u2029\r ", "\u2029\r ",
-                        " \u2029\f ", "\u2029\f ", " \u2029\u0085 ", "\u2029\u0085 ", " \u2029\u2028 ", "\u2029\u2028 ", " \u2029\u2029 ", "\u2029\u2029 ", "\n\t\n",
-                        "\r\n\t\r\n", "\r\t\r", "\f\t\f", "\u0085\t\u0085", "\u2028\t\u2028", "\u2029\t\u2029", "\t\n\n\t", "\n\n\t", "\t\n\r\n\t", "\n\r\n\t", "\t\n\r\t",
-                        "\n\r\t", "\t\n\f\t", "\n\f\t", "\t\n\u0085\t", "\n\u0085\t", "\t\n\u2028\t", "\n\u2028\t", "\t\n\u2029\t", "\n\u2029\t", "\t\r\n\n\t", "\r\n\n\t",
-                        "\t\r\n\r\n\t", "\r\n\r\n\t", "\t\r\n\r\t", "\r\n\r\t", "\t\r\n\f\t", "\r\n\f\t", "\t\r\n\u0085\t", "\r\n\u0085\t", "\t\r\n\u2028\t", "\r\n\u2028\t",
-                        "\t\r\n\u2029\t", "\r\n\u2029\t", "\t\r\r\n\t", "\r\r\n\t", "\t\r\r\t", "\r\r\t", "\t\r\f\t", "\r\f\t", "\t\r\u0085\t", "\r\u0085\t", "\t\r\u2028\t",
-                        "\r\u2028\t", "\t\r\u2029\t", "\r\u2029\t", "\t\f\n\t", "\f\n\t", "\t\f\r\n\t", "\f\r\n\t", "\t\f\r\t", "\f\r\t", "\t\f\f\t", "\f\f\t",
-                        "\t\f\u0085\t", "\f\u0085\t", "\t\f\u2028\t", "\f\u2028\t", "\t\f\u2029\t", "\f\u2029\t", "\t\u0085\n\t", "\u0085\n\t", "\t\u0085\r\n\t",
-                        "\u0085\r\n\t", "\t\u0085\r\t", "\u0085\r\t", "\t\u0085\f\t", "\u0085\f\t", "\t\u0085\u0085\t", "\u0085\u0085\t", "\t\u0085\u2028\t",
-                        "\u0085\u2028\t", "\t\u0085\u2029\t", "\u0085\u2029\t", "\t\u2028\n\t", "\u2028\n\t", "\t\u2028\r\n\t", "\u2028\r\n\t", "\t\u2028\r\t", "\u2028\r\t",
-                        "\t\u2028\f\t", "\u2028\f\t", "\t\u2028\u0085\t", "\u2028\u0085\t", "\t\u2028\u2028\t", "\u2028\u2028\t", "\t\u2028\u2029\t", "\u2028\u2029\t",
-                        "\t\u2029\n\t", "\u2029\n\t", "\t\u2029\r\n\t", "\u2029\r\n\t", "\t\u2029\r\t", "\u2029\r\t", "\t\u2029\f\t", "\u2029\f\t", "\t\u2029\u0085\t",
-                        "\u2029\u0085\t", "\t\u2029\u2028\t", "\u2029\u2028\t", "\t\u2029\u2029\t", "\u2029\u2029\t", "\n\u1680\n", "\r\n\u1680\r\n", "\r\u1680\r",
-                        "\f\u1680\f", "\u0085\u1680\u0085", "\u2028\u1680\u2028", "\u2029\u1680\u2029", "\u1680\n\n\u1680", "\n\n\u1680", "\u1680\n\r\n\u1680",
-                        "\n\r\n\u1680", "\u1680\n\r\u1680", "\n\r\u1680", "\u1680\n\f\u1680", "\n\f\u1680", "\u1680\n\u0085\u1680", "\n\u0085\u1680", "\u1680\n\u2028\u1680",
-                        "\n\u2028\u1680", "\u1680\n\u2029\u1680", "\n\u2029\u1680", "\u1680\r\n\n\u1680", "\r\n\n\u1680", "\u1680\r\n\r\n\u1680", "\r\n\r\n\u1680",
-                        "\u1680\r\n\r\u1680", "\r\n\r\u1680", "\u1680\r\n\f\u1680", "\r\n\f\u1680", "\u1680\r\n\u0085\u1680", "\r\n\u0085\u1680", "\u1680\r\n\u2028\u1680",
-                        "\r\n\u2028\u1680", "\u1680\r\n\u2029\u1680", "\r\n\u2029\u1680", "\u1680\r\r\n\u1680", "\r\r\n\u1680", "\u1680\r\r\u1680", "\r\r\u1680",
-                        "\u1680\r\f\u1680", "\r\f\u1680", "\u1680\r\u0085\u1680", "\r\u0085\u1680", "\u1680\r\u2028\u1680", "\r\u2028\u1680", "\u1680\r\u2029\u1680",
-                        "\r\u2029\u1680", "\u1680\f\n\u1680", "\f\n\u1680", "\u1680\f\r\n\u1680", "\f\r\n\u1680", "\u1680\f\r\u1680", "\f\r\u1680", "\u1680\f\f\u1680",
-                        "\f\f\u1680", "\u1680\f\u0085\u1680", "\f\u0085\u1680", "\u1680\f\u2028\u1680", "\f\u2028\u1680", "\u1680\f\u2029\u1680", "\f\u2029\u1680",
-                        "\u1680\u0085\n\u1680", "\u0085\n\u1680", "\u1680\u0085\r\n\u1680", "\u0085\r\n\u1680", "\u1680\u0085\r\u1680", "\u0085\r\u1680",
-                        "\u1680\u0085\f\u1680", "\u0085\f\u1680", "\u1680\u0085\u0085\u1680", "\u0085\u0085\u1680", "\u1680\u0085\u2028\u1680", "\u0085\u2028\u1680",
-                        "\u1680\u0085\u2029\u1680", "\u0085\u2029\u1680", "\u1680\u2028\n\u1680", "\u2028\n\u1680", "\u1680\u2028\r\n\u1680", "\u2028\r\n\u1680",
-                        "\u1680\u2028\r\u1680", "\u2028\r\u1680", "\u1680\u2028\f\u1680", "\u2028\f\u1680", "\u1680\u2028\u0085\u1680", "\u2028\u0085\u1680",
-                        "\u1680\u2028\u2028\u1680", "\u2028\u2028\u1680", "\u1680\u2028\u2029\u1680", "\u2028\u2029\u1680", "\u1680\u2029\n\u1680", "\u2029\n\u1680",
-                        "\u1680\u2029\r\n\u1680", "\u2029\r\n\u1680", "\u1680\u2029\r\u1680", "\u2029\r\u1680", "\u1680\u2029\f\u1680", "\u2029\f\u1680",
-                        "\u1680\u2029\u0085\u1680", "\u2029\u0085\u1680", "\u1680\u2029\u2028\u1680", "\u2029\u2028\u1680", "\u1680\u2029\u2029\u1680", "\u2029\u2029\u1680"),
-                new TestData("\n\n\n\n", "\n\n \n\n", "\n\r\n \n\r\n", "\n\r \n\r", "\n\f \n\f", "\n\u0085 \n\u0085", "\n\u2028 \n\u2028", "\n\u2029 \n\u2029",
-                        "\r\n\n \r\n\n", "\r\n\r\n \r\n\r\n", "\r\n\r \r\n\r", "\r\n\f \r\n\f", "\r\n\u0085 \r\n\u0085", "\r\n\u2028 \r\n\u2028", "\r\n\u2029 \r\n\u2029",
-                        "\r\r\n \r\r\n", "\r\r \r\r", "\r\f \r\f", "\r\u0085 \r\u0085", "\r\u2028 \r\u2028", "\r\u2029 \r\u2029", "\f\n \f\n", "\f\r\n \f\r\n", "\f\r \f\r",
-                        "\f\f \f\f", "\f\u0085 \f\u0085", "\f\u2028 \f\u2028", "\f\u2029 \f\u2029", "\u0085\n \u0085\n", "\u0085\r\n \u0085\r\n", "\u0085\r \u0085\r",
-                        "\u0085\f \u0085\f", "\u0085\u0085 \u0085\u0085", "\u0085\u2028 \u0085\u2028", "\u0085\u2029 \u0085\u2029", "\u2028\n \u2028\n",
-                        "\u2028\r\n \u2028\r\n", "\u2028\r \u2028\r", "\u2028\f \u2028\f", "\u2028\u0085 \u2028\u0085", "\u2028\u2028 \u2028\u2028",
-                        "\u2028\u2029 \u2028\u2029", "\u2029\n \u2029\n", "\u2029\r\n \u2029\r\n", "\u2029\r \u2029\r", "\u2029\f \u2029\f", "\u2029\u0085 \u2029\u0085",
-                        "\u2029\u2028 \u2029\u2028", "\u2029\u2029 \u2029\u2029", "\n\n\t\n\n", "\n\r\n\t\n\r\n", "\n\r\t\n\r", "\n\f\t\n\f", "\n\u0085\t\n\u0085",
-                        "\n\u2028\t\n\u2028", "\n\u2029\t\n\u2029", "\r\n\n\t\r\n\n", "\r\n\r\n\t\r\n\r\n", "\r\n\r\t\r\n\r", "\r\n\f\t\r\n\f", "\r\n\u0085\t\r\n\u0085",
-                        "\r\n\u2028\t\r\n\u2028", "\r\n\u2029\t\r\n\u2029", "\r\r\n\t\r\r\n", "\r\r\t\r\r", "\r\f\t\r\f", "\r\u0085\t\r\u0085", "\r\u2028\t\r\u2028",
-                        "\r\u2029\t\r\u2029", "\f\n\t\f\n", "\f\r\n\t\f\r\n", "\f\r\t\f\r", "\f\f\t\f\f", "\f\u0085\t\f\u0085", "\f\u2028\t\f\u2028", "\f\u2029\t\f\u2029",
-                        "\u0085\n\t\u0085\n", "\u0085\r\n\t\u0085\r\n", "\u0085\r\t\u0085\r", "\u0085\f\t\u0085\f", "\u0085\u0085\t\u0085\u0085",
-                        "\u0085\u2028\t\u0085\u2028", "\u0085\u2029\t\u0085\u2029", "\u2028\n\t\u2028\n", "\u2028\r\n\t\u2028\r\n", "\u2028\r\t\u2028\r",
-                        "\u2028\f\t\u2028\f", "\u2028\u0085\t\u2028\u0085", "\u2028\u2028\t\u2028\u2028", "\u2028\u2029\t\u2028\u2029", "\u2029\n\t\u2029\n",
-                        "\u2029\r\n\t\u2029\r\n", "\u2029\r\t\u2029\r", "\u2029\f\t\u2029\f", "\u2029\u0085\t\u2029\u0085", "\u2029\u2028\t\u2029\u2028",
-                        "\u2029\u2029\t\u2029\u2029", "\n\n\u1680\n\n", "\n\r\n\u1680\n\r\n", "\n\r\u1680\n\r", "\n\f\u1680\n\f", "\n\u0085\u1680\n\u0085",
-                        "\n\u2028\u1680\n\u2028", "\n\u2029\u1680\n\u2029", "\r\n\n\u1680\r\n\n", "\r\n\r\n\u1680\r\n\r\n", "\r\n\r\u1680\r\n\r", "\r\n\f\u1680\r\n\f",
-                        "\r\n\u0085\u1680\r\n\u0085", "\r\n\u2028\u1680\r\n\u2028", "\r\n\u2029\u1680\r\n\u2029", "\r\r\n\u1680\r\r\n", "\r\r\u1680\r\r", "\r\f\u1680\r\f",
-                        "\r\u0085\u1680\r\u0085", "\r\u2028\u1680\r\u2028", "\r\u2029\u1680\r\u2029", "\f\n\u1680\f\n", "\f\r\n\u1680\f\r\n", "\f\r\u1680\f\r",
-                        "\f\f\u1680\f\f", "\f\u0085\u1680\f\u0085", "\f\u2028\u1680\f\u2028", "\f\u2029\u1680\f\u2029", "\u0085\n\u1680\u0085\n",
-                        "\u0085\r\n\u1680\u0085\r\n", "\u0085\r\u1680\u0085\r", "\u0085\f\u1680\u0085\f", "\u0085\u0085\u1680\u0085\u0085", "\u0085\u2028\u1680\u0085\u2028",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u2028\n\u1680\u2028\n", "\u2028\r\n\u1680\u2028\r\n", "\u2028\r\u1680\u2028\r", "\u2028\f\u1680\u2028\f",
-                        "\u2028\u0085\u1680\u2028\u0085", "\u2028\u2028\u1680\u2028\u2028", "\u2028\u2029\u1680\u2028\u2029", "\u2029\n\u1680\u2029\n",
-                        "\u2029\r\n\u1680\u2029\r\n", "\u2029\r\u1680\u2029\r", "\u2029\f\u1680\u2029\f", "\u2029\u0085\u1680\u2029\u0085", "\u2029\u2028\u1680\u2029\u2028",
-                        "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData("Test ", "Test ", " Test ", "  Test  ", "Test\t", "\tTest\t", "\t\tTest\t\t", "Test\u1680", "\u1680Test\u1680",
-                        "\u1680\u1680Test\u1680\u1680"),
-                new TestData("Test \nData", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test \nData ", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData("\nTest", " \n Test", " \r\n Test", " \r Test", " \f Test", " \u0085 Test", " \u2028 Test", " \u2029 Test", "\t\n\tTest", "\t\r\n\tTest",
-                        "\t\r\tTest", "\t\f\tTest", "\t\u0085\tTest", "\t\u2028\tTest", "\t\u2029\tTest", "\u1680\n\u1680Test", "\u1680\r\n\u1680Test", "\u1680\r\u1680Test",
-                        "\u1680\f\u1680Test", "\u1680\u0085\u1680Test", "\u1680\u2028\u1680Test", "\u1680\u2029\u1680Test", "\nTest", "\r\nTest", "\rTest", "\fTest",
-                        "\u0085Test", "\u2028Test", "\u2029Test"),
-                new TestData("\nTest ", "\n Test ", "\r\n Test ", "\r Test ", "\f Test ", "\u0085 Test ", "\u2028 Test ", "\u2029 Test ", "\n\tTest\t", "\r\n\tTest\t",
-                        "\r\tTest\t", "\f\tTest\t", "\u0085\tTest\t", "\u2028\tTest\t", "\u2029\tTest\t", "\n\u1680Test\u1680", "\r\n\u1680Test\u1680", "\r\u1680Test\u1680",
-                        "\f\u1680Test\u1680", "\u0085\u1680Test\u1680", "\u2028\u1680Test\u1680", "\u2029\u1680Test\u1680"),
-                new TestData("\nTest \n", "\n Test \n", " \n Test \n ", "\r\n Test \r\n", " \r\n Test \r\n ", "\r Test \r", " \r Test \r ", "\f Test \f", " \f Test \f ",
-                        "\u0085 Test \u0085", " \u0085 Test \u0085 ", "\u2028 Test \u2028", " \u2028 Test \u2028 ", "\u2029 Test \u2029", " \u2029 Test \u2029 ",
-                        "\n\tTest\t\n", "\t\n\tTest\t\n\t", "\r\n\tTest\t\r\n", "\t\r\n\tTest\t\r\n\t", "\r\tTest\t\r", "\t\r\tTest\t\r\t", "\f\tTest\t\f",
-                        "\t\f\tTest\t\f\t", "\u0085\tTest\t\u0085", "\t\u0085\tTest\t\u0085\t", "\u2028\tTest\t\u2028", "\t\u2028\tTest\t\u2028\t", "\u2029\tTest\t\u2029",
-                        "\t\u2029\tTest\t\u2029\t", "\n\u1680Test\u1680\n", "\u1680\n\u1680Test\u1680\n\u1680", "\r\n\u1680Test\u1680\r\n",
-                        "\u1680\r\n\u1680Test\u1680\r\n\u1680", "\r\u1680Test\u1680\r", "\u1680\r\u1680Test\u1680\r\u1680", "\f\u1680Test\u1680\f",
-                        "\u1680\f\u1680Test\u1680\f\u1680", "\u0085\u1680Test\u1680\u0085", "\u1680\u0085\u1680Test\u1680\u0085\u1680", "\u2028\u1680Test\u1680\u2028",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u2029\u1680Test\u1680\u2029", "\u1680\u2029\u1680Test\u1680\u2029\u1680"),
-                new TestData("Test\nData", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data"),
-                new TestData("\nTest\n", "\nTest\n", "\r\nTest\r\n", "\rTest\r", "\fTest\f", "\u0085Test\u0085", "\u2028Test\u2028", "\u2029Test\u2029"),
-                new TestData("Test\n\nData", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data",
-                        "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data",
-                        "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData",
-                        "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData",
-                        "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data",
-                        "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data",
-                        "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data",
-                        "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("Test\n\n", "Test\n\n", "Test\n\r\n", "Test\n\r", "Test\n\f", "Test\n\u0085", "Test\n\u2028", "Test\n\u2029", "Test\r\n\n", "Test\r\n\r\n",
-                        "Test\r\n\r", "Test\r\n\f", "Test\r\n\u0085", "Test\r\n\u2028", "Test\r\n\u2029", "Test\r\r\n", "Test\r\r", "Test\r\f", "Test\r\u0085",
-                        "Test\r\u2028", "Test\r\u2029", "Test\f\n", "Test\f\r\n", "Test\f\r", "Test\f\f", "Test\f\u0085", "Test\f\u2028", "Test\f\u2029", "Test\u0085\n",
-                        "Test\u0085\r\n", "Test\u0085\r", "Test\u0085\f", "Test\u0085\u0085", "Test\u0085\u2028", "Test\u0085\u2029", "Test\u2028\n", "Test\u2028\r\n",
-                        "Test\u2028\r", "Test\u2028\f", "Test\u2028\u0085", "Test\u2028\u2028", "Test\u2028\u2029", "Test\u2029\n", "Test\u2029\r\n", "Test\u2029\r",
-                        "Test\u2029\f", "Test\u2029\u0085", "Test\u2029\u2028", "Test\u2029\u2029"),
-                new TestData("\n\nTest", "\n\nTest", "\n\r\nTest", "\n\rTest", "\n\fTest", "\n\u0085Test", "\n\u2028Test", "\n\u2029Test", "\r\n\nTest", "\r\n\r\nTest",
-                        "\r\n\rTest", "\r\n\fTest", "\r\n\u0085Test", "\r\n\u2028Test", "\r\n\u2029Test", "\r\r\nTest", "\r\rTest", "\r\fTest", "\r\u0085Test",
-                        "\r\u2028Test", "\r\u2029Test", "\f\nTest", "\f\r\nTest", "\f\rTest", "\f\fTest", "\f\u0085Test", "\f\u2028Test", "\f\u2029Test", "\u0085\nTest",
-                        "\u0085\r\nTest", "\u0085\rTest", "\u0085\fTest", "\u0085\u0085Test", "\u0085\u2028Test", "\u0085\u2029Test", "\u2028\nTest", "\u2028\r\nTest",
-                        "\u2028\rTest", "\u2028\fTest", "\u2028\u0085Test", "\u2028\u2028Test", "\u2028\u2029Test", "\u2029\nTest", "\u2029\r\nTest", "\u2029\rTest",
-                        "\u2029\fTest", "\u2029\u0085Test", "\u2029\u2028Test", "\u2029\u2029Test"),
-                new TestData("\n\nTest\n\n", "\n\nTest\n\n", "\n\r\nTest\n\r\n", "\n\rTest\n\r", "\n\fTest\n\f", "\n\u0085Test\n\u0085", "\n\u2028Test\n\u2028",
-                        "\n\u2029Test\n\u2029", "\r\n\nTest\r\n\n", "\r\n\r\nTest\r\n\r\n", "\r\n\rTest\r\n\r", "\r\n\fTest\r\n\f", "\r\n\u0085Test\r\n\u0085",
-                        "\r\n\u2028Test\r\n\u2028", "\r\n\u2029Test\r\n\u2029", "\r\r\nTest\r\r\n", "\r\rTest\r\r", "\r\fTest\r\f", "\r\u0085Test\r\u0085",
-                        "\r\u2028Test\r\u2028", "\r\u2029Test\r\u2029", "\f\nTest\f\n", "\f\r\nTest\f\r\n", "\f\rTest\f\r", "\f\fTest\f\f", "\f\u0085Test\f\u0085",
-                        "\f\u2028Test\f\u2028", "\f\u2029Test\f\u2029", "\u0085\nTest\u0085\n", "\u0085\r\nTest\u0085\r\n", "\u0085\rTest\u0085\r", "\u0085\fTest\u0085\f",
-                        "\u0085\u0085Test\u0085\u0085", "\u0085\u2028Test\u0085\u2028", "\u0085\u2029Test\u0085\u2029", "\u2028\nTest\u2028\n", "\u2028\r\nTest\u2028\r\n",
-                        "\u2028\rTest\u2028\r", "\u2028\fTest\u2028\f", "\u2028\u0085Test\u2028\u0085", "\u2028\u2028Test\u2028\u2028", "\u2028\u2029Test\u2028\u2029",
-                        "\u2029\nTest\u2029\n", "\u2029\r\nTest\u2029\r\n", "\u2029\rTest\u2029\r", "\u2029\fTest\u2029\f", "\u2029\u0085Test\u2029\u0085",
-                        "\u2029\u2028Test\u2029\u2028", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData("\u00A0 ", "\u00A0 ", " \u00A0 ", "  \u00A0  ", "\u00A0\t", "\t\u00A0\t", "\t\t\u00A0\t\t", "\u00A0\u1680", "\u1680\u00A0\u1680",
-                        "\u1680\u1680\u00A0\u1680\u1680"),
-                new TestData("\u00A0 \n_", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _", " \u00A0 \u2029 _",
-                        "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_", "\t\u00A0\t\u2029\t_",
-                        "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0 \n_ ", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ", "\u00A0 \u2029 _ ",
-                        "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t", "\u00A0\t\u2029\t_\t",
-                        "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680"),
-                new TestData("\n\u00A0", " \n \u00A0", " \r\n \u00A0", " \r \u00A0", " \f \u00A0", " \u0085 \u00A0", " \u2028 \u00A0", " \u2029 \u00A0", "\t\n\t\u00A0",
-                        "\t\r\n\t\u00A0", "\t\r\t\u00A0", "\t\f\t\u00A0", "\t\u0085\t\u00A0", "\t\u2028\t\u00A0", "\t\u2029\t\u00A0", "\u1680\n\u1680\u00A0",
-                        "\u1680\r\n\u1680\u00A0", "\u1680\r\u1680\u00A0", "\u1680\f\u1680\u00A0", "\u1680\u0085\u1680\u00A0", "\u1680\u2028\u1680\u00A0",
-                        "\u1680\u2029\u1680\u00A0", "\n\u00A0", "\r\n\u00A0", "\r\u00A0", "\f\u00A0", "\u0085\u00A0", "\u2028\u00A0", "\u2029\u00A0"),
-                new TestData("\n\u00A0 ", "\n \u00A0 ", "\r\n \u00A0 ", "\r \u00A0 ", "\f \u00A0 ", "\u0085 \u00A0 ", "\u2028 \u00A0 ", "\u2029 \u00A0 ", "\n\t\u00A0\t",
-                        "\r\n\t\u00A0\t", "\r\t\u00A0\t", "\f\t\u00A0\t", "\u0085\t\u00A0\t", "\u2028\t\u00A0\t", "\u2029\t\u00A0\t", "\n\u1680\u00A0\u1680",
-                        "\r\n\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680", "\u2028\u1680\u00A0\u1680",
-                        "\u2029\u1680\u00A0\u1680"),
-                new TestData("\n\u00A0 \n", "\n \u00A0 \n", " \n \u00A0 \n ", "\r\n \u00A0 \r\n", " \r\n \u00A0 \r\n ", "\r \u00A0 \r", " \r \u00A0 \r ", "\f \u00A0 \f",
-                        " \f \u00A0 \f ", "\u0085 \u00A0 \u0085", " \u0085 \u00A0 \u0085 ", "\u2028 \u00A0 \u2028", " \u2028 \u00A0 \u2028 ", "\u2029 \u00A0 \u2029",
-                        " \u2029 \u00A0 \u2029 ", "\n\t\u00A0\t\n", "\t\n\t\u00A0\t\n\t", "\r\n\t\u00A0\t\r\n", "\t\r\n\t\u00A0\t\r\n\t", "\r\t\u00A0\t\r",
-                        "\t\r\t\u00A0\t\r\t", "\f\t\u00A0\t\f", "\t\f\t\u00A0\t\f\t", "\u0085\t\u00A0\t\u0085", "\t\u0085\t\u00A0\t\u0085\t", "\u2028\t\u00A0\t\u2028",
-                        "\t\u2028\t\u00A0\t\u2028\t", "\u2029\t\u00A0\t\u2029", "\t\u2029\t\u00A0\t\u2029\t", "\n\u1680\u00A0\u1680\n", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\r\n\u1680\u00A0\u1680\r\n", "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\r\u1680\u00A0\u1680\r", "\u1680\r\u1680\u00A0\u1680\r\u1680",
-                        "\f\u1680\u00A0\u1680\f", "\u1680\f\u1680\u00A0\u1680\f\u1680", "\u0085\u1680\u00A0\u1680\u0085", "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680",
-                        "\u2028\u1680\u00A0\u1680\u2028", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u2029\u1680\u00A0\u1680\u2029",
-                        "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680"),
-                new TestData("\u00A0\n_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_"),
-                new TestData("\n\u00A0\n", "\n\u00A0\n", "\r\n\u00A0\r\n", "\r\u00A0\r", "\f\u00A0\f", "\u0085\u00A0\u0085", "\u2028\u00A0\u2028", "\u2029\u00A0\u2029"),
-                new TestData("\u00A0\n\n_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_",
-                        "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_",
-                        "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_",
-                        "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_",
-                        "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_",
-                        "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_",
-                        "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData("\u00A0\n\n", "\u00A0\n\n", "\u00A0\n\r\n", "\u00A0\n\r", "\u00A0\n\f", "\u00A0\n\u0085", "\u00A0\n\u2028", "\u00A0\n\u2029",
-                        "\u00A0\r\n\n", "\u00A0\r\n\r\n", "\u00A0\r\n\r", "\u00A0\r\n\f", "\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\u00A0\r\r\n",
-                        "\u00A0\r\r", "\u00A0\r\f", "\u00A0\r\u0085", "\u00A0\r\u2028", "\u00A0\r\u2029", "\u00A0\f\n", "\u00A0\f\r\n", "\u00A0\f\r", "\u00A0\f\f",
-                        "\u00A0\f\u0085", "\u00A0\f\u2028", "\u00A0\f\u2029", "\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u00A0\u0085\f", "\u00A0\u0085\u0085",
-                        "\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u00A0\u2028\f", "\u00A0\u2028\u0085",
-                        "\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u00A0\u2029\f", "\u00A0\u2029\u0085",
-                        "\u00A0\u2029\u2028", "\u00A0\u2029\u2029"),
-                new TestData("\n\n\u00A0", "\n\n\u00A0", "\n\r\n\u00A0", "\n\r\u00A0", "\n\f\u00A0", "\n\u0085\u00A0", "\n\u2028\u00A0", "\n\u2029\u00A0",
-                        "\r\n\n\u00A0", "\r\n\r\n\u00A0", "\r\n\r\u00A0", "\r\n\f\u00A0", "\r\n\u0085\u00A0", "\r\n\u2028\u00A0", "\r\n\u2029\u00A0", "\r\r\n\u00A0",
-                        "\r\r\u00A0", "\r\f\u00A0", "\r\u0085\u00A0", "\r\u2028\u00A0", "\r\u2029\u00A0", "\f\n\u00A0", "\f\r\n\u00A0", "\f\r\u00A0", "\f\f\u00A0",
-                        "\f\u0085\u00A0", "\f\u2028\u00A0", "\f\u2029\u00A0", "\u0085\n\u00A0", "\u0085\r\n\u00A0", "\u0085\r\u00A0", "\u0085\f\u00A0", "\u0085\u0085\u00A0",
-                        "\u0085\u2028\u00A0", "\u0085\u2029\u00A0", "\u2028\n\u00A0", "\u2028\r\n\u00A0", "\u2028\r\u00A0", "\u2028\f\u00A0", "\u2028\u0085\u00A0",
-                        "\u2028\u2028\u00A0", "\u2028\u2029\u00A0", "\u2029\n\u00A0", "\u2029\r\n\u00A0", "\u2029\r\u00A0", "\u2029\f\u00A0", "\u2029\u0085\u00A0",
-                        "\u2029\u2028\u00A0", "\u2029\u2029\u00A0"),
-                new TestData("\n\n\u00A0\n\n", "\n\n\u00A0\n\n", "\n\r\n\u00A0\n\r\n", "\n\r\u00A0\n\r", "\n\f\u00A0\n\f", "\n\u0085\u00A0\n\u0085",
-                        "\n\u2028\u00A0\n\u2028", "\n\u2029\u00A0\n\u2029", "\r\n\n\u00A0\r\n\n", "\r\n\r\n\u00A0\r\n\r\n", "\r\n\r\u00A0\r\n\r", "\r\n\f\u00A0\r\n\f",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\r\n\u2028\u00A0\r\n\u2028", "\r\n\u2029\u00A0\r\n\u2029", "\r\r\n\u00A0\r\r\n", "\r\r\u00A0\r\r", "\r\f\u00A0\r\f",
-                        "\r\u0085\u00A0\r\u0085", "\r\u2028\u00A0\r\u2028", "\r\u2029\u00A0\r\u2029", "\f\n\u00A0\f\n", "\f\r\n\u00A0\f\r\n", "\f\r\u00A0\f\r",
-                        "\f\f\u00A0\f\f", "\f\u0085\u00A0\f\u0085", "\f\u2028\u00A0\f\u2028", "\f\u2029\u00A0\f\u2029", "\u0085\n\u00A0\u0085\n",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u0085\r\u00A0\u0085\r", "\u0085\f\u00A0\u0085\f", "\u0085\u0085\u00A0\u0085\u0085", "\u0085\u2028\u00A0\u0085\u2028",
-                        "\u0085\u2029\u00A0\u0085\u2029", "\u2028\n\u00A0\u2028\n", "\u2028\r\n\u00A0\u2028\r\n", "\u2028\r\u00A0\u2028\r", "\u2028\f\u00A0\u2028\f",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u2028\u2028\u00A0\u2028\u2028", "\u2028\u2029\u00A0\u2028\u2029", "\u2029\n\u00A0\u2029\n",
-                        "\u2029\r\n\u00A0\u2029\r\n", "\u2029\r\u00A0\u2029\r", "\u2029\f\u00A0\u2029\f", "\u2029\u0085\u00A0\u2029\u0085", "\u2029\u2028\u00A0\u2029\u2028",
-                        "\u2029\u2029\u00A0\u2029\u2029")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String d = TestHelper.toStringDescription(u);
-                String a = target1.apply(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     /**
+     * Mode: Multi-Line; Blank Lines: Leave; Trim: None; Whitespace: Normalize.
      * <code>{@link StringNormalizationOption#NO_TRIM} | {@link StringNormalizationOption#LEAVE_BLANK_LINES}</code>
      * Was:
      */
@@ -11625,227 +9365,6 @@ public class StringHelperTest {
         }
     }
 
-    public void getStringNormalizer26_old() {
-        Function<String, String> target1 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM, StringNormalizationOption.LEAVE_BLANK_LINES);
-        Function<String, String> target2 = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM, StringNormalizationOption.LEAVE_BLANK_LINES, StringNormalizationOption.PASS_NULL_VALUE);
-        String actual = target1.apply(null);
-        assertEquals("", actual);
-        actual = target2.apply(null);
-        assertNull(actual);
-        TestData[] testData = new TestData[]{
-                new TestData("", ""),
-                new TestData("Test", "Test"),
-                new TestData("_", "_"),
-                new TestData("\u00A0", "\u00A0"),
-                new TestData("\n", "\n", "\r\n", "\r", "\f", "\u0085", "\u2028", "\u2029"),
-                new TestData("\n\n", "\n\n", "\n\r\n", "\n\r", "\n\f", "\n\u0085", "\n\u2028", "\n\u2029", "\r\n\n", "\r\n\r\n", "\r\n\r", "\r\n\f", "\r\n\u0085",
-                        "\r\n\u2028", "\r\n\u2029", "\r\r\n", "\r\r", "\r\f", "\r\u0085", "\r\u2028", "\r\u2029", "\f\n", "\f\r\n", "\f\r", "\f\f", "\f\u0085", "\f\u2028",
-                        "\f\u2029", "\u0085\n", "\u0085\r\n", "\u0085\r", "\u0085\f", "\u0085\u0085", "\u0085\u2028", "\u0085\u2029", "\u2028\n", "\u2028\r\n", "\u2028\r",
-                        "\u2028\f", "\u2028\u0085", "\u2028\u2028", "\u2028\u2029", "\u2029\n", "\u2029\r\n", "\u2029\r", "\u2029\f", "\u2029\u0085", "\u2029\u2028",
-                        "\u2029\u2029"),
-                new TestData(" ", " ", "  ", " \t", " \u1680", "\t", "\t ", "\t\t", "\t\u1680", "\u1680", "\u1680 ", "\u1680\t", "\u1680\u1680"),
-                new TestData(" \n ", " \n ", " \r\n ", " \r ", " \f ", " \u0085 ", " \u2028 ", " \u2029 ", "\t\n\t", "\t\r\n\t", "\t\r\t", "\t\f\t", "\t\u0085\t",
-                        "\t\u2028\t", "\t\u2029\t", "\u1680\n\u1680", "\u1680\r\n\u1680", "\u1680\r\u1680", "\u1680\f\u1680", "\u1680\u0085\u1680", "\u1680\u2028\u1680",
-                        "\u1680\u2029\u1680"),
-                new TestData("\n ", "\n ", "\r\n ", "\r ", "\f ", "\u0085 ", "\u2028 ", "\u2029 ", "\n\t", "\r\n\t", "\r\t", "\f\t", "\u0085\t", "\u2028\t", "\u2029\t",
-                        "\n\u1680", "\r\n\u1680", "\r\u1680", "\f\u1680", "\u0085\u1680", "\u2028\u1680", "\u2029\u1680"),
-                new TestData("\n \n", "\n \n", "\r\n \r\n", "\r \r", "\f \f", "\u0085 \u0085", "\u2028 \u2028", "\u2029 \u2029", "\n\t\n", "\r\n\t\r\n", "\r\t\r",
-                        "\f\t\f", "\u0085\t\u0085", "\u2028\t\u2028", "\u2029\t\u2029", "\n\u1680\n", "\r\n\u1680\r\n", "\r\u1680\r", "\f\u1680\f", "\u0085\u1680\u0085",
-                        "\u2028\u1680\u2028", "\u2029\u1680\u2029"),
-                new TestData(" \n\n ", " \n\n ", " \n\r\n ", " \n\r ", " \n\f ", " \n\u0085 ", " \n\u2028 ", " \n\u2029 ", " \r\n\n ", " \r\n\r\n ", " \r\n\r ",
-                        " \r\n\f ", " \r\n\u0085 ", " \r\n\u2028 ", " \r\n\u2029 ", " \r\r\n ", " \r\r ", " \r\f ", " \r\u0085 ", " \r\u2028 ", " \r\u2029 ", " \f\n ",
-                        " \f\r\n ", " \f\r ", " \f\f ", " \f\u0085 ", " \f\u2028 ", " \f\u2029 ", " \u0085\n ", " \u0085\r\n ", " \u0085\r ", " \u0085\f ", " \u0085\u0085 ",
-                        " \u0085\u2028 ", " \u0085\u2029 ", " \u2028\n ", " \u2028\r\n ", " \u2028\r ", " \u2028\f ", " \u2028\u0085 ", " \u2028\u2028 ", " \u2028\u2029 ",
-                        " \u2029\n ", " \u2029\r\n ", " \u2029\r ", " \u2029\f ", " \u2029\u0085 ", " \u2029\u2028 ", " \u2029\u2029 ", "\t\n\n\t", "\t\n\r\n\t", "\t\n\r\t",
-                        "\t\n\f\t", "\t\n\u0085\t", "\t\n\u2028\t", "\t\n\u2029\t", "\t\r\n\n\t", "\t\r\n\r\n\t", "\t\r\n\r\t", "\t\r\n\f\t", "\t\r\n\u0085\t",
-                        "\t\r\n\u2028\t", "\t\r\n\u2029\t", "\t\r\r\n\t", "\t\r\r\t", "\t\r\f\t", "\t\r\u0085\t", "\t\r\u2028\t", "\t\r\u2029\t", "\t\f\n\t", "\t\f\r\n\t",
-                        "\t\f\r\t", "\t\f\f\t", "\t\f\u0085\t", "\t\f\u2028\t", "\t\f\u2029\t", "\t\u0085\n\t", "\t\u0085\r\n\t", "\t\u0085\r\t", "\t\u0085\f\t",
-                        "\t\u0085\u0085\t", "\t\u0085\u2028\t", "\t\u0085\u2029\t", "\t\u2028\n\t", "\t\u2028\r\n\t", "\t\u2028\r\t", "\t\u2028\f\t", "\t\u2028\u0085\t",
-                        "\t\u2028\u2028\t", "\t\u2028\u2029\t", "\t\u2029\n\t", "\t\u2029\r\n\t", "\t\u2029\r\t", "\t\u2029\f\t", "\t\u2029\u0085\t", "\t\u2029\u2028\t",
-                        "\t\u2029\u2029\t", "\u1680\n\n\u1680", "\u1680\n\r\n\u1680", "\u1680\n\r\u1680", "\u1680\n\f\u1680", "\u1680\n\u0085\u1680", "\u1680\n\u2028\u1680",
-                        "\u1680\n\u2029\u1680", "\u1680\r\n\n\u1680", "\u1680\r\n\r\n\u1680", "\u1680\r\n\r\u1680", "\u1680\r\n\f\u1680", "\u1680\r\n\u0085\u1680",
-                        "\u1680\r\n\u2028\u1680", "\u1680\r\n\u2029\u1680", "\u1680\r\r\n\u1680", "\u1680\r\r\u1680", "\u1680\r\f\u1680", "\u1680\r\u0085\u1680",
-                        "\u1680\r\u2028\u1680", "\u1680\r\u2029\u1680", "\u1680\f\n\u1680", "\u1680\f\r\n\u1680", "\u1680\f\r\u1680", "\u1680\f\f\u1680",
-                        "\u1680\f\u0085\u1680", "\u1680\f\u2028\u1680", "\u1680\f\u2029\u1680", "\u1680\u0085\n\u1680", "\u1680\u0085\r\n\u1680", "\u1680\u0085\r\u1680",
-                        "\u1680\u0085\f\u1680", "\u1680\u0085\u0085\u1680", "\u1680\u0085\u2028\u1680", "\u1680\u0085\u2029\u1680", "\u1680\u2028\n\u1680",
-                        "\u1680\u2028\r\n\u1680", "\u1680\u2028\r\u1680", "\u1680\u2028\f\u1680", "\u1680\u2028\u0085\u1680", "\u1680\u2028\u2028\u1680",
-                        "\u1680\u2028\u2029\u1680", "\u1680\u2029\n\u1680", "\u1680\u2029\r\n\u1680", "\u1680\u2029\r\u1680", "\u1680\u2029\f\u1680",
-                        "\u1680\u2029\u0085\u1680", "\u1680\u2029\u2028\u1680", "\u1680\u2029\u2029\u1680"),
-                new TestData("\n\n ", "\n\n ", "\n\r\n ", "\n\r ", "\n\f ", "\n\u0085 ", "\n\u2028 ", "\n\u2029 ", "\r\n\n ", "\r\n\r\n ", "\r\n\r ", "\r\n\f ",
-                        "\r\n\u0085 ", "\r\n\u2028 ", "\r\n\u2029 ", "\r\r\n ", "\r\r ", "\r\f ", "\r\u0085 ", "\r\u2028 ", "\r\u2029 ", "\f\n ", "\f\r\n ", "\f\r ",
-                        "\f\f ", "\f\u0085 ", "\f\u2028 ", "\f\u2029 ", "\u0085\n ", "\u0085\r\n ", "\u0085\r ", "\u0085\f ", "\u0085\u0085 ", "\u0085\u2028 ",
-                        "\u0085\u2029 ", "\u2028\n ", "\u2028\r\n ", "\u2028\r ", "\u2028\f ", "\u2028\u0085 ", "\u2028\u2028 ", "\u2028\u2029 ", "\u2029\n ", "\u2029\r\n ",
-                        "\u2029\r ", "\u2029\f ", "\u2029\u0085 ", "\u2029\u2028 ", "\u2029\u2029 ", "\n\n\t", "\n\r\n\t", "\n\r\t", "\n\f\t", "\n\u0085\t", "\n\u2028\t",
-                        "\n\u2029\t", "\r\n\n\t", "\r\n\r\n\t", "\r\n\r\t", "\r\n\f\t", "\r\n\u0085\t", "\r\n\u2028\t", "\r\n\u2029\t", "\r\r\n\t", "\r\r\t", "\r\f\t",
-                        "\r\u0085\t", "\r\u2028\t", "\r\u2029\t", "\f\n\t", "\f\r\n\t", "\f\r\t", "\f\f\t", "\f\u0085\t", "\f\u2028\t", "\f\u2029\t", "\u0085\n\t",
-                        "\u0085\r\n\t", "\u0085\r\t", "\u0085\f\t", "\u0085\u0085\t", "\u0085\u2028\t", "\u0085\u2029\t", "\u2028\n\t", "\u2028\r\n\t", "\u2028\r\t",
-                        "\u2028\f\t", "\u2028\u0085\t", "\u2028\u2028\t", "\u2028\u2029\t", "\u2029\n\t", "\u2029\r\n\t", "\u2029\r\t", "\u2029\f\t", "\u2029\u0085\t",
-                        "\u2029\u2028\t", "\u2029\u2029\t", "\n\n\u1680", "\n\r\n\u1680", "\n\r\u1680", "\n\f\u1680", "\n\u0085\u1680", "\n\u2028\u1680", "\n\u2029\u1680",
-                        "\r\n\n\u1680", "\r\n\r\n\u1680", "\r\n\r\u1680", "\r\n\f\u1680", "\r\n\u0085\u1680", "\r\n\u2028\u1680", "\r\n\u2029\u1680", "\r\r\n\u1680",
-                        "\r\r\u1680", "\r\f\u1680", "\r\u0085\u1680", "\r\u2028\u1680", "\r\u2029\u1680", "\f\n\u1680", "\f\r\n\u1680", "\f\r\u1680", "\f\f\u1680",
-                        "\f\u0085\u1680", "\f\u2028\u1680", "\f\u2029\u1680", "\u0085\n\u1680", "\u0085\r\n\u1680", "\u0085\r\u1680", "\u0085\f\u1680", "\u0085\u0085\u1680",
-                        "\u0085\u2028\u1680", "\u0085\u2029\u1680", "\u2028\n\u1680", "\u2028\r\n\u1680", "\u2028\r\u1680", "\u2028\f\u1680", "\u2028\u0085\u1680",
-                        "\u2028\u2028\u1680", "\u2028\u2029\u1680", "\u2029\n\u1680", "\u2029\r\n\u1680", "\u2029\r\u1680", "\u2029\f\u1680", "\u2029\u0085\u1680",
-                        "\u2029\u2028\u1680", "\u2029\u2029\u1680"),
-                new TestData("\n\n \n\n", "\n\n \n\n", "\n\r\n \n\r\n", "\n\r \n\r", "\n\f \n\f", "\n\u0085 \n\u0085", "\n\u2028 \n\u2028", "\n\u2029 \n\u2029",
-                        "\r\n\n \r\n\n", "\r\n\r\n \r\n\r\n", "\r\n\r \r\n\r", "\r\n\f \r\n\f", "\r\n\u0085 \r\n\u0085", "\r\n\u2028 \r\n\u2028", "\r\n\u2029 \r\n\u2029",
-                        "\r\r\n \r\r\n", "\r\r \r\r", "\r\f \r\f", "\r\u0085 \r\u0085", "\r\u2028 \r\u2028", "\r\u2029 \r\u2029", "\f\n \f\n", "\f\r\n \f\r\n", "\f\r \f\r",
-                        "\f\f \f\f", "\f\u0085 \f\u0085", "\f\u2028 \f\u2028", "\f\u2029 \f\u2029", "\u0085\n \u0085\n", "\u0085\r\n \u0085\r\n", "\u0085\r \u0085\r",
-                        "\u0085\f \u0085\f", "\u0085\u0085 \u0085\u0085", "\u0085\u2028 \u0085\u2028", "\u0085\u2029 \u0085\u2029", "\u2028\n \u2028\n",
-                        "\u2028\r\n \u2028\r\n", "\u2028\r \u2028\r", "\u2028\f \u2028\f", "\u2028\u0085 \u2028\u0085", "\u2028\u2028 \u2028\u2028",
-                        "\u2028\u2029 \u2028\u2029", "\u2029\n \u2029\n", "\u2029\r\n \u2029\r\n", "\u2029\r \u2029\r", "\u2029\f \u2029\f", "\u2029\u0085 \u2029\u0085",
-                        "\u2029\u2028 \u2029\u2028", "\u2029\u2029 \u2029\u2029", "\n\n\t\n\n", "\n\r\n\t\n\r\n", "\n\r\t\n\r", "\n\f\t\n\f", "\n\u0085\t\n\u0085",
-                        "\n\u2028\t\n\u2028", "\n\u2029\t\n\u2029", "\r\n\n\t\r\n\n", "\r\n\r\n\t\r\n\r\n", "\r\n\r\t\r\n\r", "\r\n\f\t\r\n\f", "\r\n\u0085\t\r\n\u0085",
-                        "\r\n\u2028\t\r\n\u2028", "\r\n\u2029\t\r\n\u2029", "\r\r\n\t\r\r\n", "\r\r\t\r\r", "\r\f\t\r\f", "\r\u0085\t\r\u0085", "\r\u2028\t\r\u2028",
-                        "\r\u2029\t\r\u2029", "\f\n\t\f\n", "\f\r\n\t\f\r\n", "\f\r\t\f\r", "\f\f\t\f\f", "\f\u0085\t\f\u0085", "\f\u2028\t\f\u2028", "\f\u2029\t\f\u2029",
-                        "\u0085\n\t\u0085\n", "\u0085\r\n\t\u0085\r\n", "\u0085\r\t\u0085\r", "\u0085\f\t\u0085\f", "\u0085\u0085\t\u0085\u0085",
-                        "\u0085\u2028\t\u0085\u2028", "\u0085\u2029\t\u0085\u2029", "\u2028\n\t\u2028\n", "\u2028\r\n\t\u2028\r\n", "\u2028\r\t\u2028\r",
-                        "\u2028\f\t\u2028\f", "\u2028\u0085\t\u2028\u0085", "\u2028\u2028\t\u2028\u2028", "\u2028\u2029\t\u2028\u2029", "\u2029\n\t\u2029\n",
-                        "\u2029\r\n\t\u2029\r\n", "\u2029\r\t\u2029\r", "\u2029\f\t\u2029\f", "\u2029\u0085\t\u2029\u0085", "\u2029\u2028\t\u2029\u2028",
-                        "\u2029\u2029\t\u2029\u2029", "\n\n\u1680\n\n", "\n\r\n\u1680\n\r\n", "\n\r\u1680\n\r", "\n\f\u1680\n\f", "\n\u0085\u1680\n\u0085",
-                        "\n\u2028\u1680\n\u2028", "\n\u2029\u1680\n\u2029", "\r\n\n\u1680\r\n\n", "\r\n\r\n\u1680\r\n\r\n", "\r\n\r\u1680\r\n\r", "\r\n\f\u1680\r\n\f",
-                        "\r\n\u0085\u1680\r\n\u0085", "\r\n\u2028\u1680\r\n\u2028", "\r\n\u2029\u1680\r\n\u2029", "\r\r\n\u1680\r\r\n", "\r\r\u1680\r\r", "\r\f\u1680\r\f",
-                        "\r\u0085\u1680\r\u0085", "\r\u2028\u1680\r\u2028", "\r\u2029\u1680\r\u2029", "\f\n\u1680\f\n", "\f\r\n\u1680\f\r\n", "\f\r\u1680\f\r",
-                        "\f\f\u1680\f\f", "\f\u0085\u1680\f\u0085", "\f\u2028\u1680\f\u2028", "\f\u2029\u1680\f\u2029", "\u0085\n\u1680\u0085\n",
-                        "\u0085\r\n\u1680\u0085\r\n", "\u0085\r\u1680\u0085\r", "\u0085\f\u1680\u0085\f", "\u0085\u0085\u1680\u0085\u0085", "\u0085\u2028\u1680\u0085\u2028",
-                        "\u0085\u2029\u1680\u0085\u2029", "\u2028\n\u1680\u2028\n", "\u2028\r\n\u1680\u2028\r\n", "\u2028\r\u1680\u2028\r", "\u2028\f\u1680\u2028\f",
-                        "\u2028\u0085\u1680\u2028\u0085", "\u2028\u2028\u1680\u2028\u2028", "\u2028\u2029\u1680\u2028\u2029", "\u2029\n\u1680\u2029\n",
-                        "\u2029\r\n\u1680\u2029\r\n", "\u2029\r\u1680\u2029\r", "\u2029\f\u1680\u2029\f", "\u2029\u0085\u1680\u2029\u0085", "\u2029\u2028\u1680\u2029\u2028",
-                        "\u2029\u2029\u1680\u2029\u2029"),
-                new TestData("Test Data", "Test Data", "Test  Data", "Test\tData", "Test\t\tData", "Test\u1680Data", "Test\u1680\u1680Data"),
-                new TestData("Test ", "Test ", "Test\t", "Test\u1680"),
-                new TestData(" Test", " Test", "\tTest", "\u1680Test"),
-                new TestData(" Test ", " Test ", "  Test  ", "\tTest\t", "\t\tTest\t\t", "\u1680Test\u1680", "\u1680\u1680Test\u1680\u1680"),
-                new TestData(" Test \n Data", " Test \n Data", " Test \r\n Data", " Test \r Data", " Test \f Data", " Test \u0085 Data", " Test \u2028 Data",
-                        " Test \u2029 Data", "\tTest\t\n\tData", "\tTest\t\r\n\tData", "\tTest\t\r\tData", "\tTest\t\f\tData", "\tTest\t\u0085\tData",
-                        "\tTest\t\u2028\tData", "\tTest\t\u2029\tData", "\u1680Test\u1680\n\u1680Data", "\u1680Test\u1680\r\n\u1680Data", "\u1680Test\u1680\r\u1680Data",
-                        "\u1680Test\u1680\f\u1680Data", "\u1680Test\u1680\u0085\u1680Data", "\u1680Test\u1680\u2028\u1680Data", "\u1680Test\u1680\u2029\u1680Data"),
-                new TestData("Test \n Data ", "Test \n Data ", "Test \r\n Data ", "Test \r Data ", "Test \f Data ", "Test \u0085 Data ", "Test \u2028 Data ",
-                        "Test \u2029 Data ", "Test\t\n\tData\t", "Test\t\r\n\tData\t", "Test\t\r\tData\t", "Test\t\f\tData\t", "Test\t\u0085\tData\t",
-                        "Test\t\u2028\tData\t", "Test\t\u2029\tData\t", "Test\u1680\n\u1680Data\u1680", "Test\u1680\r\n\u1680Data\u1680", "Test\u1680\r\u1680Data\u1680",
-                        "Test\u1680\f\u1680Data\u1680", "Test\u1680\u0085\u1680Data\u1680", "Test\u1680\u2028\u1680Data\u1680", "Test\u1680\u2029\u1680Data\u1680"),
-                new TestData(" \n Test", " \n Test", " \r\n Test", " \r Test", " \f Test", " \u0085 Test", " \u2028 Test", " \u2029 Test", "\t\n\tTest", "\t\r\n\tTest",
-                        "\t\r\tTest", "\t\f\tTest", "\t\u0085\tTest", "\t\u2028\tTest", "\t\u2029\tTest", "\u1680\n\u1680Test", "\u1680\r\n\u1680Test", "\u1680\r\u1680Test",
-                        "\u1680\f\u1680Test", "\u1680\u0085\u1680Test", "\u1680\u2028\u1680Test", "\u1680\u2029\u1680Test"),
-                new TestData("\n Test ", "\n Test ", "\r\n Test ", "\r Test ", "\f Test ", "\u0085 Test ", "\u2028 Test ", "\u2029 Test ", "\n\tTest\t", "\r\n\tTest\t",
-                        "\r\tTest\t", "\f\tTest\t", "\u0085\tTest\t", "\u2028\tTest\t", "\u2029\tTest\t", "\n\u1680Test\u1680", "\r\n\u1680Test\u1680", "\r\u1680Test\u1680",
-                        "\f\u1680Test\u1680", "\u0085\u1680Test\u1680", "\u2028\u1680Test\u1680", "\u2029\u1680Test\u1680"),
-                new TestData("\n Test \n", "\n Test \n", "\r\n Test \r\n", "\r Test \r", "\f Test \f", "\u0085 Test \u0085", "\u2028 Test \u2028", "\u2029 Test \u2029",
-                        "\n\tTest\t\n", "\r\n\tTest\t\r\n", "\r\tTest\t\r", "\f\tTest\t\f", "\u0085\tTest\t\u0085", "\u2028\tTest\t\u2028", "\u2029\tTest\t\u2029",
-                        "\n\u1680Test\u1680\n", "\r\n\u1680Test\u1680\r\n", "\r\u1680Test\u1680\r", "\f\u1680Test\u1680\f", "\u0085\u1680Test\u1680\u0085",
-                        "\u2028\u1680Test\u1680\u2028", "\u2029\u1680Test\u1680\u2029"),
-                new TestData(" \n Test \n ", " \n Test \n ", " \r\n Test \r\n ", " \r Test \r ", " \f Test \f ", " \u0085 Test \u0085 ", " \u2028 Test \u2028 ",
-                        " \u2029 Test \u2029 ", "\t\n\tTest\t\n\t", "\t\r\n\tTest\t\r\n\t", "\t\r\tTest\t\r\t", "\t\f\tTest\t\f\t", "\t\u0085\tTest\t\u0085\t",
-                        "\t\u2028\tTest\t\u2028\t", "\t\u2029\tTest\t\u2029\t", "\u1680\n\u1680Test\u1680\n\u1680", "\u1680\r\n\u1680Test\u1680\r\n\u1680",
-                        "\u1680\r\u1680Test\u1680\r\u1680", "\u1680\f\u1680Test\u1680\f\u1680", "\u1680\u0085\u1680Test\u1680\u0085\u1680",
-                        "\u1680\u2028\u1680Test\u1680\u2028\u1680", "\u1680\u2029\u1680Test\u1680\u2029\u1680"),
-                new TestData("Test\nData", "Test\nData", "Test\r\nData", "Test\rData", "Test\fData", "Test\u0085Data", "Test\u2028Data", "Test\u2029Data"),
-                new TestData("\nTest", "\nTest", "\r\nTest", "\rTest", "\fTest", "\u0085Test", "\u2028Test", "\u2029Test"),
-                new TestData("\nTest\n", "\nTest\n", "\r\nTest\r\n", "\rTest\r", "\fTest\f", "\u0085Test\u0085", "\u2028Test\u2028", "\u2029Test\u2029"),
-                new TestData("Test\n\nData", "Test\n\nData", "Test\n\r\nData", "Test\n\rData", "Test\n\fData", "Test\n\u0085Data", "Test\n\u2028Data",
-                        "Test\n\u2029Data", "Test\r\n\nData", "Test\r\n\r\nData", "Test\r\n\rData", "Test\r\n\fData", "Test\r\n\u0085Data", "Test\r\n\u2028Data",
-                        "Test\r\n\u2029Data", "Test\r\r\nData", "Test\r\rData", "Test\r\fData", "Test\r\u0085Data", "Test\r\u2028Data", "Test\r\u2029Data", "Test\f\nData",
-                        "Test\f\r\nData", "Test\f\rData", "Test\f\fData", "Test\f\u0085Data", "Test\f\u2028Data", "Test\f\u2029Data", "Test\u0085\nData",
-                        "Test\u0085\r\nData", "Test\u0085\rData", "Test\u0085\fData", "Test\u0085\u0085Data", "Test\u0085\u2028Data", "Test\u0085\u2029Data",
-                        "Test\u2028\nData", "Test\u2028\r\nData", "Test\u2028\rData", "Test\u2028\fData", "Test\u2028\u0085Data", "Test\u2028\u2028Data",
-                        "Test\u2028\u2029Data", "Test\u2029\nData", "Test\u2029\r\nData", "Test\u2029\rData", "Test\u2029\fData", "Test\u2029\u0085Data",
-                        "Test\u2029\u2028Data", "Test\u2029\u2029Data"),
-                new TestData("Test\n\n", "Test\n\n", "Test\n\r\n", "Test\n\r", "Test\n\f", "Test\n\u0085", "Test\n\u2028", "Test\n\u2029", "Test\r\n\n", "Test\r\n\r\n",
-                        "Test\r\n\r", "Test\r\n\f", "Test\r\n\u0085", "Test\r\n\u2028", "Test\r\n\u2029", "Test\r\r\n", "Test\r\r", "Test\r\f", "Test\r\u0085",
-                        "Test\r\u2028", "Test\r\u2029", "Test\f\n", "Test\f\r\n", "Test\f\r", "Test\f\f", "Test\f\u0085", "Test\f\u2028", "Test\f\u2029", "Test\u0085\n",
-                        "Test\u0085\r\n", "Test\u0085\r", "Test\u0085\f", "Test\u0085\u0085", "Test\u0085\u2028", "Test\u0085\u2029", "Test\u2028\n", "Test\u2028\r\n",
-                        "Test\u2028\r", "Test\u2028\f", "Test\u2028\u0085", "Test\u2028\u2028", "Test\u2028\u2029", "Test\u2029\n", "Test\u2029\r\n", "Test\u2029\r",
-                        "Test\u2029\f", "Test\u2029\u0085", "Test\u2029\u2028", "Test\u2029\u2029"),
-                new TestData("\n\nTest", "\n\nTest", "\n\r\nTest", "\n\rTest", "\n\fTest", "\n\u0085Test", "\n\u2028Test", "\n\u2029Test", "\r\n\nTest", "\r\n\r\nTest",
-                        "\r\n\rTest", "\r\n\fTest", "\r\n\u0085Test", "\r\n\u2028Test", "\r\n\u2029Test", "\r\r\nTest", "\r\rTest", "\r\fTest", "\r\u0085Test",
-                        "\r\u2028Test", "\r\u2029Test", "\f\nTest", "\f\r\nTest", "\f\rTest", "\f\fTest", "\f\u0085Test", "\f\u2028Test", "\f\u2029Test", "\u0085\nTest",
-                        "\u0085\r\nTest", "\u0085\rTest", "\u0085\fTest", "\u0085\u0085Test", "\u0085\u2028Test", "\u0085\u2029Test", "\u2028\nTest", "\u2028\r\nTest",
-                        "\u2028\rTest", "\u2028\fTest", "\u2028\u0085Test", "\u2028\u2028Test", "\u2028\u2029Test", "\u2029\nTest", "\u2029\r\nTest", "\u2029\rTest",
-                        "\u2029\fTest", "\u2029\u0085Test", "\u2029\u2028Test", "\u2029\u2029Test"),
-                new TestData("\n\nTest\n\n", "\n\nTest\n\n", "\n\r\nTest\n\r\n", "\n\rTest\n\r", "\n\fTest\n\f", "\n\u0085Test\n\u0085", "\n\u2028Test\n\u2028",
-                        "\n\u2029Test\n\u2029", "\r\n\nTest\r\n\n", "\r\n\r\nTest\r\n\r\n", "\r\n\rTest\r\n\r", "\r\n\fTest\r\n\f", "\r\n\u0085Test\r\n\u0085",
-                        "\r\n\u2028Test\r\n\u2028", "\r\n\u2029Test\r\n\u2029", "\r\r\nTest\r\r\n", "\r\rTest\r\r", "\r\fTest\r\f", "\r\u0085Test\r\u0085",
-                        "\r\u2028Test\r\u2028", "\r\u2029Test\r\u2029", "\f\nTest\f\n", "\f\r\nTest\f\r\n", "\f\rTest\f\r", "\f\fTest\f\f", "\f\u0085Test\f\u0085",
-                        "\f\u2028Test\f\u2028", "\f\u2029Test\f\u2029", "\u0085\nTest\u0085\n", "\u0085\r\nTest\u0085\r\n", "\u0085\rTest\u0085\r", "\u0085\fTest\u0085\f",
-                        "\u0085\u0085Test\u0085\u0085", "\u0085\u2028Test\u0085\u2028", "\u0085\u2029Test\u0085\u2029", "\u2028\nTest\u2028\n", "\u2028\r\nTest\u2028\r\n",
-                        "\u2028\rTest\u2028\r", "\u2028\fTest\u2028\f", "\u2028\u0085Test\u2028\u0085", "\u2028\u2028Test\u2028\u2028", "\u2028\u2029Test\u2028\u2029",
-                        "\u2029\nTest\u2029\n", "\u2029\r\nTest\u2029\r\n", "\u2029\rTest\u2029\r", "\u2029\fTest\u2029\f", "\u2029\u0085Test\u2029\u0085",
-                        "\u2029\u2028Test\u2029\u2028", "\u2029\u2029Test\u2029\u2029"),
-                new TestData("\u00A0 _", "\u00A0 _", "\u00A0  _", "\u00A0\t_", "\u00A0\t\t_", "\u00A0\u1680_", "\u00A0\u1680\u1680_"),
-                new TestData("\u00A0 ", "\u00A0 ", "\u00A0\t", "\u00A0\u1680"),
-                new TestData(" \u00A0", " \u00A0", "\t\u00A0", "\u1680\u00A0"),
-                new TestData(" \u00A0 ", " \u00A0 ", "  \u00A0  ", "\t\u00A0\t", "\t\t\u00A0\t\t", "\u1680\u00A0\u1680", "\u1680\u1680\u00A0\u1680\u1680"),
-                new TestData(" \u00A0 \n _", " \u00A0 \n _", " \u00A0 \r\n _", " \u00A0 \r _", " \u00A0 \f _", " \u00A0 \u0085 _", " \u00A0 \u2028 _",
-                        " \u00A0 \u2029 _", "\t\u00A0\t\n\t_", "\t\u00A0\t\r\n\t_", "\t\u00A0\t\r\t_", "\t\u00A0\t\f\t_", "\t\u00A0\t\u0085\t_", "\t\u00A0\t\u2028\t_",
-                        "\t\u00A0\t\u2029\t_", "\u1680\u00A0\u1680\n\u1680_", "\u1680\u00A0\u1680\r\n\u1680_", "\u1680\u00A0\u1680\r\u1680_", "\u1680\u00A0\u1680\f\u1680_",
-                        "\u1680\u00A0\u1680\u0085\u1680_", "\u1680\u00A0\u1680\u2028\u1680_", "\u1680\u00A0\u1680\u2029\u1680_"),
-                new TestData("\u00A0 \n _ ", "\u00A0 \n _ ", "\u00A0 \r\n _ ", "\u00A0 \r _ ", "\u00A0 \f _ ", "\u00A0 \u0085 _ ", "\u00A0 \u2028 _ ",
-                        "\u00A0 \u2029 _ ", "\u00A0\t\n\t_\t", "\u00A0\t\r\n\t_\t", "\u00A0\t\r\t_\t", "\u00A0\t\f\t_\t", "\u00A0\t\u0085\t_\t", "\u00A0\t\u2028\t_\t",
-                        "\u00A0\t\u2029\t_\t", "\u00A0\u1680\n\u1680_\u1680", "\u00A0\u1680\r\n\u1680_\u1680", "\u00A0\u1680\r\u1680_\u1680", "\u00A0\u1680\f\u1680_\u1680",
-                        "\u00A0\u1680\u0085\u1680_\u1680", "\u00A0\u1680\u2028\u1680_\u1680", "\u00A0\u1680\u2029\u1680_\u1680"),
-                new TestData(" \n \u00A0", " \n \u00A0", " \r\n \u00A0", " \r \u00A0", " \f \u00A0", " \u0085 \u00A0", " \u2028 \u00A0", " \u2029 \u00A0",
-                        "\t\n\t\u00A0", "\t\r\n\t\u00A0", "\t\r\t\u00A0", "\t\f\t\u00A0", "\t\u0085\t\u00A0", "\t\u2028\t\u00A0", "\t\u2029\t\u00A0", "\u1680\n\u1680\u00A0",
-                        "\u1680\r\n\u1680\u00A0", "\u1680\r\u1680\u00A0", "\u1680\f\u1680\u00A0", "\u1680\u0085\u1680\u00A0", "\u1680\u2028\u1680\u00A0",
-                        "\u1680\u2029\u1680\u00A0"),
-                new TestData("\n \u00A0 ", "\n \u00A0 ", "\r\n \u00A0 ", "\r \u00A0 ", "\f \u00A0 ", "\u0085 \u00A0 ", "\u2028 \u00A0 ", "\u2029 \u00A0 ",
-                        "\n\t\u00A0\t", "\r\n\t\u00A0\t", "\r\t\u00A0\t", "\f\t\u00A0\t", "\u0085\t\u00A0\t", "\u2028\t\u00A0\t", "\u2029\t\u00A0\t", "\n\u1680\u00A0\u1680",
-                        "\r\n\u1680\u00A0\u1680", "\r\u1680\u00A0\u1680", "\f\u1680\u00A0\u1680", "\u0085\u1680\u00A0\u1680", "\u2028\u1680\u00A0\u1680",
-                        "\u2029\u1680\u00A0\u1680"),
-                new TestData("\n \u00A0 \n", "\n \u00A0 \n", "\r\n \u00A0 \r\n", "\r \u00A0 \r", "\f \u00A0 \f", "\u0085 \u00A0 \u0085", "\u2028 \u00A0 \u2028",
-                        "\u2029 \u00A0 \u2029", "\n\t\u00A0\t\n", "\r\n\t\u00A0\t\r\n", "\r\t\u00A0\t\r", "\f\t\u00A0\t\f", "\u0085\t\u00A0\t\u0085",
-                        "\u2028\t\u00A0\t\u2028", "\u2029\t\u00A0\t\u2029", "\n\u1680\u00A0\u1680\n", "\r\n\u1680\u00A0\u1680\r\n", "\r\u1680\u00A0\u1680\r",
-                        "\f\u1680\u00A0\u1680\f", "\u0085\u1680\u00A0\u1680\u0085", "\u2028\u1680\u00A0\u1680\u2028", "\u2029\u1680\u00A0\u1680\u2029"),
-                new TestData(" \n \u00A0 \n ", " \n \u00A0 \n ", " \r\n \u00A0 \r\n ", " \r \u00A0 \r ", " \f \u00A0 \f ", " \u0085 \u00A0 \u0085 ",
-                        " \u2028 \u00A0 \u2028 ", " \u2029 \u00A0 \u2029 ", "\t\n\t\u00A0\t\n\t", "\t\r\n\t\u00A0\t\r\n\t", "\t\r\t\u00A0\t\r\t", "\t\f\t\u00A0\t\f\t",
-                        "\t\u0085\t\u00A0\t\u0085\t", "\t\u2028\t\u00A0\t\u2028\t", "\t\u2029\t\u00A0\t\u2029\t", "\u1680\n\u1680\u00A0\u1680\n\u1680",
-                        "\u1680\r\n\u1680\u00A0\u1680\r\n\u1680", "\u1680\r\u1680\u00A0\u1680\r\u1680", "\u1680\f\u1680\u00A0\u1680\f\u1680",
-                        "\u1680\u0085\u1680\u00A0\u1680\u0085\u1680", "\u1680\u2028\u1680\u00A0\u1680\u2028\u1680", "\u1680\u2029\u1680\u00A0\u1680\u2029\u1680"),
-                new TestData("\u00A0\n_", "\u00A0\n_", "\u00A0\r\n_", "\u00A0\r_", "\u00A0\f_", "\u00A0\u0085_", "\u00A0\u2028_", "\u00A0\u2029_"),
-                new TestData("\n\u00A0", "\n\u00A0", "\r\n\u00A0", "\r\u00A0", "\f\u00A0", "\u0085\u00A0", "\u2028\u00A0", "\u2029\u00A0"),
-                new TestData("\n\u00A0\n", "\n\u00A0\n", "\r\n\u00A0\r\n", "\r\u00A0\r", "\f\u00A0\f", "\u0085\u00A0\u0085", "\u2028\u00A0\u2028", "\u2029\u00A0\u2029"),
-                new TestData("\u00A0\n\n_", "\u00A0\n\n_", "\u00A0\n\r\n_", "\u00A0\n\r_", "\u00A0\n\f_", "\u00A0\n\u0085_", "\u00A0\n\u2028_", "\u00A0\n\u2029_",
-                        "\u00A0\r\n\n_", "\u00A0\r\n\r\n_", "\u00A0\r\n\r_", "\u00A0\r\n\f_", "\u00A0\r\n\u0085_", "\u00A0\r\n\u2028_", "\u00A0\r\n\u2029_", "\u00A0\r\r\n_",
-                        "\u00A0\r\r_", "\u00A0\r\f_", "\u00A0\r\u0085_", "\u00A0\r\u2028_", "\u00A0\r\u2029_", "\u00A0\f\n_", "\u00A0\f\r\n_", "\u00A0\f\r_", "\u00A0\f\f_",
-                        "\u00A0\f\u0085_", "\u00A0\f\u2028_", "\u00A0\f\u2029_", "\u00A0\u0085\n_", "\u00A0\u0085\r\n_", "\u00A0\u0085\r_", "\u00A0\u0085\f_",
-                        "\u00A0\u0085\u0085_", "\u00A0\u0085\u2028_", "\u00A0\u0085\u2029_", "\u00A0\u2028\n_", "\u00A0\u2028\r\n_", "\u00A0\u2028\r_", "\u00A0\u2028\f_",
-                        "\u00A0\u2028\u0085_", "\u00A0\u2028\u2028_", "\u00A0\u2028\u2029_", "\u00A0\u2029\n_", "\u00A0\u2029\r\n_", "\u00A0\u2029\r_", "\u00A0\u2029\f_",
-                        "\u00A0\u2029\u0085_", "\u00A0\u2029\u2028_", "\u00A0\u2029\u2029_"),
-                new TestData("\u00A0\n\n", "\u00A0\n\n", "\u00A0\n\r\n", "\u00A0\n\r", "\u00A0\n\f", "\u00A0\n\u0085", "\u00A0\n\u2028", "\u00A0\n\u2029",
-                        "\u00A0\r\n\n", "\u00A0\r\n\r\n", "\u00A0\r\n\r", "\u00A0\r\n\f", "\u00A0\r\n\u0085", "\u00A0\r\n\u2028", "\u00A0\r\n\u2029", "\u00A0\r\r\n",
-                        "\u00A0\r\r", "\u00A0\r\f", "\u00A0\r\u0085", "\u00A0\r\u2028", "\u00A0\r\u2029", "\u00A0\f\n", "\u00A0\f\r\n", "\u00A0\f\r", "\u00A0\f\f",
-                        "\u00A0\f\u0085", "\u00A0\f\u2028", "\u00A0\f\u2029", "\u00A0\u0085\n", "\u00A0\u0085\r\n", "\u00A0\u0085\r", "\u00A0\u0085\f", "\u00A0\u0085\u0085",
-                        "\u00A0\u0085\u2028", "\u00A0\u0085\u2029", "\u00A0\u2028\n", "\u00A0\u2028\r\n", "\u00A0\u2028\r", "\u00A0\u2028\f", "\u00A0\u2028\u0085",
-                        "\u00A0\u2028\u2028", "\u00A0\u2028\u2029", "\u00A0\u2029\n", "\u00A0\u2029\r\n", "\u00A0\u2029\r", "\u00A0\u2029\f", "\u00A0\u2029\u0085",
-                        "\u00A0\u2029\u2028", "\u00A0\u2029\u2029"),
-                new TestData("\n\n\u00A0", "\n\n\u00A0", "\n\r\n\u00A0", "\n\r\u00A0", "\n\f\u00A0", "\n\u0085\u00A0", "\n\u2028\u00A0", "\n\u2029\u00A0",
-                        "\r\n\n\u00A0", "\r\n\r\n\u00A0", "\r\n\r\u00A0", "\r\n\f\u00A0", "\r\n\u0085\u00A0", "\r\n\u2028\u00A0", "\r\n\u2029\u00A0", "\r\r\n\u00A0",
-                        "\r\r\u00A0", "\r\f\u00A0", "\r\u0085\u00A0", "\r\u2028\u00A0", "\r\u2029\u00A0", "\f\n\u00A0", "\f\r\n\u00A0", "\f\r\u00A0", "\f\f\u00A0",
-                        "\f\u0085\u00A0", "\f\u2028\u00A0", "\f\u2029\u00A0", "\u0085\n\u00A0", "\u0085\r\n\u00A0", "\u0085\r\u00A0", "\u0085\f\u00A0", "\u0085\u0085\u00A0",
-                        "\u0085\u2028\u00A0", "\u0085\u2029\u00A0", "\u2028\n\u00A0", "\u2028\r\n\u00A0", "\u2028\r\u00A0", "\u2028\f\u00A0", "\u2028\u0085\u00A0",
-                        "\u2028\u2028\u00A0", "\u2028\u2029\u00A0", "\u2029\n\u00A0", "\u2029\r\n\u00A0", "\u2029\r\u00A0", "\u2029\f\u00A0", "\u2029\u0085\u00A0",
-                        "\u2029\u2028\u00A0", "\u2029\u2029\u00A0"),
-                new TestData("\n\n\u00A0\n\n", "\n\n\u00A0\n\n", "\n\r\n\u00A0\n\r\n", "\n\r\u00A0\n\r", "\n\f\u00A0\n\f", "\n\u0085\u00A0\n\u0085",
-                        "\n\u2028\u00A0\n\u2028", "\n\u2029\u00A0\n\u2029", "\r\n\n\u00A0\r\n\n", "\r\n\r\n\u00A0\r\n\r\n", "\r\n\r\u00A0\r\n\r", "\r\n\f\u00A0\r\n\f",
-                        "\r\n\u0085\u00A0\r\n\u0085", "\r\n\u2028\u00A0\r\n\u2028", "\r\n\u2029\u00A0\r\n\u2029", "\r\r\n\u00A0\r\r\n", "\r\r\u00A0\r\r", "\r\f\u00A0\r\f",
-                        "\r\u0085\u00A0\r\u0085", "\r\u2028\u00A0\r\u2028", "\r\u2029\u00A0\r\u2029", "\f\n\u00A0\f\n", "\f\r\n\u00A0\f\r\n", "\f\r\u00A0\f\r",
-                        "\f\f\u00A0\f\f", "\f\u0085\u00A0\f\u0085", "\f\u2028\u00A0\f\u2028", "\f\u2029\u00A0\f\u2029", "\u0085\n\u00A0\u0085\n",
-                        "\u0085\r\n\u00A0\u0085\r\n", "\u0085\r\u00A0\u0085\r", "\u0085\f\u00A0\u0085\f", "\u0085\u0085\u00A0\u0085\u0085", "\u0085\u2028\u00A0\u0085\u2028",
-                        "\u0085\u2029\u00A0\u0085\u2029", "\u2028\n\u00A0\u2028\n", "\u2028\r\n\u00A0\u2028\r\n", "\u2028\r\u00A0\u2028\r", "\u2028\f\u00A0\u2028\f",
-                        "\u2028\u0085\u00A0\u2028\u0085", "\u2028\u2028\u00A0\u2028\u2028", "\u2028\u2029\u00A0\u2028\u2029", "\u2029\n\u00A0\u2029\n",
-                        "\u2029\r\n\u00A0\u2029\r\n", "\u2029\r\u00A0\u2029\r", "\u2029\f\u00A0\u2029\f", "\u2029\u0085\u00A0\u2029\u0085", "\u2029\u2028\u00A0\u2029\u2028",
-                        "\u2029\u2029\u00A0\u2029\u2029")
-        };
-        for (TestData t : testData) {
-            t.source.forEach(u -> {
-                String d = TestHelper.toStringDescription(u);
-                String a = target1.apply(u);
-                assertEquals(d, t.expected, a);
-                a = target2.apply(u);
-                assertEquals(d, t.expected, a);
-            });
-        }
-    }
-
     public static class TestData {
 
         //        private final List<SourceValue> source;
@@ -11863,280 +9382,5 @@ public class StringHelperTest {
             this.expected = expected;
         }
     }
-
-//    enum Combination {
-//        NWS_SINGLE(TestValue.NWS_SINGLE),
-//        NWS_MULTI(TestValue.NWS_MULTI),
-//        SPACE(TestValue.SPACE),
-//        TAB(TestValue.TAB),
-//        CR(TestValue.CR),
-//        LF(TestValue.LF),
-//        CRLF(TestValue.CRLF),
-//        LS(TestValue.LS),
-//        PS(TestValue.PS),
-//        SPACE_SPACE(TestValue.SPACE),
-//        SPACE_TAB(TestValue.SPACE, TestValue.TAB),
-//        SPACE_CR(TestValue.SPACE, TestValue.CR),
-//        SPACE_LF(TestValue.SPACE, TestValue.LF),
-//        SPACE_CRLF(TestValue.SPACE, TestValue.CRLF),
-//        SPACE_LS(TestValue.SPACE, TestValue.LS),
-//        SPACE_PS(TestValue.SPACE, TestValue.PS),
-//        TAB_SPACE(TestValue.TAB, TestValue.SPACE),
-//        TAB_TAB(TestValue.TAB, TestValue.TAB),
-//        TAB_CR(TestValue.TAB, TestValue.CR),
-//        TAB_LF(TestValue.TAB, TestValue.LF),
-//        TAB_CRLF(TestValue.TAB, TestValue.CRLF),
-//        TAB_LS(TestValue.TAB, TestValue.LS),
-//        TAB_PS(TestValue.TAB, TestValue.PS),
-//        CR_SPACE(TestValue.CR, TestValue.SPACE),
-//        CR_TAB(TestValue.CR, TestValue.TAB),
-//        CR_CR(TestValue.CR, TestValue.CR),
-//        CR_CRLF(TestValue.CR, TestValue.CRLF),
-//        CR_LS(TestValue.CR, TestValue.LS),
-//        CR_PS(TestValue.CR, TestValue.PS),
-//        LF_SPACE(TestValue.LF, TestValue.SPACE),
-//        LF_TAB(TestValue.LF, TestValue.TAB),
-//        LF_CR(TestValue.LF, TestValue.CR),
-//        LF_LF(TestValue.LF, TestValue.LF),
-//        LF_CRLF(TestValue.LF, TestValue.CRLF),
-//        LF_LS(TestValue.LF, TestValue.LS),
-//        LF_PS(TestValue.LF, TestValue.PS),
-//        CRLF_SPACE(TestValue.CRLF, TestValue.SPACE),
-//        CRLF_TAB(TestValue.CRLF, TestValue.TAB),
-//        CRLF_CR(TestValue.CRLF, TestValue.CR),
-//        CRLF_LF(TestValue.CRLF, TestValue.LF),
-//        CRLF_CRLF(TestValue.CRLF, TestValue.CRLF),
-//        CRLF_LS(TestValue.CRLF, TestValue.LS),
-//        CRLF_PS(TestValue.CRLF, TestValue.PS),
-//        LS_SPACE(TestValue.LS, TestValue.SPACE),
-//        LS_TAB(TestValue.LS, TestValue.TAB),
-//        LS_CR(TestValue.LS, TestValue.CR),
-//        LS_LF(TestValue.LS, TestValue.LF),
-//        LS_CRLF(TestValue.LS, TestValue.CRLF),
-//        LS_LS(TestValue.LS, TestValue.LS),
-//        LS_PS(TestValue.LS, TestValue.PS),
-//        PS_SPACE(TestValue.PS, TestValue.SPACE),
-//        PS_TAB(TestValue.PS, TestValue.TAB),
-//        PS_CR(TestValue.PS, TestValue.CR),
-//        PS_LF(TestValue.PS, TestValue.LF),
-//        PS_CRLF(TestValue.PS, TestValue.CRLF),
-//        PS_LS(TestValue.PS, TestValue.LS),
-//        PS_PS(TestValue.PS, TestValue.PS),
-//        SPACE_CR_SPACE(TestValue.SPACE, TestValue.CR, TestValue.SPACE),
-//        SPACE_CR_TAB(TestValue.SPACE, TestValue.CR, TestValue.TAB),
-//        TAB_CR_SPACE(TestValue.TAB, TestValue.CR, TestValue.SPACE),
-//        TAB_CR_TAB(TestValue.TAB, TestValue.CR, TestValue.TAB),
-//        SPACE_LF_SPACE(TestValue.SPACE, TestValue.LF, TestValue.SPACE),
-//        SPACE_LF_TAB(TestValue.SPACE, TestValue.LF, TestValue.TAB),
-//        TAB_LF_SPACE(TestValue.TAB, TestValue.LF, TestValue.SPACE),
-//        TAB_LF_TAB(TestValue.TAB, TestValue.LF, TestValue.TAB),
-//        SPACE_CRLF_SPACE(TestValue.SPACE, TestValue.CRLF, TestValue.SPACE),
-//        SPACE_CRLF_TAB(TestValue.SPACE, TestValue.CRLF, TestValue.TAB),
-//        TAB_CRLF_SPACE(TestValue.TAB, TestValue.CRLF, TestValue.SPACE),
-//        TAB_CRLF_TAB(TestValue.TAB, TestValue.CRLF, TestValue.TAB),
-//        SPACE_LS_SPACE(TestValue.SPACE, TestValue.LS, TestValue.SPACE),
-//        SPACE_LS_TAB(TestValue.SPACE, TestValue.LS, TestValue.TAB),
-//        TAB_LS_SPACE(TestValue.TAB, TestValue.LS, TestValue.SPACE),
-//        TAB_LS_TAB(TestValue.TAB, TestValue.LS, TestValue.TAB),
-//        SPACE_PS_SPACE(TestValue.SPACE, TestValue.PS, TestValue.SPACE),
-//        SPACE_PS_TAB(TestValue.SPACE, TestValue.PS, TestValue.TAB),
-//        TAB_PS_SPACE(TestValue.TAB, TestValue.PS, TestValue.SPACE),
-//        TAB_PS_TAB(TestValue.TAB, TestValue.PS, TestValue.TAB);
-//
-//        private final List<TestValue> values;
-//        private final boolean whitespace;
-//        private final int lineCount;
-//
-//        private Combination(TestValue singleValue) {
-//            values = Collections.unmodifiableList(Collections.singletonList(singleValue));
-//            whitespace = singleValue.whitespace;
-//            lineCount = (singleValue.lineSeparator) ? 1 : 0;
-//        }
-//
-//        private Combination(TestValue value1, TestValue value2) {
-//            values = Collections.unmodifiableList(Arrays.asList(value1, value2));
-//            whitespace = value1.whitespace && value2.whitespace;
-//            lineCount = (value1.lineSeparator) ? ((value2.lineSeparator) ? 2 : 1) : ((value2.lineSeparator) ? 1 : 0);
-//        }
-//
-//        private Combination(TestValue value1, TestValue value2, TestValue value3) {
-//            values = Collections.unmodifiableList(Arrays.asList(value1, value2, value3));
-//            whitespace = value1.whitespace && value2.whitespace;
-//            lineCount = (value1.lineSeparator) ?
-//                    ((value2.lineSeparator) ? ((value3.lineSeparator) ? 3 : 2) : ((value3.lineSeparator) ? 2 : 1))
-//                    : ((value2.lineSeparator) ? ((value3.lineSeparator) ? 2 : 1) : ((value3.lineSeparator) ? 1 : 0));
-//        }
-//
-//        public int getLineCount() {
-//            return lineCount;
-//        }
-//
-//        public List<TestValue> getValues() {
-//            return values;
-//        }
-//
-//        public boolean isWhitespace() {
-//            return whitespace;
-//        }
-//    }
-//
-//    enum TestValue {
-//        NWS_SINGLE("_", "."),
-//        NWS_MULTI("example", "data", "for", "test"),
-//        SPACE(" ", false),
-//        TAB("\t", false),
-//        CR("\r", true),
-//        LF("\n", true),
-//        CRLF("\r\n", true),
-//        LS("\u2028", true),
-//        PS("\u2029", true);
-//
-//        private final List<String> text;
-//        private final boolean whitespace;
-//        private final boolean lineSeparator;
-//
-//        private TestValue(String text, String alt1, String alt2, String alt3) {
-//            this.text = Collections.unmodifiableList(Arrays.asList(text, alt1, alt2, alt3));
-//            this.whitespace = false;
-//            this.lineSeparator = false;
-//        }
-//        private TestValue(String text, String alt) {
-//            this(text, alt, text, alt);
-//        }
-//        private TestValue(String text, boolean lineSeparator) {
-//            this.text = Collections.unmodifiableList(Arrays.asList(text, text, text, text));
-//            this.whitespace = true;
-//            this.lineSeparator = lineSeparator;
-//        }
-//
-//        public List<String> getText() {
-//            return text;
-//        }
-//
-//        public boolean isWhitespace() {
-//            return whitespace;
-//        }
-//
-//        public boolean isLineSeparator() {
-//            return lineSeparator;
-//        }
-//    }
-//
-//    static class TestData {
-//        private final List<Pair<String, TestValue>> allValueElements;
-//        private final boolean whitespace;
-//        private final String source;
-//        private final List<List<Pair<String, TestValue>>> lines;
-//        private final String description;
-//
-//        TestData(Stream<TestValue> values) {
-//            final List<Pair<String, TestValue>> allValues = new ArrayList<>();
-//            final List<List<Pair<String, TestValue>>> lines = new ArrayList<>();
-//            final List<Pair<String, TestValue>> currentLine = new ArrayList<>();
-//            final StringBuilder description = new StringBuilder();
-//            final StringBuilder source = new StringBuilder();
-//            final HashMap<TestValue, Integer> alternations = new HashMap<>();
-//            whitespace = values.filter(u -> {
-//                Pair<String, TestValue> s;
-//                if (alternations.containsKey(u)) {
-//                    int i = alternations.get(u);
-//                    alternations.put(u, (i == 3) ? 0 : i + 1);
-//                    s = new Pair<>(u.text.get(i), u);
-//                } else {
-//                    alternations.put(u, 1);
-//                    s = new Pair<>(u.text.get(0), u);
-//                }
-//                allValues.add(s);
-//                source.append(s.first);
-//                if (u.lineSeparator) {
-//                    List<Pair<String, TestValue>> l = new ArrayList<>();
-//                    Collections.addAll(currentLine);
-//                    lines.add(Collections.unmodifiableList(l));
-//                    currentLine.clear();
-//                    description.append("[" + u.name() + "]");
-//                } else {
-//                    currentLine.add(s);
-//                    description.append((u.whitespace) ? "[" + u.name() + "]" : s.first);
-//                }
-//                return !u.whitespace;
-//            }).count() == 0;
-//            lines.add(currentLine);
-//            allValueElements = Collections.unmodifiableList(allValues);
-//            this.source = source.toString();
-//            this.description = description.toString();
-//            this.lines = Collections.unmodifiableList(lines);
-//        }
-//
-//        public String getSource() {
-//            return source;
-//        }
-//
-//        public List<List<Pair<String, TestValue>>> getLines() {
-//            return lines;
-//        }
-//
-//        public List<Pair<String, TestValue>> getAllValueElements() {
-//            return allValueElements;
-//        }
-//
-//        public String getDescription() {
-//            return description;
-//        }
-//
-//        public boolean isWhitespace() {
-//            return whitespace;
-//        }
-//
-//        static TestData create(Combination ...values) {
-//            Stream.Builder<TestValue> builder = Stream.builder();
-//            for (Combination c : values) {
-//                c.values.forEach(t -> builder.accept(t));
-//            }
-//            return new TestData(builder.build());
-//        }
-//
-//        static TestData create(TestData source, Combination ...values) {
-//            Stream.Builder<TestValue> builder = Stream.builder();
-//            source.allValueElements.forEach(t -> builder.accept(t.second));
-//            for (Combination c : values) {
-//                c.values.forEach(t -> builder.accept(t));
-//            }
-//            return new TestData(builder.build());
-//        }
-//
-//        static List<TestData> createList(Stream<Combination> sourceElements, int maxLength) {
-//            ArrayList<Combination> nws = new ArrayList<>();
-//            ArrayList<Combination> ws = new ArrayList<>();
-//            sourceElements.forEach(t -> {
-//                if (t.whitespace) {
-//                    ws.add(t);
-//                } else {
-//                    nws.add(t);
-//                }
-//            });
-//            ArrayList<TestData> result = new ArrayList<>();
-//            ws.forEach(t -> result.add(TestData.create(t)));
-//            nws.forEach(t -> result.add(TestData.create(t)));
-//            int start = 0;
-//            for (int i = 1; i < maxLength; i++) {
-//                int end = result.size();
-//                ArrayList<Combination> list = ((i % 2) == 1) ? ws : nws;
-//                for (int n = start; n < end; n++) {
-//                    TestData d = result.get(n);
-//                    list.forEach(t -> result.add(TestData.create(d, t)));
-//                }
-//                start = end;
-//            }
-//            return result;
-//        }
-//
-//        static List<TestData> createList(int maxLength, Predicate<Combination> filter) {
-//            return createList(Arrays.stream(Combination.values()).filter(filter), maxLength);
-//        }
-//
-//        static List<TestData> createList(int maxLength) {
-//            return createList(Arrays.stream(Combination.values()), maxLength);
-//        }
-//    }
 
 }
