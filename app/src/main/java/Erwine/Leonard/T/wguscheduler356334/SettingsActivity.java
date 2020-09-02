@@ -38,21 +38,21 @@ public class SettingsActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void onResetDatabaseButtonClick(View view) {
-        new AlertDialog.Builder(this).setTitle(R.string.reset_database).setMessage(R.string.reset_db_confirm).setPositiveButton(R.string.yes, (dialogInterface, i1) -> {
-            dbLoader.resetDatabase().subscribe(this::finish, (throwable) ->
-                    new AlertDialog.Builder(this).setTitle(R.string.reset_db_error_title)
-                            .setMessage(getString(R.string.reset_db_error_message, throwable.getMessage())).setCancelable(false).show()
-            );
-        }).setNegativeButton(R.string.no, null).show();
+        //noinspection ResultOfMethodCallIgnored
+        new AlertDialog.Builder(this).setTitle(R.string.reset_database).setMessage(R.string.reset_db_confirm).setPositiveButton(R.string.yes,
+                (dialogInterface, i1) -> dbLoader.resetDatabase().subscribe(this::finish, (throwable) ->
+                        new AlertDialog.Builder(this).setTitle(R.string.reset_db_error_title)
+                                .setMessage(getString(R.string.reset_db_error_message, throwable.getMessage())).setCancelable(false).show()
+                )).setNegativeButton(R.string.no, null).show();
     }
 
     private void onAddSampleDataButtonClick(View view) {
-        new AlertDialog.Builder(this).setTitle(R.string.add_sample_data).setMessage(R.string.add_sample_data_confirm).setPositiveButton(R.string.yes, (dialogInterface, i1) -> {
-            dbLoader.populateSampleData().subscribe(this::finish, (throwable) ->
-                    new AlertDialog.Builder(this).setTitle(R.string.add_sample_data_error_title)
-                            .setMessage(getString(R.string.add_sample_data_error_message, throwable.getMessage())).setCancelable(false).show()
-            );
-        }).setNegativeButton(R.string.no, null).show();
+        //noinspection ResultOfMethodCallIgnored
+        new AlertDialog.Builder(this).setTitle(R.string.add_sample_data).setMessage(R.string.add_sample_data_confirm).setPositiveButton(R.string.yes,
+                (dialogInterface, i1) -> dbLoader.populateSampleData().subscribe(this::finish, (throwable) ->
+                        new AlertDialog.Builder(this).setTitle(R.string.add_sample_data_error_title)
+                                .setMessage(getString(R.string.add_sample_data_error_message, throwable.getMessage())).setCancelable(true).show()
+                )).setNegativeButton(R.string.no, null).show();
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
