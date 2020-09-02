@@ -67,7 +67,7 @@
     <string name="add_sample_data">Add Sample Data</string>
     <string name="all_data_delete_warning">Warning! These options will delete all data stored by this app!</string>
     <string name="add_sample_data_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
-    <string name="add_sample_data_error_title">Ad Sample Data Error</string>
+    <string name="add_sample_data_error_title">Add Sample Data Error</string>
     <string name="add_sample_data_error_message">An unexpected error has occurred while populating sample data: %s</string>
     <string name="reset_database">Reset Database</string>
     <string name="reset_db_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
