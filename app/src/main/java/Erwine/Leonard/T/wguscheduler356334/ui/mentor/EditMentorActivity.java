@@ -155,8 +155,8 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onMentorEntityChanged(MentorEntity mentorEntity) {
         mentorNameEditText.setText(mentorEntity.getName());
-        emailAddresses = mentorEntity.getEmailAddresses_obsolete();
-        phoneNumbers = mentorEntity.getPhoneNumbers_obsolete();
+        emailAddresses = IndexedStringList.of(mentorEntity.getEmailAddresses());
+        phoneNumbers = IndexedStringList.of(mentorEntity.getPhoneNumbers());
         notes = mentorEntity.getNotes();
         View view = editMentorViewPager.getChildAt(editMentorViewPager.getCurrentItem());
         if (currentTabFragment instanceof EmailAddressessFragment) {

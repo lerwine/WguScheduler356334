@@ -17,7 +17,6 @@ import java.util.function.Function;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.MentorDAO;
-import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
@@ -25,6 +24,9 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
         @Index(value = MentorEntity.COLNAME_NAME, name = MentorEntity.INDEX_NAME, unique = true)
 })
 public class MentorEntity {
+
+    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
+    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
 
     //<editor-fold defaultstate="collapsed" desc="Static Members" >
 
@@ -54,41 +56,8 @@ public class MentorEntity {
     public static final String SAMPLE_MENTOR_MALCOLM_WABARA = "Malcolm Wabara";
     public static final String SAMPLE_MENTOR_MARK_KINKEAD = "Mark Kinkead";
     public static final String SAMPLE_MENTOR_ALVARO_ESCOBAR = "Alvaro Escobar";
-    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
-    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
-
-    static HashMap<String, MentorEntity> populateSampleData(AppDb appDb) {
-        MentorDAO dao = appDb.mentorDAO();
-        dao.insertAllItems(
-                new MentorEntity(SAMPLE_MENTOR_SCOTT_STROMBERG, "", IndexedStringList.of("1-877-435-7948 ext. 4750"), IndexedStringList.of("sstromberg@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_ANDY_DOREN, "", IndexedStringList.of(""), IndexedStringList.of("andy.doren@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_KATIE_CRAIG, "", IndexedStringList.of("1-877-435-7948 ext. 6695"), IndexedStringList.of("Katie.Craig@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_STEVEN_HARRIS, "", IndexedStringList.of("1-877-435-7948  x4023"), IndexedStringList.of("steven.harris@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_SABRENA_PARTON, "", IndexedStringList.of("1-877-435-7948 ext 6467"), IndexedStringList.of("sabrena.parton@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_ABIGAIL_SCHEG, "", IndexedStringList.of(""), IndexedStringList.of("abigail.scheg@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_CONSTANCE_BLANSON, "", IndexedStringList.of(""), IndexedStringList.of("constance.blanson@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_JEFF_EDMUNDS, "", IndexedStringList.of("877-435-7948, ext 5925"), IndexedStringList.of("jeff.edmunds@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_JESSICA_SHIELDS, "", IndexedStringList.of("1.877.435.7948 Ext. 4198"), IndexedStringList.of("cmweb@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_MICHAEL_SMITH, "", IndexedStringList.of(""), IndexedStringList.of("m.smith@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_ED_LAVIERI, "", IndexedStringList.of(""), IndexedStringList.of("ed.lavieri@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_MASON_MCWATTERS, "", IndexedStringList.of("1.877.435.7948 Ext. 5532"), IndexedStringList.of("mason.mcwatters@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_KANDI_DUFF, "", IndexedStringList.of("1.877.435.7948 Ext. 4090"), IndexedStringList.of("kandi.duff@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_JIM_JIVIDEN, "", IndexedStringList.of("801-924-4510\n1-877-435-7948 x4510"), IndexedStringList.of("jim.jividen@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_NICK_MEYER, "", IndexedStringList.of("1-877-435-7948 ext. 2337"), IndexedStringList.of("nick.meyer@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_RANDY_RUTLEDGE, "", IndexedStringList.of("1.877.435.7948 Ext. 8246"), IndexedStringList.of("randy.rutledge@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_MARIA_SCHENK, "", IndexedStringList.of("1.877.435.7948 Ext. 4029"), IndexedStringList.of("maria.schenk@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_JOE_BARNHART, "", IndexedStringList.of("1.877.435.7948 Ext. 4889"), IndexedStringList.of("joe.barnhart@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_WANDA_BURWICK, "", IndexedStringList.of(""), IndexedStringList.of("wanda.burwick@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_CHARLES_LIVELY, "", IndexedStringList.of("(385) 428-4645"), IndexedStringList.of("charles.lively@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_MALCOLM_WABARA, "", IndexedStringList.of("(385) 428-5006"), IndexedStringList.of("malcolm.wabara@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_MARK_KINKEAD, "", IndexedStringList.of("1-385-428-3617"), IndexedStringList.of("mark.kinkead@wgu.edu")),
-                new MentorEntity(SAMPLE_MENTOR_ALVARO_ESCOBAR, "", IndexedStringList.of("(385) 428-8835"), IndexedStringList.of("alvaro.escobar@wgu.edu"))
-        );
-        List<MentorEntity> allItems = dao.getAllItems();
-        HashMap<String, MentorEntity> allMentors = new HashMap<>();
-        allItems.forEach(t -> allMentors.put(t.name, t));
-        return allMentors;
-    }
+    @Ignore
+    private String altPhoneNumbers;
 
     //</editor-fold>
 
@@ -99,11 +68,11 @@ public class MentorEntity {
     private Integer id;
     @ColumnInfo(name = COLNAME_NAME)
     private String name;
-    private IndexedStringList phoneNumbers_obsolete;
     @Ignore
     private String primaryPhone;
+    @Ignore
+    private String altEmailAddresses;
     private String phoneNumbers;
-    private IndexedStringList emailAddresses_obsolete;
     @Ignore
     private String primaryEmail;
     private String emailAddresses;
@@ -111,21 +80,54 @@ public class MentorEntity {
     @Ignore
     private LiveData<List<CourseEntity>> courses;
 
+    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses, int id) {
+        this(name, notes, phoneNumbers, emailAddresses);
+        this.id = id;
+    }
+
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Constructors">
 
-    public MentorEntity(String name, String notes, IndexedStringList phoneNumbers_obsolete, IndexedStringList emailAddresses_obsolete, int id) {
-        this(name, notes, phoneNumbers_obsolete, emailAddresses_obsolete);
-        this.id = id;
-    }
-
     @Ignore
-    public MentorEntity(String name, String notes, IndexedStringList phoneNumbers_obsolete, IndexedStringList emailAddresses_obsolete) {
+    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses) {
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
-        this.phoneNumbers_obsolete = phoneNumbers_obsolete;
-        this.emailAddresses_obsolete = emailAddresses_obsolete;
+        this.phoneNumbers = MULTI_LINE_NORMALIZER.apply(phoneNumbers);
+        this.emailAddresses = MULTI_LINE_NORMALIZER.apply(emailAddresses);
+    }
+
+    static HashMap<String, MentorEntity> populateSampleData(AppDb appDb) {
+        MentorDAO dao = appDb.mentorDAO();
+        dao.insertAllItems(
+                new MentorEntity(SAMPLE_MENTOR_SCOTT_STROMBERG, "", "1-877-435-7948 ext. 4750", "sstromberg@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_ANDY_DOREN, "", "", "andy.doren@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_KATIE_CRAIG, "", "1-877-435-7948 ext. 6695", "Katie.Craig@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_STEVEN_HARRIS, "", "1-877-435-7948  x4023", "steven.harris@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_SABRENA_PARTON, "", "1-877-435-7948 ext 6467", "sabrena.parton@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_ABIGAIL_SCHEG, "", "", "abigail.scheg@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_CONSTANCE_BLANSON, "", "", "constance.blanson@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_JEFF_EDMUNDS, "", "877-435-7948, ext 5925", "jeff.edmunds@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_JESSICA_SHIELDS, "", "1.877.435.7948 Ext. 4198", "cmweb@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_MICHAEL_SMITH, "", "", "m.smith@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_ED_LAVIERI, "", "", "ed.lavieri@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_MASON_MCWATTERS, "", "1.877.435.7948 Ext. 5532", "mason.mcwatters@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_KANDI_DUFF, "", "1.877.435.7948 Ext. 4090", "kandi.duff@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_JIM_JIVIDEN, "", "801-924-4510\n1-877-435-7948 x4510", "jim.jividen@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_NICK_MEYER, "", "1-877-435-7948 ext. 2337", "nick.meyer@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_RANDY_RUTLEDGE, "", "1.877.435.7948 Ext. 8246", "randy.rutledge@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_MARIA_SCHENK, "", "1.877.435.7948 Ext. 4029", "maria.schenk@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_JOE_BARNHART, "", "1.877.435.7948 Ext. 4889", "joe.barnhart@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_WANDA_BURWICK, "", "", "wanda.burwick@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_CHARLES_LIVELY, "", "(385) 428-4645", "charles.lively@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_MALCOLM_WABARA, "", "(385) 428-5006", "malcolm.wabara@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_MARK_KINKEAD, "", "1-385-428-3617", "mark.kinkead@wgu.edu"),
+                new MentorEntity(SAMPLE_MENTOR_ALVARO_ESCOBAR, "", "(385) 428-8835", "alvaro.escobar@wgu.edu")
+        );
+        List<MentorEntity> allItems = dao.getAllItems();
+        HashMap<String, MentorEntity> allMentors = new HashMap<>();
+        allItems.forEach(t -> allMentors.put(t.name, t));
+        return allMentors;
     }
 
     @Ignore
@@ -151,7 +153,7 @@ public class MentorEntity {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = SINGLE_LINE_NORMALIZER.apply(name);
     }
 
     public String getNotes() {
@@ -162,55 +164,115 @@ public class MentorEntity {
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
-    public String getPrimaryPhone() {
-        return primaryPhone;
-    }
-
-    public void setPrimaryPhone(String primaryPhone) {
-        this.primaryPhone = primaryPhone;
-    }
-
-    public String getPhoneNumbers() {
+    public synchronized String getPhoneNumbers() {
+        if (null == phoneNumbers) {
+            if (primaryPhone.isEmpty())
+                phoneNumbers = altPhoneNumbers;
+            else if (altPhoneNumbers.isEmpty())
+                phoneNumbers = primaryPhone;
+            else
+                phoneNumbers = primaryPhone + "\n" + altPhoneNumbers;
+        }
         return phoneNumbers;
     }
 
-    public void setPhoneNumbers(String phoneNumbers) {
-        this.phoneNumbers = phoneNumbers;
+    public synchronized void setPhoneNumbers(String phoneNumbers) {
+        this.phoneNumbers = MULTI_LINE_NORMALIZER.apply(phoneNumbers);
+        primaryPhone = altPhoneNumbers = null;
     }
 
-    public synchronized IndexedStringList getPhoneNumbers_obsolete() {
-        return phoneNumbers_obsolete;
+    public synchronized String getPrimaryPhone() {
+        if (null == primaryPhone)
+            calculatePrimaryAndAltPhone();
+        return primaryPhone;
     }
 
-    public synchronized void setPhoneNumbers_obsolete(IndexedStringList phoneNumbers_obsolete) {
-        this.phoneNumbers_obsolete = phoneNumbers_obsolete;
+    public synchronized void setPrimaryPhone(String primaryPhone) {
+        if (null == altPhoneNumbers)
+            calculatePrimaryAndAltPhone();
+        this.primaryPhone = SINGLE_LINE_NORMALIZER.apply(primaryPhone);
+        phoneNumbers = null;
     }
 
-    public String getPrimaryEmail() {
-        return primaryEmail;
+    public synchronized String getAltPhoneNumbers() {
+        if (null == altPhoneNumbers)
+            calculatePrimaryAndAltPhone();
+        return altPhoneNumbers;
     }
 
-    public void setPrimaryEmail(String primaryEmail) {
-        this.primaryEmail = primaryEmail;
+    public synchronized void setAltPhoneNumbers(String altPhoneNumbers) {
+        if (null == primaryPhone)
+            calculatePrimaryAndAltPhone();
+        this.altPhoneNumbers = MULTI_LINE_NORMALIZER.apply(altPhoneNumbers);
+        phoneNumbers = null;
     }
 
-    public String getEmailAddresses() {
+    public synchronized String getEmailAddresses() {
+        if (null == emailAddresses) {
+            if (primaryEmail.isEmpty())
+                emailAddresses = altEmailAddresses;
+            else if (altEmailAddresses.isEmpty())
+                emailAddresses = primaryEmail;
+            else
+                emailAddresses = primaryEmail + "\n" + altEmailAddresses;
+        }
         return emailAddresses;
     }
 
-    public void setEmailAddresses(String emailAddresses) {
-        this.emailAddresses = emailAddresses;
+    public synchronized void setEmailAddresses(String emailAddresses) {
+        this.emailAddresses = MULTI_LINE_NORMALIZER.apply(emailAddresses);
+        primaryEmail = altEmailAddresses = null;
     }
 
-    public synchronized IndexedStringList getEmailAddresses_obsolete() {
-        return emailAddresses_obsolete;
+    public synchronized String getPrimaryEmail() {
+        if (null == primaryEmail)
+            calculatePrimaryAndAltEmail();
+        return primaryEmail;
     }
 
-    public synchronized void setEmailAddresses_obsolete(IndexedStringList emailAddresses_obsolete) {
-        this.emailAddresses_obsolete = emailAddresses_obsolete;
+    public synchronized void setPrimaryEmail(String primaryEmail) {
+        if (null == altEmailAddresses)
+            calculatePrimaryAndAltEmail();
+        this.primaryEmail = SINGLE_LINE_NORMALIZER.apply(primaryEmail);
+        emailAddresses = null;
+    }
+
+    public synchronized String getAltEmailAddresses() {
+        if (null == altEmailAddresses)
+            calculatePrimaryAndAltEmail();
+        return altEmailAddresses;
+    }
+
+    public synchronized void setAltEmailAddresses(String altEmailAddresses) {
+        if (null == primaryEmail)
+            calculatePrimaryAndAltEmail();
+        this.altEmailAddresses = MULTI_LINE_NORMALIZER.apply(altEmailAddresses);
+        emailAddresses = null;
     }
 
     //</editor-fold>
+
+    private void calculatePrimaryAndAltPhone() {
+        int i = phoneNumbers.indexOf('\n');
+        if (i > 0) {
+            altPhoneNumbers = phoneNumbers.substring(i + 1);
+            primaryPhone = phoneNumbers.substring(0, i);
+        } else {
+            primaryPhone = phoneNumbers;
+            altPhoneNumbers = "";
+        }
+    }
+
+    private void calculatePrimaryAndAltEmail() {
+        int i = emailAddresses.indexOf('\n');
+        if (i > 0) {
+            altEmailAddresses = emailAddresses.substring(i + 1);
+            primaryEmail = emailAddresses.substring(0, i);
+        } else {
+            primaryEmail = emailAddresses;
+            altEmailAddresses = "";
+        }
+    }
 
     @Ignore
     public LiveData<List<CourseEntity>> getCourses(Context context) {
@@ -235,8 +297,10 @@ public class MentorEntity {
         }
         return null == that.id &&
                 name.equals(that.name) &&
-                phoneNumbers_obsolete.equals(that.phoneNumbers_obsolete) &&
-                emailAddresses_obsolete.equals(that.emailAddresses_obsolete) &&
+                primaryPhone.equals(that.primaryPhone) &&
+                primaryEmail.equals(that.primaryEmail) &&
+                altPhoneNumbers.equals(that.altPhoneNumbers) &&
+                altEmailAddresses.equals(that.altEmailAddresses) &&
                 notes.equals(that.notes);
     }
 
@@ -245,7 +309,7 @@ public class MentorEntity {
         if (id > 0) {
             return id;
         }
-        return Objects.hash(id, name, notes, phoneNumbers_obsolete, emailAddresses_obsolete);
+        return Objects.hash(id, name, primaryPhone, primaryEmail, altPhoneNumbers, altEmailAddresses, notes);
     }
 
     @SuppressWarnings("NullableProblems")
@@ -254,8 +318,10 @@ public class MentorEntity {
         return "MentorEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", phoneNumbers=" + phoneNumbers_obsolete +
-                ", emailAddresses=" + emailAddresses_obsolete +
+                ", primaryPhone=" + primaryPhone +
+                ", phoneNumbers=" + altPhoneNumbers +
+                ", primaryEmail=" + primaryEmail +
+                ", emailAddresses=" + altEmailAddresses +
                 ", notes='" + notes + '\'' +
                 '}';
     }

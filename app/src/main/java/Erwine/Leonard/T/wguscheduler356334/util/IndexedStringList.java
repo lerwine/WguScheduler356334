@@ -481,7 +481,6 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                     super.postValue(value);
                 }
             };
-            // FIXME: Fails to be instantiated from background thread - Error thrown: Cannot invoke ObserveForever on a background thread.
             lineNumber.observeForever(t -> raiseLineNumberChanged());
             normalizedValue.observeForever(t -> raiseContentChanged());
             empty.observeForever(t -> raiseEmptyChanged());

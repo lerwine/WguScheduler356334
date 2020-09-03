@@ -33,11 +33,11 @@ public class EditMentorViewModel extends AndroidViewModel {
     public Completable save(String name, IndexedStringList emailAddresses, IndexedStringList phoneNumbers, String notes) {
         MentorEntity entity = liveData.getValue();
         if (null == entity) {
-            entity = new MentorEntity(name, notes, emailAddresses, phoneNumbers);
+            entity = new MentorEntity(name, notes, emailAddresses.toString(), phoneNumbers.toString());
         } else {
             entity.setName(name);
-            entity.setEmailAddresses_obsolete(emailAddresses);
-            entity.setPhoneNumbers_obsolete(phoneNumbers);
+            entity.setEmailAddresses(emailAddresses.toString());
+            entity.setPhoneNumbers(phoneNumbers.toString());
             entity.setNotes(notes);
         }
         Completable result = dbLoader.saveMentor(entity);
