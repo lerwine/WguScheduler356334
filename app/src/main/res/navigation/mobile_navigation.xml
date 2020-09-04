@@ -24,6 +24,6 @@
         tools:layout="@layout/fragment_notifications" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="Erwine.Leonard.T.wguscheduler356334.SettingsActivity.SettingsFragment"
+        android:name="Erwine.Leonard.T.wguscheduler356334.SettingsFragment"
         android:label="SettingsFragment" />
 </navigation>

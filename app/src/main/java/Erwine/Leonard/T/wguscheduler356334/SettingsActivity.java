@@ -8,7 +8,6 @@ import android.view.View;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceFragmentCompat;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 
@@ -56,10 +55,4 @@ public class SettingsActivity extends AppCompatActivity {
                 )).setNegativeButton(R.string.no, null).show();
     }
 
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.root_preferences, rootKey);
-        }
-    }
 }
