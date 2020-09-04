@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 public class StringLineIterator implements Iterator<String> {
     private final String source;
@@ -12,6 +13,14 @@ public class StringLineIterator implements Iterator<String> {
     public StringLineIterator(String source) {
         this.source = source;
         reset();
+    }
+
+    public static Stream<String> getLines(String source) {
+        StringLineIterator iterator = new StringLineIterator(source);
+        Stream.Builder<String> builder = Stream.builder();
+        while (iterator.hasNext())
+            builder.accept(iterator.next());
+        return builder.build();
     }
 
     public static StringLineIterator create(String source, boolean trimLineStart, boolean trimLineEnd) {

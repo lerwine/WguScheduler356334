@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveIntegerData;
 import Erwine.Leonard.T.wguscheduler356334.util.live.PostTrackingLiveData;
@@ -167,40 +168,47 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         return "";
     }
 
+    /**
+     * Re-populate current {@code IndexedStringList} with lines parsed from the specified string.
+     *
+     * @param text The text containing lines separated by newline sequences.
+     * @return {@code true} if the current {@code IndexedStringList} was changed; otherwise {@code false}.
+     */
     public synchronized boolean setText(String text) {
-        if (null != text && !text.isEmpty()) {
-            Iterator<String> sourceIterator = StringLineIterator.create(text, true, true);
-            String line = sourceIterator.next();
-            while (line.isEmpty() && sourceIterator.hasNext()) {
-                line = sourceIterator.next();
-            }
-            if (!line.isEmpty()) {
-                backingList.clear();
+        Optional<Stream<String>> lines = CollectionHelper.ifAnyElementDiffers(
+                backingList.iterator(),
+                StringLineIterator.getLines(text).iterator(), SINGLE_LINE_NORMALIZER,
+                t -> !t.isEmpty(),
+                (a, b) -> a.normalizedValue.getPostedValue().equals(b)
+        );
+        return lines.map(t -> {
+            Iterator<String> iterator = t.iterator();
+            if (iterator.hasNext()) {
+                if (!backingList.isEmpty())
+                    clearImpl();
                 int index = 0;
                 do {
-                    Item item = new Item(line);
+                    Item item = new Item(iterator.next());
                     item.observeContentChange(contentChangeObserver);
                     item.observeEmptyChange(emptyStateChangeObserver);
                     item.lineNumber.set(++index);
                     backingList.add(item);
-                    line = sourceIterator.next();
-                    while (line.isEmpty() && sourceIterator.hasNext()) {
-                        line = sourceIterator.next();
-                    }
-                } while (!line.isEmpty());
-                raiseListChanged();
-                return true;
+                } while (iterator.hasNext());
+            } else {
+                if (!backingList.isEmpty()) {
+                    if (backingList.size() == 1 && backingList.get(0).normalizedValue.getPostedValue().isEmpty())
+                        return false;
+                    clearImpl();
+                }
+                Item item = new Item("");
+                item.observeContentChange(contentChangeObserver);
+                item.observeEmptyChange(emptyStateChangeObserver);
+                item.lineNumber.set(1);
+                backingList.add(item);
             }
-        }
-        if (!backingList.isEmpty()) {
-            if (backingList.size() == 1 && backingList.get(0).normalizedValue.getPostedValue().isEmpty()) {
-                return false;
-            }
-            clearImpl();
-        }
-        backingList.add(new Item(""));
-        raiseListChanged();
-        return true;
+            raiseListChanged();
+            return true;
+        }).orElse(false);
     }
 
     @Override
