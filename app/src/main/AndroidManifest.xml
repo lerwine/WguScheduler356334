@@ -13,11 +13,7 @@
         tools:ignore="AllowBackup">
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
-        <activity
-            android:name=".ui.mentor.EditMentorActivity"
-            android:label="@string/title_activity_edit_mentor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_settings" />
         <activity
             android:name=".ui.term.EditTermActivity"
             android:label="@string/title_activity_edit_term"
