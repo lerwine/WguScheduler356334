@@ -61,4 +61,8 @@
     <string name="reset_db_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
     <string name="reset_db_error_title">Reset Database Error</string>
     <string name="reset_db_error_message">An unexpected error has occurred while resetting the database: %s</string>
+    <string name="title_mentor_list">Mentors</string>
+    <string name="title_mentor_detail">Mentor Detail</string>
+    <string name="loading_elipsis">Loading...</string>
+    <string name="load_failed_parentheses">(load failed)</string>
 </resources>

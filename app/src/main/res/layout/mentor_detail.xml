@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mentor_detail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".ui.mentor.MentorDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/mentorNameLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="Label for mentor name"
+            android:text="@string/mentor_name"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/editMentorNameImageButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/mentorNameTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="Name of mentor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/editMentorNameImageButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mentorNameLabelTextView" />
+
+        <ImageButton
+            android:id="@+id/editMentorNameImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:contentDescription="Edit mentor name button"
+            android:src="@drawable/ic_edit_12"
+            android:tint="@color/colorPrimaryInverse"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/phoneNumberLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="Label for phone numbers"
+            android:gravity="bottom"
+            android:text="@string/phone_number"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/phoneNumbersTextView"
+            app:layout_constraintEnd_toStartOf="@+id/editPhoneNumbersImageButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/phoneNumbersTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="Mentor phone numbers"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editPhoneNumbersImageButton" />
+
+        <ImageButton
+            android:id="@+id/editPhoneNumbersImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:contentDescription="Edit mentor phone numbers button"
+            android:src="@drawable/ic_edit_12"
+            android:tint="@color/colorPrimaryInverse"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/emailAddressLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="Email addresses label"
+            android:gravity="bottom"
+            android:text="@string/email_address"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/emailAddressesTextView"
+            app:layout_constraintEnd_toStartOf="@+id/editEmailAddressesImageButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/emailAddressesTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="Mentor email addresses"
+            android:scrollbars="horizontal|vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editEmailAddressesImageButton" />
+
+        <ImageButton
+            android:id="@+id/editEmailAddressesImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:contentDescription="Edit mentor email addresses button"
+            android:src="@drawable/ic_edit_12"
+            android:tint="@color/colorPrimaryInverse"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/notesLabelTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/notes"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/notesEditTextMultiLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="Notes related to mentor"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:scrollbars="horizontal|vertical" />
+
+    <Button
+        android:id="@+id/saveChangesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:text="@string/save_changes"
+        android:textColor="@color/colorPrimaryInverse" />
+
+</LinearLayout>

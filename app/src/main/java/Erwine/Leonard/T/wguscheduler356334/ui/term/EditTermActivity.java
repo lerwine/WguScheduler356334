@@ -86,7 +86,7 @@ public class EditTermActivity extends AppCompatActivity {
             int id = extras.getInt(EXTRAS_KEY_TERM_ID);
             itemViewModel.load(id).onErrorReturn((throwable) -> {
                 new AlertDialog.Builder(this).setTitle(R.string.read_error_title)
-                        .setMessage(getString(R.string.read_error_message, throwable.getMessage())).setCancelable(false).show();
+                        .setMessage(getString(R.string.read_error_message, throwable.getMessage())).setCancelable(true).show();
                 finish();
                 return null;
             }).subscribe();
