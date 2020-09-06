@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/mentorNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:textColor="@color/color_primary_dark"
+        android:textColorHighlight="@color/color_primary"
+        android:textColorLink="@color/color_accent"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/phoneOrEmailTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/color_primary_dark"
+        android:textColorHighlight="@color/color_primary"
+        android:textColorLink="@color/color_accent" />
+</LinearLayout>

@@ -27,7 +27,7 @@ public interface TermDAO {
     Completable insertAll(List<TermEntity> terms);
 
     @Insert
-    void insertAllItems(TermEntity... items);
+    void insertAllItems(List<TermEntity> items);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<TermEntity> terms);

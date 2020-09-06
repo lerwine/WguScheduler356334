@@ -5,17 +5,14 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.room.Entity;
 
 import java.time.LocalDate;
 
-import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-@Entity(tableName = AppDb.TABLE_NAME_TERMS)
 public class EditTermViewModel extends AndroidViewModel {
 
     private final MutableLiveData<TermEntity> liveData;

@@ -2,7 +2,6 @@ package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,7 +33,7 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.term_list_item, parent, false);
+        View view = inflater.inflate(R.layout.fragment_term_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -58,11 +55,11 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
         } else {
             holder.text_view_term_list_item_range.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
         }
-        holder.button_term_list_item_edit.setOnClickListener((view) -> {
-            Intent intent = new Intent(context, EditTermActivity.class);
-            intent.putExtra(EditTermActivity.EXTRAS_KEY_TERM_ID, item.getId());
-            context.startActivity(intent);
-        });
+//        holder.mView.setOnClickListener(v -> {
+//            Intent intent = new Intent(context, EditTermActivity.class);
+//            intent.putExtra(EditTermActivity.EXTRAS_KEY_TERM_ID, item.getId());
+//            context.startActivity(intent);
+//        });
     }
 
     @Override
@@ -71,15 +68,15 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
         private TextView text_view_term_list_item_name;
         private TextView text_view_term_list_item_range;
-        private FloatingActionButton button_term_list_item_edit;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            mView = itemView;
             text_view_term_list_item_name = itemView.findViewById(R.id.termNameTextView);
             text_view_term_list_item_range = itemView.findViewById(R.id.termRangeTextView);
-            button_term_list_item_edit = itemView.findViewById(R.id.editTermButton);
         }
 
     }

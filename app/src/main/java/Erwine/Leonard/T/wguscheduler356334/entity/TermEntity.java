@@ -10,14 +10,12 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.db.TermDAO;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
@@ -29,16 +27,6 @@ public class TermEntity {
     public static final String INDEX_NAME = "IDX_TERM_NAME";
     public static final String COLNAME_ID = "id";
     public static final String COLNAME_NAME = "name";
-    public static final String SAMPLE_TERM_1 = "Term 1";
-    public static final String SAMPLE_TERM_2 = "Term 2";
-    public static final String SAMPLE_TERM_3 = "Term 3";
-    public static final String SAMPLE_TERM_4 = "Term 4";
-    public static final String SAMPLE_TERM_5 = "Term 5";
-    public static final String SAMPLE_TERM_6 = "Term 6";
-    public static final String SAMPLE_TERM_7 = "Term 7";
-    public static final String SAMPLE_TERM_8 = "Term 8";
-    public static final String SAMPLE_TERM_9 = "Term 9";
-    public static final String SAMPLE_TERM_10 = "Term 10";
     private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
     private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
 
@@ -150,42 +138,5 @@ public class TermEntity {
                 ", end=" + end +
                 ", notes='" + notes + '\'' +
                 '}';
-    }
-
-    public static void populateSampleData(AppDb appDb) {
-        TermDAO dao = appDb.termDAO();
-        dao.insertAllItems(
-                new TermEntity(SAMPLE_TERM_1, LocalDate.of(2015, 5, 1), LocalDate.of(2015, 10, 31), ""),
-                new TermEntity(SAMPLE_TERM_2, LocalDate.of(2016, 1, 1), LocalDate.of(2016, 6, 30), ""),
-                new TermEntity(SAMPLE_TERM_3, LocalDate.of(2016, 7, 1), LocalDate.of(2016, 12, 31), ""),
-                new TermEntity(SAMPLE_TERM_4, LocalDate.of(2017, 2, 1), LocalDate.of(2017, 7, 31), ""),
-                new TermEntity(SAMPLE_TERM_5, LocalDate.of(2017, 8, 1), LocalDate.of(2018, 1, 31), ""),
-                new TermEntity(SAMPLE_TERM_6, LocalDate.of(2018, 2, 1), LocalDate.of(2018, 7, 31), ""),
-                new TermEntity(SAMPLE_TERM_7, LocalDate.of(2018, 8, 1), LocalDate.of(2019, 1, 31), ""),
-                new TermEntity(SAMPLE_TERM_8, LocalDate.of(2019, 2, 1), LocalDate.of(2019, 7, 31), ""),
-                new TermEntity(SAMPLE_TERM_9, LocalDate.of(2019, 10, 1), LocalDate.of(2020, 3, 31), ""),
-                new TermEntity(SAMPLE_TERM_10, LocalDate.of(2020, 4, 1), LocalDate.of(2020, 9, 30), "")
-        );
-        List<TermEntity> allItems = dao.getAllItems();
-        HashMap<String, SampleData> allTerms = new HashMap<>();
-        allItems.forEach(t -> allTerms.put(t.name, new SampleData(t)));
-        CourseEntity.populateSampleData(appDb, allTerms);
-    }
-
-    static class SampleData {
-        private TermEntity term;
-        private CourseEntity.SampleData[] courses;
-
-        private SampleData(TermEntity term) {
-            this.term = term;
-        }
-
-        TermEntity getTerm() {
-            return term;
-        }
-
-        CourseEntity.SampleData[] getCourses() {
-            return courses;
-        }
     }
 }

@@ -1,6 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
@@ -24,47 +24,47 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 
 public class TermListFragment extends Fragment {
 
-    private TermListViewModel termListViewModel;
-    private RecyclerView recycler_view_terms;
-    private List<TermEntity> items;
-    private TermListAdapter adapter;
+    private final List<TermEntity> mItems;
+    private TermListViewModel mTermListViewModel;
+    private RecyclerView mTermsRecyclerView;
+    private TermListAdapter mAdapter;
+
+    public TermListFragment() {
+        mItems = new ArrayList<>();
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        items = new ArrayList<>();
         View root = inflater.inflate(R.layout.fragment_term_list, container, false);
-
-        recycler_view_terms = root.findViewById(R.id.termsRecyclerView);
-        recycler_view_terms.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recycler_view_terms.getLayoutManager();
-        DividerItemDecoration decoration = new DividerItemDecoration(recycler_view_terms.getContext(), linearLayoutManager.getOrientation());
-        recycler_view_terms.addItemDecoration(decoration);
+        mTermsRecyclerView = root.findViewById(R.id.termsRecyclerView);
+        mAdapter = new TermListAdapter(mItems, getContext());
+        mTermsRecyclerView.setAdapter(mAdapter);
+        mTermsRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) mTermsRecyclerView.getLayoutManager());
+        DividerItemDecoration decoration = new DividerItemDecoration(mTermsRecyclerView.getContext(), linearLayoutManager.getOrientation());
+        mTermsRecyclerView.addItemDecoration(decoration);
         FloatingActionButton fab = root.findViewById(R.id.addTermButton);
-        fab.setOnClickListener(this::onNewTermClick);
-
+        fab.setOnClickListener(this::onAddTermButtonClick);
         return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        termListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermListViewModel.class);
-        termListViewModel.getTerms().observe(getViewLifecycleOwner(), this::onTermListChanged);
+        mTermListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermListViewModel.class);
+        mTermListViewModel.getTerms().observe(getViewLifecycleOwner(), this::onTermListChanged);
     }
 
     private void onTermListChanged(List<TermEntity> list) {
-        items.clear();
-        items.addAll(list);
-        if (null == adapter) {
-            adapter = new TermListAdapter(items, getContext());
-            recycler_view_terms.setAdapter(adapter);
-        } else {
-            adapter.notifyDataSetChanged();
+        mItems.clear();
+        mItems.addAll(list);
+        if (null != mAdapter) {
+            mAdapter.notifyDataSetChanged();
         }
     }
 
-    private void onNewTermClick(View view) {
-        Intent intent = new Intent(getContext(), EditTermActivity.class);
-        startActivity(intent);
+    private void onAddTermButtonClick(View view) {
+//        Intent intent = new Intent(getContext(), EditTermActivity.class);
+//        startActivity(intent);
     }
 
 }

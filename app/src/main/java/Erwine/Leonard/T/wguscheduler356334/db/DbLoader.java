@@ -1,21 +1,32 @@
 package Erwine.Leonard.T.wguscheduler356334.db;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import androidx.lifecycle.LiveData;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.LogHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -24,8 +35,26 @@ import io.reactivex.schedulers.Schedulers;
 
 public class DbLoader {
 
-    private static final Logger LOG = LogHelper.setLoggerAndHandlerLevels(Logger.getLogger(DbLoader.class.getName()), Level.FINER);
-//    private static final Logger LOG = Logger.getLogger(DbLoader.class.getName());
+    /**
+     * 1=title, 2=start, 3=end, 4=notes?
+     */
+    private static final Pattern PATTERN_SAMPLE_TERM_DATA = Pattern.compile("^\\s*([^,]+),([^,]+),([^,]+),(\\S+(?:\\s+\\S+)*)?\\s*$");
+
+    /**
+     * 1=name; 2=notes?; 3=phone_numbers?; 4=email_addresses?
+     */
+    private static final Pattern PATTERN_SAMPLE_MENTOR_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?$");
+
+    /**
+     * 1=termId; 2=number; 3=title; 4=status; 5=expectedStart?; 6=actualStart?; 7=expectedEnd?; 8=actualEnd?; 9=competencyUnits?; 10=notes?; 11=mentorId?
+     */
+    private static final Pattern PATTERN_SAMPLE_COURSE_DATA = Pattern.compile("^(\\d+)\\t([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?" +
+            "\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?$");
+    /**
+     * 1=courseNumber; 2=code; 3=status; (4=yyyy-mm-dd | 5=expectedEnd | 6=actualEnd)=goalDate?; 7=type; 8=notes?; (9=yyyy-mm-dd | 10=expectedEnd | 11=actualEnd)=evaluationDate?
+     */
+    private static final Pattern PATTERN_SAMPLE_ASSESSMENT_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?" +
+            "\\t([^\\t]+)\\t([^\\t]+)?\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?$");
 
     private static DbLoader instance;
     private final AppDb appDb;
@@ -238,10 +267,96 @@ public class DbLoader {
         return Completable.fromAction(this::resetDb).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable populateSampleData() {
+    public Completable populateSampleData(Resources resources) {
         return Completable.fromAction(() -> {
             resetDb();
-            TermEntity.populateSampleData(appDb);
+            TermDAO termDAO = appDb.termDAO();
+            BiFunction<String, Integer, ArrayList<String>> parseSampleDataCells = (t, u) -> {
+                try {
+                    ArrayList<ArrayList<String>> rows = StringHelper.parseCsv(t.trim());
+                    if (rows.size() != 1)
+                        throw new RuntimeException(String.format("Expected 1 parsed CSV row; Actual: %d", rows.size()));
+                    ArrayList<String> r = rows.get(0);
+                    if (r.size() != u)
+                        throw new RuntimeException(String.format("Expected %d parsed CSV cells; Actual: %d", u, r.size()));
+                    return r;
+                } catch (RuntimeException ex) {
+                    throw new RuntimeException(String.format("Error parsing sample data %s", t), ex);
+                }
+            };
+            termDAO.insertAllItems(Arrays.stream(resources.getStringArray(R.array.sample_terms)).map(new Function<String, TermEntity>() {
+                private int id = 0;
+
+                @Override
+                public TermEntity apply(String s) {
+                    List<String> cells = parseSampleDataCells.apply(s, 4);
+                    return new TermEntity(cells.get(0), LocalDate.parse(cells.get(1)), LocalDate.parse(cells.get(2)), cells.get(3), ++id);
+                }
+            }).collect(Collectors.toList()));
+            MentorDAO mentorDAO = appDb.mentorDAO();
+            mentorDAO.insertAllItems(Arrays.stream(resources.getStringArray(R.array.sample_mentors)).map(new Function<String, MentorEntity>() {
+                private int id = 0;
+
+                @Override
+                public MentorEntity apply(String s) {
+                    List<String> cells = parseSampleDataCells.apply(s, 4);
+                    return new MentorEntity(cells.get(0), cells.get(1), cells.get(2), cells.get(3), ++id);
+                }
+            }).collect(Collectors.toList()));
+
+            CourseDAO courseDAO = appDb.courseDAO();
+            HashMap<String, CourseStatus> statusMap = new HashMap<>();
+            for (CourseStatus cs : CourseStatus.values()) {
+                statusMap.put(cs.name(), cs);
+            }
+            Function<String, LocalDate> parseDateCell = t -> (t.isEmpty()) ? null : LocalDate.parse(t);
+            HashMap<Integer, CourseEntity> courseMap = new HashMap<>();
+            courseDAO.insertAllItems(Arrays.stream(resources.getStringArray(R.array.sample_courses)).map(new Function<String, CourseEntity>() {
+                private int id = 0;
+
+                @Override
+                public CourseEntity apply(String s) {
+                    List<String> cells = parseSampleDataCells.apply(s, 11);
+                    // 0=termId, 1=number, 2=title, 3=status, 4=expectedStart, 5=actualStart, 6=expectedEnd, 7=actualEnd, 8=competencyUnits, 9=notes, 10=mentorId
+                    String n = cells.get(1);
+                    String c = cells.get(8);
+                    String m = cells.get(10);
+                    CourseEntity e = new CourseEntity(n, cells.get(2), statusMap.get(cells.get(3)), parseDateCell.apply(cells.get(4)), parseDateCell.apply(cells.get(5)),
+                            parseDateCell.apply(cells.get(6)), parseDateCell.apply(cells.get(7)), (c.isEmpty()) ? null : Integer.parseInt(c), cells.get(9),
+                            Integer.parseInt(cells.get(0)), (m.isEmpty()) ? null : Integer.parseInt(m), ++id);
+                    courseMap.put(id, e);
+                    return e;
+                }
+            }).collect(Collectors.toList()));
+            AssessmentDAO assessmentDAO = appDb.assessmentDAO();
+            HashMap<String, AssessmentStatus> am = new HashMap<>();
+            for (AssessmentStatus a : AssessmentStatus.values()) {
+                am.put(a.name(), a);
+            }
+            HashMap<String, AssessmentType> at = new HashMap<>();
+            for (AssessmentType a : AssessmentType.values()) {
+                at.put(a.name(), a);
+            }
+            BiFunction<String, CourseEntity, LocalDate> convertDateCell = (t, u) -> {
+                switch (t) {
+                    case "expectedEnd":
+                        return u.getExpectedEnd();
+                    case "actualEnd":
+                        return u.getActualEnd();
+                    case "":
+                        return null;
+                    default:
+                        return LocalDate.parse(t);
+                }
+            };
+            assessmentDAO.insertAllItems(Arrays.stream(resources.getStringArray(R.array.sample_assessments)).map(t -> {
+                // 0=courseId, 1=code, 2=status, 3=goalDate, 4=type, 5=notes, 6=evaluationDate
+                List<String> cells = parseSampleDataCells.apply(t, 7);
+                int courseId = Integer.parseInt(cells.get(0));
+                CourseEntity course = Objects.requireNonNull(courseMap.get(courseId));
+                return new AssessmentEntity(cells.get(1), am.get(cells.get(2)), convertDateCell.apply(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
+                        convertDateCell.apply(cells.get(6), course), course.getId());
+            }).collect(Collectors.toList()));
         }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 

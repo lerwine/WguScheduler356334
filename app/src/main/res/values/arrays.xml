@@ -1,12 +1,150 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <string-array name="sample_terms" tools:ignore="TypographyDashes">
+        <!-- title, start, end, notes  -->
+        <item>Term 1,2015-05-01,2015-10-31,</item>
+        <item>Term 2,2016-01-01,2016-06-30,</item>
+        <item>Term 3,2016-07-01,2016-12-31,</item>
+        <item>Term 4,2017-02-01,2017-07-31,</item>
+        <item>Term 5,2017-08-01,2018-01-31,</item>
+        <item>Term 6,2018-02-01,2018-07-31,</item>
+        <item>Term 7,2018-08-01,2019-01-31,</item>
+        <item>Term 8,2019-02-01,2019-07-31,</item>
+        <item>Term 9,2019-10-01,2020-03-31,</item>
+        <item>Term 10,2020-04-01,2020-09-30,</item>
     </string-array>
-
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="sample_mentors" tools:ignore="TypographyDashes">
+        <!-- name, notes, phone numbers, email addresses -->
+        <item>\"Scott Stromberg, M.CS.\",,1-877-435-7948 ext. 4750,sstromberg@wgu.edu</item>
+        <item>Andy Doren,,,andy.doren@wgu.edu</item>
+        <item>\"Katie Craig, MBA\",,1-877-435-7948 ext. 6695,Katie.Craig@wgu.edu</item>
+        <item>\"Steven Harris, PhD\",,1-877-435-7948  x4023,steven.harris@wgu.edu</item>
+        <item>Sabrena Parton,,1-877-435-7948 ext 6467,sabrena.parton@wgu.edu</item>
+        <item>Abigail Scheg,,,abigail.scheg@wgu.edu</item>
+        <item>Constance Blanson,,,constance.blanson@wgu.edu</item>
+        <item>\"Jeff Edmunds, Ph.D.\",,\"877-435-7948, ext 5925\",jeff.edmunds@wgu.edu</item>
+        <item>Jessica Shields,,1.877.435.7948 Ext. 4198,cmweb@wgu.edu</item>
+        <item>Michael Smith,,,m.smith@wgu.edu</item>
+        <item>Ed Lavieri,,,ed.lavieri@wgu.edu</item>
+        <item>Mason McWatters,,1.877.435.7948 Ext. 5532,mason.mcwatters@wgu.edu</item>
+        <item>Kandi Duff,,1.877.435.7948 Ext. 4090,kandi.duff@wgu.edu</item>
+        <item>\"Jim Jividen, JD, MA\",,\"801-924-4510\n1-877-435-7948 x4510\",jim.jividen@wgu.edu</item>
+        <item>\"Nick Meyer, PhD\",,1-877-435-7948 ext. 2337,nick.meyer@wgu.edu</item>
+        <item>Randy Rutledge,,1.877.435.7948 Ext. 8246,randy.rutledge@wgu.edu</item>
+        <item>Maria Schenk,,1.877.435.7948 Ext. 4029,maria.schenk@wgu.edu</item>
+        <item>\"Joe Barnhart, Ph.D.\",,1.877.435.7948 Ext. 4889,joe.barnhart@wgu.edu</item>
+        <item>Wanda Burwick,,,wanda.burwick@wgu.edu</item>
+        <item>Charles Lively,,(385) 428-4645,charles.lively@wgu.edu</item>
+        <item>Malcolm Wabara,,(385) 428-5006,malcolm.wabara@wgu.edu</item>
+        <item>Mark Kinkead,,1-385-428-3617,mark.kinkead@wgu.edu</item>
+        <item>Alvaro Escobar,,(385) 428-8835,alvaro.escobar@wgu.edu</item>
+    </string-array>
+    <string-array name="sample_courses" tools:ignore="TypographyDashes">
+        <!-- termId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes, mentorId -->
+        <item>1,ORA,Orientation,PASSED,2015-04-15,2015-04-15,2015-04-21,2015-04-30,0,,</item>
+        <item>1,C182,Introduction to IT,PASSED,2015-09-01,2015-05-01,2015-09-30,2015-06-09,4,,1</item>
+        <item>1,C483,Principles of Management,PASSED,2015-08-01,2015-06-10,2015-08-31,2015-08-28,4,,2</item>
+        <item>1,C176,Business of IT - Project Management,PASSED,2015-07-01,2015-08-29,2015-07-31,2015-10-23,4,,3</item>
+        <item>2,C168,Critical Thinking and Logic,PASSED,2016-01-01,2016-01-01,2016-02-22,2016-02-22,3,\"was \"\"Reasoning and Problem Solving\"\"\",4</item>
+        <item>2,C132,Elements of Effective Communication,PASSED,2016-02-23,2016-02-23,2016-05-07,2016-05-07,3,,5</item>
+        <item>2,C455,English Composition I,PASSED,2016-05-06,2016-05-06,2016-06-05,2016-06-05,3,,6</item>
+        <item>2,C456,English Composition II,PASSED,2016-06-06,2016-06-06,2016-07-05,2016-07-05,3,,6</item>
+        <item>3,C393,IT Foundations,PASSED,2016-07-01,2016-07-06,2016-10-22,2016-10-22,4,,7</item>
+        <item>3,C278,College Algebra,PASSED,2016-10-23,2016-10-23,2016-12-28,2016-12-28,4,,8</item>
+        <item>3,C394,IT Applications,PASSED,2016-12-28,2016-12-28,2016-12-28,2016-12-28,4,,7</item>
+        <item>4,C173,Scripting and Programming - Foundations,PASSED,2017-02-01,2017-02-01,2017-02-14,2017-02-22,3,,9</item>
+        <item>4,C100,Introduction to Humanities,PASSED,2017-02-15,2017-02-23,2017-04-06,2017-05-08,3,,10</item>
+        <item>4,C169,Scripting and Programming - Applications,PASSED,2017-03-01,2017-05-09,2017-04-29,2017-05-23,4,,11</item>
+        <item>4,C255,Introduction to Geography,PASSED,2017-04-07,2017-05-24,2017-05-29,2017-07-22,3,,12</item>
+        <item>5,C165,Integrated Physical Sciences,PASSED,2017-08-01,2017-08-01,2017-08-11,2017-08-11,3,,13</item>
+        <item>5,C683,Natural Science Lab,PASSED,2017-08-12,2017-08-13,2017-10-30,2017-10-30,2,,9</item>
+        <item>5,C779,Web Development Foundations,PASSED,2017-10-31,2017-10-31,2017-11-29,2017-11-29,3,,9</item>
+        <item>5,C484,Organizational Behavior and Leadership,PASSED,2017-11-30,2017-11-30,2018-01-03,2018-01-03,3,,14</item>
+        <item>5,C459,Introduction to Probability and Statistics,PASSED,2018-01-04,2018-01-04,2018-01-31,2018-01-31,3,,15</item>
+        <item>6,C175,Data Management - Foundations,PASSED,2018-02-01,2018-02-01,2018-06-14,2018-05-15,3,,16</item>
+        <item>6,C170,Data Management - Applications,PASSED,2018-06-14,2018-05-16,2018-07-31,2018-07-28,4,,17</item>
+        <item>6,C773,User Interface Design,PASSED,2018-03-01,2018-07-29,2018-03-31,2018-07-27,4,,9</item>
+        <item>6,C768,Technical Communication,PASSED,2018-02-15,2018-07-28,2018-02-28,2018-08-09,3,,18</item>
+        <item>7,C188,Software Engineering,NOT_PASSED,2018-08-01,2018-08-01,2018-09-30,2018-11-20,4,,19</item>
+        <item>7,C191,Operating Systems for Programmers,PASSED,2018-12-01,2018-11-21,2018-01-31,2019-01-30,3,,19</item>
+        <item>7,C777,Web Development Applications,PASSED,2018-10-01,2019-01-31,2018-11-30,2019-02-01,6,,9</item>
+        <item>8,C482,Software I,PASSED,2019-02-01,2019-02-01,2019-08-10,2019-05-28,6,,19</item>
+        <item>8,C179,Business of IT - Applications,PASSED,2019-07-10,2019-05-29,2019-08-10,2019-07-04,4,,19</item>
+        <item>8,C188,Software Engineering,PASSED,2019-07-10,2019-07-05,2019-08-10,2019-07-31,4,,19</item>
+        <item>9,C193,Client-Server Application Development,PASSED,2019-10-01,2019-10-01,2019-11-30,2019-10-10,3,,20</item>
+        <item>9,C195,Software II - Advanced Java Concepts,NOT_PASSED,2019-12-01,2019-10-11,2019-02-28,2020-05-08,6,,21</item>
+        <item>9,C192,Data Management for Programmers,NOT_PASSED,2019-03-01,2019-10-11,2020-03-31,2020-05-08,3,,21</item>
+        <item>10,C195,Software II - Advanced Java Concepts,PASSED,2020-04-01,2020-04-01,2020-06-30,2020-08-05,6,,22</item>
+        <item>10,C196,Mobile Application Development,IN_PROGRESS,2020-08-21,,2020-09-10,,3,,23</item>
+        <item>10,C769,IT Capstone Written Project,PLANNED,2020-09-10,,2020-09-30,,4,,</item>
+        <item>10,C192,Data Management for Programmers,UNPLANNED,,,,,3,,</item>
+    </string-array>
+    <string-array name="sample_assessments" tools:ignore="TypographyDashes">
+        <!-- courseId, code, status, goalDate, type, notes, evaluationDate : date = yyyy-mm-dd|expectedEnd|actualEnd -->
+        <item>1,ORA1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,2015-04-21</item>
+        <item>2,PAG5,PASSED,expectedEnd,PRE_ASSESSMENT,,2015-05-04</item>
+        <item>2,GSC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>3,PIAC,PASSED,expectedEnd,PRE_ASSESSMENT,,2015-08-23</item>
+        <item>3,IAC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>4,EKV1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,CompTIA - Project+,actualEnd</item>
+        <item>5,PLMC,PASSED,expectedEnd,PRE_ASSESSMENT,,2016-01-17</item>
+        <item>5,LMC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>6,PYJC,PASSED,expectedEnd,PRE_ASSESSMENT,,2016-05-05</item>
+        <item>6,YJC1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,2016-05-07</item>
+        <item>6,YJT1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>7,DIT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,Task 1,2016-05-15</item>
+        <item>7,DIT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,Task 2,2016-05-22</item>
+        <item>7,DIT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,Task 3,2016-05-28</item>
+        <item>7,DIT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,Task 4,actualEnd</item>
+        <item>8,DJT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,Task 1,actualEnd</item>
+        <item>8,DJT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,Task 2,actualEnd</item>
+        <item tools:ignore="TypographyFractions">9,KEV1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,CompTIA A+ Part 1/2,actualEnd</item>
+        <item>10,PCEC,NOT_PASSED,expectedEnd,PRE_ASSESSMENT,,2016-12-13</item>
+        <item>10,CEC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>11,KFV1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,CompTIA - A+,actualEnd</item>
+        <item>12,PCGO,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-01-05</item>
+        <item>12,CGO1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>13,PCKC,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-02-22</item>
+        <item>13,PCKC,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-05-03</item>
+        <item>13,CKC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,2017-05-08</item>
+        <item>13,UXT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>14,PDQC,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-05-09</item>
+        <item>14,VGT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,2017-05-21</item>
+        <item>14,DQC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>15,PJQC,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-07-19</item>
+        <item>15,JQC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>16,PHTC,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-08-02</item>
+        <item>16,HTC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>17,BRP1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>18,HCV1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>19,PIBC,PASSED,expectedEnd,PRE_ASSESSMENT,,2017-12-26</item>
+        <item>19,IBC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>20,GVC1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>21,PFKO,PASSED,expectedEnd,PRE_ASSESSMENT,,2018-04-13</item>
+        <item>21,FKO1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>22,PFJO,PASSED,expectedEnd,PRE_ASSESSMENT,,2018-05-15</item>
+        <item>22,FJO1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,2018-06-02</item>
+        <item>22,VHT1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>23,FPV1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>24,EWP1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>25,FRV1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>26,PAG7,NOT_PASSED,expectedEnd,PRE_ASSESSMENT,,2018-10-31</item>
+        <item>26,ACO1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>27,AAO1,NOT_PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,2019-01-31</item>
+        <item>28,GYP1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>29,DIP1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>30,PAG8,NOT_PASSED,expectedEnd,PRE_ASSESSMENT,,2019-01-30</item>
+        <item>30,AAO1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>31,PAG9,PASSED,expectedEnd,PRE_ASSESSMENT,,2019-10-02</item>
+        <item>31,AEO1,PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>32,GZP1,NOT_PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>33,PADO,NOT_PASSED,expectedEnd,PRE_ASSESSMENT,,2019-10-02</item>
+        <item>33,ADO1,NOT_PASSED,expectedEnd,OBJECTIVE_ASSESSMENT,,actualEnd</item>
+        <item>34,GZP1,PASSED,expectedEnd,PERFORMANCE_EVALUATION,,actualEnd</item>
+        <item>35,ABM1,IN_PROGRESS,expectedEnd,PERFORMANCE_EVALUATION,,</item>
+        <item>36,ROM2,NOT_STARTED,2020-09-13,PERFORMANCE_EVALUATION,Task 1,</item>
+        <item>36,ROM2,NOT_STARTED,2020-09-20,PERFORMANCE_EVALUATION,Task 2,</item>
+        <item>36,ROM2,NOT_STARTED,expectedEnd,PERFORMANCE_EVALUATION,Task 3,</item>
+        <item>37,ADO1,NOT_STARTED,expectedEnd,OBJECTIVE_ASSESSMENT,,</item>
     </string-array>
 </resources>

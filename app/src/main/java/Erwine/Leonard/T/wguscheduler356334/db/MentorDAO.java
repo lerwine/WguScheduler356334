@@ -26,7 +26,7 @@ public interface MentorDAO {
     Completable insertAll(List<MentorEntity> mentors);
 
     @Insert
-    void insertAllItems(MentorEntity... items);
+    void insertAllItems(List<MentorEntity> items);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<MentorEntity> mentors);

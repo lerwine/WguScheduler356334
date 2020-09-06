@@ -1,6 +1,8 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -38,6 +40,40 @@ public final class StringHelper {
      * Do not remove blank lines. Ignored when {@link #NORMALIZE_FLAG_SINGLE_LINE} is present.
      */
     public static final int NORMALIZE_FLAG_LEAVE_BLANK_LINES = 0x20;
+
+    /**
+     * Cell content groups: 1=Double-quote qualified, 2=Plain text, none=empty; cell terminator groups: 3=Newline-terminated, 4=Comma-terminated, none=end of string.
+     */
+    public static final Pattern PATTERN_CSV_CELL = Pattern.compile("\\G(?:(?:\"((?:\"\"|[^\"]+)+)\")|([^\",\\r\\n]+))?(?:(\\r\\n?|\\n)|(,)|$)");
+
+    public static ArrayList<ArrayList<String>> parseCsv(String source) throws IllegalFormatException {
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        if (null == source) {
+            return result;
+        }
+        ArrayList<String> currentLine = new ArrayList<>();
+        result.add(currentLine);
+        if (source.isEmpty()) {
+            return result;
+        }
+        Matcher matcher = PATTERN_CSV_CELL.matcher(source);
+        int position = 0;
+        while (matcher.find()) {
+            if (null != matcher.group(1)) {
+                currentLine.add(matcher.group(1).replace("\"\"", "\""));
+            } else {
+                currentLine.add((null == matcher.group(2)) ? "" : matcher.group(2));
+            }
+            if (null != matcher.group(3)) {
+                currentLine = new ArrayList<>();
+                result.add(currentLine);
+            } else if (null == matcher.group(4)) {
+                return result;
+            }
+            position = matcher.end();
+        }
+        throw new IllegalArgumentException(String.format("Invalid CSV data at position %d", position));
+    }
 
     public static final Pattern PATTERN_LINEBREAK = Pattern.compile("\\r\\n?|[\\n\\f\\u0085\\u2028\\u2029]");
 
@@ -78,12 +114,10 @@ public final class StringHelper {
     }
 
     public static boolean isWhiteSpaceOrLineSeparator(char c) {
-        switch (c) {
-            case '\u0085':
-                return true;
-            default:
-                return Character.isWhitespace(c);
+        if (c == '\u0085') {
+            return true;
         }
+        return Character.isWhitespace(c);
     }
 
     /**

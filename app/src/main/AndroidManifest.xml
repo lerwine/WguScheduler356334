@@ -15,9 +15,12 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".ui.term.EditTermActivity"
-            android:label="@string/title_activity_edit_term"
+            android:name=".ui.term.ViewTermActivity"
+            android:label="@string/title_activity_view_term"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ManageDataActivity"
+            android:label="@string/title_activity_settings" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">

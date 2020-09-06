@@ -29,6 +29,9 @@ public interface AssessmentDAO {
     @Insert
     Completable insertAll(List<AssessmentEntity> list);
 
+    @Insert
+    void insertAllItems(List<AssessmentEntity> list);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<AssessmentEntity> list);
 

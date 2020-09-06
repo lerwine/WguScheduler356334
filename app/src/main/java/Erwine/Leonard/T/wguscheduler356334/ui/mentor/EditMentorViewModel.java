@@ -5,16 +5,13 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.room.Entity;
 
-import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-@Entity(tableName = AppDb.TABLE_NAME_MENTORS)
 public class EditMentorViewModel extends AndroidViewModel {
 
     private final MutableLiveData<MentorEntity> liveData;
