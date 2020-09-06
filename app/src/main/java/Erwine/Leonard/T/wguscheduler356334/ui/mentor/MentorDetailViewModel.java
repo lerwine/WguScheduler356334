@@ -13,12 +13,12 @@ import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-public class EditMentorViewModel extends AndroidViewModel {
+public class MentorDetailViewModel extends AndroidViewModel {
 
     private final MutableLiveData<MentorEntity> liveData;
     private final DbLoader dbLoader;
 
-    public EditMentorViewModel(@NonNull Application application) {
+    public MentorDetailViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         liveData = new MutableLiveData<>();

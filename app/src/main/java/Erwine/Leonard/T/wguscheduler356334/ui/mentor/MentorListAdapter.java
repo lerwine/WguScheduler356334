@@ -75,8 +75,8 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
         }
 
         private void onViewClick(View v) {
-            Intent intent = new Intent(mContext, ViewMentorActivity.class);
-            intent.putExtra(ViewMentorActivity.EXTRAS_KEY_MENTOR_ID, mItem.getId());
+            Intent intent = new Intent(mContext, MentorDetailActivity.class);
+            intent.putExtra(MentorDetailActivity.EXTRAS_KEY_MENTOR_ID, mItem.getId());
             mContext.startActivity(intent);
         }
 

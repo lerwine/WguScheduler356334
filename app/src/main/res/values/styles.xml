@@ -1,10 +1,67 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryVariant">@color/color_primary_variant</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
         <item name="colorAccent">@color/color_accent</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="colorSecondaryVariant">@color/color_secondary_variant</item>
+        <item name="colorOnSecondary">@color/color_on_secondary</item>
+        <item name="colorError">@color/color_error</item>
+        <item name="colorOnError">@color/color_on_error</item>
+        <item name="colorControlNormal">@color/color_on_primary</item>
+        <item name="colorButtonNormal">@color/color_button_normal</item>
+        <!--        <item name="buttonStyle">WGU.Scheduler.ButtonStyle</item>-->
+        <!--
+        <item name="actionMenuTextColor">?android:attr/actionMenuTextColor</item>
+        <item name="actionModeSplitBackground">?attr/colorPrimaryDark</item>
+        <item name="colorBackgroundFloating">@color/background_holo_light</item>
+        <item name="colorControlActivated">@color/holo_light_control_activated</item>
+        <item name="colorControlHighlight">@color/ripple_material_light</item>
+        <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
+        <item name="controlBackground">?attr/selectableItemBackgroundBorderless</item>
+        <item name="editTextColor">@color/primary_text_light</item>
+        <item name="textColorAlertDialogListItem">@color/primary_text_holo_light</item>
+        <item name="textColorSearchUrl">@color/abc_search_url_text</item>
+        <item name="tooltipForegroundColor">@color/bright_foreground_dark</item>
+        <item name="android:colorAccent">?attr/colorAccent</item>
+        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="android:colorButtonNormal">?attr/colorButtonNormal</item>
+        <item name="android:colorControlActivated">?attr/colorControlActivated</item>
+        <item name="android:colorControlHighlight">?attr/colorControlHighlight</item>
+        <item name="android:colorControlNormal">?attr/colorControlNormal</item>
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
+        <item name="android:colorPrimary">?attr/colorPrimary</item>
+        <item name="android:colorPrimaryDark">?attr/colorPrimaryDark</item>
+        <item name="android:panelBackground">@android:color/transparent</item>
+        <item name="android:textColorAlertDialogListItem">@color/abc_primary_text_material_light</item>
+        <item name="android:textColorHighlight">@color/highlighted_text_material_light</item>
+        <item name="android:textColorHighlightInverse">@color/highlighted_text_material_dark</item>
+        <item name="android:textColorHint">@color/abc_hint_foreground_material_light</item>
+        <item name="android:textColorHintInverse">@color/abc_hint_foreground_material_dark</item>
+        <item name="android:textColorLink">?attr/colorAccent</item>
+        <item name="android:textColorLinkInverse">?attr/colorAccent</item>
+        <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/abc_primary_text_disable_only_material_light</item>
+        <item name="android:textColorPrimaryInverse">@color/abc_primary_text_material_dark</item>
+        <item name="android:textColorPrimaryInverseDisableOnly">@color/abc_primary_text_disable_only_material_dark</item>
+        <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
+        <item name="android:textColorSecondaryInverse">@color/abc_secondary_text_material_dark</item>
+        <item name="android:textColorTertiary">@color/abc_secondary_text_material_light</item>
+        <item name="android:textColorTertiaryInverse">@color/abc_secondary_text_material_dark</item>
+        <item name="android:windowBackground">@color/background_material_light</item>
+        -->
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="BaseAppTheme" />
+
+    <style name="WGU.Scheduler.ButtonStyle" parent="@android:style/Widget.Material.Light.Button">
+        <item name="android:textColor">@color/color_on_primary</item>
     </style>
 
     <style name="WGU.Scheduler.FieldLabel" parent="TextAppearance.AppCompat.Large">
@@ -13,9 +70,9 @@
 
     <style name="WGU.Scheduler.ErrorText" parent="TextAppearance.AppCompat.Body2">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/color_error_dark</item>
-        <item name="colorPrimary">@color/color_error</item>
-        <item name="colorPrimaryDark">@color/color_error_dark</item>
+        <item name="android:textColor">@color/color_error</item>
+        <item name="colorPrimary">@color/color_error_light</item>
+        <item name="colorPrimaryDark">@color/color_error</item>
         <item name="colorAccent">@color/color_error_accent</item>
     </style>
 
@@ -34,26 +91,40 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="linear_edit_button">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@android:drawable/btn_default_small</item>
-        <item name="android:backgroundTint">@color/color_accent</item>
-        <item name="android:paddingHorizontal">6dp</item>
-        <item name="android:paddingVertical">6dp</item>
-        <item name="android:scaleX">1.25</item>
-        <item name="android:scaleY">1.25</item>
-        <item name="android:tint">@color/color_primary_inverse</item>
-    </style>
-
     <style name="inline_command_button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:backgroundTint">@color/color_accent</item>
+        <!--        <item name="android:backgroundTint">@color/color_accent</item>-->
         <item name="android:scaleX">1.25</item>
         <item name="android:scaleY">1.25</item>
-        <item name="android:tint">@color/color_primary_inverse</item>
+        <!--        <item name="android:tint">@color/color_primary_inverse</item>-->
         <item name="android:translationY">2dp</item>
+    </style>
+
+    <style name="list_item_fab">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="list_item_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/text_margin</item>
+        <item name="android:layout_weight">100</item>
+        <item name="android:textAppearance">?attr/textAppearanceListItem</item>
+    </style>
+
+    <style name="command_button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">end</item>
+        <item name="android:background">@android:drawable/btn_default</item>
+        <item name="android:backgroundTint">@color/color_accent</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:textColor">@color/color_on_primary</item>
     </style>
 
 </resources>

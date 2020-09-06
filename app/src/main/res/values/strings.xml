@@ -59,12 +59,8 @@
     <string name="command_cancel">Cancel</string>
     <string name="command_ok">OK</string>
     <string name="title_activity_edit_phone_numbers">Edit Phone Numbers</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_activity_mentor_detail">Mentor Details</string>
+    <string name="tab_title_general">General</string>
+    <string name="tab_title_phone">Phone</string>
+    <string name="tab_title_email">Email</string>
 </resources>

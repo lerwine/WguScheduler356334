@@ -26,7 +26,7 @@
             android:id="@+id/editMentorNameImageButton"
             style="@style/inline_command_button"
             android:contentDescription="@string/message_edit_phone_numbers"
-            android:src="@drawable/ic_edit_12"
+            android:src="@drawable/edit_12"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -54,7 +54,7 @@
             android:id="@+id/editPhoneNumberImageButton"
             style="@style/inline_command_button"
             android:contentDescription="@string/edit_mentor_name"
-            android:src="@drawable/ic_edit_12"
+            android:src="@drawable/edit_12"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -86,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/message_edit_email_addresses"
-            android:src="@drawable/ic_edit_12"
+            android:src="@drawable/edit_12"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -119,10 +119,6 @@
 
     <Button
         android:id="@+id/saveNotesButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:background="@android:drawable/btn_default"
-        android:paddingHorizontal="8dp"
+        style="@style/command_button"
         android:text="@string/command_save_notes" />
 </LinearLayout>

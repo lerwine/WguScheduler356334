@@ -11,6 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+        <activity
+            android:name=".ui.mentor.MentorDetailActivity"
+            android:label="@string/title_activity_mentor_detail"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.mentor.ViewMentorActivity" />
         <activity
             android:name=".SettingsActivity"

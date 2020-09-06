@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:name="Erwine.Leonard.T.wguscheduler356334.CourseListFragment"
+    android:name="Erwine.Leonard.T.wguscheduler356334.EmailAddressFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.course.CourseListFragment">
+    tools:context=".ui.mentor.EmailAddressFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -14,14 +14,14 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/addCourseButton"
+        app:layout_constraintBottom_toTopOf="@+id/addEmailButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/fragment_course_item" />
+        tools:listitem="@layout/fragment_email_address_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addCourseButton"
+        android:id="@+id/addEmailButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/color_accent"

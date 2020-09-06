@@ -5,13 +5,13 @@
     tools:context=".ui.term.EditTermActivity">
     <item
         android:id="@+id/action_term_delete"
-        android:icon="@drawable/ic_two_tone_delete_forever_24"
+        android:icon="@drawable/delete_12"
         android:orderInCategory="100"
         android:title="@string/command_delete"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_term_cancel"
-        android:icon="@drawable/ic_two_tone_undo_24"
+        android:icon="@drawable/undo_24"
         android:orderInCategory="100"
         android:title="@string/title_discard_changes"
         app:showAsAction="ifRoom" />
