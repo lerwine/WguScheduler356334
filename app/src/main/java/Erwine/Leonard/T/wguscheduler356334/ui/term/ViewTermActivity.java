@@ -14,6 +14,8 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 
 public class ViewTermActivity extends AppCompatActivity {
 
+    public static final String EXTRAS_KEY_TERM_ID = "termId";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

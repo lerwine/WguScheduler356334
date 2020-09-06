@@ -38,8 +38,8 @@ public class ManageDataActivity extends AppCompatActivity {
         new AlertDialog.Builder(this).setTitle(R.string.command_reset_database).setMessage(R.string.message_reset_db_confirm).setPositiveButton(R.string.response_yes,
                 (dialogInterface, i1) -> dbLoader.resetDatabase().subscribe(this::finish, (throwable) -> {
                             Log.e(getClass().getName(), "Error on dbLoader.resetDatabase()", throwable);
-                            new AlertDialog.Builder(this).setTitle(R.string.title_reset_db_error)
-                                    .setMessage(getString(R.string.format_message_reset_db_error, throwable.getMessage())).setCancelable(false).show();
+                    new AlertDialog.Builder(this).setTitle(R.string.title_reset_db_error)
+                            .setMessage(getString(R.string.format_message_reset_db_error, throwable.getMessage())).setCancelable(true).show();
                         }
                 )).setNegativeButton(R.string.response_no, null).show();
     }

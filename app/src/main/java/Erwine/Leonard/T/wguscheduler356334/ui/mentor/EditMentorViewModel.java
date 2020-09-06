@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -37,18 +38,17 @@ public class EditMentorViewModel extends AndroidViewModel {
             entity.setPhoneNumbers(phoneNumbers.toString());
             entity.setNotes(notes);
         }
-        Completable result = dbLoader.saveMentor(entity);
-        return result;
+        return dbLoader.saveMentor(entity);
     }
 
-    public Single<MentorEntity> load(int id) {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void load(int id) {
         Single<MentorEntity> result = dbLoader.getMentorById(id).doAfterSuccess(liveData::postValue);
-        return result;
+        result.subscribe(liveData::postValue, throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
     }
 
     public Completable delete() {
-        Completable result = dbLoader.deleteMentor(liveData.getValue());
-        return result;
+        return dbLoader.deleteMentor(liveData.getValue());
     }
 
 }

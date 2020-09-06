@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+        <activity android:name=".ui.mentor.ViewMentorActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />

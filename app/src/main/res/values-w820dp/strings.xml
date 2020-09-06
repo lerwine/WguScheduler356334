@@ -52,4 +52,11 @@
     <string name="message_reset_db_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
     <string name="title_reset_db_error">Reset Database Error</string>
     <string name="format_message_reset_db_error">An unexpected error has occurred while resetting the database: %s</string>
+    <string name="edit_mentor_name">Edit mentor name</string>
+    <string name="message_edit_phone_numbers">Edit phone numbers</string>
+    <string name="command_save_notes">Save Notes</string>
+    <string name="message_edit_email_addresses">Edit email addresses</string>
+    <string name="title_change_mentor_name">Change Mentor Name</string>
+    <string name="command_cancel">Cancel</string>
+    <string name="command_ok">OK</string>
 </resources>

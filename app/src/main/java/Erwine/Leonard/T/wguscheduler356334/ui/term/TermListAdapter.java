@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,26 +41,7 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final TermEntity item = entityList.get(position);
-        holder.text_view_term_list_item_name.setText(item.getName());
-        LocalDate start = item.getStart();
-        LocalDate end = item.getEnd();
-        if (null == start) {
-            if (null == end) {
-                holder.text_view_term_list_item_range.setText("? to ?");
-            } else {
-                holder.text_view_term_list_item_range.setText(String.format("? to %s", FORMATTER.format(end)));
-            }
-        } else if (null == end) {
-            holder.text_view_term_list_item_range.setText(String.format("%s to ?", FORMATTER.format(start)));
-        } else {
-            holder.text_view_term_list_item_range.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
-        }
-//        holder.mView.setOnClickListener(v -> {
-//            Intent intent = new Intent(context, EditTermActivity.class);
-//            intent.putExtra(EditTermActivity.EXTRAS_KEY_TERM_ID, item.getId());
-//            context.startActivity(intent);
-//        });
+        holder.setItem(entityList.get(position));
     }
 
     @Override
@@ -68,15 +50,41 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        private TextView text_view_term_list_item_name;
-        private TextView text_view_term_list_item_range;
+        private final View mView;
+        private final TextView mTermNameTextView;
+        private final TextView mTermRangeTextView;
+        private TermEntity mItem;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
-            text_view_term_list_item_name = itemView.findViewById(R.id.termNameTextView);
-            text_view_term_list_item_range = itemView.findViewById(R.id.termRangeTextView);
+            mTermNameTextView = itemView.findViewById(R.id.termNameTextView);
+            mTermRangeTextView = itemView.findViewById(R.id.termRangeTextView);
+            mView.setOnClickListener(this::onViewClick);
+        }
+
+        public void setItem(TermEntity item) {
+            mItem = item;
+            mTermNameTextView.setText(item.getName());
+            LocalDate start = item.getStart();
+            LocalDate end = item.getEnd();
+            if (null == start) {
+                if (null == end) {
+                    mTermRangeTextView.setText("? to ?");
+                } else {
+                    mTermRangeTextView.setText(String.format("? to %s", FORMATTER.format(end)));
+                }
+            } else if (null == end) {
+                mTermRangeTextView.setText(String.format("%s to ?", FORMATTER.format(start)));
+            } else {
+                mTermRangeTextView.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
+            }
+        }
+
+        private void onViewClick(View v) {
+            Intent intent = new Intent(context, ViewTermActivity.class);
+            intent.putExtra(ViewTermActivity.EXTRAS_KEY_TERM_ID, mItem.getId());
+            context.startActivity(intent);
         }
 
     }

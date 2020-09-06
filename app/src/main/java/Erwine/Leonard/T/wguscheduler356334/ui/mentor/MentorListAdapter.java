@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -39,15 +40,7 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mentorNameTextView.setText(holder.mItem.getName());
-        if (mPreferEmailAddress) {
-            String s = holder.mItem.getPrimaryEmail();
-            holder.phoneOrEmailTextView.setText((s.isEmpty()) ? holder.mItem.getPrimaryPhone() : s);
-        } else {
-            String s = holder.mItem.getPrimaryPhone();
-            holder.phoneOrEmailTextView.setText((s.isEmpty()) ? holder.mItem.getPrimaryEmail() : s);
-        }
+        holder.setItem(mValues.get(position));
     }
 
     @Override
@@ -66,11 +59,26 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
             mView = view;
             mentorNameTextView = (TextView) view.findViewById(R.id.mentorNameTextView);
             phoneOrEmailTextView = (TextView) view.findViewById(R.id.phoneOrEmailTextView);
+            mView.setOnClickListener(this::onViewClick);
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mentorNameTextView.getText() + "'";
+        public void setItem(MentorEntity item) {
+            mItem = item;
+            mentorNameTextView.setText(mItem.getName());
+            if (mPreferEmailAddress) {
+                String s = mItem.getPrimaryEmail();
+                phoneOrEmailTextView.setText((s.isEmpty()) ? mItem.getPrimaryPhone() : s);
+            } else {
+                String s = mItem.getPrimaryPhone();
+                phoneOrEmailTextView.setText((s.isEmpty()) ? mItem.getPrimaryEmail() : s);
+            }
         }
+
+        private void onViewClick(View v) {
+            Intent intent = new Intent(mContext, ViewMentorActivity.class);
+            intent.putExtra(ViewMentorActivity.EXTRAS_KEY_MENTOR_ID, mItem.getId());
+            mContext.startActivity(intent);
+        }
+
     }
 }
