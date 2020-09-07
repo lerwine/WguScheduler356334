@@ -15,7 +15,6 @@
             android:name=".ui.mentor.MentorDetailActivity"
             android:label="@string/title_activity_mentor_detail"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.mentor.ViewMentorActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
