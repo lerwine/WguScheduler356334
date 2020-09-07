@@ -41,58 +41,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class DbLoader {
 
-    //<editor-fold defaultstate="collapsed" desc="Fields">
-
-    /**
-     * 1=title, 2=start, 3=end, 4=notes?
-     */
-    private static final Pattern PATTERN_SAMPLE_TERM_DATA = Pattern.compile("^\\s*([^,]+),([^,]+),([^,]+),(\\S+(?:\\s+\\S+)*)?\\s*$");
-
-    /**
-     * 1=name; 2=notes?; 3=phone_numbers?; 4=email_addresses?
-     */
-    private static final Pattern PATTERN_SAMPLE_MENTOR_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?$");
-
-    /**
-     * 1=termId; 2=number; 3=title; 4=status; 5=expectedStart?; 6=actualStart?; 7=expectedEnd?; 8=actualEnd?; 9=competencyUnits?; 10=notes?; 11=mentorId?
-     */
-    private static final Pattern PATTERN_SAMPLE_COURSE_DATA = Pattern.compile("^(\\d+)\\t([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?" +
-            "\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?$");
-    /**
-     * 1=courseNumber; 2=code; 3=status; (4=yyyy-mm-dd | 5=expectedEnd | 6=actualEnd)=goalDate?; 7=type; 8=notes?; (9=yyyy-mm-dd | 10=expectedEnd | 11=actualEnd)=evaluationDate?
-     */
-    private static final Pattern PATTERN_SAMPLE_ASSESSMENT_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?" +
-            "\\t([^\\t]+)\\t([^\\t]+)?\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?$");
-
-    private static DbLoader instance;
-    private final AppDb appDb;
-    private final TempDb tempDb;
-    private final Scheduler scheduler;
-    private LiveData<List<TermEntity>> allTerms;
-    private LiveData<List<MentorEntity>> allMentors;
-    private LiveData<List<CourseEntity>> allCourses;
-    private LiveData<List<AssessmentEntity>> allAssessments;
-    private Executor dataExecutor = Executors.newSingleThreadExecutor();
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Constructors">
-
-    public DbLoader(Context context) {
-        appDb = AppDb.getInstance(context);
-        tempDb = TempDb.getInstance(context);
-        scheduler = Schedulers.from(dataExecutor);
-    }
-
-    public static DbLoader getInstance(Context context) {
-        if (null == instance) {
-            instance = new DbLoader(context);
-        }
-
-        return instance;
-    }
-
-    //</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="Static methods">
 
     private static <T> void applyInsertedIds(List<Long> ids, List<T> entities, BiConsumer<T, Long> setId) {
         for (int n = 0; n < ids.size() && n < entities.size(); n++) {
@@ -102,8 +51,6 @@ public class DbLoader {
             }
         }
     }
-
-    //<editor-fold defaultstate="collapsed" desc="TermEntity methods">
 
     private static ArrayList<String> parseSampleDataCells(String csvText, Integer expectedCellCount) {
         try {
@@ -129,33 +76,6 @@ public class DbLoader {
             }
         }).collect(Collectors.toList());
     }
-
-    public Completable deleteTerm(TermEntity entity) {
-        return appDb.termDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Single<TermEntity> getTermByRowId(int rowId) {
-        return appDb.termDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Single<TermEntity> getTermById(int id) {
-        return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public LiveData<List<TermEntity>> getAllTerms() {
-        if (null == allTerms) {
-            allTerms = appDb.termDAO().getAll();
-        }
-        return allTerms;
-    }
-
-    public Single<Integer> getTermCount(LiveData<Integer> liveData) {
-        return appDb.termDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="MentorEntity methods">
 
     private static <T> HashMap<Integer, T> createSampleDataObjects(Resources resources, int resourceId, int expectedCellCount, Function<List<String>, T> factory) {
         final HashMap<Integer, T> result = new HashMap<>();
@@ -183,6 +103,87 @@ public class DbLoader {
         }
     }
 
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Fields">
+
+    /**
+     * 1=title, 2=start, 3=end, 4=notes?
+     */
+    private static final Pattern PATTERN_SAMPLE_TERM_DATA = Pattern.compile("^\\s*([^,]+),([^,]+),([^,]+),(\\S+(?:\\s+\\S+)*)?\\s*$");
+
+    /**
+     * 1=name; 2=notes?; 3=phone_numbers?; 4=email_addresses?
+     */
+    private static final Pattern PATTERN_SAMPLE_MENTOR_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?$");
+
+    /**
+     * 1=termId; 2=number; 3=title; 4=status; 5=expectedStart?; 6=actualStart?; 7=expectedEnd?; 8=actualEnd?; 9=competencyUnits?; 10=notes?; 11=mentorId?
+     */
+    private static final Pattern PATTERN_SAMPLE_COURSE_DATA = Pattern.compile("^(\\d+)\\t([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?" +
+            "\\t([^\\t]+)?\\t([^\\t]+)?\\t([^\\t]+)?$");
+    /**
+     * 1=courseNumber; 2=code; 3=status; (4=yyyy-mm-dd | 5=expectedEnd | 6=actualEnd)=goalDate?; 7=type; 8=notes?; (9=yyyy-mm-dd | 10=expectedEnd | 11=actualEnd)=evaluationDate?
+     */
+    private static final Pattern PATTERN_SAMPLE_ASSESSMENT_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?" +
+            "\\t([^\\t]+)\\t([^\\t]+)?\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?$");
+
+    private static DbLoader instance;
+    private final AppDb appDb;
+    private final TempDb tempDb;
+    private final Scheduler scheduler;
+    private final Executor dataExecutor;
+    private LiveData<List<TermEntity>> allTerms;
+    private LiveData<List<MentorEntity>> allMentors;
+    private LiveData<List<CourseEntity>> allCourses;
+    private LiveData<List<AssessmentEntity>> allAssessments;
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Constructors">
+
+    public DbLoader(Context context) {
+        appDb = AppDb.getInstance(context);
+        tempDb = TempDb.getInstance(context);
+        dataExecutor = Executors.newSingleThreadExecutor();
+        scheduler = Schedulers.from(dataExecutor);
+    }
+
+    public static DbLoader getInstance(Context context) {
+        if (null == instance) {
+            instance = new DbLoader(context);
+        }
+
+        return instance;
+    }
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="TermEntity methods">
+
+    public Completable deleteTerm(TermEntity entity) {
+        return appDb.termDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<TermEntity> getTermByRowId(int rowId) {
+        return appDb.termDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<TermEntity> getTermById(int id) {
+        return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public LiveData<List<TermEntity>> getAllTerms() {
+        if (null == allTerms) {
+            allTerms = appDb.termDAO().getAll();
+        }
+        return allTerms;
+    }
+
+    public Single<Integer> getTermCount() {
+        return appDb.termDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Completable saveTerm(TermEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.termDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -191,13 +192,17 @@ public class DbLoader {
         return appDb.termDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<MentorEntity> getMentorByRowId(int rowId) {
-        return appDb.mentorDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
     public Completable insertAllTerms(List<TermEntity> list) {
         return Completable.fromSingle(appDb.termDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, TermEntity::applyInsertedId)));
+    }
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="MentorEntity methods">
+
+    public Single<MentorEntity> getMentorByRowId(int rowId) {
+        return appDb.mentorDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public LiveData<List<MentorEntity>> getAllMentors() {
@@ -210,12 +215,6 @@ public class DbLoader {
     public Single<Integer> getMentorCount() {
         return appDb.mentorDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="PhoneNumberEntity methods">
-
-//    public LiveData<List<PhoneNumberEntity>> getPhoneNumbers(int mentorId) { return tempDb.phoneNumberDAO().getAll(); }
 
     public Completable saveMentor(MentorEntity entity, boolean doNotUseTempDb) {
         if (doNotUseTempDb) {
@@ -244,10 +243,6 @@ public class DbLoader {
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, MentorEntity::applyInsertedId)));
     }
 
-    public Completable deletePhoneNumber(PhoneNumberEntity entity) {
-        return tempDb.phoneNumberDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
     public Completable deleteMentor(MentorEntity entity, boolean clearTempDbData) {
         if (clearTempDbData) {
             return Completable.fromAction(() -> {
@@ -259,22 +254,10 @@ public class DbLoader {
         return appDb.mentorDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-//    public LiveData<List<PhoneNumberEntity>> getPhoneNumbersByMentorId(int mentorId) {
-//        return tempDb.phoneNumberDAO().getByMentorId(mentorId);
-//    }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="EmailAddressEntity methods">
-
-//    public LiveData<List<EmailAddressEntity>> getEmailAddressesByMentorId(int mentorId) {
-//        return tempDb.emailAddressDAO().getByMentorId(mentorId);
-//    }
-
     public Single<MentorEntity> getMentorById(long id, boolean setTempDbData) {
         if (setTempDbData) {
-            return Single.fromCallable(() -> {
-                MentorEntity entity = appDb.mentorDAO().getByIdSynchronous(id);
+
+            return appDb.mentorDAO().getById(id).subscribeOn(scheduler).map(entity -> {
                 tempDb.emailAddressDAO().deleteAllSynchronous();
                 tempDb.phoneNumberDAO().deleteAllSynchronous();
                 if (null != entity) {
@@ -309,17 +292,21 @@ public class DbLoader {
                     }
                 }
                 return entity;
-            });
+            }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
         }
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public LiveData<List<PhoneNumberEntity>> getPhoneNumbers() {
-        return tempDb.phoneNumberDAO().getAll();
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="PhoneNumberEntity methods">
+
+    public Completable deletePhoneNumber(PhoneNumberEntity entity) {
+        return tempDb.phoneNumberDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable deleteEmailAddress(EmailAddressEntity entity) {
-        return tempDb.emailAddressDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public LiveData<List<PhoneNumberEntity>> getPhoneNumbers() {
+        return tempDb.phoneNumberDAO().getAll();
     }
 
     public Completable savePhoneNumber(PhoneNumberEntity entity) {
@@ -329,10 +316,6 @@ public class DbLoader {
         }
         return tempDb.phoneNumberDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="CourseEntity methods">
 
     public Completable setPhoneNumbersFromMultiLineString(String phoneNumbers) {
         return Completable.fromAction(() -> {
@@ -354,9 +337,49 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="EmailAddressEntity methods">
+
+    public Completable deleteEmailAddress(EmailAddressEntity entity) {
+        return tempDb.emailAddressDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
     public LiveData<List<EmailAddressEntity>> getEmailAddresses() {
         return tempDb.emailAddressDAO().getAll();
     }
+
+    public Completable saveEmailAddress(EmailAddressEntity entity) {
+        if (null == entity.getId()) {
+            return Completable.fromSingle(tempDb.emailAddressDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+                    .doAfterSuccess(id -> EmailAddressEntity.applyInsertedId(entity, id)));
+        }
+        return tempDb.emailAddressDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable setEmailAddressesFromMultiLineString(String emailAddresses) {
+        return Completable.fromAction(() -> {
+            tempDb.emailAddressDAO().deleteAllSynchronous();
+            if (null == emailAddresses || emailAddresses.trim().isEmpty()) {
+                return;
+            }
+            List<EmailAddressEntity> list = StringLineIterator.getLines(emailAddresses).filter(t -> !t.isEmpty()).map(new Function<String, EmailAddressEntity>() {
+                int order = -1;
+
+                @Override
+                public EmailAddressEntity apply(String t) {
+                    return new EmailAddressEntity(t, ++order);
+                }
+            }).collect(Collectors.toList());
+            if (!list.isEmpty()) {
+                tempDb.emailAddressDAO().insertAllSynchronous(list);
+            }
+        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="CourseEntity methods">
 
     public Completable deleteCourse(CourseEntity entity) {
         return appDb.courseDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
@@ -393,37 +416,22 @@ public class DbLoader {
         return appDb.courseDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Completable saveCourse(CourseEntity entity) {
+        if (null == entity.getId()) {
+            return Completable.fromSingle(appDb.courseDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+                    .doAfterSuccess(id -> CourseEntity.applyInsertedId(entity, id)));
+        }
+        return appDb.courseDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable insertAllCourses(List<CourseEntity> list) {
+        return Completable.fromSingle(appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+                .doAfterSuccess(ids -> applyInsertedIds(ids, list, CourseEntity::applyInsertedId)));
+    }
+
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="AssessmentEntity methods">
-
-    public Completable saveEmailAddress(EmailAddressEntity entity) {
-        if (null == entity.getId()) {
-            return Completable.fromSingle(tempDb.emailAddressDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> EmailAddressEntity.applyInsertedId(entity, id)));
-        }
-        return tempDb.emailAddressDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Completable setEmailAddressesFromMultiLineString(String emailAddresses) {
-        return Completable.fromAction(() -> {
-            tempDb.emailAddressDAO().deleteAllSynchronous();
-            if (null == emailAddresses || emailAddresses.trim().isEmpty()) {
-                return;
-            }
-            List<EmailAddressEntity> list = StringLineIterator.getLines(emailAddresses).filter(t -> !t.isEmpty()).map(new Function<String, EmailAddressEntity>() {
-                int order = -1;
-
-                @Override
-                public EmailAddressEntity apply(String t) {
-                    return new EmailAddressEntity(t, ++order);
-                }
-            }).collect(Collectors.toList());
-            if (!list.isEmpty()) {
-                tempDb.emailAddressDAO().insertAllSynchronous(list);
-            }
-        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
 
     public Completable deleteAssessment(AssessmentEntity entity) {
         return appDb.assessmentDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
@@ -452,6 +460,19 @@ public class DbLoader {
         return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Completable saveAssessment(AssessmentEntity entity) {
+        if (null == entity.getId()) {
+            return Completable.fromSingle(appDb.assessmentDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+                    .doAfterSuccess(id -> AssessmentEntity.applyInsertedId(entity, id)));
+        }
+        return appDb.assessmentDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable insertAllAssessments(List<AssessmentEntity> list) {
+        return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AssessmentEntity::applyInsertedId)));
+    }
+
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="resetDatabase">
@@ -475,32 +496,6 @@ public class DbLoader {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="populateSampleData">
-
-    public Completable saveCourse(CourseEntity entity) {
-        if (null == entity.getId()) {
-            return Completable.fromSingle(appDb.courseDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> CourseEntity.applyInsertedId(entity, id)));
-        }
-        return appDb.courseDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Completable insertAllCourses(List<CourseEntity> list) {
-        return Completable.fromSingle(appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, CourseEntity::applyInsertedId)));
-    }
-
-    public Completable saveAssessment(AssessmentEntity entity) {
-        if (null == entity.getId()) {
-            return Completable.fromSingle(appDb.assessmentDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> AssessmentEntity.applyInsertedId(entity, id)));
-        }
-        return appDb.assessmentDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Completable insertAllAssessments(List<AssessmentEntity> list) {
-        return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AssessmentEntity::applyInsertedId)));
-    }
 
     @NonNull
     private HashMap<Integer, Long> createSampleTerms(Resources resources) {

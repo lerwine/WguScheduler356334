@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -38,15 +39,15 @@ public class EditTermViewModel extends AndroidViewModel {
             entity.setEnd(end);
             entity.setNotes(notes);
         }
-        return dbLoader.saveTerm(entity);
+        return dbLoader.saveTerm(entity).doOnError(throwable -> Log.e(getClass().getName(), "Error saving term", throwable));
     }
 
     public Single<TermEntity> load(int id) {
-        return dbLoader.getTermById(id).doAfterSuccess(liveData::postValue);
+        return dbLoader.getTermById(id).doAfterSuccess(liveData::postValue).doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
     }
 
     public Completable delete() {
-        return dbLoader.deleteTerm(liveData.getValue());
+        return dbLoader.deleteTerm(liveData.getValue()).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting term", throwable));
     }
 
 }

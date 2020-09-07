@@ -57,10 +57,10 @@ public class PhoneNumberListAdapter extends RecyclerView.Adapter<PhoneNumberList
             super(view);
             mView = view;
             contentTextView = (TextView) view.findViewById(R.id.contentTextView);
-            mEditPhoneFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.editEmailFloatingActionButton);
-            mPhoneUpFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.emailUpFloatingActionButton);
-            mPhoneDownFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.emailDownFloatingActionButton);
-            mDeletePhoneFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.deleteEmailFloatingActionButton);
+            mEditPhoneFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.editPhoneFloatingActionButton);
+            mPhoneUpFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.phoneUpFloatingActionButton);
+            mPhoneDownFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.phoneDownFloatingActionButton);
+            mDeletePhoneFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.deletePhoneFloatingActionButton);
             mEditPhoneFloatingActionButton.setOnClickListener(this::onEditPhoneFloatingActionButton);
             mPhoneUpFloatingActionButton.setOnClickListener(this::onPhoneUpFloatingActionButton);
             mPhoneDownFloatingActionButton.setOnClickListener(this::onPhoneDownFloatingActionButton);
