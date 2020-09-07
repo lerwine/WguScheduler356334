@@ -519,8 +519,8 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         }
 
         public boolean isEmpty() {
-            // FIXME: Unboxing of 'empty.getValue()' may produce 'NullPointerException'
-            return empty.getValue();
+            Boolean b = empty.getValue();
+            return null != b && b;
         }
 
         public LiveBoolean empty() {

@@ -38,13 +38,20 @@ public class CourseEntity implements Comparable<CourseEntity> {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
-    private Integer id;
+    private Long id;
     @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
     @ColumnInfo(name = COLNAME_TERM_ID)
-    private int termId;
+    private long termId;
     @ForeignKey(entity = MentorEntity.class, parentColumns = {MentorEntity.COLNAME_ID}, childColumns = {COLNAME_MENTOR_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
     @ColumnInfo(name = COLNAME_MENTOR_ID)
-    private Integer mentorId;
+    private Long mentorId;
+
+    public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
+                        LocalDate expectedEnd, LocalDate actualEnd, Integer competencyUnits, String notes, long termId, Long mentorId, long id) {
+        this(number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes, termId, mentorId);
+        this.id = id;
+    }
+
     @ColumnInfo(name = COLNAME_NUMBER)
     private String number;
     private String title;
@@ -56,18 +63,19 @@ public class CourseEntity implements Comparable<CourseEntity> {
     private int competencyUnits;
     private String notes;
 
-    public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
-                        LocalDate expectedEnd, LocalDate actualEnd, Integer competencyUnits, String notes, int termId, Integer mentorId, int id) {
-        this(number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes, termId, mentorId);
-        this.id = id;
-    }
-
     @Ignore
     public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
-                        LocalDate expectedEnd, LocalDate actualEnd, Integer competencyUnits, String notes, int termId, Integer mentorId) {
+                        LocalDate expectedEnd, LocalDate actualEnd, Integer competencyUnits, String notes, long termId, Long mentorId) {
         this(number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
         this.termId = termId;
         this.mentorId = mentorId;
+    }
+
+    public static void applyInsertedId(CourseEntity source, long id) {
+        if (null != source.getId()) {
+            throw new IllegalStateException();
+        }
+        source.id = id;
     }
 
     @Ignore
@@ -89,19 +97,19 @@ public class CourseEntity implements Comparable<CourseEntity> {
         this(null, null, null, null, null, null, null, null, null);
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public int getTermId() {
+    public long getTermId() {
         return termId;
     }
 
-    public void setTermId(int termId) {
+    public void setTermId(long termId) {
         this.termId = termId;
     }
 
-    public Integer getMentorId() {
+    public Long getMentorId() {
         return mentorId;
     }
 
@@ -161,7 +169,7 @@ public class CourseEntity implements Comparable<CourseEntity> {
         this.actualEnd = actualEnd;
     }
 
-    public void setMentorId(Integer mentorId) {
+    public void setMentorId(Long mentorId) {
         this.mentorId = mentorId;
     }
 
@@ -204,12 +212,13 @@ public class CourseEntity implements Comparable<CourseEntity> {
 
     @Override
     public synchronized int hashCode() {
-        if (id > 0) {
-            return id;
+        if (null != id) {
+            return id.hashCode();
         }
         return Objects.hash(id, termId, mentorId, number, title, expectedStart, actualStart, expectedEnd, actualEnd, status, notes);
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @Override
     public synchronized int compareTo(CourseEntity o) {
         if (this == o) return 0;
@@ -220,7 +229,11 @@ public class CourseEntity implements Comparable<CourseEntity> {
             thisRange0 = new Pair<>(actualStart, actualEnd);
             thisRange1 = (null != expectedStart || null != actualEnd) ? new Pair<>(expectedStart, expectedEnd) : null;
         } else {
-            thisRange0 = new Pair<>(expectedStart, expectedEnd);
+            if (null == expectedStart && null == expectedEnd) {
+                thisRange0 = null;
+            } else {
+                thisRange0 = new Pair<>(expectedStart, expectedEnd);
+            }
             thisRange1 = null;
         }
         Pair<LocalDate, LocalDate> thatRange0 = new Pair<>(that.actualStart, that.actualEnd);
@@ -257,9 +270,9 @@ public class CourseEntity implements Comparable<CourseEntity> {
         if ((result = status.compareTo(that.status)) != 0) {
             return result;
         }
-        Integer i = that.id;
+        Long i = that.id;
         if (null != i) {
-            return (null == id) ? 1 : id - i;
+            return (null == id) ? 1 : Long.compare(id, i);
         }
         if (null != id) {
             return -1;

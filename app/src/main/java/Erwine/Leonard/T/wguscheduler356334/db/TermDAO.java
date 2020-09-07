@@ -18,16 +18,16 @@ import io.reactivex.Single;
 public interface TermDAO {
 
     @Insert
-    Completable insert(TermEntity term);
+    Single<Long> insert(TermEntity term);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(TermEntity term);
 
     @Insert
-    Completable insertAll(List<TermEntity> terms);
+    Single<List<Long>> insertAll(List<TermEntity> terms);
 
     @Insert
-    void insertAllItems(List<TermEntity> items);
+    List<Long> insertAllSynchronous(List<TermEntity> items);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<TermEntity> terms);
@@ -45,7 +45,7 @@ public interface TermDAO {
     LiveData<List<TermEntity>> getAll();
 
     @Query("SELECT * FROM terms")
-    List<TermEntity> getAllItems();
+    List<TermEntity> getAllSynchronous();
 
     @Query("SELECT COUNT(*) FROM terms")
     Single<Integer> getCount();

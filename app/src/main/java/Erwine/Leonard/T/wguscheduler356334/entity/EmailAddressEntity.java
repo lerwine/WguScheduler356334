@@ -16,45 +16,65 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 @Entity(tableName = TempDb.TABLE_NAME_EMAIL_ADDRESSES)
 public class EmailAddressEntity implements Comparable<EmailAddressEntity> {
     public static final String COLNAME_ID = "id";
-    public static final String COLNAME_MENTOR_ID = "mentorId";
+    //    public static final String COLNAME_MENTOR_ID = "mentorId";
     public static final String COLNAME_SORT_ORDER = "sortOrder";
     public static final String COLNAME_VALUE = "value";
     private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
-
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
-    private Integer id;
-    @ColumnInfo(name = COLNAME_MENTOR_ID)
-    private int mentorId;
+    private Long id;
+    //    @ColumnInfo(name = COLNAME_MENTOR_ID)
+//    private long mentorId;
     @ColumnInfo(name = COLNAME_VALUE)
     private String value;
     @ColumnInfo(name = COLNAME_SORT_ORDER)
     private int sortOrder;
 
     @Ignore
-    public EmailAddressEntity(int mentorId, String value, int sortOrder) {
-        this.mentorId = mentorId;
+    public EmailAddressEntity(String value, int sortOrder) {
         this.value = SINGLE_LINE_NORMALIZER.apply(value);
         this.sortOrder = sortOrder;
     }
 
     @Ignore
-    public EmailAddressEntity(int mentorId, String value) {
-        this(mentorId, value, Integer.MAX_VALUE);
+    public EmailAddressEntity(String value) {
+        this(value, Integer.MAX_VALUE);
     }
 
-    public EmailAddressEntity(int mentorId, String value, int sortOrder, int id) {
-        this(mentorId, value, sortOrder);
+//    public EmailAddressEntity(long mentorId, String value, int sortOrder) {
+//        this.mentorId = mentorId;
+//        this.value = SINGLE_LINE_NORMALIZER.apply(value);
+//        this.sortOrder = sortOrder;
+//    }
+
+    public EmailAddressEntity(String value, int sortOrder, long id) {
+        this(value, sortOrder);
         this.id = id;
     }
 
-    public Integer getId() {
+//    public EmailAddressEntity(long mentorId, String value) {
+//        this(mentorId, value, Integer.MAX_VALUE);
+//    }
+
+    public static void applyInsertedId(EmailAddressEntity source, long id) {
+        if (null != source.getId()) {
+            throw new IllegalStateException();
+        }
+        source.id = id;
+    }
+
+//    public EmailAddressEntity(long mentorId, String value, int sortOrder, long id) {
+//        this(mentorId, value, sortOrder);
+//        this.id = id;
+//    }
+
+    public Long getId() {
         return id;
     }
 
-    public int getMentorId() {
-        return mentorId;
-    }
+//    public long getMentorId() {
+//        return mentorId;
+//    }
 
     public String getValue() {
         return value;
@@ -77,14 +97,20 @@ public class EmailAddressEntity implements Comparable<EmailAddressEntity> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EmailAddressEntity that = (EmailAddressEntity) o;
-        return (null == id) ? null == that.id && mentorId == that.mentorId && value.equals(that.value) && sortOrder == that.sortOrder : Objects.equals(id, that.id);
+//        return (null == id) ? null == that.id && mentorId == that.mentorId && value.equals(that.value) && sortOrder == that.sortOrder : Objects.equals(id, that.id);
+        return (null == id) ? null == that.id && value.equals(that.value) && sortOrder == that.sortOrder : Objects.equals(id, that.id);
     }
 
     @Override
     public synchronized int hashCode() {
-        return (null == id) ? Objects.hash(value, sortOrder) : id;
+        return (null == id) ? Objects.hash(value, sortOrder) : id.hashCode();
     }
 
+//    public synchronized int hashCode() {
+//        return (null == id) ? Objects.hash(mentorId, value, sortOrder) : id;
+//    }
+
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @Override
     public synchronized int compareTo(EmailAddressEntity o) {
         if (this == o) return 0;
@@ -94,11 +120,18 @@ public class EmailAddressEntity implements Comparable<EmailAddressEntity> {
         if (result != 0) {
             return result;
         }
-        Integer i = that.id;
+        Long i = that.id;
         if (null == i) {
+//            if (null != id) {
+//                return -1;
+//            }
+//            if ((result = value.compareTo(that.value)) != 0) {
+//                return result;
+//            }
+//            return mentorId - that.mentorId;
             return (null == id) ? value.compareTo(that.value) : -1;
         }
-        return (null == id) ? 1 : id - i;
+        return (null == id) ? 1 : Long.compare(id, i);
     }
 
     @NonNull
@@ -106,7 +139,7 @@ public class EmailAddressEntity implements Comparable<EmailAddressEntity> {
     public String toString() {
         return "EmailAddressEntity{" +
                 "id=" + id +
-                ", mentorId=" + mentorId +
+//                ", mentorId=" + mentorId +
                 ", value='" + value + '\'' +
                 ", sortOrder=" + sortOrder +
                 '}';

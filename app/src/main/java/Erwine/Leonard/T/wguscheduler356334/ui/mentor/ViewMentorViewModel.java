@@ -30,20 +30,20 @@ public class ViewMentorViewModel extends AndroidViewModel {
     public Completable saveNotes(String notes) {
         MentorEntity entity = Objects.requireNonNull(liveData.getValue());
         entity.setNotes(notes);
-        return dbLoader.saveMentor(entity);
+        return dbLoader.saveMentor(entity, true);
     }
 
     public Completable saveName(String name) {
         MentorEntity entity = Objects.requireNonNull(liveData.getValue());
         entity.setName(name);
-        return dbLoader.saveMentor(entity);
+        return dbLoader.saveMentor(entity, true);
     }
 
     public Single<MentorEntity> load(int id) {
-        return dbLoader.getMentorById(id).doAfterSuccess(liveData::postValue);
+        return dbLoader.getMentorById(id, true).doAfterSuccess(liveData::postValue);
     }
 
     public Completable delete() {
-        return dbLoader.deleteMentor(liveData.getValue());
+        return dbLoader.deleteMentor(liveData.getValue(), true);
     }
 }

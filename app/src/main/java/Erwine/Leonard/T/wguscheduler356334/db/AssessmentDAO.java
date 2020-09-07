@@ -18,19 +18,19 @@ import io.reactivex.Single;
 public interface AssessmentDAO {
 
     @Insert
-    Completable insert(AssessmentEntity assessment);
+    Single<Long> insert(AssessmentEntity assessment);
 
     @Insert
-    void insertItem(AssessmentEntity item);
+    long insertSynchronous(AssessmentEntity item);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(AssessmentEntity assessment);
 
     @Insert
-    Completable insertAll(List<AssessmentEntity> list);
+    Single<List<Long>> insertAll(List<AssessmentEntity> list);
 
     @Insert
-    void insertAllItems(List<AssessmentEntity> list);
+    List<Long> insertAllSynchronous(List<AssessmentEntity> list);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<AssessmentEntity> list);
@@ -48,7 +48,7 @@ public interface AssessmentDAO {
     LiveData<List<AssessmentEntity>> getByCourseId(int courseId);
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId")
-    List<AssessmentEntity> getItemsByCourseId(int courseId);
+    List<AssessmentEntity> getByCourseIdSynchronous(int courseId);
 
     @Query("SELECT * FROM assessments ORDER BY [goalDate], [evaluationDate]")
     LiveData<List<AssessmentEntity>> getAll();
@@ -56,7 +56,7 @@ public interface AssessmentDAO {
     @Query("SELECT COUNT(*) FROM assessments")
     Single<Integer> getCount();
 
-    @Query("DELETE FROM assessments")
-    Single<Integer> deleteAll();
+    @Query("DELETE FROM assessments WHERE courseId=:courseId")
+    Single<Integer> deleteByCourseId(int courseId);
 
 }

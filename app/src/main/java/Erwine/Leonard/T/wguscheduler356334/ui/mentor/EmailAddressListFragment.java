@@ -19,30 +19,30 @@ import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.PhoneNumberEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.EmailAddressEntity;
 
 /**
  * A fragment representing a list of Items.
  */
-public class PhoneNumberListFragment extends Fragment {
+public class EmailAddressListFragment extends Fragment {
 
-    private final List<PhoneNumberEntity> mItems;
     //    private static final String ARG_MENTOR_ID = "mentor-id";
-//    private Integer mMentorId;
-    private RecyclerView phoneNumberListRecyclerView;
-    private PhoneNumberListAdapter mAdapter;
-    private PhoneNumberListViewModel phoneNumberListViewModel;
+    private final List<EmailAddressEntity> mItems;
+    //    private Integer mMentorId;
+    private RecyclerView emailListRecyclerView;
+    private EmailAddressListAdapter mAdapter;
+    private EmailAddressListViewModel emailAddressListViewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PhoneNumberListFragment() {
+    public EmailAddressListFragment() {
         mItems = new ArrayList<>();
     }
 
-//    public static PhoneNumberListFragment newInstance(int mentorId) {
-//        PhoneNumberListFragment fragment = new PhoneNumberListFragment();
+//    public static EmailAddressListFragment newInstance(int mentorId) {
+//        EmailAddressListFragment fragment = new EmailAddressListFragment();
 //        Bundle args = new Bundle();
 //        args.putInt(ARG_MENTOR_ID, mentorId);
 //        fragment.setArguments(args);
@@ -52,6 +52,7 @@ public class PhoneNumberListFragment extends Fragment {
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
+//
 //        Bundle arguments = getArguments();
 //        if (null != arguments) {
 //            mMentorId = arguments.getInt(ARG_MENTOR_ID);
@@ -61,27 +62,30 @@ public class PhoneNumberListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_phone_number_list, container, false);
-        phoneNumberListRecyclerView = root.findViewById(R.id.phoneNumberListRecyclerView);
-        mAdapter = new PhoneNumberListAdapter(mItems, getContext());
-        phoneNumberListRecyclerView.setAdapter(mAdapter);
-        phoneNumberListRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) phoneNumberListRecyclerView.getLayoutManager());
-        DividerItemDecoration decoration = new DividerItemDecoration(phoneNumberListRecyclerView.getContext(), linearLayoutManager.getOrientation());
-        phoneNumberListRecyclerView.addItemDecoration(decoration);
-        FloatingActionButton fab = root.findViewById(R.id.addPhoneButton);
-        fab.setOnClickListener(this::onAddPhoneButtonClick);
+        View root = inflater.inflate(R.layout.fragment_email_address_list, container, false);
+
+        emailListRecyclerView = root.findViewById(R.id.emailListRecyclerView);
+        mAdapter = new EmailAddressListAdapter(mItems, getContext());
+        emailListRecyclerView.setAdapter(mAdapter);
+
+        emailListRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) emailListRecyclerView.getLayoutManager());
+        DividerItemDecoration decoration = new DividerItemDecoration(emailListRecyclerView.getContext(), linearLayoutManager.getOrientation());
+        emailListRecyclerView.addItemDecoration(decoration);
+
+        FloatingActionButton fab = root.findViewById(R.id.addEmailButton);
+        fab.setOnClickListener(this::onAddEmailButtonClick);
         return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        phoneNumberListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(PhoneNumberListViewModel.class);
-        phoneNumberListViewModel.getLiveData().observe(getViewLifecycleOwner(), this::onPhoneNumberListChanged);
+        emailAddressListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(EmailAddressListViewModel.class);
+        emailAddressListViewModel.getLiveData().observe(getViewLifecycleOwner(), this::onEmailAddressListChanged);
     }
 
-    private void onPhoneNumberListChanged(List<PhoneNumberEntity> list) {
+    private void onEmailAddressListChanged(List<EmailAddressEntity> list) {
         mItems.clear();
         mItems.addAll(list);
         if (null != mAdapter) {
@@ -89,7 +93,6 @@ public class PhoneNumberListFragment extends Fragment {
         }
     }
 
-    private void onAddPhoneButtonClick(View view) {
-
+    private void onAddEmailButtonClick(View view) {
     }
 }

@@ -29,16 +29,24 @@ public class TermEntity implements Comparable<TermEntity> {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
-    private Integer id;
+    private Long id;
+
+    public TermEntity(String name, LocalDate start, LocalDate end, String notes, long id) {
+        this(name, start, end, notes);
+        this.id = id;
+    }
+
     @ColumnInfo(name = COLNAME_NAME)
     private String name;
     private LocalDate start;
     private LocalDate end;
     private String notes;
 
-    public TermEntity(String name, LocalDate start, LocalDate end, String notes, int id) {
-        this(name, start, end, notes);
-        this.id = id;
+    public static void applyInsertedId(TermEntity source, long id) {
+        if (null != source.getId()) {
+            throw new IllegalStateException();
+        }
+        source.id = id;
     }
 
     @Ignore
@@ -54,7 +62,7 @@ public class TermEntity implements Comparable<TermEntity> {
         this(null, null, null, null);
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -106,12 +114,13 @@ public class TermEntity implements Comparable<TermEntity> {
 
     @Override
     public synchronized int hashCode() {
-        if (id > 0) {
-            return id;
+        if (null != id) {
+            return id.hashCode();
         }
         return Objects.hash(name, start, end, notes);
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @Override
     public synchronized int compareTo(TermEntity o) {
         if (this == o) return 0;
@@ -122,11 +131,11 @@ public class TermEntity implements Comparable<TermEntity> {
         if (result != 0) {
             return result;
         }
-        Integer i = that.id;
+        Long i = that.id;
         if (null == i) {
             return (null == id) ? name.compareTo(that.name) : -1;
         }
-        return (null == id) ? 1 : id - i;
+        return (null == id) ? 1 : Long.compare(id, i);
     }
 
     @NonNull

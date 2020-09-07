@@ -28,11 +28,19 @@ public class AssessmentEntity implements Comparable<AssessmentEntity> {
     public static final String COLNAME_CODE = "code";
     private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
     private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
+
     @PrimaryKey(autoGenerate = true)
-    private Integer id;
+    private Long id;
     @ForeignKey(entity = CourseEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
     @ColumnInfo(name = COLNAME_COURSE_ID)
-    private int courseId;
+    private long courseId;
+
+    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate, long courseId,
+                            long id) {
+        this(code, status, goalDate, type, notes, evaluationDate, courseId);
+        this.id = id;
+    }
+
     @ColumnInfo(name = COLNAME_CODE)
     private String code;
     private AssessmentStatus status;
@@ -41,16 +49,17 @@ public class AssessmentEntity implements Comparable<AssessmentEntity> {
     private AssessmentType type;
     private String notes;
 
-    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate, int courseId,
-                            int id) {
-        this(code, status, goalDate, type, notes, evaluationDate, courseId);
-        this.id = id;
-    }
-
     @Ignore
-    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate, int courseId) {
+    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate evaluationDate, long courseId) {
         this(code, status, goalDate, type, notes, evaluationDate);
         this.courseId = courseId;
+    }
+
+    public static void applyInsertedId(AssessmentEntity source, long id) {
+        if (null != source.getId()) {
+            throw new IllegalStateException();
+        }
+        source.id = id;
     }
 
     @Ignore
@@ -73,15 +82,15 @@ public class AssessmentEntity implements Comparable<AssessmentEntity> {
         this(null, null, null, null, null);
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public int getCourseId() {
+    public long getCourseId() {
         return courseId;
     }
 
-    public void setCourseId(int courseId) {
+    public void setCourseId(long courseId) {
         this.courseId = courseId;
     }
 
@@ -153,12 +162,13 @@ public class AssessmentEntity implements Comparable<AssessmentEntity> {
 
     @Override
     public synchronized int hashCode() {
-        if (id > 0) {
-            return id;
+        if (null != id) {
+            return id.hashCode();
         }
         return Objects.hash(id, courseId, code, status, goalDate, evaluationDate, type, notes);
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @Override
     public synchronized int compareTo(AssessmentEntity o) {
         if (this == o) return 0;
@@ -208,8 +218,8 @@ public class AssessmentEntity implements Comparable<AssessmentEntity> {
         if ((result = status.compareTo(that.status)) != 0 || (result = type.compareTo(that.type)) != 0 || (result = code.compareTo(that.code)) != 0) {
             return result;
         }
-        Integer i = that.id;
-        return (null == i) ? ((null == id) ? 0 : -1) : ((null == id) ? 1 : id - i);
+        Long i = that.id;
+        return (null == i) ? ((null == id) ? 0 : -1) : ((null == id) ? 1 : Long.compare(id, i));
     }
 
     @NonNull

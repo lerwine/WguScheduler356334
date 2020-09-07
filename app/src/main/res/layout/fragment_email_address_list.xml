@@ -5,10 +5,10 @@
     android:name="Erwine.Leonard.T.wguscheduler356334.EmailAddressFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.mentor.EmailAddressFragment">
+    tools:context=".ui.mentor.EmailAddressListFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
+        android:id="@+id/emailListRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="16dp"

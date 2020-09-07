@@ -17,16 +17,22 @@ import io.reactivex.Single;
 public interface MentorDAO {
 
     @Insert
-    Completable insert(MentorEntity mentor);
+    Single<Long> insert(MentorEntity mentor);
+
+    @Insert
+    long insertSynchronous(MentorEntity mentor);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable update(MentorEntity mentor);
 
-    @Insert
-    Completable insertAll(List<MentorEntity> mentors);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void updateSynchronous(MentorEntity mentor);
 
     @Insert
-    void insertAllItems(List<MentorEntity> items);
+    Single<List<Long>> insertAll(List<MentorEntity> mentors);
+
+    @Insert
+    List<Long> insertAllSynchronous(List<MentorEntity> items);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<MentorEntity> mentors);
@@ -34,17 +40,23 @@ public interface MentorDAO {
     @Delete
     Completable delete(MentorEntity mentor);
 
+    @Delete
+    void deleteSynchronous(MentorEntity mentor);
+
     @Query("SELECT * FROM mentors WHERE ROWID = :rowId")
     Single<MentorEntity> getByRowId(int rowId);
 
     @Query("SELECT * FROM mentors WHERE id = :id")
-    Single<MentorEntity> getById(int id);
+    Single<MentorEntity> getById(long id);
+
+    @Query("SELECT * FROM mentors WHERE id = :id")
+    MentorEntity getByIdSynchronous(long id);
 
     @Query("SELECT * FROM mentors ORDER BY [name]")
     LiveData<List<MentorEntity>> getAll();
 
     @Query("SELECT * FROM mentors")
-    List<MentorEntity> getAllItems();
+    List<MentorEntity> getAllSynchronous();
 
     @Query("SELECT COUNT(*) FROM mentors")
     Single<Integer> getCount();

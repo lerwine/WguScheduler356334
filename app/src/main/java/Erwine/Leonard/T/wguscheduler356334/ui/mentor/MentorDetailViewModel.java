@@ -5,50 +5,69 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.EmailAddressEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.IndexedStringList;
+import Erwine.Leonard.T.wguscheduler356334.entity.PhoneNumberEntity;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
 public class MentorDetailViewModel extends AndroidViewModel {
 
-    private final MutableLiveData<MentorEntity> liveData;
+    private final MutableLiveData<MentorEntity> mLiveData;
     private final DbLoader dbLoader;
+    private LiveData<List<PhoneNumberEntity>> phoneNumbers;
+    private LiveData<List<EmailAddressEntity>> emailAddresses;
 
     public MentorDetailViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        liveData = new MutableLiveData<>();
+        mLiveData = new MutableLiveData<>();
+        phoneNumbers = dbLoader.getPhoneNumbers();
+        emailAddresses = dbLoader.getEmailAddresses();
     }
 
     public MutableLiveData<MentorEntity> getLiveData() {
-        return liveData;
+        return mLiveData;
     }
 
-    public Completable save(String name, IndexedStringList emailAddresses, IndexedStringList phoneNumbers, String notes) {
-        MentorEntity entity = liveData.getValue();
-        if (null == entity) {
-            entity = new MentorEntity(name, notes, emailAddresses.toString(), phoneNumbers.toString());
+    public LiveData<List<PhoneNumberEntity>> getPhoneNumbers() {
+        return phoneNumbers;
+    }
+
+    public LiveData<List<EmailAddressEntity>> getEmailAddresses() {
+        return emailAddresses;
+    }
+
+    public Completable save(String name, String notes) {
+        MentorEntity currentEntity = mLiveData.getValue();
+        Completable result;
+        if (null == currentEntity) {
+            MentorEntity newEntity = new MentorEntity(name, notes, emailAddresses.toString(), phoneNumbers.toString());
+            result = dbLoader.saveMentor(newEntity, false).doOnComplete(() -> mLiveData.postValue(newEntity));
         } else {
-            entity.setName(name);
-            entity.setEmailAddresses(emailAddresses.toString());
-            entity.setPhoneNumbers(phoneNumbers.toString());
-            entity.setNotes(notes);
+            currentEntity.setName(name);
+            currentEntity.setEmailAddresses(emailAddresses.toString());
+            currentEntity.setPhoneNumbers(phoneNumbers.toString());
+            currentEntity.setNotes(notes);
+            result = dbLoader.saveMentor(currentEntity, false);
         }
-        return dbLoader.saveMentor(entity);
+        return result.doOnError(throwable -> Log.e(getClass().getName(), "Error saving mentor", throwable));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void load(int id) {
-        Single<MentorEntity> result = dbLoader.getMentorById(id).doAfterSuccess(liveData::postValue);
-        result.subscribe(liveData::postValue, throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
+    public Single<MentorEntity> getEntity(long id) {
+        return dbLoader.getMentorById(id, true).doAfterSuccess(mLiveData::postValue)
+                .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
     }
 
     public Completable delete() {
-        return dbLoader.deleteMentor(liveData.getValue());
+        return dbLoader.deleteMentor(mLiveData.getValue(), true).doOnComplete(() -> mLiveData.postValue(null))
+                .doOnError(throwable -> Log.e(getClass().getName(), "Error deleting mentor", throwable));
     }
 
 }

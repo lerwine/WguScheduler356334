@@ -8,7 +8,7 @@
     tools:context=".ui.mentor.PhoneNumberListFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
+        android:id="@+id/phoneNumberListRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="16dp"

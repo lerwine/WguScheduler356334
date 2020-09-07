@@ -19,16 +19,16 @@ import io.reactivex.Single;
 public interface CourseDAO {
 
     @Insert
-    Completable insert(CourseEntity course);
+    Single<Long> insert(CourseEntity course);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(CourseEntity course);
 
     @Insert
-    Completable insertAll(List<CourseEntity> list);
+    Single<List<Long>> insertAll(List<CourseEntity> list);
 
     @Insert
-    void insertAllItems(List<CourseEntity> list);
+    List<Long> insertAllSynchronous(List<CourseEntity> list);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable updateAll(List<CourseEntity> list);
@@ -46,13 +46,13 @@ public interface CourseDAO {
     LiveData<List<CourseEntity>> getAll();
 
     @Query("SELECT * FROM courses")
-    List<CourseEntity> getAllItems();
+    List<CourseEntity> getAllSynchronous();
 
     @Query("SELECT * FROM courses WHERE termId = :termId ORDER BY [expectedStart], [actualStart]")
     LiveData<List<CourseEntity>> getByTermId(int termId);
 
     @Query("SELECT * FROM courses WHERE termId = :termId")
-    List<CourseEntity> getItemsByTermId(int termId);
+    List<CourseEntity> getByTermIdSynchronous(int termId);
 
     @Query("SELECT * FROM courses WHERE mentorId = :mentorId ORDER BY [expectedStart], [actualStart]")
     LiveData<List<CourseEntity>> getByMentorId(int mentorId);
@@ -63,7 +63,7 @@ public interface CourseDAO {
     @Query("SELECT COUNT(*) FROM courses")
     Single<Integer> getCount();
 
-    @Query("DELETE FROM courses")
-    Single<Integer> deleteAll();
+    @Query("DELETE FROM courses WHERE termId=:termId")
+    Single<Integer> deleteByTermId(int termId);
 
 }

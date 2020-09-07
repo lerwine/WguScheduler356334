@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -19,24 +20,24 @@ public class MentorDetailPagerAdapter extends FragmentPagerAdapter {
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_title_general, R.string.tab_title_phone, R.string.tab_title_email};
     private final Context mContext;
+    private final long mMentorId;
 
-    public MentorDetailPagerAdapter(Context context, FragmentManager fm) {
-        super(fm);
+    public MentorDetailPagerAdapter(Context context, long mentorId, FragmentManager fm) {
+        super(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         mContext = context;
+        mMentorId = mentorId;
     }
 
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         switch (position) {
             case 1:
-                // TODO: Need to get mentor ID, instead
-                return PhoneNumberListFragment.newInstance(position);
+                return new PhoneNumberListFragment();
             case 2:
-                // TODO: Need to get mentor ID, instead
-                return EmailAddressFragment.newInstance(position);
+                return new EmailAddressListFragment();
             default:
-                // TODO: Need to get mentor ID, instead
-                return MentorDetailFragment.newInstance(position + 1);
+                return MentorDetailFragment.newInstance(mMentorId);
         }
     }
 

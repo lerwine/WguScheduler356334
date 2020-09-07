@@ -43,10 +43,12 @@ public class MentorListFragment extends Fragment {
         mMentorListRecyclerView = root.findViewById(R.id.mentorListRecyclerView);
         mAdapter = new MentorListAdapter(mItems, getContext());
         mMentorListRecyclerView.setAdapter(mAdapter);
+
         mMentorListRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) mMentorListRecyclerView.getLayoutManager());
         DividerItemDecoration decoration = new DividerItemDecoration(mMentorListRecyclerView.getContext(), linearLayoutManager.getOrientation());
         mMentorListRecyclerView.addItemDecoration(decoration);
+
         FloatingActionButton fab = root.findViewById(R.id.addMentorButton);
         fab.setOnClickListener(this::onAddMentorButtonClick);
         return root;
