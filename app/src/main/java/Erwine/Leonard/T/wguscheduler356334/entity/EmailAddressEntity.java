@@ -14,7 +14,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
 @Entity(tableName = TempDb.TABLE_NAME_EMAIL_ADDRESSES)
-public class EmailAddressEntity {
+public class EmailAddressEntity implements Comparable<EmailAddressEntity> {
     public static final String COLNAME_ID = "id";
     public static final String COLNAME_MENTOR_ID = "mentorId";
     public static final String COLNAME_SORT_ORDER = "sortOrder";
@@ -73,7 +73,7 @@ public class EmailAddressEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EmailAddressEntity that = (EmailAddressEntity) o;
@@ -81,8 +81,24 @@ public class EmailAddressEntity {
     }
 
     @Override
-    public int hashCode() {
+    public synchronized int hashCode() {
         return (null == id) ? Objects.hash(value, sortOrder) : id;
+    }
+
+    @Override
+    public synchronized int compareTo(EmailAddressEntity o) {
+        if (this == o) return 0;
+        if (o == null || getClass() != o.getClass()) return -1;
+        EmailAddressEntity that = (EmailAddressEntity) o;
+        int result = sortOrder - that.sortOrder;
+        if (result != 0) {
+            return result;
+        }
+        Integer i = that.id;
+        if (null == i) {
+            return (null == id) ? value.compareTo(that.value) : -1;
+        }
+        return (null == id) ? 1 : id - i;
     }
 
     @NonNull

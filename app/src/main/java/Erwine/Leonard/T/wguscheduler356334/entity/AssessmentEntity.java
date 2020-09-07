@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -19,7 +20,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
         @Index(value = AssessmentEntity.COLNAME_COURSE_ID, name = AssessmentEntity.INDEX_COURSE),
         @Index(value = AssessmentEntity.COLNAME_CODE, name = AssessmentEntity.INDEX_CODE)
 })
-public class AssessmentEntity {
+public class AssessmentEntity implements Comparable<AssessmentEntity> {
 
     public static final String INDEX_COURSE = "IDX_ASSESSMENT_COURSE";
     public static final String INDEX_CODE = "IDX_ASSESSMENT_CODE";
@@ -133,7 +134,7 @@ public class AssessmentEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AssessmentEntity that = (AssessmentEntity) o;
@@ -151,14 +152,67 @@ public class AssessmentEntity {
     }
 
     @Override
-    public int hashCode() {
+    public synchronized int hashCode() {
         if (id > 0) {
             return id;
         }
         return Objects.hash(id, courseId, code, status, goalDate, evaluationDate, type, notes);
     }
 
-    @SuppressWarnings("NullableProblems")
+    @Override
+    public synchronized int compareTo(AssessmentEntity o) {
+        if (this == o) return 0;
+        if (o == null || getClass() != o.getClass()) return -1;
+        AssessmentEntity that = (AssessmentEntity) o;
+        LocalDate d = that.evaluationDate;
+        int result;
+        if (null == d) {
+            if (null == (d = that.goalDate)) {
+                if (null != goalDate || null != evaluationDate) {
+                    return -1;
+                }
+            } else if (null == evaluationDate) {
+                if (null == goalDate) {
+                    return 1;
+                }
+                if ((result = goalDate.compareTo(d)) != 0) {
+                    return result;
+                }
+            } else {
+                if ((result = evaluationDate.compareTo(d)) != 0 || (null != goalDate && (result = goalDate.compareTo(d)) != 0)) {
+                    return result;
+                }
+            }
+        } else {
+            if (null == evaluationDate) {
+                if (null == goalDate) {
+                    return 1;
+                }
+                if ((result = goalDate.compareTo(d)) != 0 || (null != (d = that.goalDate) && (result = goalDate.compareTo(d)) != 0)) {
+                    return result;
+                }
+            } else {
+                if ((result = evaluationDate.compareTo(d)) != 0) {
+                    return result;
+                }
+                LocalDate g = that.goalDate;
+                if (null == g) {
+                    if (null != goalDate && (result = goalDate.compareTo(d)) != 0) {
+                        return result;
+                    }
+                } else if ((result = ((null == goalDate) ? evaluationDate : goalDate).compareTo(g)) != 0) {
+                    return result;
+                }
+            }
+        }
+        if ((result = status.compareTo(that.status)) != 0 || (result = type.compareTo(that.type)) != 0 || (result = code.compareTo(that.code)) != 0) {
+            return result;
+        }
+        Integer i = that.id;
+        return (null == i) ? ((null == id) ? 0 : -1) : ((null == id) ? 1 : id - i);
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return "AssessmentEntity{" +

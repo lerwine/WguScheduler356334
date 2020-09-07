@@ -1,5 +1,8 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.util.Pair;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -14,13 +17,14 @@ import java.util.function.Function;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 @Entity(tableName = AppDb.TABLE_NAME_COURSES, indices = {
         @Index(value = CourseEntity.COLNAME_TERM_ID, name = CourseEntity.INDEX_TERM),
         @Index(value = CourseEntity.COLNAME_MENTOR_ID, name = CourseEntity.INDEX_MENTOR),
         @Index(value = {CourseEntity.COLNAME_NUMBER, CourseEntity.COLNAME_TERM_ID}, name = CourseEntity.INDEX_NUMBER, unique = true)
 })
-public class CourseEntity {
+public class CourseEntity implements Comparable<CourseEntity> {
 
     public static final String INDEX_TERM = "IDX_COURSE_TERM";
     public static final String INDEX_MENTOR = "IDX_COURSE_MENTOR";
@@ -165,6 +169,10 @@ public class CourseEntity {
         return competencyUnits;
     }
 
+    public void setCompetencyUnits(int competencyUnits) {
+        this.competencyUnits = competencyUnits;
+    }
+
     public String getNotes() {
         return notes;
     }
@@ -174,7 +182,7 @@ public class CourseEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CourseEntity that = (CourseEntity) o;
@@ -195,14 +203,74 @@ public class CourseEntity {
     }
 
     @Override
-    public int hashCode() {
+    public synchronized int hashCode() {
         if (id > 0) {
             return id;
         }
         return Objects.hash(id, termId, mentorId, number, title, expectedStart, actualStart, expectedEnd, actualEnd, status, notes);
     }
 
-    @SuppressWarnings("NullableProblems")
+    @Override
+    public synchronized int compareTo(CourseEntity o) {
+        if (this == o) return 0;
+        if (o == null || getClass() != o.getClass()) return -1;
+        CourseEntity that = (CourseEntity) o;
+        Pair<LocalDate, LocalDate> thisRange0, thisRange1;
+        if (null != actualStart || null != actualEnd) {
+            thisRange0 = new Pair<>(actualStart, actualEnd);
+            thisRange1 = (null != expectedStart || null != actualEnd) ? new Pair<>(expectedStart, expectedEnd) : null;
+        } else {
+            thisRange0 = new Pair<>(expectedStart, expectedEnd);
+            thisRange1 = null;
+        }
+        Pair<LocalDate, LocalDate> thatRange0 = new Pair<>(that.actualStart, that.actualEnd);
+        Pair<LocalDate, LocalDate> thatRange1 = new Pair<>(that.expectedStart, that.expectedStart);
+        if (null == thatRange1.first && null == thatRange1.second)
+            thatRange1 = null;
+        if (null == thatRange0.first && null == thatRange0.second) {
+            thatRange0 = thatRange1;
+            thatRange1 = null;
+        }
+        int result;
+        if (null == thisRange0) {
+            if (null != thatRange0) {
+                return 1;
+            }
+        } else {
+            if (null == thatRange0) {
+                return -1;
+            }
+            if ((result = Values.compareDateRanges(thisRange0.first, thisRange0.second, thatRange0.first, thatRange0.second)) != 0) {
+                return result;
+            }
+            if (null != thisRange1) {
+                if (null == thatRange1) {
+                    thatRange1 = thatRange0;
+                }
+                if ((result = Values.compareDateRanges(thisRange1.first, thisRange1.second, thatRange1.first, thatRange1.second)) != 0) {
+                    return result;
+                }
+            } else if (null != thatRange1 && (result = Values.compareDateRanges(thisRange0.first, thisRange0.second, thatRange1.first, thatRange1.second)) != 0) {
+                return result;
+            }
+        }
+        if ((result = status.compareTo(that.status)) != 0) {
+            return result;
+        }
+        Integer i = that.id;
+        if (null != i) {
+            return (null == id) ? 1 : id - i;
+        }
+        if (null != id) {
+            return -1;
+        }
+        if ((result = number.compareTo(that.number)) != 0) {
+            return result;
+        }
+        return title.compareTo(that.title);
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return "CourseEntity{" +
@@ -218,27 +286,5 @@ public class CourseEntity {
                 ", status=" + status +
                 ", notes='" + notes + '\'' +
                 '}';
-    }
-
-    public void setCompetencyUnits(int competencyUnits) {
-        this.competencyUnits = competencyUnits;
-    }
-
-    class SampleData {
-        private CourseEntity course;
-        private MentorEntity mentor;
-        private AssessmentEntity[] assessments;
-
-        public CourseEntity getCourse() {
-            return course;
-        }
-
-        public MentorEntity getMentor() {
-            return mentor;
-        }
-
-        public AssessmentEntity[] getAssessments() {
-            return assessments;
-        }
     }
 }

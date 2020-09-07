@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -13,11 +14,12 @@ import java.util.function.Function;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.Values;
 
 @Entity(tableName = AppDb.TABLE_NAME_TERMS, indices = {
         @Index(value = TermEntity.COLNAME_NAME, name = TermEntity.INDEX_NAME, unique = true)
 })
-public class TermEntity {
+public class TermEntity implements Comparable<TermEntity> {
 
     public static final String INDEX_NAME = "IDX_TERM_NAME";
     public static final String COLNAME_ID = "id";
@@ -89,7 +91,7 @@ public class TermEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TermEntity that = (TermEntity) o;
@@ -103,14 +105,31 @@ public class TermEntity {
     }
 
     @Override
-    public int hashCode() {
+    public synchronized int hashCode() {
         if (id > 0) {
             return id;
         }
         return Objects.hash(name, start, end, notes);
     }
 
-    @SuppressWarnings("NullableProblems")
+    @Override
+    public synchronized int compareTo(TermEntity o) {
+        if (this == o) return 0;
+        if (o == null || getClass() != o.getClass()) return -1;
+        TermEntity that = (TermEntity) o;
+        LocalDate date = that.start;
+        int result = Values.compareDateRanges(start, end, that.start, that.end);
+        if (result != 0) {
+            return result;
+        }
+        Integer i = that.id;
+        if (null == i) {
+            return (null == id) ? name.compareTo(that.name) : -1;
+        }
+        return (null == id) ? 1 : id - i;
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return "TermEntity{" +
