@@ -50,7 +50,7 @@ public interface TermDAO {
     @Query("SELECT COUNT(*) FROM terms")
     Single<Integer> getCount();
 
-    @Query("DELETE FROM courses")
+    @Query("DELETE FROM terms")
     Single<Integer> deleteAll();
 
 }

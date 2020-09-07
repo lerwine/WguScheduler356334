@@ -24,7 +24,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.EmailAddressEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.PhoneNumberEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.Completable;
@@ -58,6 +60,7 @@ public class DbLoader {
 
     private static DbLoader instance;
     private final AppDb appDb;
+    private final TempDb tempDb;
     private final Scheduler scheduler;
     private LiveData<List<TermEntity>> allTerms;
     private LiveData<List<MentorEntity>> allMentors;
@@ -67,6 +70,7 @@ public class DbLoader {
 
     public DbLoader(Context context) {
         appDb = AppDb.getInstance(context);
+        tempDb = TempDb.getInstance(context);
         scheduler = Schedulers.from(dataExecutor);
     }
 
@@ -78,11 +82,11 @@ public class DbLoader {
         return instance;
     }
 
-    public Completable saveTerm(TermEntity viewModel) {
-        if (null == viewModel.getId()) {
-            return appDb.termDAO().insert(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable saveTerm(TermEntity entity) {
+        if (null == entity.getId()) {
+            return appDb.termDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
         }
-        return appDb.termDAO().update(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        return appDb.termDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
 //    public void insertTerm(TermEntity viewModel) {
@@ -99,8 +103,8 @@ public class DbLoader {
 //        });
 //    }
 
-    public Completable deleteTerm(TermEntity viewModel) {
-        return appDb.termDAO().delete(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable deleteTerm(TermEntity entity) {
+        return appDb.termDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<TermEntity> getTermByRowId(int rowId) {
@@ -133,19 +137,19 @@ public class DbLoader {
         return appDb.termDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable saveMentor(MentorEntity viewModel) {
-        if (null == viewModel.getId()) {
-            return appDb.mentorDAO().insert(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable saveMentor(MentorEntity entity) {
+        if (null == entity.getId()) {
+            return appDb.mentorDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
         }
-        return appDb.mentorDAO().update(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        return appDb.mentorDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Completable insertAllMentors(List<MentorEntity> list) {
         return appDb.mentorDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable deleteMentor(MentorEntity viewModel) {
-        return appDb.mentorDAO().delete(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable deleteMentor(MentorEntity entity) {
+        return appDb.mentorDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<MentorEntity> getMentorByRowId(int rowId) {
@@ -167,19 +171,65 @@ public class DbLoader {
         return appDb.mentorDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable insertCourse(CourseEntity viewModel) {
-        if (null == viewModel.getId()) {
-            return appDb.courseDAO().insert(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public LiveData<List<PhoneNumberEntity>> getPhoneNumbersByMentorId(int mentorId) {
+        return tempDb.phoneNumberDAO().getByMentorId(mentorId);
+    }
+
+    public Completable savePhoneNumber(PhoneNumberEntity entity) {
+        if (null == entity.getId()) {
+            return tempDb.phoneNumberDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
         }
-        return appDb.courseDAO().update(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        return tempDb.phoneNumberDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable insertAllPhoneNumbers(List<PhoneNumberEntity> list) {
+        return tempDb.phoneNumberDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable deletePhoneNumber(PhoneNumberEntity entity) {
+        return tempDb.phoneNumberDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<Integer> deletePhoneNumbersByMentorId(int mentorId) {
+        return tempDb.phoneNumberDAO().deleteByMentorId(mentorId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public LiveData<List<EmailAddressEntity>> getEmailAddressesByMentorId(int mentorId) {
+        return tempDb.emailAddressDAO().getByMentorId(mentorId);
+    }
+
+    public Completable savePEmailAddress(EmailAddressEntity entity) {
+        if (null == entity.getId()) {
+            return tempDb.emailAddressDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        }
+        return tempDb.emailAddressDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable insertAllEmailAddresses(List<EmailAddressEntity> list) {
+        return tempDb.emailAddressDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable deleteEmailAddress(EmailAddressEntity entity) {
+        return tempDb.emailAddressDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<Integer> deleteEmailAddressesByMentorId(int mentorId) {
+        return tempDb.phoneNumberDAO().deleteByMentorId(mentorId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable saveCourse(CourseEntity entity) {
+        if (null == entity.getId()) {
+            return appDb.courseDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        }
+        return appDb.courseDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Completable insertAllCourses(List<CourseEntity> list) {
         return appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable deleteCourse(CourseEntity course) {
-        return appDb.courseDAO().delete(course).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable deleteCourse(CourseEntity entity) {
+        return appDb.courseDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<CourseEntity> getCourseByRowId(int rowId) {
@@ -213,19 +263,19 @@ public class DbLoader {
         return appDb.courseDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable saveAssessment(AssessmentEntity viewModel) {
-        if (null == viewModel.getId()) {
-            return appDb.assessmentDAO().insert(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable saveAssessment(AssessmentEntity entity) {
+        if (null == entity.getId()) {
+            return appDb.assessmentDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
         }
-        return appDb.assessmentDAO().update(viewModel).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        return appDb.assessmentDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Completable insertAllAssessments(List<AssessmentEntity> list) {
         return appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Completable deleteAssessment(AssessmentEntity course) {
-        return appDb.assessmentDAO().delete(course).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Completable deleteAssessment(AssessmentEntity entity) {
+        return appDb.assessmentDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<AssessmentEntity> getAssessmentByRowId(int rowId) {

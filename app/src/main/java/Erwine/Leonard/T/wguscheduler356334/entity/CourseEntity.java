@@ -1,8 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
-import android.content.Context;
-
-import androidx.lifecycle.LiveData;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -11,12 +8,10 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
@@ -56,8 +51,6 @@ public class CourseEntity {
     private CourseStatus status;
     private int competencyUnits;
     private String notes;
-    @Ignore
-    private LiveData<List<AssessmentEntity>> assessments;
 
     public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
                         LocalDate expectedEnd, LocalDate actualEnd, Integer competencyUnits, String notes, int termId, Integer mentorId, int id) {
@@ -178,17 +171,6 @@ public class CourseEntity {
 
     public void setNotes(String notes) {
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
-    }
-
-    @Ignore
-    public LiveData<List<AssessmentEntity>> getAssessments(Context context) {
-        if (null == assessments) {
-            if (id < 1) {
-                throw new IllegalStateException();
-            }
-            assessments = DbLoader.getInstance(context).getAssessmentsByCourseId(id);
-        }
-        return assessments;
     }
 
     @Override

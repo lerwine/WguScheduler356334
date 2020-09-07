@@ -1,20 +1,15 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
-import android.content.Context;
-
-import androidx.lifecycle.LiveData;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
@@ -53,17 +48,15 @@ public class MentorEntity {
     private String primaryEmail;
     private String emailAddresses;
     private String notes;
-    @Ignore
-    private LiveData<List<CourseEntity>> courses;
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Constructors">
 
     public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses, int id) {
         this(name, notes, phoneNumbers, emailAddresses);
         this.id = id;
     }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Constructors">
 
     @Ignore
     public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses) {
@@ -215,17 +208,6 @@ public class MentorEntity {
             primaryEmail = emailAddresses;
             altEmailAddresses = "";
         }
-    }
-
-    @Ignore
-    public LiveData<List<CourseEntity>> getCourses(Context context) {
-        if (null == courses) {
-            if (id < 1) {
-                throw new IllegalStateException();
-            }
-            courses = DbLoader.getInstance(context).getCoursesByMentorId(id);
-        }
-        return courses;
     }
 
     //<editor-fold desc="Overrides">
