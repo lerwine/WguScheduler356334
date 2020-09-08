@@ -40,26 +40,14 @@ public interface EmailAddressDAO {
     @Query("SELECT * FROM email_addresses WHERE id = :id")
     Single<EmailAddressEntity> getById(int id);
 
-//    @Query("SELECT * FROM email_addresses WHERE mentorId =:mentorId ORDER BY [sortOrder], [id]")
-//    LiveData<List<EmailAddressEntity>> getByMentorId(int mentorId);
-
     @Query("SELECT * FROM email_addresses ORDER BY [sortOrder], [id]")
     LiveData<List<EmailAddressEntity>> getAll();
-
-//    @Query("SELECT * FROM email_addresses WHERE mentorId =:mentorId")
-//    List<EmailAddressEntity> getItemsByMentorId(int mentorId);
 
     @Query("SELECT * FROM email_addresses")
     List<EmailAddressEntity> getAllSynchronous();
 
-//    @Query("SELECT COUNT(*) FROM email_addresses WHERE mentorId =:mentorId")
-//    Single<Integer> getCountByMentorId(int mentorId);
-
     @Query("SELECT COUNT(*) FROM email_addresses")
     Single<Integer> getCount();
-
-//    @Query("DELETE FROM email_addresses WHERE mentorId =:mentorId")
-//    Single<Integer> deleteByMentorId(int mentorId);
 
     @Query("DELETE FROM email_addresses")
     Single<Integer> deleteAll();

@@ -24,11 +24,13 @@
         android:id="@+id/addPhoneButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="86dp"
+        android:layout_marginBottom="@dimen/fab_margin"
         android:backgroundTint="@color/color_accent"
         android:clickable="true"
         android:src="@drawable/add_circle_24"
         android:tint="@color/color_accent_inverse"
-        app:fabSize="mini"
+        app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -24,45 +24,59 @@ public class MentorEntity {
     public static final String INDEX_NAME = "IDX_MENTOR_NAME";
     public static final String COLNAME_ID = "id";
     public static final String COLNAME_NAME = "name";
+    public static final String COLNAME_PHONE_NUMBERS = "phoneNumbers";
+    public static final String COLNAME_EMAIL_ADDRESSES = "emailAddresses";
+    public static final String COLNAME_NOTES = "notes";
 
     private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
     private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COLNAME_ID)
-    private Long id;
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Fields">
-    @Ignore
-    private String altPhoneNumbers;
-    @ColumnInfo(name = COLNAME_NAME)
-    private String name;
-    @Ignore
-    private String primaryPhone;
-    @Ignore
-    private String altEmailAddresses;
-    private String phoneNumbers;
-    @Ignore
-    private String primaryEmail;
-
-    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses, long id) {
-        this(name, notes, phoneNumbers, emailAddresses);
-        this.id = id;
-    }
-
-    private String emailAddresses;
-    private String notes;
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Constructors">
 
     public static void applyInsertedId(MentorEntity source, long id) {
         if (null != source.getId()) {
             throw new IllegalStateException();
         }
         source.id = id;
+    }
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Fields">
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = COLNAME_ID)
+    private Long id;
+
+    @ColumnInfo(name = COLNAME_NAME)
+    private String name;
+
+    @Ignore
+    private String primaryPhone;
+
+    @Ignore
+    private String altPhoneNumbers;
+
+    @ColumnInfo(name = COLNAME_PHONE_NUMBERS)
+    private String phoneNumbers;
+
+    @Ignore
+    private String primaryEmail;
+
+    @Ignore
+    private String altEmailAddresses;
+
+    @ColumnInfo(name = COLNAME_EMAIL_ADDRESSES)
+    private String emailAddresses;
+
+    @ColumnInfo(name = COLNAME_NOTES)
+    private String notes;
+
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Constructors">
+
+    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses, long id) {
+        this(name, notes, phoneNumbers, emailAddresses);
+        this.id = id;
     }
 
     @Ignore

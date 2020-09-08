@@ -40,20 +40,11 @@ public interface PhoneNumberDAO {
     @Query("SELECT * FROM phone_numbers WHERE id = :id")
     Single<PhoneNumberEntity> getById(int id);
 
-//    @Query("SELECT * FROM email_addresses WHERE mentorId =:mentorId ORDER BY [sortOrder], [id]")
-//    LiveData<List<PhoneNumberEntity>> getByMentorId(int mentorId);
-
-    @Query("SELECT * FROM email_addresses ORDER BY [sortOrder], [id]")
+    @Query("SELECT * FROM phone_numbers ORDER BY [sortOrder], [id]")
     LiveData<List<PhoneNumberEntity>> getAll();
 
-//    @Query("SELECT * FROM email_addresses WHERE mentorId =:mentorId")
-//    List<PhoneNumberEntity> getItemsByMentorId(int mentorId);
-
-    @Query("SELECT * FROM email_addresses")
+    @Query("SELECT * FROM phone_numbers")
     List<PhoneNumberEntity> getAllSynchronous();
-
-//    @Query("SELECT COUNT(*) FROM phone_numbers WHERE mentorId =:mentorId")
-//    Single<Integer> getCountByMentorId(int mentorId);
 
     @Query("SELECT COUNT(*) FROM phone_numbers")
     Single<Integer> getCount();

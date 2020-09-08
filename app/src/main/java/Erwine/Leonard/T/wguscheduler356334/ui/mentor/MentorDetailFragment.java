@@ -57,8 +57,8 @@ public class MentorDetailFragment extends Fragment {
         }
         mentorNameEditText = root.findViewById(R.id.mentorNameEditText);
         notesEditTextMultiLine = root.findViewById(R.id.notesEditTextMultiLine);
-        root.findViewById(R.id.cancelButton).setOnClickListener(this::onCancelButtonClick);
-        root.findViewById(R.id.saveButton).setOnClickListener(this::onSaveButtonClick);
+//        root.findViewById(R.id.cancelButton).setOnClickListener(this::onCancelButtonClick);
+//        root.findViewById(R.id.saveButton).setOnClickListener(this::onSaveButtonClick);
         mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(MentorDetailViewModel.class);
         if (editInitialized && null != savedInstanceState) {
             mentorNameEditText.setText(savedInstanceState.getCharSequence(STATE_KEY_MENTOR_NAME));
