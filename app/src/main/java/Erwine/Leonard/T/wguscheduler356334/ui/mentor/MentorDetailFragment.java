@@ -39,14 +39,6 @@ public class MentorDetailFragment extends Fragment {
         compositeDisposable = new CompositeDisposable();
     }
 
-    public static MentorDetailFragment newInstance(long mentorId) {
-        MentorDetailFragment fragment = new MentorDetailFragment();
-        Bundle bundle = new Bundle();
-        bundle.putLong(ARG_MENTOR_ID, mentorId);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_mentor_detail, container, false);

@@ -84,8 +84,6 @@ public class DbLoader {
 
     //</editor-fold>
 
-    //<editor-fold defaultstate="collapsed" desc="Static methods">
-
     /**
      * Gets the singleton {@code DbLoader} instance.
      *
@@ -136,8 +134,6 @@ public class DbLoader {
         }
     }
 
-    //</editor-fold>
-
     private DbLoader(Context context) {
         compositeDisposable = new CompositeDisposable();
         mEditedMentorLiveData = new CurrentEditedMentor();
@@ -147,8 +143,6 @@ public class DbLoader {
         dataExecutor = Executors.newSingleThreadExecutor();
         scheduler = Schedulers.from(dataExecutor);
     }
-
-    //<editor-fold defaultstate="collapsed" desc="TermEntity methods">
 
     /**
      * Asynchronously gets a {@link TermEntity} from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb} by its {@code ROWID}.
@@ -229,10 +223,6 @@ public class DbLoader {
         return appDb.termDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="CourseEntity methods">
-
     /**
      * Asynchronously gets a {@link MentorEntity} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb} by its {@code ROWID}.
      *
@@ -285,6 +275,10 @@ public class DbLoader {
      */
     public Single<MentorEntity> ensureEditedMentorId(long mentorId) {
         return mEditedMentorLiveData.ensureEditedMentorId(mentorId);
+    }
+
+    public Single<MentorEntity> ensureNewEditedMentor() {
+        return mEditedMentorLiveData.ensureNewEditedMentor();
     }
 
     /**
@@ -463,6 +457,16 @@ public class DbLoader {
     }
 
     /**
+     * Asynchronously deletes the {@link MentorEntity} returned by {@link #getEditedMentor()} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
+     * {@link AppDb}.
+     *
+     * @return The {@link Completable} that can be observed for DB operation completion status.
+     */
+    public Completable deletedEditedMentor() {
+        return mEditedMentorLiveData.deletedEditedMentor();
+    }
+
+    /**
      * Asynchronously saves the specified {@link MentorEntity} object into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table of the underlying {@link AppDb}.
      * If {@link MentorEntity#getId()} is null, then it will be inserted into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table; otherwise, the corresponding table row will be
      * updated. After a new {@link MentorEntity} has been successfully inserted, the value returned by {@link MentorEntity#getId()} will contain the unique identifier of the
@@ -510,10 +514,6 @@ public class DbLoader {
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="PhoneNumberEntity methods">
-
     /**
      * Asynchronously deletes a {@link PhoneNumberEntity} from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table of the underlying {@link TempDb}.
      *
@@ -550,10 +550,6 @@ public class DbLoader {
         return tempDb.phoneNumberDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="EmailAddressEntity methods">
-
     /**
      * Asynchronously deletes a {@link EmailAddressEntity} from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table of the underlying {@link TempDb}.
      *
@@ -589,10 +585,6 @@ public class DbLoader {
         }
         return tempDb.emailAddressDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="CourseEntity methods">
 
     /**
      * Asynchronously deletes a {@link CourseEntity} from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
@@ -709,10 +701,6 @@ public class DbLoader {
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, CourseEntity::applyInsertedId)));
     }
 
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="AssessmentEntity methods">
-
     /**
      * Asynchronously deletes a {@link AssessmentEntity} from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table of the underlying {@link AppDb}.
      *
@@ -803,10 +791,6 @@ public class DbLoader {
         return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, AssessmentEntity::applyInsertedId)));
     }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Bulk DB Operations">
 
     private void resetDb() {
         appDb.clearAllTables();
@@ -912,8 +896,6 @@ public class DbLoader {
             }).collect(Collectors.toList()));
         }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
-
-    //</editor-fold>
 
     private class CurrentEditedMentor extends LiveData<MentorEntity> {
         private MentorEntity mPostedValue = null;
@@ -1038,6 +1020,20 @@ public class DbLoader {
             }
         }
 
+        private synchronized Completable deletedEditedMentor() {
+            MentorEntity entity = mPostedValue;
+            if (null == entity) {
+                return Completable.complete().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+            }
+            Object key = new Object();
+            changeKey = key;
+            return Completable.fromAction(() -> onDeleteEditedMentor(entity, key)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        }
+
+        private synchronized void onDeleteEditedMentor(MentorEntity entity, Object key) {
+            appDb.mentorDAO().deleteSynchronous(entity);
+            postValue(null);
+        }
     }
 
 }

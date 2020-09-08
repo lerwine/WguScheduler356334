@@ -21,12 +21,10 @@ public class MentorDetailPagerAdapter extends FragmentPagerAdapter {
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_title_general, R.string.tab_title_phone, R.string.tab_title_email};
     private final Context mContext;
-    private final long mMentorId;
 
-    public MentorDetailPagerAdapter(Context context, long mentorId, FragmentManager fm) {
+    public MentorDetailPagerAdapter(Context context, FragmentManager fm) {
         super(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         mContext = context;
-        mMentorId = mentorId;
     }
 
     @NonNull
@@ -44,7 +42,7 @@ public class MentorDetailPagerAdapter extends FragmentPagerAdapter {
             case 2:
                 return new EmailAddressListFragment();
             default:
-                return MentorDetailFragment.newInstance(mMentorId);
+                return new MentorDetailFragment();
         }
     }
 
