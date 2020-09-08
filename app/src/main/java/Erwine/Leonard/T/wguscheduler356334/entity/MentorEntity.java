@@ -1,6 +1,9 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.util.Pair;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -11,13 +14,14 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.PropertyChangeSupported;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
 @Entity(tableName = AppDb.TABLE_NAME_MENTORS, indices = {
         @Index(value = MentorEntity.COLNAME_NAME, name = MentorEntity.INDEX_NAME, unique = true)
 })
-public class MentorEntity {
+public class MentorEntity extends PropertyChangeSupported {
 
     //<editor-fold defaultstate="collapsed" desc="Static Members" >
 
@@ -36,6 +40,7 @@ public class MentorEntity {
             throw new IllegalStateException();
         }
         source.id = id;
+        source.firePropertyChange(COLNAME_ID, null, id);
     }
 
     //</editor-fold>
@@ -52,17 +57,11 @@ public class MentorEntity {
     @Ignore
     private String primaryPhone;
 
-    @Ignore
-    private String altPhoneNumbers;
-
     @ColumnInfo(name = COLNAME_PHONE_NUMBERS)
     private String phoneNumbers;
 
     @Ignore
     private String primaryEmail;
-
-    @Ignore
-    private String altEmailAddresses;
 
     @ColumnInfo(name = COLNAME_EMAIL_ADDRESSES)
     private String emailAddresses;
@@ -109,8 +108,11 @@ public class MentorEntity {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = SINGLE_LINE_NORMALIZER.apply(name);
+    public synchronized void setName(String name) {
+        String oldValue = applyName(SINGLE_LINE_NORMALIZER.apply(name));
+        if (null != oldValue) {
+            firePropertyChange(COLNAME_NAME, oldValue, this.name);
+        }
     }
 
     public String getNotes() {
@@ -118,117 +120,94 @@ public class MentorEntity {
     }
 
     public void setNotes(String notes) {
-        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
+        String oldValue = applyNotes(MULTI_LINE_NORMALIZER.apply(notes));
+        if (null != oldValue) {
+            firePropertyChange(COLNAME_NOTES, oldValue, this.notes);
+        }
     }
 
     public synchronized String getPhoneNumbers() {
-        if (null == phoneNumbers) {
-            if (primaryPhone.isEmpty())
-                phoneNumbers = altPhoneNumbers;
-            else if (altPhoneNumbers.isEmpty())
-                phoneNumbers = primaryPhone;
-            else
-                phoneNumbers = primaryPhone + "\n" + altPhoneNumbers;
-        }
         return phoneNumbers;
     }
 
-    public synchronized void setPhoneNumbers(String phoneNumbers) {
-        this.phoneNumbers = MULTI_LINE_NORMALIZER.apply(phoneNumbers);
-        primaryPhone = altPhoneNumbers = null;
+    public void setPhoneNumbers(String phoneNumbers) {
+        Pair<String, String> oldValues = applyPhoneNumbers(MULTI_LINE_NORMALIZER.apply(phoneNumbers));
+        if (null != oldValues) {
+            if (null != oldValues.first) {
+                firePropertyChange("primaryPhone", oldValues.first, this.primaryPhone);
+            }
+            firePropertyChange(COLNAME_PHONE_NUMBERS, oldValues.second, this.phoneNumbers);
+        }
     }
 
     public synchronized String getPrimaryPhone() {
-        if (null == primaryPhone)
-            calculatePrimaryAndAltPhone();
         return primaryPhone;
     }
 
-    public synchronized void setPrimaryPhone(String primaryPhone) {
-        if (null == altPhoneNumbers)
-            calculatePrimaryAndAltPhone();
-        this.primaryPhone = SINGLE_LINE_NORMALIZER.apply(primaryPhone);
-        phoneNumbers = null;
-    }
-
-    public synchronized String getAltPhoneNumbers() {
-        if (null == altPhoneNumbers)
-            calculatePrimaryAndAltPhone();
-        return altPhoneNumbers;
-    }
-
-    public synchronized void setAltPhoneNumbers(String altPhoneNumbers) {
-        if (null == primaryPhone)
-            calculatePrimaryAndAltPhone();
-        this.altPhoneNumbers = MULTI_LINE_NORMALIZER.apply(altPhoneNumbers);
-        phoneNumbers = null;
-    }
-
     public synchronized String getEmailAddresses() {
-        if (null == emailAddresses) {
-            if (primaryEmail.isEmpty())
-                emailAddresses = altEmailAddresses;
-            else if (altEmailAddresses.isEmpty())
-                emailAddresses = primaryEmail;
-            else
-                emailAddresses = primaryEmail + "\n" + altEmailAddresses;
-        }
         return emailAddresses;
     }
 
     public synchronized void setEmailAddresses(String emailAddresses) {
-        this.emailAddresses = MULTI_LINE_NORMALIZER.apply(emailAddresses);
-        primaryEmail = altEmailAddresses = null;
+        Pair<String, String> oldValues = applyPhoneNumbers(MULTI_LINE_NORMALIZER.apply(emailAddresses));
+        if (null != oldValues) {
+            if (null != oldValues.first) {
+                firePropertyChange("primaryEmail", oldValues.first, this.primaryEmail);
+            }
+            firePropertyChange(COLNAME_EMAIL_ADDRESSES, oldValues.second, this.emailAddresses);
+        }
     }
 
     public synchronized String getPrimaryEmail() {
-        if (null == primaryEmail)
-            calculatePrimaryAndAltEmail();
         return primaryEmail;
-    }
-
-    public synchronized void setPrimaryEmail(String primaryEmail) {
-        if (null == altEmailAddresses)
-            calculatePrimaryAndAltEmail();
-        this.primaryEmail = SINGLE_LINE_NORMALIZER.apply(primaryEmail);
-        emailAddresses = null;
-    }
-
-    public synchronized String getAltEmailAddresses() {
-        if (null == altEmailAddresses)
-            calculatePrimaryAndAltEmail();
-        return altEmailAddresses;
-    }
-
-    public synchronized void setAltEmailAddresses(String altEmailAddresses) {
-        if (null == primaryEmail)
-            calculatePrimaryAndAltEmail();
-        this.altEmailAddresses = MULTI_LINE_NORMALIZER.apply(altEmailAddresses);
-        emailAddresses = null;
     }
 
     //</editor-fold>
 
-    private void calculatePrimaryAndAltPhone() {
-        int i = phoneNumbers.indexOf('\n');
-        if (i > 0) {
-            altPhoneNumbers = phoneNumbers.substring(i + 1);
-            primaryPhone = phoneNumbers.substring(0, i);
-        } else {
-            primaryPhone = phoneNumbers;
-            altPhoneNumbers = "";
+    @Nullable
+    private synchronized String applyName(@NonNull String newValue) {
+        String oldValue = name;
+        if (newValue.equals(name)) {
+            return null;
         }
+        name = newValue;
+        return oldValue;
     }
 
-    private void calculatePrimaryAndAltEmail() {
-        int i = emailAddresses.indexOf('\n');
-        if (i > 0) {
-            altEmailAddresses = emailAddresses.substring(i + 1);
-            primaryEmail = emailAddresses.substring(0, i);
-        } else {
-            primaryEmail = emailAddresses;
-            altEmailAddresses = "";
+    @Nullable
+    private synchronized String applyNotes(@NonNull String newValue) {
+        String oldValue = notes;
+        if (newValue.equals(notes)) {
+            return null;
         }
+        notes = newValue;
+        return oldValue;
+    }
+
+    @Nullable
+    private synchronized Pair<String, String> applyPhoneNumbers(@NonNull String newValue) {
+        String oldValue = phoneNumbers;
+        if (newValue.equals(phoneNumbers)) {
+            return null;
+        }
+        phoneNumbers = newValue;
+        int i = phoneNumbers.indexOf("\n");
+        String oldPrimary = primaryPhone;
+        primaryPhone = (i < 0) ? "" : phoneNumbers.substring(0, i);
+        return new Pair<>((oldPrimary.equals(primaryPhone)) ? null : oldPrimary, oldValue);
+    }
+
+    @Nullable
+    private synchronized Pair<String, String> applyEmailAddresses(@NonNull String newValue) {
+        String oldValue = emailAddresses;
+        if (newValue.equals(emailAddresses)) {
+            return null;
+        }
+        emailAddresses = newValue;
+        int i = emailAddresses.indexOf("\n");
+        String oldPrimary = primaryEmail;
+        primaryEmail = (i < 0) ? "" : emailAddresses.substring(0, i);
+        return new Pair<>((oldPrimary.equals(primaryEmail)) ? null : oldPrimary, oldValue);
     }
 
     //<editor-fold desc="Overrides">
@@ -243,10 +222,8 @@ public class MentorEntity {
         }
         return null == that.id &&
                 name.equals(that.name) &&
-                primaryPhone.equals(that.primaryPhone) &&
-                primaryEmail.equals(that.primaryEmail) &&
-                altPhoneNumbers.equals(that.altPhoneNumbers) &&
-                altEmailAddresses.equals(that.altEmailAddresses) &&
+                phoneNumbers.equals(that.phoneNumbers) &&
+                emailAddresses.equals(that.emailAddresses) &&
                 notes.equals(that.notes);
     }
 
@@ -255,7 +232,7 @@ public class MentorEntity {
         if (null != id) {
             return id.hashCode();
         }
-        return Objects.hash(id, name, primaryPhone, primaryEmail, altPhoneNumbers, altEmailAddresses, notes);
+        return Objects.hash(id, name, phoneNumbers, emailAddresses, notes);
     }
 
     @NonNull
@@ -264,10 +241,8 @@ public class MentorEntity {
         return "MentorEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", primaryPhone=" + primaryPhone +
-                ", phoneNumbers=" + altPhoneNumbers +
-                ", primaryEmail=" + primaryEmail +
-                ", emailAddresses=" + altEmailAddresses +
+                ", primaryPhone=" + phoneNumbers +
+                ", primaryEmail=" + emailAddresses +
                 ", notes='" + notes + '\'' +
                 '}';
     }

@@ -31,6 +31,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.EmailAddressEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.PhoneNumberEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorEditState;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringLineIterator;
 import io.reactivex.Completable;
@@ -74,7 +75,8 @@ public class DbLoader {
     private final TempDb tempDb;
     private final Scheduler scheduler;
     private final Executor dataExecutor;
-    private final CurrentEditedMentor mEditedMentor;
+    private final CurrentEditedMentor mEditedMentorLiveData;
+    private final MentorEditState currentEditedMentor;
     private LiveData<List<TermEntity>> allTerms;
     private LiveData<List<MentorEntity>> allMentors;
     private LiveData<List<CourseEntity>> allCourses;
@@ -138,9 +140,10 @@ public class DbLoader {
 
     private DbLoader(Context context) {
         compositeDisposable = new CompositeDisposable();
-        mEditedMentor = new CurrentEditedMentor();
+        mEditedMentorLiveData = new CurrentEditedMentor();
         appDb = AppDb.getInstance(context);
         tempDb = TempDb.getInstance(context);
+        currentEditedMentor = new MentorEditState(mEditedMentorLiveData, tempDb.phoneNumberDAO().getAll(), tempDb.emailAddressDAO().getAll());
         dataExecutor = Executors.newSingleThreadExecutor();
         scheduler = Schedulers.from(dataExecutor);
     }
@@ -266,8 +269,8 @@ public class DbLoader {
      *
      * @return The {@link MentorEntity} currently being edited by the {@link Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity}.
      */
-    public LiveData<MentorEntity> getEditedMentor() {
-        return mEditedMentor;
+    public MentorEditState getEditedMentor() {
+        return currentEditedMentor;
     }
 
     /**
@@ -281,7 +284,7 @@ public class DbLoader {
      * the underlying {@link AppDb}.
      */
     public Single<MentorEntity> ensureEditedMentorId(long mentorId) {
-        return mEditedMentor.ensureEditedMentorId(mentorId);
+        return mEditedMentorLiveData.ensureEditedMentorId(mentorId);
     }
 
     /**
@@ -298,7 +301,7 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers, Supplier<String> getEmailAddresses) {
-        return mEditedMentor.saveEditedMentor(
+        return mEditedMentorLiveData.saveEditedMentor(
                 clearCurrent,
                 getNameAndNotes,
                 getPhoneNumbers,
@@ -321,7 +324,7 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers, boolean getEmailAddressesFromTempDb) {
-        return mEditedMentor.saveEditedMentor(
+        return mEditedMentorLiveData.saveEditedMentor(
                 clearCurrent,
                 getNameAndNotes,
                 getPhoneNumbers,

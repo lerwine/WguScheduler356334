@@ -1,10 +1,12 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -65,6 +68,24 @@ public class MentorDetailFragment extends Fragment {
             notesEditTextMultiLine.setText(savedInstanceState.getCharSequence(STATE_KEY_MENTOR_NOTES));
         }
         compositeDisposable.add(mViewModel.getEntity(mentorId).subscribe(this::onMentorEntityChanged));
+        mentorNameEditText.setOnEditorActionListener(this::onMentorNameEditorAction);
+        mentorNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(s -> {
+            if (s.trim().isEmpty()) {
+                mentorNameEditText.setError("Name is required.");
+            } else {
+                mentorNameEditText.setError(null);
+            }
+            MentorEntity mentor = mViewModel.getLiveData().getValue();
+            if (null != mentor) {
+                mentor.setName(s);
+            }
+        }));
+        notesEditTextMultiLine.addTextChangedListener(StringHelper.createAfterTextChangedListener(s -> {
+            MentorEntity mentor = mViewModel.getLiveData().getValue();
+            if (null != mentor) {
+                mentor.setNotes(s);
+            }
+        }));
         return root;
     }
 
@@ -83,6 +104,10 @@ public class MentorDetailFragment extends Fragment {
             mentorNameEditText.setText(mentorEntity.getName());
             notesEditTextMultiLine.setText(mentorEntity.getNotes());
         }
+    }
+
+    private boolean onMentorNameEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        return false;
     }
 
     private void onCancelButtonClick(View view) {

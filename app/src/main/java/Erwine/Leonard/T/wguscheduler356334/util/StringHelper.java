@@ -1,9 +1,13 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,6 +102,22 @@ public final class StringHelper {
     private static final HashMap<Integer, Function<String, String>> STRING_NORMALIZER_MAP = new HashMap<>();
 
     private StringHelper() {
+    }
+
+    public static TextWatcher createAfterTextChangedListener(Consumer<String> afterTextChanged) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            public void afterTextChanged(Editable s) {
+                afterTextChanged.accept((null == s) ? "" : s.toString());
+            }
+        };
     }
 
     public static boolean isLineSeparator(char c) {
