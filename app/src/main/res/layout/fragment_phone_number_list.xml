@@ -24,7 +24,7 @@
         android:id="@+id/addPhoneButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="86dp"
+        android:layout_marginEnd="144dp"
         android:layout_marginBottom="@dimen/fab_margin"
         android:backgroundTint="@color/color_accent"
         android:clickable="true"

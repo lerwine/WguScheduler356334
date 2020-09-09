@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,8 +58,8 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mentorNameTextView = (TextView) view.findViewById(R.id.mentorNameTextView);
-            phoneOrEmailTextView = (TextView) view.findViewById(R.id.phoneOrEmailTextView);
+            mentorNameTextView = view.findViewById(R.id.mentorNameTextView);
+            phoneOrEmailTextView = view.findViewById(R.id.phoneOrEmailTextView);
             mView.setOnClickListener(this::onViewClick);
         }
 
@@ -76,7 +77,9 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
 
         private void onViewClick(View v) {
             Intent intent = new Intent(mContext, MentorDetailActivity.class);
-            intent.putExtra(MentorDetailActivity.EXTRAS_KEY_MENTOR_ID, mItem.getId());
+            long id = mItem.getId();
+            Log.i(getClass().getName(), String.format("Starting MentorDetailActivity with %d", id));
+            intent.putExtra(MentorDetailActivity.EXTRAS_KEY_MENTOR_ID, id);
             mContext.startActivity(intent);
         }
 

@@ -83,7 +83,9 @@ public class MentorEntity extends PropertyChangeSupported {
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
         this.phoneNumbers = MULTI_LINE_NORMALIZER.apply(phoneNumbers);
+        applyPrimaryPhone();
         this.emailAddresses = MULTI_LINE_NORMALIZER.apply(emailAddresses);
+        applyPrimaryEmail();
     }
 
     @Ignore
@@ -149,7 +151,7 @@ public class MentorEntity extends PropertyChangeSupported {
     }
 
     public synchronized void setEmailAddresses(String emailAddresses) {
-        Pair<String, String> oldValues = applyPhoneNumbers(MULTI_LINE_NORMALIZER.apply(emailAddresses));
+        Pair<String, String> oldValues = applyEmailAddresses(MULTI_LINE_NORMALIZER.apply(emailAddresses));
         if (null != oldValues) {
             if (null != oldValues.first) {
                 firePropertyChange("primaryEmail", oldValues.first, this.primaryEmail);
@@ -191,10 +193,15 @@ public class MentorEntity extends PropertyChangeSupported {
             return null;
         }
         phoneNumbers = newValue;
+        String oldPrimary = applyPrimaryPhone();
+        return new Pair<>((oldPrimary.equals(primaryPhone)) ? null : oldPrimary, oldValue);
+    }
+
+    private String applyPrimaryPhone() {
         int i = phoneNumbers.indexOf("\n");
         String oldPrimary = primaryPhone;
-        primaryPhone = (i < 0) ? "" : phoneNumbers.substring(0, i);
-        return new Pair<>((oldPrimary.equals(primaryPhone)) ? null : oldPrimary, oldValue);
+        primaryPhone = (i < 0) ? phoneNumbers : phoneNumbers.substring(0, i);
+        return oldPrimary;
     }
 
     @Nullable
@@ -204,10 +211,15 @@ public class MentorEntity extends PropertyChangeSupported {
             return null;
         }
         emailAddresses = newValue;
+        String oldPrimary = applyPrimaryEmail();
+        return new Pair<>((oldPrimary.equals(primaryEmail)) ? null : oldPrimary, oldValue);
+    }
+
+    private String applyPrimaryEmail() {
         int i = emailAddresses.indexOf("\n");
         String oldPrimary = primaryEmail;
-        primaryEmail = (i < 0) ? "" : emailAddresses.substring(0, i);
-        return new Pair<>((oldPrimary.equals(primaryEmail)) ? null : oldPrimary, oldValue);
+        primaryEmail = (i < 0) ? emailAddresses : emailAddresses.substring(0, i);
+        return oldPrimary;
     }
 
     //<editor-fold desc="Overrides">

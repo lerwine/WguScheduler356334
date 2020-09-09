@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.db;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -47,6 +48,8 @@ import io.reactivex.schedulers.Schedulers;
 public class DbLoader {
 
     //<editor-fold defaultstate="collapsed" desc="Fields">
+
+    private static final String LOG_TAG = DbLoader.class.getName();
 
     /**
      * 1=title, 2=start, 3=end, 4=notes?
@@ -150,6 +153,7 @@ public class DbLoader {
      * @param rowId The {@code ROWID} of the {@link TermEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link TermEntity} object.
      */
+    @NonNull
     public Single<TermEntity> getTermByRowId(int rowId) {
         return appDb.termDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -160,6 +164,7 @@ public class DbLoader {
      * @param id The unique identifier of the  {@link TermEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link TermEntity} object.
      */
+    @NonNull
     public Single<TermEntity> getTermById(int id) {
         return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -169,6 +174,7 @@ public class DbLoader {
      *
      * @return A {@link LiveData} object that will contain the list of {@link TermEntity} objects retrieved from the underlying {@link AppDb}.
      */
+    @NonNull
     public LiveData<List<TermEntity>> getAllTerms() {
         if (null == allTerms) {
             allTerms = appDb.termDAO().getAll();
@@ -181,6 +187,7 @@ public class DbLoader {
      *
      * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb}.
      */
+    @NonNull
     public Single<Integer> getTermCount() {
         return appDb.termDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -194,6 +201,7 @@ public class DbLoader {
      * @param entity The {@link TermEntity} to be saved.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveTerm(TermEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.termDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -208,6 +216,7 @@ public class DbLoader {
      * @param list The {@link List} of @link TermEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_TERMS "terms"} data table.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable insertAllTerms(List<TermEntity> list) {
         return Completable.fromSingle(appDb.termDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, TermEntity::applyInsertedId)));
@@ -219,6 +228,7 @@ public class DbLoader {
      * @param entity The {@link TermEntity} to delete.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deleteTerm(TermEntity entity) {
         return appDb.termDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -229,6 +239,7 @@ public class DbLoader {
      * @param rowId The {@code ROWID} of the {@link MentorEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link MentorEntity} object.
      */
+    @NonNull
     public Single<MentorEntity> getMentorByRowId(int rowId) {
         return appDb.mentorDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -238,6 +249,7 @@ public class DbLoader {
      *
      * @return A {@link LiveData} object that will contain the list of {@link MentorEntity} objects retrieved from the underlying {@link AppDb}.
      */
+    @NonNull
     public LiveData<List<MentorEntity>> getAllMentors() {
         if (null == allMentors) {
             allMentors = appDb.mentorDAO().getAll();
@@ -250,6 +262,7 @@ public class DbLoader {
      *
      * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
      */
+    @NonNull
     public Single<Integer> getMentorCount() {
         return appDb.mentorDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -259,6 +272,7 @@ public class DbLoader {
      *
      * @return The {@link MentorEntity} currently being edited by the {@link Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity}.
      */
+    @NonNull
     public MentorEditState getEditedMentor() {
         return currentEditedMentor;
     }
@@ -273,10 +287,12 @@ public class DbLoader {
      * @return The {@link Single} object that can be used to observe the {@link MentorEntity} object loaded from {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within
      * the underlying {@link AppDb}.
      */
+    @NonNull
     public Single<MentorEntity> ensureEditedMentorId(long mentorId) {
         return mEditedMentorLiveData.ensureEditedMentorId(mentorId);
     }
 
+    @NonNull
     public Single<MentorEntity> ensureNewEditedMentor() {
         return mEditedMentorLiveData.ensureNewEditedMentor();
     }
@@ -294,6 +310,7 @@ public class DbLoader {
      *                          {@code null} if the {@link MentorEntity} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers, Supplier<String> getEmailAddresses) {
         return mEditedMentorLiveData.saveEditedMentor(
                 clearCurrent,
@@ -317,6 +334,7 @@ public class DbLoader {
      *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers, boolean getEmailAddressesFromTempDb) {
         return mEditedMentorLiveData.saveEditedMentor(
                 clearCurrent,
@@ -341,6 +359,7 @@ public class DbLoader {
      *                                  {@code null} if the {@link MentorEntity} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, boolean getPhoneNumbersFromTempDb, Supplier<String> getEmailAddresses) {
         return saveEditedMentor(
                 clearCurrent,
@@ -366,6 +385,7 @@ public class DbLoader {
      *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, boolean getPhoneNumbersFromTempDb, boolean getEmailAddressesFromTempDb) {
         return saveEditedMentor(
                 clearCurrent,
@@ -388,6 +408,7 @@ public class DbLoader {
      *                          {@code null} if the {@link MentorEntity} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<String> getPhoneNumbers, Supplier<String> getEmailAddresses) {
         return saveEditedMentor(clearCurrent, null, getPhoneNumbers, getEmailAddresses);
     }
@@ -405,6 +426,7 @@ public class DbLoader {
      *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, Supplier<String> getPhoneNumbers, boolean getEmailAddressesFromTempDb) {
         return saveEditedMentor(clearCurrent, null, getPhoneNumbers, getEmailAddressesFromTempDb);
     }
@@ -422,6 +444,7 @@ public class DbLoader {
      *                                  {@code null} if the {@link MentorEntity} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, boolean getPhoneNumbersFromTempDb, Supplier<String> getEmailAddresses) {
         return saveEditedMentor(clearCurrent, null, getPhoneNumbersFromTempDb, getEmailAddresses);
     }
@@ -440,6 +463,7 @@ public class DbLoader {
      *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent, boolean getPhoneNumbersFromTempDb, boolean getEmailAddressesFromTempDb) {
         return saveEditedMentor(clearCurrent, null, getPhoneNumbersFromTempDb, getEmailAddressesFromTempDb);
     }
@@ -452,6 +476,7 @@ public class DbLoader {
      * @param clearCurrent If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEditedMentor(boolean clearCurrent) {
         return saveEditedMentor(clearCurrent, false, false);
     }
@@ -462,6 +487,7 @@ public class DbLoader {
      *
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deletedEditedMentor() {
         return mEditedMentorLiveData.deletedEditedMentor();
     }
@@ -475,6 +501,7 @@ public class DbLoader {
      * @param entity The {@link MentorEntity} to be saved.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveMentor(MentorEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.mentorDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -489,6 +516,7 @@ public class DbLoader {
      * @param list The {@link List} of @link TermEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable insertAllMentors(List<MentorEntity> list) {
         return Completable.fromSingle(appDb.mentorDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, MentorEntity::applyInsertedId)));
@@ -500,6 +528,7 @@ public class DbLoader {
      * @param entity The {@link MentorEntity} to delete.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deleteMentor(MentorEntity entity) {
         return appDb.mentorDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -510,6 +539,7 @@ public class DbLoader {
      * @param id The unique identifier of the  {@link MentorEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link MentorEntity} object.
      */
+    @NonNull
     public Single<MentorEntity> getMentorById(long id) {
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -520,6 +550,7 @@ public class DbLoader {
      * @param entity The {@link PhoneNumberEntity} to delete.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deletePhoneNumber(PhoneNumberEntity entity) {
         return tempDb.phoneNumberDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -529,6 +560,7 @@ public class DbLoader {
      *
      * @return A {@link LiveData} object that will contain the list of {@link PhoneNumberEntity} objects retrieved from the underlying {@link TempDb}.
      */
+    @NonNull
     public LiveData<List<PhoneNumberEntity>> getPhoneNumbers() {
         return tempDb.phoneNumberDAO().getAll();
     }
@@ -542,6 +574,7 @@ public class DbLoader {
      * @param entity The {@link PhoneNumberEntity} to be saved.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable savePhoneNumber(PhoneNumberEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(tempDb.phoneNumberDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -556,6 +589,7 @@ public class DbLoader {
      * @param entity The {@link EmailAddressEntity} to delete.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deleteEmailAddress(EmailAddressEntity entity) {
         return tempDb.emailAddressDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -565,6 +599,7 @@ public class DbLoader {
      *
      * @return A {@link LiveData} object that will contain the list of {@link EmailAddressEntity} objects retrieved from the underlying {@link TempDb}.
      */
+    @NonNull
     public LiveData<List<EmailAddressEntity>> getEmailAddresses() {
         return tempDb.emailAddressDAO().getAll();
     }
@@ -578,6 +613,7 @@ public class DbLoader {
      * @param entity The {@link EmailAddressEntity} to be saved.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveEmailAddress(EmailAddressEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(tempDb.emailAddressDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -592,6 +628,7 @@ public class DbLoader {
      * @param entity The {@link CourseEntity} to delete.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deleteCourse(CourseEntity entity) {
         return appDb.courseDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -602,6 +639,7 @@ public class DbLoader {
      * @param rowId The {@code ROWID} of the {@link CourseEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link CourseEntity} object.
      */
+    @NonNull
     public Single<CourseEntity> getCourseByRowId(int rowId) {
         return appDb.courseDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -612,6 +650,7 @@ public class DbLoader {
      * @param id The unique identifier of the  {@link CourseEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link CourseEntity} object.
      */
+    @NonNull
     public Single<CourseEntity> getCourseById(int id) {
         return appDb.courseDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -621,6 +660,7 @@ public class DbLoader {
      *
      * @return A {@link LiveData} object that will contain the list of {@link CourseEntity} objects retrieved from the underlying {@link AppDb}.
      */
+    @NonNull
     public LiveData<List<CourseEntity>> getAllCourses() {
         if (null == allCourses) {
             allCourses = appDb.courseDAO().getAll();
@@ -636,6 +676,7 @@ public class DbLoader {
      * @return A {@link LiveData} object that will contain the list of {@link CourseEntity} objects retrieved from the underlying {@link AppDb} that are associated with a
      * specific {@link TermEntity}.
      */
+    @NonNull
     public LiveData<List<CourseEntity>> getCoursesByTermId(int termId) {
         return appDb.courseDAO().getByTermId(termId);
     }
@@ -648,6 +689,7 @@ public class DbLoader {
      * @return A {@link LiveData} object that will contain the list of {@link CourseEntity} objects retrieved from the underlying {@link AppDb} that are associated with a
      * specific {@link MentorEntity}.
      */
+    @NonNull
     public LiveData<List<CourseEntity>> getCoursesByMentorId(int mentorId) {
         return appDb.courseDAO().getByMentorId(mentorId);
     }
@@ -660,6 +702,7 @@ public class DbLoader {
      * @return A {@link LiveData} object that will contain the list of {@link CourseEntity} objects retrieved from the underlying {@link AppDb} that have not been completed and
      * are expected to start on or before a specified date.
      */
+    @NonNull
     public LiveData<List<CourseEntity>> getUnterminatedCoursesOnOrBefore(LocalDate date) {
         return appDb.courseDAO().getUnterminatedOnOrBefore(date);
     }
@@ -669,6 +712,7 @@ public class DbLoader {
      *
      * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
      */
+    @NonNull
     public Single<Integer> getCourseCount() {
         return appDb.courseDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -682,6 +726,7 @@ public class DbLoader {
      * @param entity The {@link CourseEntity} to be saved.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveCourse(CourseEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.courseDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -696,6 +741,7 @@ public class DbLoader {
      * @param list The {@link List} of @link CourseEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable insertAllCourses(List<CourseEntity> list) {
         return Completable.fromSingle(appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, CourseEntity::applyInsertedId)));
@@ -707,6 +753,7 @@ public class DbLoader {
      * @param entity The {@link AssessmentEntity} to delete.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable deleteAssessment(AssessmentEntity entity) {
         return appDb.assessmentDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -717,6 +764,7 @@ public class DbLoader {
      * @param rowId The {@code ROWID} of the {@link AssessmentEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link AssessmentEntity} object.
      */
+    @NonNull
     public Single<AssessmentEntity> getAssessmentByRowId(int rowId) {
         return appDb.assessmentDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -727,6 +775,7 @@ public class DbLoader {
      * @param id The unique identifier of the  {@link AssessmentEntity} to retrieve.
      * @return The {@link Single} object that can be used to observe the result {@link AssessmentEntity} object.
      */
+    @NonNull
     public Single<AssessmentEntity> getAssessmentById(int id) {
         return appDb.assessmentDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -739,6 +788,7 @@ public class DbLoader {
      * @return A {@link LiveData} object that will contain the list of {@link AssessmentEntity} objects retrieved from the underlying {@link AppDb} that are associated with a
      * specific {@link CourseEntity}.
      */
+    @NonNull
     public LiveData<List<AssessmentEntity>> getAssessmentsByCourseId(int courseId) {
         return appDb.assessmentDAO().getByCourseId(courseId);
     }
@@ -748,6 +798,7 @@ public class DbLoader {
      *
      * @return A {@link LiveData} object that will contain the list of {@link AssessmentEntity} objects retrieved from the underlying {@link AppDb}.
      */
+    @NonNull
     public LiveData<List<AssessmentEntity>> getAllAssessments() {
         if (null == allAssessments) {
             allAssessments = appDb.assessmentDAO().getAll();
@@ -760,6 +811,7 @@ public class DbLoader {
      *
      * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
      */
+    @NonNull
     public Single<Integer> getAssessmentCount() {
         return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -773,6 +825,7 @@ public class DbLoader {
      * @param entity The {@link AssessmentEntity} to be saved.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable saveAssessment(AssessmentEntity entity) {
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.assessmentDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
@@ -787,6 +840,7 @@ public class DbLoader {
      * @param list The {@link List} of @link AssessmentEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table.
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
+    @NonNull
     public Completable insertAllAssessments(List<AssessmentEntity> list) {
         return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, AssessmentEntity::applyInsertedId)));
@@ -804,6 +858,7 @@ public class DbLoader {
         }
     }
 
+    @NonNull
     public Completable resetDatabase() {
         return Completable.fromAction(this::resetDb).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -871,6 +926,7 @@ public class DbLoader {
         return result;
     }
 
+    @NonNull
     public Completable populateSampleData(Resources resources) {
         return Completable.fromAction(() -> {
             resetDb();
@@ -908,10 +964,12 @@ public class DbLoader {
             changeKey = new Object();
             MentorEntity value = mPostedValue;
             if (null == value) {
+                Log.i(LOG_TAG, "CurrentEditedMentor cleared");
                 tempDb.emailAddressDAO().deleteAllSynchronous();
                 tempDb.phoneNumberDAO().deleteAllSynchronous();
                 return;
             }
+            Log.i(LOG_TAG, "CurrentEditedMentor changed");
             tempDb.emailAddressDAO().deleteAllSynchronous();
             tempDb.phoneNumberDAO().deleteAllSynchronous();
             String phoneNumbers = value.getPhoneNumbers();
@@ -966,6 +1024,7 @@ public class DbLoader {
                 postValue(null);
             }
 
+            Log.i(LOG_TAG, String.format("Calling mentorDAO().getById(%d)", mentorId));
             return appDb.mentorDAO().getById(mentorId).subscribeOn(scheduler).doOnSuccess(this::postValue).observeOn(AndroidSchedulers.mainThread());
         }
 

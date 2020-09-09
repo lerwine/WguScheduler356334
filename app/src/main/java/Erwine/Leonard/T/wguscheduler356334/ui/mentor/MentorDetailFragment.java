@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
@@ -22,6 +24,7 @@ import io.reactivex.disposables.CompositeDisposable;
  */
 public class MentorDetailFragment extends Fragment {
 
+    private static final String LOG_TAG = MentorDetailFragment.class.getName();
     private static final String ARG_MENTOR_ID = "mentor_id";
     public static final String STATE_KEY_EDIT_INITIALIZED = "edit_initialized";
     public static final String STATE_KEY_MENTOR_NAME = "mentor_name";
@@ -31,35 +34,39 @@ public class MentorDetailFragment extends Fragment {
     private final CompositeDisposable compositeDisposable;
     private MentorDetailViewModel mViewModel;
     private boolean editInitialized;
-    private long mentorId;
     private EditText mentorNameEditText;
     private EditText notesEditTextMultiLine;
 
     public MentorDetailFragment() {
+        Log.i(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailFragment");
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.i(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailFragment.onCreateView");
         View root = inflater.inflate(R.layout.fragment_mentor_detail, container, false);
-        if (null != savedInstanceState && savedInstanceState.containsKey(STATE_KEY_EDIT_INITIALIZED)) {
-            editInitialized = savedInstanceState.getBoolean(STATE_KEY_EDIT_INITIALIZED, false);
-            mentorId = savedInstanceState.getLong(STATE_KEY_MENTOR_ID);
-        } else {
-            editInitialized = false;
-            Bundle arguments = getArguments();
-            mentorId = (null == arguments) ? 0L : arguments.getLong(ARG_MENTOR_ID);
-        }
         mentorNameEditText = root.findViewById(R.id.mentorNameEditText);
         notesEditTextMultiLine = root.findViewById(R.id.notesEditTextMultiLine);
-//        root.findViewById(R.id.cancelButton).setOnClickListener(this::onCancelButtonClick);
-//        root.findViewById(R.id.saveButton).setOnClickListener(this::onSaveButtonClick);
-        mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(MentorDetailViewModel.class);
-        if (editInitialized && null != savedInstanceState) {
-            mentorNameEditText.setText(savedInstanceState.getCharSequence(STATE_KEY_MENTOR_NAME));
-            notesEditTextMultiLine.setText(savedInstanceState.getCharSequence(STATE_KEY_MENTOR_NOTES));
+        if (null != savedInstanceState && savedInstanceState.containsKey(STATE_KEY_EDIT_INITIALIZED)) {
+            editInitialized = savedInstanceState.getBoolean(STATE_KEY_EDIT_INITIALIZED, false);
+            if (editInitialized) {
+                mentorNameEditText.setText(savedInstanceState.getCharSequence(STATE_KEY_MENTOR_NAME));
+                notesEditTextMultiLine.setText(savedInstanceState.getCharSequence(STATE_KEY_MENTOR_NOTES));
+            }
+        } else {
+            editInitialized = false;
         }
-        compositeDisposable.add(mViewModel.getEntity(mentorId).subscribe(this::onMentorEntityChanged));
+        Log.i(LOG_TAG, "Exit Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailFragment.onCreateView");
+        return root;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(MentorDetailViewModel.class);
+        mViewModel.getLiveData().observe(requireActivity(), this::onMentorEntityChanged);
+
         mentorNameEditText.setOnEditorActionListener(this::onMentorNameEditorAction);
         mentorNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(s -> {
             if (s.trim().isEmpty()) {
@@ -78,13 +85,11 @@ public class MentorDetailFragment extends Fragment {
                 mentor.setNotes(s);
             }
         }));
-        return root;
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_EDIT_INITIALIZED, true);
-        outState.putLong(STATE_KEY_MENTOR_ID, mentorId);
         outState.putCharSequence(STATE_KEY_MENTOR_NAME, mentorNameEditText.getText());
         outState.putCharSequence(STATE_KEY_MENTOR_NOTES, notesEditTextMultiLine.getText());
         super.onSaveInstanceState(outState);
