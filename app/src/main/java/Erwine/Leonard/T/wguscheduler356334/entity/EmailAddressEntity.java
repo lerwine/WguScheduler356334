@@ -14,9 +14,10 @@ import Erwine.Leonard.T.wguscheduler356334.db.TempDb;
 import Erwine.Leonard.T.wguscheduler356334.util.PropertyChangeSupported;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationTracker;
 
 @Entity(tableName = TempDb.TABLE_NAME_EMAIL_ADDRESSES)
-public class EmailAddressEntity extends PropertyChangeSupported implements Comparable<EmailAddressEntity> {
+public class EmailAddressEntity extends ValidationTracker.ValidationTrackable implements Comparable<EmailAddressEntity> {
     public static final String COLNAME_ID = "id";
     public static final String COLNAME_SORT_ORDER = "sortOrder";
     public static final String COLNAME_VALUE = "value";
@@ -30,8 +31,13 @@ public class EmailAddressEntity extends PropertyChangeSupported implements Compa
     private int sortOrder;
 
     @Ignore
+//    public EmailAddressEntity(String value, int sortOrder) {
     public EmailAddressEntity(String value, int sortOrder) {
+        super(true);
         this.value = SINGLE_LINE_NORMALIZER.apply(value);
+        if (this.value.isEmpty()) {
+            ValidationTracker.setValid(this, false);
+        }
         this.sortOrder = sortOrder;
     }
 
@@ -50,7 +56,7 @@ public class EmailAddressEntity extends PropertyChangeSupported implements Compa
             throw new IllegalStateException();
         }
         source.id = id;
-        source.firePropertyChange(COLNAME_ID, null, id);
+//        source.firePropertyChange(COLNAME_ID, null, id);
     }
 
     public Long getId() {
@@ -62,9 +68,11 @@ public class EmailAddressEntity extends PropertyChangeSupported implements Compa
     }
 
     public void setValue(String value) {
-        String oldValue = applyValue(SINGLE_LINE_NORMALIZER.apply(value));
-        if (null != oldValue) {
-            firePropertyChange(COLNAME_VALUE, oldValue, this.value);
+        String oldValue = this.value;
+        String newValue = SINGLE_LINE_NORMALIZER.apply(value);
+        if (!newValue.equals(value)) {
+            this.value = newValue;
+            ValidationTracker.setValid(this, !newValue.isEmpty());
         }
     }
 
@@ -73,10 +81,7 @@ public class EmailAddressEntity extends PropertyChangeSupported implements Compa
     }
 
     public void setSortOrder(int sortOrder) {
-        Integer oldValue = applySortOrder(sortOrder);
-        if (null != oldValue) {
-            firePropertyChange(COLNAME_SORT_ORDER, (int) oldValue, this.sortOrder);
-        }
+        this.sortOrder = sortOrder;
     }
 
     @Nullable

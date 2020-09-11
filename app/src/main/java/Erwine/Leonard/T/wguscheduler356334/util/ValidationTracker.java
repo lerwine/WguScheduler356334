@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
+import android.media.MediaDrm;
 import android.speech.SpeechRecognizer;
 
 import androidx.annotation.NonNull;
@@ -9,14 +10,27 @@ import androidx.room.Ignore;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> extends ArrayList<T> {
+
+    public static boolean isValid(ValidationTrackable source) {
+        return source.valid;
+    }
+
+    public static void setValid(ValidationTrackable source, boolean valid) {
+        source.setValid(valid);
+    }
+
     private final LiveBoolean liveValid;
     private final LiveBoolean liveEmpty;
     private ValidationTrackable firstValid;
     private ValidationTrackable firstInvalid;
     private ValidationTrackable lastValid;
     private ValidationTrackable lastInvalid;
+
     public ValidationTracker(int initialCapacity) {
         super(initialCapacity);
         liveValid = new LiveBoolean(false);
@@ -35,134 +49,297 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
             liveValid = new LiveBoolean(false);
             liveEmpty = new LiveBoolean(true);
         } else {
-            liveValid = new LiveBoolean(c.stream().reduce(Boolean.FALSE, (b, t) -> {
-                checkAttached(t);
-                return !((ValidationTrackable) t).valid;
-            }, (a, b) -> a || b));
+            c.forEach(node -> {
+                if (null != ((ValidationTrackable) node).tracker) {
+                    throw new IllegalStateException();
+                }
+                link(node, false);
+            });
+            liveValid = new LiveBoolean(null != firstValid && null == firstInvalid);
             liveEmpty = new LiveBoolean(null == firstValid && null == firstInvalid);
         }
     }
 
-    private synchronized boolean checkAttached(ValidationTrackable node) {
-        return null != node && node.checkAttached(this);
+    private synchronized void onValidationChanged(ValidationTrackable node) {
+        if (unlink(node, false)) {
+            if (node.valid) {
+                link(node, false);
+                liveValid.post(true);
+            } else {
+                link(node, false);
+            }
+        } else if (link(node, false) && !node.valid) {
+            liveValid.post(false);
+        }
     }
 
-    private synchronized void onValidationChanged(ValidationTrackable node) {
-        if (node.valid) {
-            if (null == node.next) {
-                if (null == (lastInvalid = node.previous)) {
-                    firstInvalid = null;
-                    liveValid.post(true);
-                } else {
-                    lastInvalid.next = null;
-                }
-            } else {
-                if (null == (node.next.previous = node.previous)) {
-                    firstInvalid = node.next;
-                } else {
-                    node.previous.next = node;
-                }
-                node.next = null;
-            }
-            if (null == (node.previous = lastValid)) {
-                firstValid = node;
-            } else {
-                lastValid = lastValid.next = node;
-            }
-        } else {
-            if (null == node.next) {
-                if (null == (lastValid = node.previous)) {
+    private ValidationTrackable assertOrphaned(ValidationTrackable element) {
+        if (null != element.tracker) {
+            throw new IllegalStateException();
+        }
+        return  element;
+    }
+    private synchronized boolean unlink(ValidationTrackable element, boolean isSizeChange) {
+        if (null == element.tracker || element.tracker != this) {
+            throw new IllegalStateException();
+        }
+        element.tracker = null;
+        if (null == element.next) {
+            if (element.valid) {
+                if (null == (lastValid = element.previous)) {
                     firstValid = null;
+                    if (isSizeChange && null == firstInvalid) {
+                        liveEmpty.post(true);
+                        liveValid.post(false);
+                    }
+                    return true;
+                }
+            } else if (null == (lastInvalid = element.previous)) {
+                firstInvalid = null;
+                if (isSizeChange) {
+                    if (null != firstValid) {
+                        liveValid.post(true);
+                    } else {
+                        liveEmpty.post(true);
+                    }
+                }
+                return true;
+            }
+            element.previous = element.previous.next = null;
+        } else {
+            if (null == (element.next.previous = element.previous)) {
+                if (element.valid) {
+                    firstValid = element.next;
                 } else {
-                    lastValid.next = null;
+                    firstInvalid = element.next;
                 }
             } else {
-                if (null == (node.next.previous = node.previous)) {
-                    firstValid = node.next;
-                } else {
-                    node.previous.next = node;
+                element.previous.next = element.next;
+                element.previous = null;
+            }
+            element.next = null;
+        }
+        return false;
+    }
+    private synchronized boolean link(ValidationTrackable element, boolean isSizeChange) {
+        if (null != element.tracker || element.tracker != this) {
+            throw new IllegalStateException();
+        }
+        if (element.valid) {
+            element.tracker = this;
+            if (null == (element.previous = lastValid)) {
+                firstValid = lastValid = element;
+                if (isSizeChange && null == firstInvalid) {
+                    liveValid.post(true);
+                    liveEmpty.post(false);
                 }
-                node.next = null;
+                return true;
             }
-            if (null == (node.previous = lastInvalid)) {
-                firstInvalid = node;
-                liveValid.post(false);
+            lastValid = element;
+        } else {
+            if (null == (element.previous = lastInvalid)) {
+                firstInvalid = lastInvalid = element;
+                if (isSizeChange) {
+                    if (null != firstValid) {
+                        liveValid.post(false);
+                    } else {
+                        liveEmpty.post(false);
+                    }
+                }
+                return true;
+            }
+            lastInvalid = element;
+        }
+        element.previous.next = element;
+        return false;
+    }
+    private synchronized void replace(ValidationTrackable target, ValidationTrackable newElement) {
+        if (null == target.tracker || target.tracker != this) {
+            throw new IllegalStateException();
+        }
+        if (null != newElement.tracker) {
+            if (newElement != target) {
+                throw new IllegalStateException();
+            }
+            return;
+        }
+        newElement.tracker = target.tracker;
+        target.tracker = null;
+        if (target.valid == newElement.valid) {
+            if (null == (newElement.previous = target.previous)) {
+                if (newElement.valid) {
+                    firstValid = newElement;
+                } else {
+                    firstInvalid = newElement;
+                }
             } else {
-                lastInvalid = lastInvalid.next = node;
+                newElement.previous.next = newElement;
+                target.previous = null;
             }
+            if (null == (newElement.next = target.next)) {
+                if (newElement.valid) {
+                    lastValid = newElement;
+                } else {
+                    lastInvalid = newElement;
+                }
+            } else {
+                newElement.next.previous = newElement;
+                target.next = null;
+            }
+        } else if (newElement.valid) {
+            if (unlink(target, false)) {
+                link(newElement, false);
+                liveValid.post(true);
+            } else {
+                link(newElement, false);
+            }
+        } else if (link(newElement, false)) {
+            unlink(target, false);
+            liveValid.post(false);
+        } else {
+            unlink(target, false);
+        }
+    }
+    @Override
+    public synchronized T set(int index, T element) {
+        assertOrphaned(element);
+        T replaced = super.set(index, element);
+        replace(replaced, element);
+        return replaced;
+    }
+
+    @Override
+    public synchronized boolean add(T t) {
+        assertOrphaned(t);
+        if (super.add(t)) {
+            link(t, true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized void add(int index, T element) {
+        assertOrphaned(element);
+        super.add(index, element);
+        link(element, true);
+    }
+
+    @Override
+    public synchronized T remove(int index) {
+        T result = super.remove(index);
+        unlink(result, true);
+        return result;
+    }
+
+    @Override
+    public synchronized boolean remove(@Nullable Object o) {
+        if (super.remove(o)) {
+            unlink((ValidationTrackable) o, true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized void clear() {
+        if (isEmpty()) {
+            return;
+        }
+        List<T> removed = stream().collect(Collectors.toList());
+        super.clear();
+        removed.forEach(t -> {
+            ValidationTrackable node = (ValidationTrackable) t;
+            node.tracker = null;
+            node.next = node.previous = null;
+        });
+    }
+
+    private void ensureLinked() {
+        forEach(t -> {
+            if (null == ((ValidationTrackable) t).tracker) {
+                link(t, true);
+            }
+        });
+    }
+    @Override
+    public synchronized boolean addAll(@NonNull Collection<? extends T> c) {
+        if (super.addAll(c)) {
+            ensureLinked();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized boolean addAll(int index, @NonNull Collection<? extends T> c) {
+        if (super.addAll(index, c)) {
+            ensureLinked();
+            return true;
+        }
+        return false;
+    }
+
+    private void checkRemove(List<T> items) {
+        items.forEach(t -> {
+            if (!contains(t)) {
+                unlink(t, true);
+            }
+        });
+    }
+    @Override
+    public synchronized void removeRange(int fromIndex, int toIndex) {
+        if (!isEmpty()) {
+            List<T> items = stream().collect(Collectors.toList());
+            super.removeRange(fromIndex, toIndex);
+            checkRemove(items);
         }
     }
 
     @Override
-    public T set(int index, T element) {
-        return super.set(index, element);
+    public synchronized boolean removeAll(@NonNull Collection<?> c) {
+        if (!isEmpty()) {
+            List<T> items = stream().collect(Collectors.toList());
+            if (super.removeAll(c)) {
+                checkRemove(items);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public boolean add(T t) {
-        return super.add(t);
+    public synchronized boolean retainAll(@NonNull Collection<?> c) {
+        if (!isEmpty()) {
+            List<T> items = stream().collect(Collectors.toList());
+            if (super.retainAll(c)) {
+                checkRemove(items);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public void add(int index, T element) {
-        super.add(index, element);
-    }
-
-    @Override
-    public T remove(int index) {
-        return super.remove(index);
-    }
-
-    @Override
-    public boolean remove(@Nullable Object o) {
-        return super.remove(o);
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
-    }
-
-    @Override
-    public boolean addAll(@NonNull Collection<? extends T> c) {
-        return super.addAll(c);
-    }
-
-    @Override
-    public boolean addAll(int index, @NonNull Collection<? extends T> c) {
-        return super.addAll(index, c);
-    }
-
-    @Override
-    protected void removeRange(int fromIndex, int toIndex) {
-        super.removeRange(fromIndex, toIndex);
-    }
-
-    @Override
-    public boolean removeAll(@NonNull Collection<?> c) {
-        return super.removeAll(c);
-    }
-
-    @Override
-    public boolean retainAll(@NonNull Collection<?> c) {
-        return super.retainAll(c);
-    }
-
-    public static boolean isValid(ValidationTrackable source) {
-        return source.valid;
-    }
-
-    public static void setValid(ValidationTrackable source, boolean valid) {
-        source.setValid(valid);
+    public synchronized void replaceAll(@NonNull UnaryOperator<T> operator) {
+        List<T> items = stream().collect(Collectors.toList());
+        super.replaceAll(operator);
+        checkRemove(items);
+        ensureLinked();
     }
 
     private class LiveBoolean extends LiveData<Boolean> {
+        private boolean postedValue;
         private LiveBoolean(boolean initialValue) {
             super(initialValue);
+            postedValue = initialValue;
         }
 
-        public void post(boolean b) {
-
+        public synchronized void post(boolean b) {
+            if (b != postedValue) {
+                postedValue = b;
+                postValue(b);
+            }
         }
     }
 
@@ -187,29 +364,6 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
                     tracker.onValidationChanged(this);
                 }
             }
-        }
-        private synchronized boolean checkAttached(ValidationTracker<? extends ValidationTrackable> tracker) {
-            if (null != this.tracker) {
-                if (tracker != this.tracker) {
-                    throw new IllegalArgumentException();
-                }
-                return false;
-            }
-            this.tracker = tracker;
-            if (valid) {
-                if (null == (previous = tracker.lastValid)) {
-                    tracker.lastValid = tracker.firstValid = this;
-                    return null == tracker.lastInvalid;
-                }
-                tracker.lastValid = previous.next = this;
-            } else {
-                if (null == (previous = tracker.lastInvalid)) {
-                    tracker.firstInvalid = tracker.lastInvalid = this;
-                    return true;
-                }
-                tracker.lastInvalid = previous.next = this;
-            }
-            return false;
         }
     }
 

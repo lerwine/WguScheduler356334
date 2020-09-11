@@ -13,9 +13,10 @@ import Erwine.Leonard.T.wguscheduler356334.db.TempDb;
 import Erwine.Leonard.T.wguscheduler356334.util.PropertyChangeSupported;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationTracker;
 
 @Entity(tableName = TempDb.TABLE_NAME_PHONE_NUMBERS)
-public class PhoneNumberEntity extends PropertyChangeSupported implements Comparable<PhoneNumberEntity> {
+public class PhoneNumberEntity extends ValidationTracker.ValidationTrackable implements Comparable<PhoneNumberEntity> {
     public static final String COLNAME_ID = "id";
     //    public static final String COLNAME_MENTOR_ID = "mentorId";
     public static final String COLNAME_SORT_ORDER = "sortOrder";
@@ -30,8 +31,13 @@ public class PhoneNumberEntity extends PropertyChangeSupported implements Compar
     private int sortOrder;
 
     @Ignore
+//    public PhoneNumberEntity(String value, int sortOrder) {
     public PhoneNumberEntity(String value, int sortOrder) {
+        super(true);
         this.value = SINGLE_LINE_NORMALIZER.apply(value);
+        if (this.value.isEmpty()) {
+            ValidationTracker.setValid(this, false);
+        }
         this.sortOrder = sortOrder;
     }
 
@@ -50,7 +56,7 @@ public class PhoneNumberEntity extends PropertyChangeSupported implements Compar
             throw new IllegalStateException();
         }
         source.id = id;
-        source.firePropertyChange(COLNAME_ID, null, id);
+//        source.firePropertyChange(COLNAME_ID, null, id);
     }
 
     public Long getId() {
@@ -62,7 +68,12 @@ public class PhoneNumberEntity extends PropertyChangeSupported implements Compar
     }
 
     public void setValue(String value) {
-        this.value = SINGLE_LINE_NORMALIZER.apply(value);
+        String oldValue = this.value;
+        String newValue = SINGLE_LINE_NORMALIZER.apply(value);
+        if (!newValue.equals(value)) {
+            this.value = newValue;
+            ValidationTracker.setValid(this, !newValue.isEmpty());
+        }
     }
 
     public int getSortOrder() {
