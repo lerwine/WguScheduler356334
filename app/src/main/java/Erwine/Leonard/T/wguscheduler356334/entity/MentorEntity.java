@@ -1,7 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -12,14 +11,13 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.util.PropertyChangeSupported;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
 @Entity(tableName = AppDb.TABLE_NAME_MENTORS, indices = {
         @Index(value = MentorEntity.COLNAME_NAME, name = MentorEntity.INDEX_NAME, unique = true)
 })
-public class MentorEntity extends PropertyChangeSupported {
+public class MentorEntity {
 
     //<editor-fold defaultstate="collapsed" desc="Static Members" >
 
@@ -38,7 +36,6 @@ public class MentorEntity extends PropertyChangeSupported {
             throw new IllegalStateException();
         }
         source.id = id;
-        source.firePropertyChange(COLNAME_ID, null, id);
     }
 
     //</editor-fold>
@@ -101,10 +98,7 @@ public class MentorEntity extends PropertyChangeSupported {
     }
 
     public synchronized void setName(String name) {
-        String oldValue = applyName(SINGLE_LINE_NORMALIZER.apply(name));
-        if (null != oldValue) {
-            firePropertyChange(COLNAME_NAME, oldValue, this.name);
-        }
+        this.name = SINGLE_LINE_NORMALIZER.apply(name);
     }
 
     public String getNotes() {
@@ -112,10 +106,7 @@ public class MentorEntity extends PropertyChangeSupported {
     }
 
     public void setNotes(String notes) {
-        String oldValue = applyNotes(MULTI_LINE_NORMALIZER.apply(notes));
-        if (null != oldValue) {
-            firePropertyChange(COLNAME_NOTES, oldValue, this.notes);
-        }
+        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
     public synchronized String getPhoneNumber() {
@@ -123,10 +114,7 @@ public class MentorEntity extends PropertyChangeSupported {
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        String oldValue = applyPhoneNumber(SINGLE_LINE_NORMALIZER.apply(phoneNumber));
-        if (null != oldValue) {
-            firePropertyChange(COLNAME_PHONE_NUMBER, oldValue, this.phoneNumber);
-        }
+        this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);
     }
 
     public synchronized String getEmailAddress() {
@@ -134,53 +122,10 @@ public class MentorEntity extends PropertyChangeSupported {
     }
 
     public synchronized void setEmailAddress(String emailAddress) {
-        String oldValue = applyEmailAddress(SINGLE_LINE_NORMALIZER.apply(emailAddress));
-        if (null != oldValue) {
-            firePropertyChange(COLNAME_EMAIL_ADDRESS, oldValue, this.emailAddress);
-        }
+        this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
     }
 
     //</editor-fold>
-
-    @Nullable
-    private synchronized String applyName(@NonNull String newValue) {
-        String oldValue = name;
-        if (newValue.equals(name)) {
-            return null;
-        }
-        name = newValue;
-        return oldValue;
-    }
-
-    @Nullable
-    private synchronized String applyNotes(@NonNull String newValue) {
-        String oldValue = notes;
-        if (newValue.equals(notes)) {
-            return null;
-        }
-        notes = newValue;
-        return oldValue;
-    }
-
-    @Nullable
-    private synchronized String applyPhoneNumber(@NonNull String newValue) {
-        String oldValue = phoneNumber;
-        if (newValue.equals(phoneNumber)) {
-            return null;
-        }
-        phoneNumber = newValue;
-        return oldValue;
-    }
-
-    @Nullable
-    private synchronized String applyEmailAddress(@NonNull String newValue) {
-        String oldValue = emailAddress;
-        if (newValue.equals(emailAddress)) {
-            return null;
-        }
-        emailAddress = newValue;
-        return oldValue;
-    }
 
     //<editor-fold desc="Overrides">
 
