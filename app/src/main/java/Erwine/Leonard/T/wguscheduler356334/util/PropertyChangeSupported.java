@@ -24,14 +24,32 @@ public class PropertyChangeSupported {
         return propertyChangeSupport;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void ensurePropertyChangeListener(PropertyChangeListener listener) {
         if (null != listener && Arrays.stream(propertyChangeSupport.getPropertyChangeListeners()).allMatch(t -> t != listener)) {
             propertyChangeSupport.addPropertyChangeListener(listener);
         }
     }
 
+    public void ensurePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        if (null != listener && Arrays.stream(propertyChangeSupport.getPropertyChangeListeners()).allMatch(t -> t != listener)) {
+            propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+        }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
     protected <T> void fireIndexedPropertyChange(String propertyName, int index, T oldValue, T newValue) {

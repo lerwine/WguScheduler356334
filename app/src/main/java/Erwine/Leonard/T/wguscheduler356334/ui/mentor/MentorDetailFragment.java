@@ -2,12 +2,10 @@ package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,7 +65,6 @@ public class MentorDetailFragment extends Fragment {
         mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(MentorDetailViewModel.class);
         mViewModel.getLiveData().observe(requireActivity(), this::onMentorEntityChanged);
 
-        mentorNameEditText.setOnEditorActionListener(this::onMentorNameEditorAction);
         mentorNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(s -> {
             if (s.trim().isEmpty()) {
                 mentorNameEditText.setError("Name is required.");
@@ -101,18 +98,6 @@ public class MentorDetailFragment extends Fragment {
             mentorNameEditText.setText(mentorEntity.getName());
             notesEditTextMultiLine.setText(mentorEntity.getNotes());
         }
-    }
-
-    private boolean onMentorNameEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-        return false;
-    }
-
-    private void onCancelButtonClick(View view) {
-
-    }
-
-    private void onSaveButtonClick(View view) {
-
     }
 
 }

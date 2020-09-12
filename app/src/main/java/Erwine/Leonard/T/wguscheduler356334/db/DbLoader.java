@@ -138,9 +138,13 @@ public class DbLoader {
     }
 
     private DbLoader(Context context) {
+        this(context, AppDb.getInstance(context));
+    }
+
+    protected DbLoader(Context context, AppDb appDb) {
         compositeDisposable = new CompositeDisposable();
         mEditedMentorLiveData = new CurrentEditedMentor();
-        appDb = AppDb.getInstance(context);
+        this.appDb = appDb;
         tempDb = TempDb.getInstance(context);
         currentEditedMentor = new MentorEditState(mEditedMentorLiveData, tempDb.phoneNumberDAO().getAll(), tempDb.emailAddressDAO().getAll());
         dataExecutor = Executors.newSingleThreadExecutor();

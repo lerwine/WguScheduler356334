@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveIntegerData;
-import Erwine.Leonard.T.wguscheduler356334.util.live.PostTrackingLiveData;
 
 public final class IndexedStringList extends AbstractList<IndexedStringList.Item> {
 
@@ -153,7 +152,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
     }
 
     public synchronized String getText() {
-        Iterator<String> iterator = backingList.stream().map(t -> t.normalizedValue.getPostedValue()).filter(t -> !t.isEmpty()).iterator();
+        Iterator<String> iterator = backingList.stream().map(t -> t.normalizedValue.postedValue).filter(t -> !t.isEmpty()).iterator();
         if (iterator.hasNext()) {
             String text = iterator.next();
             if (iterator.hasNext()) {
@@ -179,7 +178,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                 backingList.iterator(),
                 StringLineIterator.getLines(text).iterator(), SINGLE_LINE_NORMALIZER,
                 t -> !t.isEmpty(),
-                (a, b) -> a.normalizedValue.getPostedValue().equals(b)
+                (a, b) -> a.normalizedValue.postedValue.equals(b)
         );
         return lines.map(t -> {
             Iterator<String> iterator = t.iterator();
@@ -196,7 +195,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                 } while (iterator.hasNext());
             } else {
                 if (!backingList.isEmpty()) {
-                    if (backingList.size() == 1 && backingList.get(0).normalizedValue.getPostedValue().isEmpty())
+                    if (backingList.size() == 1 && backingList.get(0).normalizedValue.postedValue.isEmpty())
                         return false;
                     clearImpl();
                 }
@@ -354,7 +353,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         if (o instanceof Item) {
             Item item = (Item) o;
             if (null != item.lineNumber.getValue()) {
-                int index = item.lineNumber.getValue() - 1;
+                int index = item.lineNumber.getValueLiveData().getValue() - 1;
                 if (index < backingList.size() && backingList.get(index) == item && null != (item = backingList.remove(index))) {
                     item.lineNumber.set(null);
                     item.removeContentChangeObserver(contentChangeObserver);
@@ -422,18 +421,22 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         }
 
         private void set(Integer value) {
-            postValue(value);
+            postValue(Optional.ofNullable(value));
         }
 
     }
 
-    private static class StringData extends PostTrackingLiveData<String> {
+    private static class StringData extends LiveData<String> {
+        private String postedValue;
+
         StringData(String initialValue) {
             super(SINGLE_LINE_NORMALIZER.apply(initialValue));
+            postedValue = getValue();
         }
 
         private void set(String value) {
-            postValue(SINGLE_LINE_NORMALIZER.apply(value));
+            postedValue = SINGLE_LINE_NORMALIZER.apply(value);
+            postValue(postedValue);
         }
     }
 
@@ -449,7 +452,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         public Item(String content) {
             lineNumber = new NumberData();
             normalizedValue = new StringData(content);
-            empty = new LiveBoolean(normalizedValue.getPostedValue().isEmpty());
+            empty = new LiveBoolean(normalizedValue.postedValue.isEmpty());
             rawValue = new MutableLiveData<String>(content) {
                 private String postedValue;
 
@@ -495,11 +498,11 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         }
 
         public Integer getLineNumber() {
-            return lineNumber.getValue();
+            return lineNumber.getValueLiveData().getValue();
         }
 
         public LiveData<Integer> lineNumber() {
-            return lineNumber;
+            return lineNumber.getValueLiveData();
         }
 
         public String getRawValue() {

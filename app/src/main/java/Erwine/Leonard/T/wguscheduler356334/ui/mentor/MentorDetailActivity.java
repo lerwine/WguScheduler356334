@@ -11,6 +11,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Objects;
@@ -37,14 +38,17 @@ public class MentorDetailActivity extends AppCompatActivity {
 
     private final DbLoader dbLoader;
     private final CompositeDisposable compositeDisposable;
+    private final MentorEditState editedMentor;
     private ViewPager mViewPager;
     private boolean editInitialized;
     private Long mentorId;
     private MentorEntity originalValues;
+    private FloatingActionButton saveFloatingActionButton;
 
     public MentorDetailActivity() {
         Log.i(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity");
         dbLoader = DbLoader.getInstance(getApplication());
+        editedMentor = dbLoader.getEditedMentor();
         compositeDisposable = new CompositeDisposable();
     }
 
@@ -100,15 +104,21 @@ public class MentorDetailActivity extends AppCompatActivity {
         MentorDetailPagerAdapter mentorDetailPagerAdapter = new MentorDetailPagerAdapter(this, getSupportFragmentManager());
         mViewPager = findViewById(R.id.view_pager);
         mViewPager.setAdapter(mentorDetailPagerAdapter);
-        findViewById(R.id.saveFloatingActionButton).setOnClickListener(this::onSaveFloatingActionButtonClick);
+        saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
+        saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
         findViewById(R.id.deleteFloatingActionButton).setOnClickListener(this::onDeleteFloatingActionButtonClick);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(mViewPager);
+        editedMentor.getIsValidLiveData().observe(this, this::onIsValidChanged);
 
 //        FloatingActionButton fab = findViewById(R.id.saveFloatingActionButton);
 //        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                .setAction("Action", null).show());
         Log.i(LOG_TAG, "Exit onCreate");
+    }
+
+    private void onIsValidChanged(Boolean isValid) {
+        saveFloatingActionButton.setEnabled(isValid);
     }
 
     @Override

@@ -1,15 +1,18 @@
 package Erwine.Leonard.T.wguscheduler356334.util.live;
 
+import androidx.lifecycle.LiveData;
+
+import java.util.Objects;
 import java.util.Optional;
 
-public class OptionalLiveData<T> extends PostTrackingLiveData<T> {
-    private final LiveBooleanData presentLiveData;
-    private Optional<T> optionalValue;
+public class OptionalLiveData<T> extends LiveData<Optional<T>> {
+    private PresentLiveData presentLiveData;
+    private ValueLiveData valueLiveData;
 
     public OptionalLiveData(Optional<T> initialValue) {
-        super(initialValue.orElse(null));
-        optionalValue = normalize(initialValue);
-        presentLiveData = new LiveBooleanData(optionalValue.isPresent());
+        super((null == initialValue) ? Optional.empty() : initialValue);
+        presentLiveData = new PresentLiveData();
+        valueLiveData = new ValueLiveData();
     }
 
     public OptionalLiveData(T initialValue) {
@@ -20,40 +23,71 @@ public class OptionalLiveData<T> extends PostTrackingLiveData<T> {
         this(Optional.empty());
     }
 
-    private static <T> Optional<T> normalize(Optional<T> value) {
-        return (null == value) ? Optional.empty() : value.flatMap(i -> (null == i) ? Optional.empty() : value);
+    protected synchronized void postPlainValue(T value) {
+        super.postValue(Optional.ofNullable(value));
     }
 
-    private static <T> Optional<T> asOptional(T value) {
-        return (null == value) ? Optional.empty() : Optional.of(value);
-    }
-
-    protected synchronized void postValue(Optional<T> value) {
-        optionalValue = normalize(value);
-        presentLiveData.postValue(optionalValue.isPresent());
-        super.postValue(optionalValue.orElse(null));
-    }
-
-    public Optional<T> getOptionalValue() {
-        return optionalValue;
+    protected T onOrElseGet() {
+        return null;
     }
 
     @Override
-    protected void onPostedValueChanged(T value) {
-        optionalValue = asOptional(value);
-        presentLiveData.postValue(optionalValue.isPresent());
+    protected void setValue(Optional<T> value) {
+        Optional<T> currentValue = Objects.requireNonNull(getValue());
+        if (value.map(t -> currentValue.map(u -> !Objects.equals(t, u)).orElse(true)).orElseGet(currentValue::isPresent)) {
+            super.setValue(value);
+            presentLiveData.set(value.isPresent());
+            valueLiveData.set(value.orElseGet(OptionalLiveData.this::onOrElseGet));
+        }
     }
 
-    public LiveBooleanData getPresentLiveData() {
+    protected void setPlainValue(T value) {
+        setValue(Optional.ofNullable(value));
+    }
+
+    public LiveData<Boolean> getPresentLiveData() {
         return presentLiveData;
+    }
+
+    public LiveData<T> getValueLiveData() {
+        return valueLiveData;
     }
 
     public boolean isPresent() {
         return presentLiveData.getValue();
     }
 
-    public boolean isPostedPresent() {
-        return presentLiveData.getPostedValue();
+    private class ValueLiveData extends LiveData<T> {
+
+        public ValueLiveData() {
+            super(OptionalLiveData.this.getValue().orElseGet(OptionalLiveData.this::onOrElseGet));
+        }
+
+        private void set(T value) {
+            if (!Objects.equals(value, getValue())) {
+                super.setValue(value);
+            }
+        }
+
+        private void post(T value) {
+            super.postValue(value);
+        }
     }
 
+    private class PresentLiveData extends LiveData<Boolean> {
+
+        public PresentLiveData() {
+            super(OptionalLiveData.this.getValue().isPresent());
+        }
+
+        private void set(boolean value) {
+            if (value != getValue()) {
+                super.setValue(value);
+            }
+        }
+
+        private void post(boolean value) {
+            super.postValue(value);
+        }
+    }
 }

@@ -1,8 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
-import android.media.MediaDrm;
-import android.speech.SpeechRecognizer;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -24,8 +21,8 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         source.setValid(valid);
     }
 
-    private final LiveBoolean liveValid;
-    private final LiveBoolean liveEmpty;
+    private final LiveBoolean isValidLiveData;
+    private final LiveBoolean isEmptyLiveData;
     private ValidationTrackable firstValid;
     private ValidationTrackable firstInvalid;
     private ValidationTrackable lastValid;
@@ -33,21 +30,21 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
 
     public ValidationTracker(int initialCapacity) {
         super(initialCapacity);
-        liveValid = new LiveBoolean(false);
-        liveEmpty = new LiveBoolean(true);
+        isValidLiveData = new LiveBoolean(false);
+        isEmptyLiveData = new LiveBoolean(true);
     }
 
     public ValidationTracker() {
         super();
-        liveValid = new LiveBoolean(false);
-        liveEmpty = new LiveBoolean(true);
+        isValidLiveData = new LiveBoolean(false);
+        isEmptyLiveData = new LiveBoolean(true);
     }
 
     public ValidationTracker(@NonNull Collection<? extends T> c) {
         super(c);
         if (c.isEmpty()) {
-            liveValid = new LiveBoolean(false);
-            liveEmpty = new LiveBoolean(true);
+            isValidLiveData = new LiveBoolean(false);
+            isEmptyLiveData = new LiveBoolean(true);
         } else {
             c.forEach(node -> {
                 if (null != ((ValidationTrackable) node).tracker) {
@@ -55,21 +52,33 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
                 }
                 link(node, false);
             });
-            liveValid = new LiveBoolean(null != firstValid && null == firstInvalid);
-            liveEmpty = new LiveBoolean(null == firstValid && null == firstInvalid);
+            isValidLiveData = new LiveBoolean(null != firstValid && null == firstInvalid);
+            isEmptyLiveData = new LiveBoolean(null == firstValid && null == firstInvalid);
         }
+    }
+
+    public boolean isValid() {
+        return isValidLiveData.getValue();
+    }
+
+    public LiveData<Boolean> getIsValidLiveData() {
+        return isValidLiveData;
+    }
+
+    public LiveData<Boolean> getIsEmptyLiveData() {
+        return isEmptyLiveData;
     }
 
     private synchronized void onValidationChanged(ValidationTrackable node) {
         if (unlink(node, false)) {
             if (node.valid) {
                 link(node, false);
-                liveValid.post(true);
+                isValidLiveData.post(true);
             } else {
                 link(node, false);
             }
         } else if (link(node, false) && !node.valid) {
-            liveValid.post(false);
+            isValidLiveData.post(false);
         }
     }
 
@@ -89,8 +98,8 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
                 if (null == (lastValid = element.previous)) {
                     firstValid = null;
                     if (isSizeChange && null == firstInvalid) {
-                        liveEmpty.post(true);
-                        liveValid.post(false);
+                        isEmptyLiveData.post(true);
+                        isValidLiveData.post(false);
                     }
                     return true;
                 }
@@ -98,9 +107,9 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
                 firstInvalid = null;
                 if (isSizeChange) {
                     if (null != firstValid) {
-                        liveValid.post(true);
+                        isValidLiveData.post(true);
                     } else {
-                        liveEmpty.post(true);
+                        isEmptyLiveData.post(true);
                     }
                 }
                 return true;
@@ -130,8 +139,8 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
             if (null == (element.previous = lastValid)) {
                 firstValid = lastValid = element;
                 if (isSizeChange && null == firstInvalid) {
-                    liveValid.post(true);
-                    liveEmpty.post(false);
+                    isValidLiveData.post(true);
+                    isEmptyLiveData.post(false);
                 }
                 return true;
             }
@@ -141,9 +150,9 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
                 firstInvalid = lastInvalid = element;
                 if (isSizeChange) {
                     if (null != firstValid) {
-                        liveValid.post(false);
+                        isValidLiveData.post(false);
                     } else {
-                        liveEmpty.post(false);
+                        isEmptyLiveData.post(false);
                     }
                 }
                 return true;
@@ -189,13 +198,13 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         } else if (newElement.valid) {
             if (unlink(target, false)) {
                 link(newElement, false);
-                liveValid.post(true);
+                isValidLiveData.post(true);
             } else {
                 link(newElement, false);
             }
         } else if (link(newElement, false)) {
             unlink(target, false);
-            liveValid.post(false);
+            isValidLiveData.post(false);
         } else {
             unlink(target, false);
         }
@@ -328,8 +337,12 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         ensureLinked();
     }
 
+    public void setAll(List<T> phoneNumberEntities) {
+    }
+
     private class LiveBoolean extends LiveData<Boolean> {
         private boolean postedValue;
+
         private LiveBoolean(boolean initialValue) {
             super(initialValue);
             postedValue = initialValue;
