@@ -1,7 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -28,8 +26,8 @@ public class MentorEntity extends PropertyChangeSupported {
     public static final String INDEX_NAME = "IDX_MENTOR_NAME";
     public static final String COLNAME_ID = "id";
     public static final String COLNAME_NAME = "name";
-    public static final String COLNAME_PHONE_NUMBERS = "phoneNumbers";
-    public static final String COLNAME_EMAIL_ADDRESSES = "emailAddresses";
+    public static final String COLNAME_PHONE_NUMBER = "phoneNumber";
+    public static final String COLNAME_EMAIL_ADDRESS = "emailAddress";
     public static final String COLNAME_NOTES = "notes";
 
     private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
@@ -54,17 +52,11 @@ public class MentorEntity extends PropertyChangeSupported {
     @ColumnInfo(name = COLNAME_NAME)
     private String name;
 
-    @Ignore
-    private String primaryPhone;
+    @ColumnInfo(name = COLNAME_PHONE_NUMBER)
+    private String phoneNumber;
 
-    @ColumnInfo(name = COLNAME_PHONE_NUMBERS)
-    private String phoneNumbers;
-
-    @Ignore
-    private String primaryEmail;
-
-    @ColumnInfo(name = COLNAME_EMAIL_ADDRESSES)
-    private String emailAddresses;
+    @ColumnInfo(name = COLNAME_EMAIL_ADDRESS)
+    private String emailAddress;
 
     @ColumnInfo(name = COLNAME_NOTES)
     private String notes;
@@ -73,19 +65,17 @@ public class MentorEntity extends PropertyChangeSupported {
 
     //<editor-fold defaultstate="collapsed" desc="Constructors">
 
-    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses, long id) {
-        this(name, notes, phoneNumbers, emailAddresses);
+    public MentorEntity(String name, String notes, String phoneNumber, String emailAddress, long id) {
+        this(name, notes, phoneNumber, emailAddress);
         this.id = id;
     }
 
     @Ignore
-    public MentorEntity(String name, String notes, String phoneNumbers, String emailAddresses) {
+    public MentorEntity(String name, String notes, String phoneNumber, String emailAddress) {
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
-        this.phoneNumbers = MULTI_LINE_NORMALIZER.apply(phoneNumbers);
-        applyPrimaryPhone();
-        this.emailAddresses = MULTI_LINE_NORMALIZER.apply(emailAddresses);
-        applyPrimaryEmail();
+        this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);
+        this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
     }
 
     @Ignore
@@ -128,40 +118,26 @@ public class MentorEntity extends PropertyChangeSupported {
         }
     }
 
-    public synchronized String getPhoneNumbers() {
-        return phoneNumbers;
+    public synchronized String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhoneNumbers(String phoneNumbers) {
-        Pair<String, String> oldValues = applyPhoneNumbers(MULTI_LINE_NORMALIZER.apply(phoneNumbers));
-        if (null != oldValues) {
-            if (null != oldValues.first) {
-                firePropertyChange("primaryPhone", oldValues.first, this.primaryPhone);
-            }
-            firePropertyChange(COLNAME_PHONE_NUMBERS, oldValues.second, this.phoneNumbers);
+    public void setPhoneNumber(String phoneNumber) {
+        String oldValue = applyPhoneNumber(SINGLE_LINE_NORMALIZER.apply(phoneNumber));
+        if (null != oldValue) {
+            firePropertyChange(COLNAME_PHONE_NUMBER, oldValue, this.phoneNumber);
         }
     }
 
-    public synchronized String getPrimaryPhone() {
-        return primaryPhone;
+    public synchronized String getEmailAddress() {
+        return emailAddress;
     }
 
-    public synchronized String getEmailAddresses() {
-        return emailAddresses;
-    }
-
-    public synchronized void setEmailAddresses(String emailAddresses) {
-        Pair<String, String> oldValues = applyEmailAddresses(MULTI_LINE_NORMALIZER.apply(emailAddresses));
-        if (null != oldValues) {
-            if (null != oldValues.first) {
-                firePropertyChange("primaryEmail", oldValues.first, this.primaryEmail);
-            }
-            firePropertyChange(COLNAME_EMAIL_ADDRESSES, oldValues.second, this.emailAddresses);
+    public synchronized void setEmailAddress(String emailAddress) {
+        String oldValue = applyEmailAddress(SINGLE_LINE_NORMALIZER.apply(emailAddress));
+        if (null != oldValue) {
+            firePropertyChange(COLNAME_EMAIL_ADDRESS, oldValue, this.emailAddress);
         }
-    }
-
-    public synchronized String getPrimaryEmail() {
-        return primaryEmail;
     }
 
     //</editor-fold>
@@ -187,39 +163,23 @@ public class MentorEntity extends PropertyChangeSupported {
     }
 
     @Nullable
-    private synchronized Pair<String, String> applyPhoneNumbers(@NonNull String newValue) {
-        String oldValue = phoneNumbers;
-        if (newValue.equals(phoneNumbers)) {
+    private synchronized String applyPhoneNumber(@NonNull String newValue) {
+        String oldValue = phoneNumber;
+        if (newValue.equals(phoneNumber)) {
             return null;
         }
-        phoneNumbers = newValue;
-        String oldPrimary = applyPrimaryPhone();
-        return new Pair<>((oldPrimary.equals(primaryPhone)) ? null : oldPrimary, oldValue);
-    }
-
-    private String applyPrimaryPhone() {
-        int i = phoneNumbers.indexOf("\n");
-        String oldPrimary = primaryPhone;
-        primaryPhone = (i < 0) ? phoneNumbers : phoneNumbers.substring(0, i);
-        return oldPrimary;
+        phoneNumber = newValue;
+        return oldValue;
     }
 
     @Nullable
-    private synchronized Pair<String, String> applyEmailAddresses(@NonNull String newValue) {
-        String oldValue = emailAddresses;
-        if (newValue.equals(emailAddresses)) {
+    private synchronized String applyEmailAddress(@NonNull String newValue) {
+        String oldValue = emailAddress;
+        if (newValue.equals(emailAddress)) {
             return null;
         }
-        emailAddresses = newValue;
-        String oldPrimary = applyPrimaryEmail();
-        return new Pair<>((oldPrimary.equals(primaryEmail)) ? null : oldPrimary, oldValue);
-    }
-
-    private String applyPrimaryEmail() {
-        int i = emailAddresses.indexOf("\n");
-        String oldPrimary = primaryEmail;
-        primaryEmail = (i < 0) ? emailAddresses : emailAddresses.substring(0, i);
-        return oldPrimary;
+        emailAddress = newValue;
+        return oldValue;
     }
 
     //<editor-fold desc="Overrides">
@@ -234,8 +194,8 @@ public class MentorEntity extends PropertyChangeSupported {
         }
         return null == that.id &&
                 name.equals(that.name) &&
-                phoneNumbers.equals(that.phoneNumbers) &&
-                emailAddresses.equals(that.emailAddresses) &&
+                phoneNumber.equals(that.phoneNumber) &&
+                emailAddress.equals(that.emailAddress) &&
                 notes.equals(that.notes);
     }
 
@@ -244,7 +204,7 @@ public class MentorEntity extends PropertyChangeSupported {
         if (null != id) {
             return id.hashCode();
         }
-        return Objects.hash(id, name, phoneNumbers, emailAddresses, notes);
+        return Objects.hash(id, name, phoneNumber, emailAddress, notes);
     }
 
     @NonNull
@@ -253,8 +213,8 @@ public class MentorEntity extends PropertyChangeSupported {
         return "MentorEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", primaryPhone=" + phoneNumbers +
-                ", primaryEmail=" + emailAddresses +
+                ", phoneNumber=" + phoneNumber +
+                ", emailAddress=" + emailAddress +
                 ", notes='" + notes + '\'' +
                 '}';
     }

@@ -2,8 +2,6 @@ package Erwine.Leonard.T.wguscheduler356334.db;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -18,7 +16,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -28,13 +25,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.EmailAddressEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.PhoneNumberEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorEditState;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.StringLineIterator;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -75,11 +68,8 @@ public class DbLoader {
     private static DbLoader instance;
     private final CompositeDisposable compositeDisposable;
     private final AppDb appDb;
-    private final TempDb tempDb;
     private final Scheduler scheduler;
     private final Executor dataExecutor;
-    private final CurrentEditedMentor mEditedMentorLiveData;
-    private final MentorEditState currentEditedMentor;
     private LiveData<List<TermEntity>> allTerms;
     private LiveData<List<MentorEntity>> allMentors;
     private LiveData<List<CourseEntity>> allCourses;
@@ -90,7 +80,7 @@ public class DbLoader {
     /**
      * Gets the singleton {@code DbLoader} instance.
      *
-     * @param context The {@link Context} to use for creating the underling {@link AppDb} and {@link TempDb} instances if they were not yet already created.
+     * @param context The {@link Context} to use for creating the underling {@link AppDb} instance if it was not yet already created.
      * @return The singleton {@code DbLoader} instance.
      */
     public static DbLoader getInstance(Context context) {
@@ -143,10 +133,7 @@ public class DbLoader {
 
     protected DbLoader(Context context, AppDb appDb) {
         compositeDisposable = new CompositeDisposable();
-        mEditedMentorLiveData = new CurrentEditedMentor();
         this.appDb = appDb;
-        tempDb = TempDb.getInstance(context);
-        currentEditedMentor = new MentorEditState(mEditedMentorLiveData, tempDb.phoneNumberDAO().getAll(), tempDb.emailAddressDAO().getAll());
         dataExecutor = Executors.newSingleThreadExecutor();
         scheduler = Schedulers.from(dataExecutor);
     }
@@ -272,231 +259,6 @@ public class DbLoader {
     }
 
     /**
-     * Gets the {@link MentorEntity} currently being edited by the {@link Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity}.
-     *
-     * @return The {@link MentorEntity} currently being edited by the {@link Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity}.
-     */
-    @NonNull
-    public MentorEditState getEditedMentor() {
-        return currentEditedMentor;
-    }
-
-    /**
-     * Ensures that {@link #getEditedMentor()} will return the {@link MentorEntity} object associated with the specified unique identifier. This is to signify that the
-     * associated {@link MentorEntity} is being edited by the {@link Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity}. After the {@link MentorEntity}
-     * is changed the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} and {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data tables within the
-     * {@link TempDb} will be updated with the lines from {@link MentorEntity#getPhoneNumbers()} and {@link MentorEntity#getEmailAddresses()}.
-     *
-     * @param mentorId The unique identifier of the {@link MentorEntity} object that is being edited by the {@link Erwine.Leonard.T.wguscheduler356334.ui.mentor.MentorDetailActivity}.
-     * @return The {@link Single} object that can be used to observe the {@link MentorEntity} object loaded from {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within
-     * the underlying {@link AppDb}.
-     */
-    @NonNull
-    public Single<MentorEntity> ensureEditedMentorId(long mentorId) {
-        return mEditedMentorLiveData.ensureEditedMentorId(mentorId);
-    }
-
-    @NonNull
-    public Single<MentorEntity> ensureNewEditedMentor() {
-        return mEditedMentorLiveData.ensureNewEditedMentor();
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     *
-     * @param clearCurrent      If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getNameAndNotes   An {@link Supplier} that returns the name and notes to be applied to the {@link MentorEntity} before saving. This parameter can be {@code null} if
-     *                          the name and notes for the {@link MentorEntity} already contain the intended values.
-     * @param getPhoneNumbers   An {@link Supplier} that returns the string containing the phone numbers to be applied to the {@link MentorEntity} before saving. This can be
-     *                          {@code null} if the {@link MentorEntity} already contains the intended phone numbers.
-     * @param getEmailAddresses An {@link Supplier} that returns the string containing the email addresses to be applied to the {@link MentorEntity} before saving. This can be
-     *                          {@code null} if the {@link MentorEntity} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers, Supplier<String> getEmailAddresses) {
-        return mEditedMentorLiveData.saveEditedMentor(
-                clearCurrent,
-                getNameAndNotes,
-                getPhoneNumbers,
-                getEmailAddresses
-        );
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     *
-     * @param clearCurrent                If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getNameAndNotes             An {@link Supplier} that returns the name and notes to be applied to the {@link MentorEntity} before saving. This parameter can be {@code null} if
-     *                                    the name and notes for the {@link MentorEntity} already contain the intended values.
-     * @param getPhoneNumbers             An {@link Supplier} that returns the string containing the phone numbers to be applied to the {@link MentorEntity} before saving. This can be
-     *                                    {@code null} if the {@link MentorEntity} already contains the intended phone numbers.
-     * @param getEmailAddressesFromTempDb If {@code true}, then the values from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table rows within the
-     *                                    {@link TempDb} will be applied to {@link MentorEntity#setEmailAddresses(String)}; otherwise, it wil be assumed that
-     *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers, boolean getEmailAddressesFromTempDb) {
-        return mEditedMentorLiveData.saveEditedMentor(
-                clearCurrent,
-                getNameAndNotes,
-                getPhoneNumbers,
-                (getEmailAddressesFromTempDb) ? () -> tempDb.emailAddressDAO().getAllSynchronous().stream().sorted().map(EmailAddressEntity::getValue).filter(t -> !t.isEmpty())
-                        .collect(Collectors.joining("\n")) : null
-        );
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     *
-     * @param clearCurrent              If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getNameAndNotes           An {@link Supplier} that returns the name and notes to be applied to the {@link MentorEntity} before saving. This parameter can be {@code null} if
-     *                                  the name and notes for the {@link MentorEntity} already contain the intended values.
-     * @param getPhoneNumbersFromTempDb If {@code true}, then the values from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table rows within the
-     *                                  {@link TempDb} will be applied to {@link MentorEntity#setPhoneNumbers(String)}; otherwise, it wil be assumed that
-     *                                  {@link MentorEntity#getPhoneNumbers()} already contains the intended phone numbers.
-     * @param getEmailAddresses         An {@link Supplier} that returns the string containing the email addresses to be applied to the {@link MentorEntity} before saving. This can be
-     *                                  {@code null} if the {@link MentorEntity} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, boolean getPhoneNumbersFromTempDb, Supplier<String> getEmailAddresses) {
-        return saveEditedMentor(
-                clearCurrent,
-                getNameAndNotes,
-                (getPhoneNumbersFromTempDb) ? () -> tempDb.phoneNumberDAO().getAllSynchronous().stream().sorted().map(PhoneNumberEntity::getValue).filter(t -> !t.isEmpty())
-                        .collect(Collectors.joining("\n")) : null,
-                getEmailAddresses
-        );
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     *
-     * @param clearCurrent                If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getNameAndNotes             An {@link Supplier} that returns the name and notes to be applied to the {@link MentorEntity} before saving. This parameter can be {@code null} if
-     *                                    the name and notes for the {@link MentorEntity} already contain the intended values.
-     * @param getPhoneNumbersFromTempDb   If {@code true}, then the values from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table rows within the
-     *                                    {@link TempDb} will be applied to {@link MentorEntity#setPhoneNumbers(String)}; otherwise, it wil be assumed that
-     *                                    {@link MentorEntity#getPhoneNumbers()} already contains the intended phone numbers.
-     * @param getEmailAddressesFromTempDb If {@code true}, then the values from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table rows within the
-     *                                    {@link TempDb} will be applied to {@link MentorEntity#setEmailAddresses(String)}; otherwise, it wil be assumed that
-     *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, boolean getPhoneNumbersFromTempDb, boolean getEmailAddressesFromTempDb) {
-        return saveEditedMentor(
-                clearCurrent,
-                getNameAndNotes,
-                (getPhoneNumbersFromTempDb) ? () -> tempDb.phoneNumberDAO().getAllSynchronous().stream().sorted().map(PhoneNumberEntity::getValue).filter(t -> !t.isEmpty())
-                        .collect(Collectors.joining("\n")) : null,
-                getEmailAddressesFromTempDb
-        );
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     * This method assumes that the name and notes for the {@link MentorEntity} already contain the intended values.
-     *
-     * @param clearCurrent      If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getPhoneNumbers   An {@link Supplier} that returns the string containing the phone numbers to be applied to the {@link MentorEntity} before saving. This can be
-     *                          {@code null} if the {@link MentorEntity} already contains the intended phone numbers.
-     * @param getEmailAddresses An {@link Supplier} that returns the string containing the email addresses to be applied to the {@link MentorEntity} before saving. This can be
-     *                          {@code null} if the {@link MentorEntity} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, Supplier<String> getPhoneNumbers, Supplier<String> getEmailAddresses) {
-        return saveEditedMentor(clearCurrent, null, getPhoneNumbers, getEmailAddresses);
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     * This method assumes that the name and notes for the {@link MentorEntity} already contain the intended values.
-     *
-     * @param clearCurrent                If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getPhoneNumbers             An {@link Supplier} that returns the string containing the phone numbers to be applied to the {@link MentorEntity} before saving. This can be
-     *                                    {@code null} if the {@link MentorEntity} already contains the intended phone numbers.
-     * @param getEmailAddressesFromTempDb If {@code true}, then the values from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table rows within the
-     *                                    {@link TempDb} will be applied to {@link MentorEntity#setEmailAddresses(String)}; otherwise, it wil be assumed that
-     *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, Supplier<String> getPhoneNumbers, boolean getEmailAddressesFromTempDb) {
-        return saveEditedMentor(clearCurrent, null, getPhoneNumbers, getEmailAddressesFromTempDb);
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     * This method assumes that the name and notes for the {@link MentorEntity} already contain the intended values.
-     *
-     * @param clearCurrent              If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getPhoneNumbersFromTempDb If {@code true}, then the values from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table rows within the
-     *                                  {@link TempDb} will be applied to {@link MentorEntity#setPhoneNumbers(String)}; otherwise, it wil be assumed that
-     *                                  {@link MentorEntity#getPhoneNumbers()} already contains the intended phone numbers.
-     * @param getEmailAddresses         An {@link Supplier} that returns the string containing the email addresses to be applied to the {@link MentorEntity} before saving. This can be
-     *                                  {@code null} if the {@link MentorEntity} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, boolean getPhoneNumbersFromTempDb, Supplier<String> getEmailAddresses) {
-        return saveEditedMentor(clearCurrent, null, getPhoneNumbersFromTempDb, getEmailAddresses);
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     * This method assumes that the name and notes for the {@link MentorEntity} already contain the intended values.
-     *
-     * @param clearCurrent                If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @param getPhoneNumbersFromTempDb   If {@code true}, then the values from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table rows within the
-     *                                    {@link TempDb} will be applied to {@link MentorEntity#setPhoneNumbers(String)}; otherwise, it wil be assumed that
-     *                                    {@link MentorEntity#getPhoneNumbers()} already contains the intended phone numbers.
-     * @param getEmailAddressesFromTempDb If {@code true}, then the values from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table rows within the
-     *                                    {@link TempDb} will be applied to {@link MentorEntity#setEmailAddresses(String)}; otherwise, it wil be assumed that
-     *                                    {@link MentorEntity#getEmailAddresses()} already contains the intended email addresses.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent, boolean getPhoneNumbersFromTempDb, boolean getEmailAddressesFromTempDb) {
-        return saveEditedMentor(clearCurrent, null, getPhoneNumbersFromTempDb, getEmailAddressesFromTempDb);
-    }
-
-    /**
-     * Asynchronously saves the {@link MentorEntity} returned by {@link #getEditedMentor()} into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     * This method assumes that the {@link MentorEntity} already contain the intended values.
-     *
-     * @param clearCurrent If {@code true}, then the value stored by {@link #getEditedMentor()} will be set to {@code null} after the operation is successful.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEditedMentor(boolean clearCurrent) {
-        return saveEditedMentor(clearCurrent, false, false);
-    }
-
-    /**
-     * Asynchronously deletes the {@link MentorEntity} returned by {@link #getEditedMentor()} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying
-     * {@link AppDb}.
-     *
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable deletedEditedMentor() {
-        return mEditedMentorLiveData.deletedEditedMentor();
-    }
-
-    /**
      * Asynchronously saves the specified {@link MentorEntity} object into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table of the underlying {@link AppDb}.
      * If {@link MentorEntity#getId()} is null, then it will be inserted into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table; otherwise, the corresponding table row will be
      * updated. After a new {@link MentorEntity} has been successfully inserted, the value returned by {@link MentorEntity#getId()} will contain the unique identifier of the
@@ -546,84 +308,6 @@ public class DbLoader {
     @NonNull
     public Single<MentorEntity> getMentorById(long id) {
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    /**
-     * Asynchronously deletes a {@link PhoneNumberEntity} from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table of the underlying {@link TempDb}.
-     *
-     * @param entity The {@link PhoneNumberEntity} to delete.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable deletePhoneNumber(PhoneNumberEntity entity) {
-        return tempDb.phoneNumberDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    /**
-     * Gets all rows from the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table within the underlying {@link TempDb}.
-     *
-     * @return A {@link LiveData} object that will contain the list of {@link PhoneNumberEntity} objects retrieved from the underlying {@link TempDb}.
-     */
-    @NonNull
-    public LiveData<List<PhoneNumberEntity>> getPhoneNumbers() {
-        return tempDb.phoneNumberDAO().getAll();
-    }
-
-    /**
-     * Asynchronously saves the specified {@link PhoneNumberEntity} object into the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table of the underlying {@link TempDb}.
-     * If {@link PhoneNumberEntity#getId()} is null, then it will be inserted into the {@link TempDb#TABLE_NAME_PHONE_NUMBERS "phone_numbers"} data table; otherwise, the corresponding table row will be
-     * updated. After a new {@link PhoneNumberEntity} has been successfully inserted, the value returned by {@link PhoneNumberEntity#getId()} will contain the unique identifier of the
-     * newly added row.
-     *
-     * @param entity The {@link PhoneNumberEntity} to be saved.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable savePhoneNumber(PhoneNumberEntity entity) {
-        if (null == entity.getId()) {
-            return Completable.fromSingle(tempDb.phoneNumberDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> PhoneNumberEntity.applyInsertedId(entity, id)));
-        }
-        return tempDb.phoneNumberDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    /**
-     * Asynchronously deletes a {@link EmailAddressEntity} from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table of the underlying {@link TempDb}.
-     *
-     * @param entity The {@link EmailAddressEntity} to delete.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable deleteEmailAddress(EmailAddressEntity entity) {
-        return tempDb.emailAddressDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    /**
-     * Gets all rows from the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table within the underlying {@link TempDb}.
-     *
-     * @return A {@link LiveData} object that will contain the list of {@link EmailAddressEntity} objects retrieved from the underlying {@link TempDb}.
-     */
-    @NonNull
-    public LiveData<List<EmailAddressEntity>> getEmailAddresses() {
-        return tempDb.emailAddressDAO().getAll();
-    }
-
-    /**
-     * Asynchronously saves the specified {@link EmailAddressEntity} object into the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table of the underlying {@link TempDb}.
-     * If {@link EmailAddressEntity#getId()} is null, then it will be inserted into the {@link TempDb#TABLE_NAME_EMAIL_ADDRESSES "email_addresses"} data table; otherwise, the corresponding table row will be
-     * updated. After a new {@link EmailAddressEntity} has been successfully inserted, the value returned by {@link EmailAddressEntity#getId()} will contain the unique identifier of the
-     * newly added row.
-     *
-     * @param entity The {@link EmailAddressEntity} to be saved.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable saveEmailAddress(EmailAddressEntity entity) {
-        if (null == entity.getId()) {
-            return Completable.fromSingle(tempDb.emailAddressDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> EmailAddressEntity.applyInsertedId(entity, id)));
-        }
-        return tempDb.emailAddressDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     /**
@@ -955,148 +639,6 @@ public class DbLoader {
                         sampleCellToLocalDate(cells.get(6), course), course.getId());
             }).collect(Collectors.toList()));
         }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private class CurrentEditedMentor extends LiveData<MentorEntity> {
-        private MentorEntity mPostedValue = null;
-        private Object changeKey;
-
-        protected synchronized void onPostedValueChanged(Object key) {
-            if (key != changeKey) {
-                return;
-            }
-            changeKey = new Object();
-            MentorEntity value = mPostedValue;
-            if (null == value) {
-                Log.i(LOG_TAG, "CurrentEditedMentor cleared");
-                tempDb.emailAddressDAO().deleteAllSynchronous();
-                tempDb.phoneNumberDAO().deleteAllSynchronous();
-                return;
-            }
-            Log.i(LOG_TAG, "CurrentEditedMentor changed");
-            tempDb.emailAddressDAO().deleteAllSynchronous();
-            tempDb.phoneNumberDAO().deleteAllSynchronous();
-            String phoneNumbers = value.getPhoneNumbers();
-            if (!phoneNumbers.trim().isEmpty()) {
-                List<PhoneNumberEntity> list = StringLineIterator.getLines(phoneNumbers).filter(t -> !t.isEmpty()).map(new Function<String, PhoneNumberEntity>() {
-                    int order = -1;
-
-                    @Override
-                    public PhoneNumberEntity apply(String t) {
-                        return new PhoneNumberEntity(t, ++order);
-                    }
-                }).collect(Collectors.toList());
-                if (!list.isEmpty()) {
-                    applyInsertedIds(tempDb.phoneNumberDAO().insertAllSynchronous(list), list, PhoneNumberEntity::applyInsertedId);
-                }
-            }
-            String emailAddresses = value.getEmailAddresses();
-            if (emailAddresses.isEmpty()) {
-                return;
-            }
-            List<EmailAddressEntity> emailAddressEntities = StringLineIterator.getLines(emailAddresses).filter(t -> !t.isEmpty()).map(new Function<String, EmailAddressEntity>() {
-                int order = -1;
-
-                @Override
-                public EmailAddressEntity apply(String t) {
-                    return new EmailAddressEntity(t, ++order);
-                }
-            }).collect(Collectors.toList());
-            if (!emailAddressEntities.isEmpty()) {
-                applyInsertedIds(tempDb.emailAddressDAO().insertAllSynchronous(emailAddressEntities), emailAddressEntities, EmailAddressEntity::applyInsertedId);
-            }
-        }
-
-        @Override
-        protected synchronized void postValue(MentorEntity value) {
-            if ((null == value) ? null != mPostedValue : null == mPostedValue || mPostedValue != value) {
-                Object key = new Object();
-                changeKey = key;
-                mPostedValue = value;
-                dataExecutor.execute(() -> onPostedValueChanged(key));
-            }
-            super.postValue(value);
-        }
-
-        private synchronized Single<MentorEntity> ensureEditedMentorId(long mentorId) {
-            MentorEntity entity = mPostedValue;
-            if (null != entity) {
-                Long id = entity.getId();
-                if (null != id && id == mentorId) {
-                    return Single.fromCallable(() -> entity).observeOn(AndroidSchedulers.mainThread());
-                }
-                postValue(null);
-            }
-
-            Log.i(LOG_TAG, String.format("Calling mentorDAO().getById(%d)", mentorId));
-            return appDb.mentorDAO().getById(mentorId).subscribeOn(scheduler).doOnSuccess(this::postValue).observeOn(AndroidSchedulers.mainThread());
-        }
-
-        private synchronized Single<MentorEntity> ensureNewEditedMentor() {
-            MentorEntity entity = mPostedValue;
-            if (null != entity) {
-                if (null == entity.getId()) {
-                    return Single.fromCallable(() -> entity).observeOn(AndroidSchedulers.mainThread());
-                }
-            }
-            MentorEntity newEntity = new MentorEntity();
-            postValue(newEntity);
-            return Single.fromCallable(() -> newEntity).observeOn(AndroidSchedulers.mainThread());
-        }
-
-        private synchronized Completable saveEditedMentor(boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes, Supplier<String> getPhoneNumbers,
-                                                          Supplier<String> getEmailAddresses) {
-            MentorEntity entity = mPostedValue;
-            if (null == entity) {
-                throw new IllegalStateException();
-            }
-            Object key = new Object();
-            changeKey = key;
-            return Completable.fromAction(() -> onSaveEditedMentor(entity, clearCurrent, getNameAndNotes, getPhoneNumbers, getEmailAddresses, key))
-                    .subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-        }
-
-        private synchronized void onSaveEditedMentor(MentorEntity entity, boolean clearCurrent, Supplier<Pair<String, String>> getNameAndNotes,
-                                                     Supplier<String> getPhoneNumbers, Supplier<String> getEmailAddresses, Object key) {
-            if (key != changeKey) {
-                return;
-            }
-            if (null != getNameAndNotes) {
-                Pair<String, String> nameAndNotes = getNameAndNotes.get();
-                entity.setName(nameAndNotes.first);
-                entity.setNotes(nameAndNotes.second);
-            }
-            if (null != getPhoneNumbers) {
-                entity.setPhoneNumbers(getPhoneNumbers.get());
-            }
-            if (null != getEmailAddresses) {
-                entity.setEmailAddresses(getEmailAddresses.get());
-            }
-            if (null == entity.getId()) {
-                long id = appDb.mentorDAO().insertSynchronous(entity);
-                MentorEntity.applyInsertedId(entity, id);
-            } else {
-                appDb.mentorDAO().updateSynchronous(entity);
-            }
-            if (clearCurrent) {
-                postValue(null);
-            }
-        }
-
-        private synchronized Completable deletedEditedMentor() {
-            MentorEntity entity = mPostedValue;
-            if (null == entity) {
-                return Completable.complete().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-            }
-            Object key = new Object();
-            changeKey = key;
-            return Completable.fromAction(() -> onDeleteEditedMentor(entity, key)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-        }
-
-        private synchronized void onDeleteEditedMentor(MentorEntity entity, Object key) {
-            appDb.mentorDAO().deleteSynchronous(entity);
-            postValue(null);
-        }
     }
 
 }
