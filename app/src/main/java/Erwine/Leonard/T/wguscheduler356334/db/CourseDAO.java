@@ -40,7 +40,7 @@ public interface CourseDAO {
     Single<CourseEntity> getByRowId(int rowId);
 
     @Query("SELECT * FROM courses WHERE id = :id")
-    Single<CourseEntity> getById(int id);
+    Single<CourseEntity> getById(long id);
 
     @Query("SELECT * FROM courses ORDER BY [expectedStart], [actualStart]")
     LiveData<List<CourseEntity>> getAll();
@@ -49,13 +49,13 @@ public interface CourseDAO {
     List<CourseEntity> getAllSynchronous();
 
     @Query("SELECT * FROM courses WHERE termId = :termId ORDER BY [expectedStart], [actualStart]")
-    LiveData<List<CourseEntity>> getByTermId(int termId);
+    LiveData<List<CourseEntity>> getByTermId(long termId);
 
     @Query("SELECT * FROM courses WHERE termId = :termId")
-    List<CourseEntity> getByTermIdSynchronous(int termId);
+    List<CourseEntity> getByTermIdSynchronous(long termId);
 
     @Query("SELECT * FROM courses WHERE mentorId = :mentorId ORDER BY [expectedStart], [actualStart]")
-    LiveData<List<CourseEntity>> getByMentorId(int mentorId);
+    LiveData<List<CourseEntity>> getByMentorId(long mentorId);
 
     @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [expectedStart], [actualStart]")
     LiveData<List<CourseEntity>> getUnterminatedOnOrBefore(LocalDate date);
@@ -64,6 +64,6 @@ public interface CourseDAO {
     Single<Integer> getCount();
 
     @Query("DELETE FROM courses WHERE termId=:termId")
-    Single<Integer> deleteByTermId(int termId);
+    Single<Integer> deleteByTermId(long termId);
 
 }

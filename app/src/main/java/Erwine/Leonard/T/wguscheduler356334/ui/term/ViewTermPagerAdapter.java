@@ -1,46 +1,73 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Supplier;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment;
 
 public class ViewTermPagerAdapter extends FragmentPagerAdapter {
-    @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.title_courses, R.string.title_properties};
-    private static final List<Supplier<Fragment>> TAB_FRAGMENTS = Arrays.asList(CourseListFragment::new, TermPropertiesFragment::new);
     private final Context mContext;
+    private final Long termId;
+    private final MutableLiveData<Fragment> currentFragmentLiveData;
 
-    public ViewTermPagerAdapter(Context context, FragmentManager fm) {
-        super(fm);
+    public ViewTermPagerAdapter(Long termId, Context context, FragmentManager fm) {
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        currentFragmentLiveData = new MutableLiveData<>();
+        this.termId = termId;
         mContext = context;
+    }
+
+    public LiveData<Fragment> getCurrentFragmentLiveData() {
+        return currentFragmentLiveData;
+    }
+
+    @Override
+    public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        if (null != object && object instanceof Fragment) {
+            currentFragmentLiveData.postValue((Fragment) object);
+        } else {
+            currentFragmentLiveData.postValue(null);
+        }
+        super.setPrimaryItem(container, position, object);
     }
 
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        if (position < 0 || position >= TAB_FRAGMENTS.size())
-            throw new IllegalStateException(String.format("Unexpected pager position %d", position));
-        return TAB_FRAGMENTS.get(position).get();
+        Bundle arguments = new Bundle();
+        switch (position) {
+            case 0:
+                return CourseListFragment.newInstance(termId);
+            case 1:
+                return EditTermFragment.newInstance(termId);
+            default:
+                throw new IllegalStateException(String.format("Unexpected pager position %d", position));
+        }
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mContext.getResources().getString(TAB_TITLES[position]);
+        switch (position) {
+            case 0:
+                return mContext.getResources().getString(R.string.title_courses);
+            case 1:
+                return mContext.getResources().getString(R.string.title_properties);
+            default:
+                throw new IllegalStateException(String.format("Unexpected title position %d", position));
+        }
     }
 
     @Override
     public int getCount() {
-        return TAB_TITLES.length;
+        return 2;
     }
 }

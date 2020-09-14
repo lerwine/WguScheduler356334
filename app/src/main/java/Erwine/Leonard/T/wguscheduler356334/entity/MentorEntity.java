@@ -5,48 +5,37 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
-import androidx.room.PrimaryKey;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 
+/**
+ * Represents a row of data from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} database table.
+ */
 @Entity(tableName = AppDb.TABLE_NAME_MENTORS, indices = {
         @Index(value = MentorEntity.COLNAME_NAME, name = MentorEntity.INDEX_NAME, unique = true)
 })
-public class MentorEntity {
+public final class MentorEntity extends AbstractNotedEntity<MentorEntity> {
 
-    //<editor-fold defaultstate="collapsed" desc="Static Members" >
-
+    /**
+     * The name of the unique index for the {@link #name "name"} database column.
+     */
     public static final String INDEX_NAME = "IDX_MENTOR_NAME";
-    public static final String COLNAME_ID = "id";
+    /**
+     * The name of the {@link #name "name"} database column, which contains the name of the course mentor.
+     */
     public static final String COLNAME_NAME = "name";
+    /**
+     * The name of the {@link #phoneNumber "phoneNumber"} database column, which contains the course mentor's phone number.
+     */
     public static final String COLNAME_PHONE_NUMBER = "phoneNumber";
+    /**
+     * The name of the {@link #emailAddress "emailAddress"} database column, which contains the course mentor's email address.
+     */
     public static final String COLNAME_EMAIL_ADDRESS = "emailAddress";
-    public static final String COLNAME_NOTES = "notes";
 
-    private static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
-    private static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer();
-
-    public static void applyInsertedId(MentorEntity source, long id) {
-        if (null != source.getId()) {
-            throw new IllegalStateException();
-        }
-        source.id = id;
-    }
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Fields">
-
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COLNAME_ID)
-    private Long id;
-
-    @ColumnInfo(name = COLNAME_NAME)
+    @ColumnInfo(name = COLNAME_NAME, collate = ColumnInfo.NOCASE)
     private String name;
 
     @ColumnInfo(name = COLNAME_PHONE_NUMBER)
@@ -55,115 +44,128 @@ public class MentorEntity {
     @ColumnInfo(name = COLNAME_EMAIL_ADDRESS)
     private String emailAddress;
 
-    @ColumnInfo(name = COLNAME_NOTES)
-    private String notes;
-
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Constructors">
-
-    public MentorEntity(String name, String notes, String phoneNumber, String emailAddress, long id) {
-        this(name, notes, phoneNumber, emailAddress);
-        this.id = id;
-    }
-
     @Ignore
-    public MentorEntity(String name, String notes, String phoneNumber, String emailAddress) {
+    private MentorEntity(Long id, String name, String notes, String phoneNumber, String emailAddress) {
+        super(id, notes);
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
-        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
         this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);
         this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
     }
 
-    @Ignore
-    public MentorEntity(String name, String notes) {
-        this(name, notes, null, null);
+    /**
+     * Initializes a new {@code MentorEntity} object to represent an existing row of data in the {@link AppDb#TABLE_NAME_MENTORS "mentors"} database table.
+     *
+     * @param name         the name of the course mentor.
+     * @param notes        multi-line text containing notes about the course mentor.
+     * @param phoneNumber  the course mentor's phone number.
+     * @param emailAddress the course mentor's email address.
+     * @param id           The value of the {@link #COLNAME_ID primary key column}.
+     */
+    public MentorEntity(String name, String notes, String phoneNumber, String emailAddress, long id) {
+        this(id, name, notes, phoneNumber, emailAddress);
     }
 
+    /**
+     * Initializes a new {@code MentorEntity} object to represent a new row of data for the {@link AppDb#TABLE_NAME_MENTORS "mentors"} database table.
+     *
+     * @param name         the name of the course mentor.
+     * @param notes        multi-line text containing notes about the course mentor.
+     * @param phoneNumber  the course mentor's phone number.
+     * @param emailAddress the course mentor's email address.
+     */
+    @Ignore
+    public MentorEntity(String name, String notes, String phoneNumber, String emailAddress) {
+        this((Long) null, name, notes, phoneNumber, emailAddress);
+    }
+
+    /**
+     * Initializes a new {@code MentorEntity} object with empty values to represent a new row of data for the {@link AppDb#TABLE_NAME_MENTORS "mentors"} database table.
+     */
     @Ignore
     public MentorEntity() {
-        this(null, null, null, null);
+        this(null, null, null, null, null);
     }
 
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="Properties">
-
-    public Long getId() {
-        return id;
-    }
-
+    /**
+     * Gets the name of the course mentor.
+     *
+     * @return The name of the course mentor, which is always single-line, whitespace-normalized and trimmed.
+     */
+    @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of the course mentor.
+     *
+     * @param name The name of the course mentor.
+     */
     public synchronized void setName(String name) {
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
     }
 
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = MULTI_LINE_NORMALIZER.apply(notes);
-    }
-
+    /**
+     * Gets the phone number for the course mentor.
+     *
+     * @return The phone number for the course mentor, which is always single-line, whitespace-normalized and trimmed.
+     */
+    @NonNull
     public synchronized String getPhoneNumber() {
         return phoneNumber;
     }
 
+    /**
+     * Sets the phone number for the course mentor.
+     *
+     * @param phoneNumber The phone number for the course mentor.
+     */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);
     }
 
+    /**
+     * Gets the email address for the course mentor.
+     *
+     * @return The email address for the course mentor, which is always single-line, whitespace-normalized and trimmed.
+     */
+    @NonNull
     public synchronized String getEmailAddress() {
         return emailAddress;
     }
 
+    /**
+     * Sets the email address for the course mentor.
+     *
+     * @param emailAddress The email address for the course mentor.
+     */
     public synchronized void setEmailAddress(String emailAddress) {
         this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
     }
 
-    //</editor-fold>
-
-    //<editor-fold desc="Overrides">
-
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MentorEntity that = (MentorEntity) o;
-        if (null != id) {
-            return id.equals(that.id);
-        }
-        return null == that.id &&
-                name.equals(that.name) &&
-                phoneNumber.equals(that.phoneNumber) &&
-                emailAddress.equals(that.emailAddress) &&
-                notes.equals(that.notes);
+    protected boolean equalsEntity(@NonNull MentorEntity other) {
+        return name.equals(other.name) &&
+                phoneNumber.equals(other.phoneNumber) &&
+                emailAddress.equals(other.emailAddress) &&
+                getNotes().equals(other.getNotes());
     }
 
     @Override
-    public int hashCode() {
-        if (null != id) {
-            return id.hashCode();
-        }
-        return Objects.hash(id, name, phoneNumber, emailAddress, notes);
+    protected int hashCodeFromProperties() {
+        return Objects.hash(name, phoneNumber, emailAddress, getNotes());
     }
 
     @NonNull
     @Override
     public String toString() {
         return "MentorEntity{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", phoneNumber=" + phoneNumber +
                 ", emailAddress=" + emailAddress +
-                ", notes='" + notes + '\'' +
+                ", notes='" + getNotes() + '\'' +
                 '}';
     }
-
-    //</editor-fold>
 
 }

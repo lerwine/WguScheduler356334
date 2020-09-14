@@ -11,11 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+        <activity android:name=".AddTermActivity"></activity>
+        <activity android:name=".EditMentorActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".ui.term.ViewTermActivity"
+            android:name=".ViewTermActivity"
             android:label="@string/title_activity_view_term"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 
 public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHolder> {

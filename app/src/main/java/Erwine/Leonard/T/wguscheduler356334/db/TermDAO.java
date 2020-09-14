@@ -39,7 +39,7 @@ public interface TermDAO {
     Single<TermEntity> getByRowId(int rowId);
 
     @Query("SELECT * FROM terms WHERE id = :id")
-    Single<TermEntity> getById(int id);
+    Single<TermEntity> getById(long id);
 
     @Query("SELECT * FROM terms ORDER BY [start], [end]")
     LiveData<List<TermEntity>> getAll();

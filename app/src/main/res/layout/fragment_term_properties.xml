@@ -1,13 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.term.TermPropertiesFragment">
 
     <TextView
+        android:id="@+id/termNameLabelTextView"
+        style="@style/WGU.Scheduler.FieldLabel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="wrap_content"
+        android:labelFor="@id/termNameEditText"
+        android:text="@string/label_name_of_term" />
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/termNameEditText"
+        style="@style/WGU.Scheduler.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/termStartLabelTextView"
+        style="@style/WGU.Scheduler.FieldLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/termStartEditText"
+        android:text="@string/label_start_of_term" />
+
+    <EditText
+        android:id="@+id/termStartEditText"
+        style="@style/WGU.Scheduler.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="date" />
+
+    <TextView
+        android:id="@+id/termEndLabelTextView"
+        style="@style/WGU.Scheduler.FieldLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/termEndEditText"
+        android:text="@string/label_end_of_term" />
+
+    <EditText
+        android:id="@+id/termEndEditText"
+        style="@style/WGU.Scheduler.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="date" />
+
+    <TextView
+        android:id="@+id/termNotesLabelTextView"
+        style="@style/WGU.Scheduler.FieldLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/termNotesEditText"
+        android:text="@string/label_notes" />
+
+    <EditText
+        android:id="@+id/termNotesEditText"
+        style="@style/WGU.Scheduler.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="fill"
+        android:inputType="textMultiLine" />
+
+</LinearLayout>

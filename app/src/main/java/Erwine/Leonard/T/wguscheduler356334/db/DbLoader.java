@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.db;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -156,7 +157,7 @@ public class DbLoader {
      * @return The {@link Single} object that can be used to observe the result {@link TermEntity} object.
      */
     @NonNull
-    public Single<TermEntity> getTermById(int id) {
+    public Single<TermEntity> getTermById(long id) {
         return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -339,7 +340,7 @@ public class DbLoader {
      * @return The {@link Single} object that can be used to observe the result {@link CourseEntity} object.
      */
     @NonNull
-    public Single<CourseEntity> getCourseById(int id) {
+    public Single<CourseEntity> getCourseById(long id) {
         return appDb.courseDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -365,7 +366,7 @@ public class DbLoader {
      * specific {@link TermEntity}.
      */
     @NonNull
-    public LiveData<List<CourseEntity>> getCoursesByTermId(int termId) {
+    public LiveData<List<CourseEntity>> getCoursesByTermId(long termId) {
         return appDb.courseDAO().getByTermId(termId);
     }
 
@@ -378,7 +379,7 @@ public class DbLoader {
      * specific {@link MentorEntity}.
      */
     @NonNull
-    public LiveData<List<CourseEntity>> getCoursesByMentorId(int mentorId) {
+    public LiveData<List<CourseEntity>> getCoursesByMentorId(long mentorId) {
         return appDb.courseDAO().getByMentorId(mentorId);
     }
 
@@ -464,7 +465,7 @@ public class DbLoader {
      * @return The {@link Single} object that can be used to observe the result {@link AssessmentEntity} object.
      */
     @NonNull
-    public Single<AssessmentEntity> getAssessmentById(int id) {
+    public Single<AssessmentEntity> getAssessmentById(long id) {
         return appDb.assessmentDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -477,7 +478,7 @@ public class DbLoader {
      * specific {@link CourseEntity}.
      */
     @NonNull
-    public LiveData<List<AssessmentEntity>> getAssessmentsByCourseId(int courseId) {
+    public LiveData<List<AssessmentEntity>> getAssessmentsByCourseId(long courseId) {
         return appDb.assessmentDAO().getByCourseId(courseId);
     }
 
@@ -556,14 +557,18 @@ public class DbLoader {
         List<TermEntity> entities = new ArrayList<>();
         for (String csv : resources.getStringArray(R.array.sample_terms)) {
             List<String> cells = parseSampleDataCells(csv, 4);
-            entities.add(new TermEntity(cells.get(0), LocalDate.parse(cells.get(1)), LocalDate.parse(cells.get(2)), cells.get(3)));
+            TermEntity term = new TermEntity(cells.get(0), LocalDate.parse(cells.get(1)), LocalDate.parse(cells.get(2)), cells.get(3));
+            Log.d(LOG_TAG, String.format("Creating: %s", term));
+            entities.add(term);
         }
         List<Long> ids = appDb.termDAO().insertAllSynchronous(entities);
         HashMap<Integer, Long> result = new HashMap<>();
         int index = 0;
         while (index < ids.size()) {
             long id = ids.get(index);
-            TermEntity.applyInsertedId(entities.get(index), id);
+            TermEntity term = entities.get(index);
+            TermEntity.applyInsertedId(term, id);
+            Log.d(LOG_TAG, String.format("ID %d applied to %s", id, term));
             result.put(++index, id);
         }
         return result;
@@ -574,14 +579,18 @@ public class DbLoader {
         List<MentorEntity> entities = new ArrayList<>();
         for (String csv : resources.getStringArray(R.array.sample_mentors)) {
             List<String> cells = parseSampleDataCells(csv, 4);
-            entities.add(new MentorEntity(cells.get(0), cells.get(1), cells.get(2), cells.get(3)));
+            MentorEntity mentor = new MentorEntity(cells.get(0), cells.get(1), cells.get(2), cells.get(3));
+            Log.d(LOG_TAG, String.format("Creating: %s", mentor));
+            entities.add(mentor);
         }
         List<Long> ids = appDb.mentorDAO().insertAllSynchronous(entities);
         HashMap<Integer, Long> result = new HashMap<>();
         int index = 0;
         while (index < ids.size()) {
             long id = ids.get(index);
-            MentorEntity.applyInsertedId(entities.get(index), id);
+            MentorEntity mentor = entities.get(index);
+            MentorEntity.applyInsertedId(mentor, id);
+            Log.d(LOG_TAG, String.format("ID %d applied to %s", id, mentor));
             result.put(++index, id);
         }
         return result;
@@ -599,16 +608,20 @@ public class DbLoader {
             List<String> cells = parseSampleDataCells(csv, 11);
             String c = cells.get(8);
             String m = cells.get(10);
-            entities.add(new CourseEntity(cells.get(1), cells.get(2), statusMap.get(cells.get(3)), parseDateCell.apply(cells.get(4)), parseDateCell.apply(cells.get(5)),
+            CourseEntity course = new CourseEntity(cells.get(1), cells.get(2), statusMap.get(cells.get(3)), parseDateCell.apply(cells.get(4)), parseDateCell.apply(cells.get(5)),
                     parseDateCell.apply(cells.get(6)), parseDateCell.apply(cells.get(7)), (c.isEmpty()) ? null : Integer.parseInt(c), cells.get(9),
-                    Objects.requireNonNull(sampleTerms.get(Integer.parseInt(cells.get(0)))), (m.isEmpty()) ? null : sampleMentors.get(Integer.parseInt(m))));
+                    Objects.requireNonNull(sampleTerms.get(Integer.parseInt(cells.get(0)))), (m.isEmpty()) ? null : sampleMentors.get(Integer.parseInt(m)));
+            Log.d(LOG_TAG, String.format("Creating: %s", course));
+            entities.add(course);
         }
         List<Long> ids = appDb.courseDAO().insertAllSynchronous(entities);
         HashMap<Integer, CourseEntity> result = new HashMap<>();
         int index = 0;
         while (index < ids.size()) {
             CourseEntity e = entities.get(index);
-            CourseEntity.applyInsertedId(e, ids.get(index));
+            Long id = ids.get(index);
+            CourseEntity.applyInsertedId(e, id);
+            Log.d(LOG_TAG, String.format("ID %d applied to %s", id, e));
             result.put(++index, e);
         }
         return result;
@@ -635,8 +648,10 @@ public class DbLoader {
                 // 0=courseId, 1=code, 2=status, 3=goalDate, 4=type, 5=notes, 6=evaluationDate
                 List<String> cells = parseSampleDataCells(t, 7);
                 CourseEntity course = Objects.requireNonNull(sampleCourses.get(Integer.parseInt(cells.get(0))));
-                return new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
+                AssessmentEntity assessment = new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
                         sampleCellToLocalDate(cells.get(6), course), course.getId());
+                Log.d(LOG_TAG, String.format("Creating: %s", assessment));
+                return assessment;
             }).collect(Collectors.toList()));
         }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }

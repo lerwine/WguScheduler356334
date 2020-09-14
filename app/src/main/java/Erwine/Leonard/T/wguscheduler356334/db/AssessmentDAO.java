@@ -42,21 +42,21 @@ public interface AssessmentDAO {
     Single<AssessmentEntity> getByRowId(int rowId);
 
     @Query("SELECT * FROM assessments WHERE id = :id")
-    Single<AssessmentEntity> getById(int id);
+    Single<AssessmentEntity> getById(long id);
 
-    @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], [evaluationDate]")
-    LiveData<List<AssessmentEntity>> getByCourseId(int courseId);
+    @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
+    LiveData<List<AssessmentEntity>> getByCourseId(long courseId);
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId")
-    List<AssessmentEntity> getByCourseIdSynchronous(int courseId);
+    List<AssessmentEntity> getByCourseIdSynchronous(long courseId);
 
-    @Query("SELECT * FROM assessments ORDER BY [goalDate], [evaluationDate]")
+    @Query("SELECT * FROM assessments ORDER BY [goalDate], completionDate")
     LiveData<List<AssessmentEntity>> getAll();
 
     @Query("SELECT COUNT(*) FROM assessments")
     Single<Integer> getCount();
 
     @Query("DELETE FROM assessments WHERE courseId=:courseId")
-    Single<Integer> deleteByCourseId(int courseId);
+    Single<Integer> deleteByCourseId(long courseId);
 
 }
