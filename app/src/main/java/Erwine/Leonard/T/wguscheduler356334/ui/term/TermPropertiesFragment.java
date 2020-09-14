@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,12 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
@@ -22,9 +24,8 @@ import java.time.LocalDate;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import io.reactivex.disposables.CompositeDisposable;
 
-import static Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.FORMATTER;
+import static Erwine.Leonard.T.wguscheduler356334.ui.term.TermViewModel.FORMATTER;
 
 /**
  * Fragment for editing the properties of a {@link TermEntity}
@@ -32,23 +33,11 @@ import static Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewMode
 public class TermPropertiesFragment extends Fragment {
 
     private static final String LOG_TAG = TermPropertiesFragment.class.getName();
-    private final CompositeDisposable compositeDisposable;
-    private final MutableLiveData<Boolean> canSaveLiveData;
-    private TermPropertiesViewModel mViewModel;
+    private TermViewModel viewModel;
     private EditText termNameEditText;
-    private EditText termStartEditText;
-    private EditText termEndEditText;
-    private EditText termNotesEditText;
-
-//    public static TermPropertiesFragment newInstance(Long termId) {
-//        TermPropertiesFragment fragment = new TermPropertiesFragment();
-//        Bundle args = new Bundle();
-//        if (null != termId) {
-//            args.putLong(TermPropertiesViewModel.ARGUMENT_KEY_TERM_ID, termId);
-//        }
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
+    private TextView termStartTextView;
+    private TextView termEndValueTextView;
+    private TextView termNotesTextView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,8 +45,6 @@ public class TermPropertiesFragment extends Fragment {
      */
     public TermPropertiesFragment() {
         Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment");
-        compositeDisposable = new CompositeDisposable();
-        canSaveLiveData = new MutableLiveData<>(false);
     }
 
     @Override
@@ -66,9 +53,9 @@ public class TermPropertiesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_term_properties, container, false);
 
         termNameEditText = view.findViewById(R.id.termNameEditText);
-        termStartEditText = view.findViewById(R.id.termStartEditText);
-        termEndEditText = view.findViewById(R.id.termEndEditText);
-        termNotesEditText = view.findViewById(R.id.termNotesEditText);
+        termStartTextView = view.findViewById(R.id.termStartTextView);
+        termEndValueTextView = view.findViewById(R.id.termEndValueTextView);
+        termNotesTextView = view.findViewById(R.id.termNotesTextView);
 
         return view;
     }
@@ -77,9 +64,8 @@ public class TermPropertiesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-//        mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermPropertiesViewModel.class);
-        mViewModel = new ViewModelProvider(requireActivity()).get(TermPropertiesViewModel.class);
-        mViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onTermLoadSuccess);
+        viewModel = new ViewModelProvider(requireActivity()).get(TermViewModel.class);
+        viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onLoadSuccess);
     }
 
     @Override
@@ -95,57 +81,77 @@ public class TermPropertiesFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onSaveInstanceState");
-        mViewModel.saveState(outState);
+        viewModel.saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
-    private void onTermLoadSuccess(TermEntity termEntity) {
-        if (null == termEntity) {
+    private void onLoadSuccess(TermEntity entity) {
+        if (null == entity) {
             return;
         }
-        Log.d(LOG_TAG, String.format("Loaded %s", termEntity));
+        Log.d(LOG_TAG, String.format("Loaded %s", entity));
 
-        if (mViewModel.isFromInitializedState()) {
-            termNameEditText.setText(mViewModel.getName());
-            LocalDate date = mViewModel.getStart();
+        if (viewModel.isFromInitializedState()) {
+            termNameEditText.setText(viewModel.getName());
+            LocalDate date = viewModel.getStart();
             if (null != date) {
-                termStartEditText.setText(FORMATTER.format(date));
+                termStartTextView.setText(FORMATTER.format(date));
             } else {
-                termStartEditText.setText("");
+                termStartTextView.setText("");
             }
-            date = mViewModel.getEnd();
+            date = viewModel.getEnd();
             if (null != date) {
-                termEndEditText.setText(FORMATTER.format(date));
+                termEndValueTextView.setText(FORMATTER.format(date));
             } else {
-                termEndEditText.setText("");
+                termEndValueTextView.setText("");
             }
-            termNotesEditText.setText(mViewModel.getNotes());
+            termNotesTextView.setText(viewModel.getNotes());
         } else {
-            termNameEditText.setText(termEntity.getName());
-            LocalDate date = termEntity.getStart();
+            termNameEditText.setText(entity.getName());
+            LocalDate date = entity.getStart();
             if (null != date) {
-                termStartEditText.setText(FORMATTER.format(date));
+                termStartTextView.setText(FORMATTER.format(date));
             } else {
-                termStartEditText.setText("");
+                termStartTextView.setText("");
             }
-            date = termEntity.getEnd();
+            date = entity.getEnd();
             if (null != date) {
-                termEndEditText.setText(FORMATTER.format(date));
+                termEndValueTextView.setText(FORMATTER.format(date));
             } else {
-                termEndEditText.setText("");
+                termEndValueTextView.setText("");
             }
-            termNotesEditText.setText(termEntity.getNotes());
+            termNotesTextView.setText(entity.getNotes());
         }
 
-        termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(mViewModel::onTermNameEditTextChanged));
-        termStartEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(mViewModel::onTermStartEditTextChanged));
-        termStartEditText.setOnClickListener(this::onStartClick);
-        termStartEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(mViewModel::onTermEndEditTextChanged));
-        termEndEditText.setOnClickListener(this::onEndClick);
-        termNotesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(mViewModel::onTermNotesEditTextChanged));
+        termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::onTermNameEditTextChanged));
+        termStartTextView.setOnClickListener(this::onStartClick);
+        termEndValueTextView.setOnClickListener(this::onEndClick);
+        termNotesTextView.setOnClickListener(this::onTermNotesEditTextClick);
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        mViewModel.getNameValidLiveData().observe(viewLifecycleOwner, this::onNameValidChanged);
-        mViewModel.getStartMessageLiveData().observe(viewLifecycleOwner, this::onStartValidationMessageChanged);
+        viewModel.getNameValidLiveData().observe(viewLifecycleOwner, this::onNameValidChanged);
+        viewModel.getStartMessageLiveData().observe(viewLifecycleOwner, this::onStartValidationMessageChanged);
+    }
+
+    private void onTermNotesEditTextClick(View view) {
+        Context context = requireContext();
+        EditText editText = new EditText(context);
+        String text = viewModel.getNotes();
+        editText.setText(text);
+        editText.setSingleLine(false);
+        editText.setVerticalScrollBarEnabled(true);
+        editText.setBackgroundResource(android.R.drawable.edit_text);
+        AlertDialog dlg = new AlertDialog.Builder(context)
+                .setTitle(getResources().getString(R.string.title_edit_notes))
+                .setView(editText)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String s = editText.getText().toString();
+                    if (!text.equals(s)) {
+                        viewModel.onTermNotesEditTextChanged(s);
+                        termNotesTextView.setText(s);
+                    }
+                })
+                .setCancelable(false).create();
+        dlg.show();
     }
 
     private void onNameValidChanged(Boolean isValid) {
@@ -158,23 +164,23 @@ public class TermPropertiesFragment extends Fragment {
 
     private void onStartValidationMessageChanged(Integer id) {
         if (null == id || id == R.string.command_ok) {
-            termStartEditText.setError(null);
+            termStartTextView.setError(null);
         } else {
-            termStartEditText.setError(getResources().getString(id));
+            termStartTextView.setError(getResources().getString(id));
         }
     }
 
     private void onStartClick(View view) {
-        LocalDate date = mViewModel.getStart();
-        if (null == date && null == (date = mViewModel.getEnd())) {
+        LocalDate date = viewModel.getStart();
+        if (null == date && null == (date = viewModel.getEnd())) {
             date = LocalDate.now();
         }
         new DatePickerDialog(requireActivity(), this::onStartDateChanged, date.getYear(), date.getMonthValue(), date.getDayOfMonth()).show();
     }
 
     private void onEndClick(View view) {
-        LocalDate date = mViewModel.getEnd();
-        if (null == date && null == (date = mViewModel.getStart())) {
+        LocalDate date = viewModel.getEnd();
+        if (null == date && null == (date = viewModel.getStart())) {
             date = LocalDate.now();
         }
         new DatePickerDialog(requireActivity(), this::onEndDateChanged, date.getYear(), date.getMonthValue(), date.getDayOfMonth()).show();
@@ -182,14 +188,14 @@ public class TermPropertiesFragment extends Fragment {
 
     void onStartDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         LocalDate d = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
-        termStartEditText.setText(FORMATTER.format(d));
-        mViewModel.onStartDateChanged(d);
+        termStartTextView.setText(FORMATTER.format(d));
+        viewModel.onStartDateChanged(d);
     }
 
     void onEndDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         LocalDate d = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
-        termEndEditText.setText(FORMATTER.format(d));
-        mViewModel.onEndDateChanged(d);
+        termEndValueTextView.setText(FORMATTER.format(d));
+        viewModel.onEndDateChanged(d);
     }
 
 }

@@ -42,22 +42,22 @@ public interface CourseDAO {
     @Query("SELECT * FROM courses WHERE id = :id")
     Single<CourseEntity> getById(long id);
 
-    @Query("SELECT * FROM courses ORDER BY [expectedStart], [actualStart]")
+    @Query("SELECT * FROM courses ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getAll();
 
     @Query("SELECT * FROM courses")
     List<CourseEntity> getAllSynchronous();
 
-    @Query("SELECT * FROM courses WHERE termId = :termId ORDER BY [expectedStart], [actualStart]")
+    @Query("SELECT * FROM courses WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getByTermId(long termId);
 
     @Query("SELECT * FROM courses WHERE termId = :termId")
     List<CourseEntity> getByTermIdSynchronous(long termId);
 
-    @Query("SELECT * FROM courses WHERE mentorId = :mentorId ORDER BY [expectedStart], [actualStart]")
+    @Query("SELECT * FROM courses WHERE mentorId = :mentorId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getByMentorId(long mentorId);
 
-    @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [expectedStart], [actualStart]")
+    @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getUnterminatedOnOrBefore(LocalDate date);
 
     @Query("SELECT COUNT(*) FROM courses")

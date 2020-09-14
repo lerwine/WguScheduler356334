@@ -16,27 +16,21 @@ import androidx.lifecycle.ViewModelProvider;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.StateHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class EditTermFragment extends Fragment {
 
     private static final String LOG_TAG = EditTermFragment.class.getName();
-    public static final String ARGUMENT_KEY_TERM_ID = "term_id";
 
     private final CompositeDisposable compositeDisposable;
-    private TermPropertiesViewModel mViewModel;
+    private TermViewModel mViewModel;
     private ImageButton saveImageButton;
     private ImageButton deleteImageButton;
-    private Long termId;
 
-    public static EditTermFragment newInstance(Long termId) {
-        EditTermFragment fragment = new EditTermFragment();
-        Bundle args = new Bundle();
-        if (null != termId) {
-            args.putLong(ARGUMENT_KEY_TERM_ID, termId);
-        }
-        fragment.setArguments(args);
-        return fragment;
+    public static Fragment newInstance(long termId) {
+        Log.d(LOG_TAG, String.format("Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.newInstance(%d)", termId));
+        return StateHelper.setIdArgs(TermViewModel.ARGUMENT_KEY_TERM_ID, termId, new EditTermFragment(), new Bundle());
     }
 
     /**
@@ -47,25 +41,6 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment");
         compositeDisposable = new CompositeDisposable();
     }
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onCreate");
-//        super.onCreate(savedInstanceState);
-//        if (null != savedInstanceState) {
-//            stateInitialized = savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
-//            if (stateInitialized) {
-//                if (savedInstanceState.containsKey(ARGUMENT_KEY_TERM_ID)) {
-//                    termId = savedInstanceState.getLong(ARGUMENT_KEY_TERM_ID);
-//                }
-//                return;
-//            }
-//        }
-//        Bundle args = getArguments();
-//        if (null != args && args.containsKey(ARGUMENT_KEY_TERM_ID)) {
-//            termId = args.getLong(ARGUMENT_KEY_TERM_ID);
-//        }
-//    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -83,15 +58,9 @@ public class EditTermFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-//        mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermPropertiesViewModel.class);
-        mViewModel = new ViewModelProvider(requireActivity()).get(TermPropertiesViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(TermViewModel.class);
         compositeDisposable.clear();
-        compositeDisposable.add(mViewModel.restoreState(savedInstanceState, () -> getArguments()).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
-//        mViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermViewModel.class);
-//        if (null != termId) {
-//            compositeDisposable.clear();
-//            compositeDisposable.add(mViewModel.load(termId).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
-//        }
+        compositeDisposable.add(mViewModel.restoreState(savedInstanceState, this::getArguments).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
     }
 
     private void onTermLoadSuccess(TermEntity termEntity) {
@@ -99,7 +68,6 @@ public class EditTermFragment extends Fragment {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", termEntity));
-
         mViewModel.getSavableLiveData().observe(getViewLifecycleOwner(), this::onCanSaveLiveDataChanged);
     }
 
@@ -113,6 +81,7 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onCanSaveLiveDataChanged(Boolean canSave) {
+        Log.d(LOG_TAG, String.format("Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onOptionsItemSelected(canSave: %s)", canSave));
         saveImageButton.setEnabled(canSave);
     }
 
@@ -121,6 +90,7 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
+            requireActivity().finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -134,21 +104,25 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onSaveTermImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveTermImageButtonClick");
         compositeDisposable.clear();
         compositeDisposable.add(mViewModel.save().subscribe(this::onDbOperationSucceeded, this::onSaveFailed));
     }
 
     private void onDbOperationSucceeded() {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDbOperationSucceeded");
         requireActivity().finish();
     }
 
     private void onSaveFailed(Throwable throwable) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveFailed");
         AlertDialog dlg = new AlertDialog.Builder(getContext()).setTitle(R.string.title_save_error)
                 .setMessage(getString(R.string.format_message_save_error, throwable.getMessage())).setCancelable(true).create();
         dlg.show();
     }
 
     private void onDeleteImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteImageButtonClick");
         AlertDialog dialog = new AlertDialog.Builder(getContext()).setTitle(R.string.title_delete_term).setMessage(R.string.message_delete_mentor_confirm).setPositiveButton(R.string.response_yes, (dialogInterface, i1) -> {
             compositeDisposable.clear();
             compositeDisposable.add(mViewModel.delete().subscribe(this::onDbOperationSucceeded, this::onDeleteFailed));
@@ -157,12 +131,14 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onDeleteFailed(Throwable throwable) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteFailed");
         AlertDialog dlg = new AlertDialog.Builder(getContext()).setTitle(R.string.title_delete_error)
                 .setMessage(getString(R.string.format_message_delete_error, throwable.getMessage())).setCancelable(true).create();
         dlg.show();
     }
 
     private void onCancelTermEditImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onCancelTermEditImageButtonClick");
         requireActivity().finish();
     }
 }

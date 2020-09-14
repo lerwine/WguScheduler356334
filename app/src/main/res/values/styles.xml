@@ -113,8 +113,27 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">@dimen/text_margin</item>
-        <item name="android:layout_weight">100</item>
         <item name="android:textAppearance">?attr/textAppearanceListItem</item>
+    </style>
+
+    <style name="list_item_text_primary">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/text_margin</item>
+        <item name="android:layout_marginStart">@dimen/text_margin</item>
+        <item name="android:layout_marginEnd">@dimen/text_margin</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textAppearance">?attr/textAppearanceListItem</item>
+    </style>
+
+    <style name="list_item_secondary">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/secondary_text_margin_left</item>
+        <item name="android:layout_marginEnd">@dimen/text_margin</item>
+        <item name="android:layout_marginBottom">@dimen/text_margin</item>
+        <item name="android:textAppearance">?attr/textAppearanceListItem</item>
+        <item name="android:textColor">@color/color_secondary</item>
     </style>
 
     <style name="command_button">

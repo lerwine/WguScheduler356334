@@ -16,10 +16,10 @@ import Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment;
 
 public class ViewTermPagerAdapter extends FragmentPagerAdapter {
     private final Context mContext;
-    private final Long termId;
+    private final long termId;
     private final MutableLiveData<Fragment> currentFragmentLiveData;
 
-    public ViewTermPagerAdapter(Long termId, Context context, FragmentManager fm) {
+    public ViewTermPagerAdapter(long termId, Context context, FragmentManager fm) {
         super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         currentFragmentLiveData = new MutableLiveData<>();
         this.termId = termId;
@@ -30,9 +30,13 @@ public class ViewTermPagerAdapter extends FragmentPagerAdapter {
         return currentFragmentLiveData;
     }
 
+    public long getTermId() {
+        return termId;
+    }
+
     @Override
     public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        if (null != object && object instanceof Fragment) {
+        if (object instanceof Fragment) {
             currentFragmentLiveData.postValue((Fragment) object);
         } else {
             currentFragmentLiveData.postValue(null);
@@ -60,7 +64,7 @@ public class ViewTermPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return mContext.getResources().getString(R.string.title_courses);
             case 1:
-                return mContext.getResources().getString(R.string.title_properties);
+                return mContext.getResources().getString(R.string.title_activity_edit);
             default:
                 throw new IllegalStateException(String.format("Unexpected title position %d", position));
         }

@@ -15,6 +15,7 @@ public class CourseListViewModel extends AndroidViewModel {
 
     private final DbLoader dbLoader;
     private LiveData<List<CourseEntity>> courses;
+    private long termId;
 
     public CourseListViewModel(@NonNull Application application) {
         super(application);
@@ -23,6 +24,10 @@ public class CourseListViewModel extends AndroidViewModel {
 
     public LiveData<List<CourseEntity>> getCourses() {
         return courses;
+    }
+
+    public long getTermId() {
+        return termId;
     }
 
     public void setTermId(long id) {

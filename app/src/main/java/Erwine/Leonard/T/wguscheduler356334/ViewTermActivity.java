@@ -1,57 +1,48 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.MenuItem;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
+import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.ViewTermPagerAdapter;
+import Erwine.Leonard.T.wguscheduler356334.util.StateHelper;
 
 public class ViewTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
-    public static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRAS_KEY_TERM_ID = "termId";
-    public static final String ARGUMENT_KEY_TERM_ID = "term_id";
 
     private ViewTermPagerAdapter sectionsPagerAdapter;
-    private boolean stateInitialized;
-    private Long termId;
     private ViewPager viewPager;
-
-    private void restoreSavedState(@Nullable Bundle savedInstanceState) {
-        if (null != savedInstanceState) {
-            stateInitialized = savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
-            if (stateInitialized) {
-                if (savedInstanceState.containsKey(ARGUMENT_KEY_TERM_ID)) {
-                    termId = savedInstanceState.getLong(ARGUMENT_KEY_TERM_ID);
-                }
-                return;
-            }
-        }
-        final Intent intent = getIntent();
-        if (intent.hasExtra(EXTRAS_KEY_TERM_ID)) {
-            termId = intent.getLongExtra(EXTRAS_KEY_TERM_ID, -1L);
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ViewTermActivity.onCreate");
         super.onCreate(savedInstanceState);
-        restoreSavedState(savedInstanceState);
         setContentView(R.layout.activity_view_term);
-        sectionsPagerAdapter = new ViewTermPagerAdapter(termId, this, getSupportFragmentManager());
-        viewPager = findViewById(R.id.view_pager);
-        viewPager.getCurrentItem();
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.viewTermTabLayout);
-        tabs.setupWithViewPager(viewPager);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        StateHelper.restoreState(EXTRAS_KEY_TERM_ID, savedInstanceState, () -> getIntent().getExtras(), this::onInitializePager, ((aBoolean, bundle) -> {
+            AlertDialog dlg = new AlertDialog.Builder(this)
+                    .setTitle("Not Found")
+                    .setMessage("Term ID not specified")
+                    .setOnCancelListener(dialog -> finish())
+                    .setCancelable(true)
+                    .create();
+            dlg.show();
+        }));
 //        FloatingActionButton fab = findViewById(R.id.saveFloatingActionButton);
 //        fab.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -62,9 +53,42 @@ public class ViewTermActivity extends AppCompatActivity {
 //        });
     }
 
+    private void onInitializePager(Bundle bundle, long termId) {
+        sectionsPagerAdapter = new ViewTermPagerAdapter(termId, this, getSupportFragmentManager());
+        viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(sectionsPagerAdapter);
+        TabLayout tabs = findViewById(R.id.viewTermTabLayout);
+        tabs.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        if (null != sectionsPagerAdapter) {
+            StateHelper.saveState(EXTRAS_KEY_TERM_ID, sectionsPagerAdapter.getTermId(), outState);
+        }
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (null != sectionsPagerAdapter) {
+            Fragment fragment = sectionsPagerAdapter.getCurrentFragmentLiveData().getValue();
+            if (fragment instanceof EditTermFragment) {
+                viewPager.setCurrentItem(0);
+                return;
+            }
+        }
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

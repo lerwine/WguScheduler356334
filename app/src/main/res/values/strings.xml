@@ -3,6 +3,7 @@
     <string name="title_terms">Terms</string>
     <string name="title_mentors">Mentors</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_activity_edit">Edit</string>
     <string name="title_activity_edit_term">Edit Term</string>
     <string name="title_activity_new_term">Add New Term</string>
     <string name="title_activity_edit_mentor">Edit Mentor</string>
@@ -36,11 +37,13 @@
     <string name="message_required">* Required</string>
     <string name="message_phone_or_email_required">* Phone number or email address required</string>
     <string name="message_start_after_end">Start date cannot occur after the end date</string>
+    <string name="title_edit_notes">Edit Notes</string>
     <string name="label_notes">Notes</string>
     <string name="label_mentor_name">Mentor Name</string>
     <string name="label_phone_number">Phone Number(s)</string>
     <string name="label_email_address">Email Address(es)</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_manage_data">Manage Data</string>
     <string name="command_manage_data">Manage Data</string>
     <string name="command_add_sample_data">Add Sample Data</string>
     <string name="message_all_data_delete_warning">Warning! These options will delete all data stored by this app!</string>

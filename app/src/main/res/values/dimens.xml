@@ -6,6 +6,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="normal_button_image_size">42dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="secondary_text_margin_left">24dp</dimen>
     <dimen name="list_item_text_size">16sp</dimen>
     <dimen name="list_item_detail_text_size">12sp</dimen>
     <dimen name="list_item_text_text_margin">16dp</dimen>
