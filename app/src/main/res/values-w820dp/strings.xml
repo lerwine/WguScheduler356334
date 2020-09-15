@@ -39,8 +39,8 @@
     <string name="message_start_after_end">Start date cannot occur after the end date</string>
     <string name="label_notes">Notes</string>
     <string name="label_mentor_name">Mentor Name</string>
-    <string name="label_phone_number">Phone Number(s)</string>
-    <string name="label_email_address">Email Address(es)</string>
+    <string name="label_phone_number">Phone Number</string>
+    <string name="label_email_address">Email Address</string>
     <string name="title_activity_settings">Settings</string>
     <string name="command_manage_data">Manage Data</string>
     <string name="command_add_sample_data">Add Sample Data</string>

@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 public class Values {
 
-
     public static TextWatcher textWatcherForTextChanged(final Consumer<String> onTextChanged) {
         return new TextWatcher() {
 
@@ -27,7 +26,6 @@ public class Values {
 
         };
     }
-
 
     /**
      * Ensures a {@link String} value is not null and that all white space is normalized. Leading and trailing whitespace will be removed. Consecutive whitespace characters will be
@@ -56,6 +54,30 @@ public class Values {
             return (null == start2 && null == end2) ? 0 : 1;
         }
         return (null == end2) ? -1 : end1.compareTo(end2);
+    }
+
+    public static boolean notNullAnd(Boolean value, Boolean... values) {
+        if (null == value || !value) {
+            return false;
+        }
+        for (Boolean b : values) {
+            if (null == b || !b) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean notNullOr(Boolean value, Boolean... values) {
+        if (null != value && value) {
+            return true;
+        }
+        for (Boolean b : values) {
+            if (null != b && b) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

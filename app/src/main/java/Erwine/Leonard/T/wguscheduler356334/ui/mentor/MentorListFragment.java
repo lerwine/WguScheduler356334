@@ -1,6 +1,9 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
@@ -70,11 +74,10 @@ public class MentorListFragment extends Fragment {
     }
 
     private void onAddMentorButtonClick(View view) {
-//        Context context = requireActivity();
-//        Intent intent = new Intent(context, MentorDetailActivity.class);
-//        Log.i(getClass().getName(), "Starting MentorDetailActivity with no mentorId");
-//        context.startActivity(intent);
-        // TODO: Start mentor edit activity
+        Context context = requireActivity();
+        Intent intent = new Intent(context, EditMentorActivity.class);
+        Log.i(getClass().getName(), "Starting EditMentorActivity with no mentorId");
+        context.startActivity(intent);
     }
 
 

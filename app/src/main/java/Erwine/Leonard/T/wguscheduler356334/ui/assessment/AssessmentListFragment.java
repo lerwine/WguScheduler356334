@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import Erwine.Leonard.T.wguscheduler356334.dummy.DummyContent;
  */
 public class AssessmentListFragment extends Fragment {
 
+    private static final String LOG_TAG = AssessmentListFragment.class.getName();
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -29,10 +31,9 @@ public class AssessmentListFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public AssessmentListFragment() {
+        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment");
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static AssessmentListFragment newInstance(int columnCount) {
         AssessmentListFragment fragment = new AssessmentListFragment();
         Bundle args = new Bundle();
@@ -43,6 +44,7 @@ public class AssessmentListFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onCreate");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
@@ -51,8 +53,8 @@ public class AssessmentListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onCreateView");
         View view = inflater.inflate(R.layout.fragment_assessment_list, container, false);
 
         // Set the adapter

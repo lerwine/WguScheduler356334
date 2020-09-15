@@ -79,11 +79,11 @@ public final class CourseEntity extends AbstractNotedEntity<CourseEntity> implem
      */
     public static final String COLNAME_COMPETENCY_UNITS = "competencyUnits";
 
-    @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
+    @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_TERM_ID)
     private long termId;
 
-    @ForeignKey(entity = MentorEntity.class, parentColumns = {MentorEntity.COLNAME_ID}, childColumns = {COLNAME_MENTOR_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
+    @ForeignKey(entity = MentorEntity.class, parentColumns = {MentorEntity.COLNAME_ID}, childColumns = {COLNAME_MENTOR_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_MENTOR_ID)
     private Long mentorId;
 
@@ -399,7 +399,7 @@ public final class CourseEntity extends AbstractNotedEntity<CourseEntity> implem
     @Override
     public synchronized int compareTo(CourseEntity o) {
         if (this == o) return 0;
-        if (o == null || getClass() != o.getClass()) return -1;
+        if (o == null) return -1;
         CourseEntity that = (CourseEntity) o;
         Pair<LocalDate, LocalDate> thisRange0, thisRange1;
         if (null != actualStart || null != actualEnd) {

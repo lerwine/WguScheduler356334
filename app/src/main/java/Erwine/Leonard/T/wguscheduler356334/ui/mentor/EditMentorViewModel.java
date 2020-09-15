@@ -17,6 +17,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.NormalizingCharSequence;
+import Erwine.Leonard.T.wguscheduler356334.util.Values;
 import Erwine.Leonard.T.wguscheduler356334.util.live.BooleanAndLiveData;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -51,6 +52,11 @@ public class EditMentorViewModel extends AndroidViewModel {
     private final NormalizingCharSequence phoneNumber;
     private final NormalizingCharSequence emailAddress;
     private final NormalizingCharSequence notes;
+
+    public boolean isChanged() {
+        return null == id || Values.notNullOr(nameChangedLiveData.getValue(), phoneNumberChangedLiveData.getValue(),
+                emailAddressChangedLiveData.getValue(), notesChangedLiveData.getValue());
+    }
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
@@ -226,7 +232,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         }
     }
 
-    void onMentorNameTextChanged(String s) {
+    public void onMentorNameTextChanged(String s) {
         onMentorNameTextChanged(s, Objects.requireNonNull(entityLiveData.getValue()));
     }
 
@@ -250,7 +256,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         }
     }
 
-    void onPhoneNumberTextChanged(String s) {
+    public void onPhoneNumberTextChanged(String s) {
         onPhoneNumberTextChanged(s, Objects.requireNonNull(entityLiveData.getValue()));
     }
 
@@ -278,7 +284,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         }
     }
 
-    void onEmailAddressTextChanged(String s) {
+    public void onEmailAddressTextChanged(String s) {
         onEmailAddressTextChanged(s, Objects.requireNonNull(entityLiveData.getValue()));
     }
 
@@ -306,7 +312,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         }
     }
 
-    void onMentorNotesEditTextChanged(String s) {
+    public void onMentorNotesEditTextChanged(String s) {
         onMentorNotesEditTextChanged(s, entityLiveData.getValue());
     }
 

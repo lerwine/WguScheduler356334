@@ -11,13 +11,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".EditAssessmentActivity"></activity>
+        <activity android:name=".EditAssessmentActivity" />
         <activity android:name=".AddCourseActivity" />
         <activity
             android:name=".ViewCourseActivity"
             android:label="@string/title_activity_view_course"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AddMentorActivity" />
         <activity
             android:name=".AddTermActivity"
             android:label="@string/title_activity_new_term" />

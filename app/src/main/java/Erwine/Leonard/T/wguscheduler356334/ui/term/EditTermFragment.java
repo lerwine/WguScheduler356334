@@ -24,7 +24,7 @@ public class EditTermFragment extends Fragment {
     private static final String LOG_TAG = EditTermFragment.class.getName();
 
     private final CompositeDisposable compositeDisposable;
-    private TermViewModel mViewModel;
+    private TermViewModel viewModel;
     private ImageButton saveImageButton;
     private ImageButton deleteImageButton;
 
@@ -58,9 +58,9 @@ public class EditTermFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity()).get(TermViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(TermViewModel.class);
         compositeDisposable.clear();
-        compositeDisposable.add(mViewModel.restoreState(savedInstanceState, this::getArguments).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
+        compositeDisposable.add(viewModel.restoreState(savedInstanceState, this::getArguments).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
     }
 
     private void onTermLoadSuccess(TermEntity termEntity) {
@@ -68,7 +68,7 @@ public class EditTermFragment extends Fragment {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", termEntity));
-        mViewModel.getSavableLiveData().observe(getViewLifecycleOwner(), this::onCanSaveLiveDataChanged);
+        viewModel.getSavableLiveData().observe(getViewLifecycleOwner(), this::onCanSaveLiveDataChanged);
     }
 
     private void onTermLoadFailed(Throwable throwable) {
@@ -90,7 +90,7 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
-            requireActivity().finish();
+            verifySaveChanges();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -99,14 +99,14 @@ public class EditTermFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveInstanceState");
-        mViewModel.saveState(outState);
+        viewModel.saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
     private void onSaveTermImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveTermImageButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(mViewModel.save().subscribe(this::onDbOperationSucceeded, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save().subscribe(this::onDbOperationSucceeded, this::onSaveFailed));
     }
 
     private void onDbOperationSucceeded() {
@@ -123,22 +123,43 @@ public class EditTermFragment extends Fragment {
 
     private void onDeleteImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteImageButtonClick");
-        AlertDialog dialog = new AlertDialog.Builder(getContext()).setTitle(R.string.title_delete_term).setMessage(R.string.message_delete_mentor_confirm).setPositiveButton(R.string.response_yes, (dialogInterface, i1) -> {
-            compositeDisposable.clear();
-            compositeDisposable.add(mViewModel.delete().subscribe(this::onDbOperationSucceeded, this::onDeleteFailed));
-        }).setNegativeButton(R.string.response_no, null).create();
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle(R.string.title_delete_term)
+                .setMessage(R.string.message_delete_term_confirm).setPositiveButton(R.string.response_yes, (dialogInterface, i1) -> {
+                    compositeDisposable.clear();
+                    compositeDisposable.add(viewModel.delete().subscribe(this::onDbOperationSucceeded, this::onDeleteFailed));
+                }).setNegativeButton(R.string.response_no, null).create();
         dialog.show();
     }
 
     private void onDeleteFailed(Throwable throwable) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteFailed");
-        AlertDialog dlg = new AlertDialog.Builder(getContext()).setTitle(R.string.title_delete_error)
+        AlertDialog dlg = new AlertDialog.Builder(requireContext()).setTitle(R.string.title_delete_error)
                 .setMessage(getString(R.string.format_message_delete_error, throwable.getMessage())).setCancelable(true).create();
         dlg.show();
     }
 
     private void onCancelTermEditImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onCancelTermEditImageButtonClick");
-        requireActivity().finish();
+        verifySaveChanges();
     }
+
+    private void verifySaveChanges() {
+        if (viewModel.isChanged()) {
+            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.title_discard_changes)
+                    .setMessage(getString(R.string.message_discard_changes))
+                    .setCancelable(true)
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> requireActivity().finish())
+                    .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                        compositeDisposable.clear();
+                        compositeDisposable.add(viewModel.save().subscribe(() -> requireActivity().finish(), this::onSaveFailed));
+                    })
+                    .create();
+            dlg.show();
+        } else {
+            requireActivity().finish();
+        }
+    }
+
 }

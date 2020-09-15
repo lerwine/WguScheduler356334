@@ -20,6 +20,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.NormalizingCharSequence;
+import Erwine.Leonard.T.wguscheduler356334.util.Values;
 import Erwine.Leonard.T.wguscheduler356334.util.live.BooleanAndLiveData;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -39,7 +40,6 @@ public class TermViewModel extends AndroidViewModel {
     public static final String ARGUMENT_KEY_ORIGINAL_START_DATE = "original_start_date";
     public static final String ARGUMENT_KEY_ORIGINAL_END_DATE = "original_end_date";
     public static final String ARGUMENT_KEY_ORIGINAL_NOTES = "original_notes";
-    private static final String EVENT_NAME_TERM_ID_CONFIGURED = "termIdConfigured";
 
     private final MutableLiveData<TermEntity> entityLiveData;
     private final DbLoader dbLoader;
@@ -360,4 +360,8 @@ public class TermViewModel extends AndroidViewModel {
         }
     }
 
+    public boolean isChanged() {
+        return null == id || Values.notNullOr(nameChangedLiveData.getValue(), startChangedLiveData.getValue(),
+                endChangedLiveData.getValue(), notesChangedLiveData.getValue());
+    }
 }

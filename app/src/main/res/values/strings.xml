@@ -40,8 +40,8 @@
     <string name="title_edit_notes">Edit Notes</string>
     <string name="label_notes">Notes</string>
     <string name="label_mentor_name">Mentor Name</string>
-    <string name="label_phone_number">Phone Number(s)</string>
-    <string name="label_email_address">Email Address(es)</string>
+    <string name="label_phone_number">Phone Number</string>
+    <string name="label_email_address">Email Address</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_manage_data">Manage Data</string>
     <string name="command_manage_data">Manage Data</string>

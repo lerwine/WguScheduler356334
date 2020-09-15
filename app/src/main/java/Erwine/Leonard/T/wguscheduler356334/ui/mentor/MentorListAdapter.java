@@ -1,8 +1,10 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 
@@ -74,12 +77,11 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
         }
 
         private void onViewClick(View v) {
-//            Intent intent = new Intent(mContext, MentorDetailActivity.class);
-//            long id = mItem.getId();
-//            Log.i(getClass().getName(), String.format("Starting MentorDetailActivity with %d", id));
-//            intent.putExtra(MentorDetailActivity.EXTRAS_KEY_MENTOR_ID, id);
-//            mContext.startActivity(intent);
-            // TODO: Start mentor edit activity
+            Intent intent = new Intent(mContext, EditMentorActivity.class);
+            long id = mItem.getId();
+            Log.i(getClass().getName(), String.format("Starting EditMentorActivity with %d", id));
+            intent.putExtra(EditMentorActivity.EXTRAS_KEY_MENTOR_ID, id);
+            mContext.startActivity(intent);
         }
 
     }

@@ -56,7 +56,7 @@ public final class AssessmentEntity extends AbstractNotedEntity<AssessmentEntity
      */
     public static final String COLNAME_COMPLETION_DATE = "completionDate";
 
-    @ForeignKey(entity = CourseEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.RESTRICT, deferred = true)
+    @ForeignKey(entity = CourseEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_COURSE_ID)
     private long courseId;
     @ColumnInfo(name = COLNAME_CODE, collate = ColumnInfo.NOCASE)
@@ -265,7 +265,7 @@ public final class AssessmentEntity extends AbstractNotedEntity<AssessmentEntity
     @Override
     public synchronized int compareTo(AssessmentEntity o) {
         if (this == o) return 0;
-        if (o == null || getClass() != o.getClass()) return -1;
+        if (o == null) return -1;
         AssessmentEntity that = (AssessmentEntity) o;
         LocalDate d = that.completionDate;
         int result;
