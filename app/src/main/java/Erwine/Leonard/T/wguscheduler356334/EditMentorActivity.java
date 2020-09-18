@@ -9,22 +9,21 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.Objects;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.Values;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class EditMentorActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
-    public static final String EXTRAS_KEY_MENTOR_ID = "mentorId";
 
     private final CompositeDisposable compositeDisposable;
     private EditMentorViewModel viewModel;
@@ -32,6 +31,7 @@ public class EditMentorActivity extends AppCompatActivity {
     private EditText phoneNumberEditText;
     private EditText emailAddressEditText;
     private TextView mentorNotesTextView;
+    private FloatingActionButton editMentorNotesFloatingActionButton;
     private ImageButton saveMentorImageButton;
     private ImageButton deleteMentorImageButton;
 
@@ -48,11 +48,16 @@ public class EditMentorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_mentor);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
         mentorNameEditText = findViewById(R.id.mentorNameEditText);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         emailAddressEditText = findViewById(R.id.emailAddressEditText);
         mentorNotesTextView = findViewById(R.id.mentorNotesTextView);
+        editMentorNotesFloatingActionButton = findViewById(R.id.editMentorNotesFloatingActionButton);
         saveMentorImageButton = findViewById(R.id.saveMentorImageButton);
         deleteMentorImageButton = findViewById(R.id.deleteMentorImageButton);
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
@@ -101,12 +106,12 @@ public class EditMentorActivity extends AppCompatActivity {
             mentorNotesTextView.setText(entity.getNotes());
         }
 
-        mentorNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::onMentorNameTextChanged));
-        phoneNumberEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::onPhoneNumberTextChanged));
-        emailAddressEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::onEmailAddressTextChanged));
-        mentorNotesTextView.setOnClickListener(this::onMentorNotesEditTextClick);
+        mentorNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
+        phoneNumberEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setPhoneNumber));
+        emailAddressEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setEmailAddress));
+        editMentorNotesFloatingActionButton.setOnClickListener(this::onEditMentorNotesFloatingActionButtonClick);
         saveMentorImageButton.setOnClickListener(this::onSaveMentorImageButtonClick);
-        if (null == viewModel.getId()) {
+        if (null == entity.getId()) {
             deleteMentorImageButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
         } else {
@@ -116,10 +121,9 @@ public class EditMentorActivity extends AppCompatActivity {
         findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
         viewModel.getNameValidLiveData().observe(this, this::onNameValidChanged);
         viewModel.getContactValidLiveData().observe(this, this::onContactValidChanged);
-        viewModel.getSavableLiveData().observe(this, this::onCanSaveLiveDataChanged);
     }
 
-    private void onMentorNotesEditTextClick(View view) {
+    private void onEditMentorNotesFloatingActionButtonClick(View view) {
         EditText editText = new EditText(this);
         String text = viewModel.getNotes();
         editText.setText(text);
@@ -132,16 +136,12 @@ public class EditMentorActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     String s = editText.getText().toString();
                     if (!text.equals(s)) {
-                        viewModel.onMentorNotesEditTextChanged(s);
+                        viewModel.setNotes(s);
                         mentorNotesTextView.setText(s);
                     }
                 })
                 .setCancelable(false).create();
         dlg.show();
-    }
-
-    private void onCanSaveLiveDataChanged(Boolean canSave) {
-        saveMentorImageButton.setEnabled(canSave);
     }
 
     private void onNameValidChanged(Boolean isValid) {
@@ -162,7 +162,18 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onSaveMentorImageButtonClick(View view) {
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save().subscribe(this::finish, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+    }
+
+    private void onSaveOperationSucceeded(@NonNull String message) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.EditMentorActivity.onSaveOperationSucceeded");
+        if (message.isEmpty()) {
+            finish();
+        } else {
+            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this).setTitle(R.string.title_save_error)
+                    .setMessage(message).setCancelable(true).create();
+            dlg.show();
+        }
     }
 
     private void onSaveFailed(Throwable throwable) {
@@ -178,7 +189,9 @@ public class EditMentorActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.response_yes, (dialogInterface, i1) -> {
                     compositeDisposable.clear();
                     compositeDisposable.add(viewModel.delete().subscribe(this::finish, this::onDeleteFailed));
-                }).setNegativeButton(R.string.response_no, null).create();
+                })
+                .setNegativeButton(R.string.response_no, null)
+                .setCancelable(true).create();
         dialog.show();
     }
 
@@ -198,12 +211,10 @@ public class EditMentorActivity extends AppCompatActivity {
                     .setTitle(R.string.title_discard_changes)
                     .setMessage(getString(R.string.message_discard_changes))
                     .setCancelable(true)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> finish())
-                    .setNegativeButton(android.R.string.no, (dialog, which) -> {
-                        if (Values.notNullAnd(viewModel.getSavableLiveData().getValue())) {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save().subscribe(this::finish, this::onSaveFailed));
-                        }
+                    .setPositiveButton(R.string.response_yes, (dialog, which) -> finish())
+                    .setNegativeButton(R.string.response_no, (dialog, which) -> {
+                        compositeDisposable.clear();
+                        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
                     })
                     .create();
             dlg.show();

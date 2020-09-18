@@ -31,8 +31,39 @@ public class ManageDataActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        findViewById(R.id.dbIntegrityCheckButton).setOnClickListener(this::onDbIntegrityCheckButtonClick);
         findViewById(R.id.resetDatabaseButton).setOnClickListener(this::onResetDatabaseButtonClick);
         findViewById(R.id.addSampleDataButton).setOnClickListener(this::onAddSampleDataButtonClick);
+    }
+
+    private void onDbIntegrityCheckButtonClick(View view) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.title_database_integrity_check)
+                .setMessage(R.string.message_in_progress)
+                .setCancelable(false).create();
+        dialog.show();
+        compositeDisposable.clear();
+        compositeDisposable.add(dbLoader.checkDbIntegrity().subscribe((s) -> {
+            dialog.dismiss();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle(R.string.title_database_integrity_check);
+            if (null == s || s.trim().isEmpty()) {
+                builder.setMessage(R.string.validation_succeeded).setIcon(R.drawable.star_icon);
+            } else {
+                builder.setMessage(s).setIcon(R.drawable.error_icon);
+            }
+            AlertDialog dlg = builder.setCancelable(false).setPositiveButton(android.R.string.ok, (d, which) -> d.dismiss()).create();
+            dlg.show();
+        }, throwable -> {
+            String s = throwable.getMessage();
+            AlertDialog dlg = new AlertDialog.Builder(this)
+                    .setTitle(R.string.title_database_integrity_check)
+                    .setMessage((null == s || s.trim().isEmpty()) ? throwable.getClass().getName() : s)
+                    .setIcon(R.drawable.error_icon)
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, (d, which) -> d.dismiss()).create();
+            dlg.show();
+        }));
     }
 
     @SuppressLint("CheckResult")
@@ -51,7 +82,7 @@ public class ManageDataActivity extends AppCompatActivity {
     }
 
     private void onAddSampleDataButtonClick(View view) {
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.command_add_sample_data).setMessage(R.string.message_add_sample_data_confirm).setPositiveButton(R.string.response_yes,
+        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.command_reset_with_sample_data).setMessage(R.string.message_add_sample_data_confirm).setPositiveButton(R.string.response_yes,
                 (dialogInterface, i1) -> {
                     compositeDisposable.clear();
                     compositeDisposable.add(dbLoader.populateSampleData(getResources()).subscribe(this::finish, (throwable) -> {

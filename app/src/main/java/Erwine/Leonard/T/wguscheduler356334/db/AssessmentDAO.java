@@ -53,6 +53,9 @@ public interface AssessmentDAO {
     @Query("SELECT * FROM assessments ORDER BY [goalDate], completionDate")
     LiveData<List<AssessmentEntity>> getAll();
 
+    @Query("SELECT * FROM assessments ORDER BY [goalDate], completionDate")
+    List<AssessmentEntity> getAllSynchronous();
+
     @Query("SELECT COUNT(*) FROM assessments")
     Single<Integer> getCount();
 

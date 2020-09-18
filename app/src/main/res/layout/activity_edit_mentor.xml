@@ -2,18 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditMentorActivity">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/mentorNameLabelTextView"
         style="@style/WGU.Scheduler.FieldLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/label_mentor_name"
         android:labelFor="@id/mentorNameEditText"
+        android:text="@string/label_mentor_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,15 +26,15 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/mentorNameLabelTextView" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/phoneNumberLabelTextView"
         style="@style/WGU.Scheduler.FieldLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/label_phone_number"
         android:labelFor="@id/phoneNumberEditText"
+        android:text="@android:string/emptyPhoneNumber"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mentorNameEditText" />
@@ -49,15 +48,15 @@
         android:inputType="phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumberLabelTextView" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/emailAddressLabelTextView"
         style="@style/WGU.Scheduler.FieldLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/label_email_address"
         android:labelFor="@id/emailAddressEditText"
+        android:text="@string/label_email_address"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneNumberEditText" />
@@ -71,28 +70,40 @@
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/emailAddressLabelTextView" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/mentorNotesLabelTextView"
         style="@style/WGU.Scheduler.FieldLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/label_notes"
         android:labelFor="@id/mentorNotesTextView"
+        android:text="@string/label_notes"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailAddressEditText" />
 
     <TextView
         android:id="@+id/mentorNotesTextView"
-        style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@android:drawable/edit_text"
         app:layout_constraintBottom_toTopOf="@+id/saveMentorImageButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/mentorNotesLabelTextView" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/editMentorNotesFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/control_margin"
+        android:clickable="true"
+        app:backgroundTint="@color/color_secondary_variant"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="@+id/mentorNotesTextView"
+        app:layout_constraintEnd_toEndOf="@+id/mentorNotesTextView"
+        app:srcCompat="@drawable/edit_icon" />
 
     <ImageButton
         android:id="@+id/saveMentorImageButton"
@@ -100,7 +111,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteMentorImageButton"
-        app:srcCompat="@drawable/save_24" />
+        app:srcCompat="@drawable/save_icon" />
 
     <ImageButton
         android:id="@+id/deleteMentorImageButton"
@@ -108,7 +119,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/cancelImageButton"
-        app:srcCompat="@drawable/delete_24" />
+        app:srcCompat="@drawable/delete_icon" />
 
     <ImageButton
         android:id="@+id/cancelImageButton"
@@ -116,5 +127,5 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/undo_24" />
+        app:srcCompat="@drawable/undo_icon" />
 </androidx.constraintlayout.widget.ConstraintLayout>

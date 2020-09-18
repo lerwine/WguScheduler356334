@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -19,13 +18,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
-import static Erwine.Leonard.T.wguscheduler356334.ui.term.TermViewModel.FORMATTER;
+import static Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel.FORMATTER;
 
 /**
  * Fragment for editing the properties of a {@link TermEntity}
@@ -33,11 +34,12 @@ import static Erwine.Leonard.T.wguscheduler356334.ui.term.TermViewModel.FORMATTE
 public class TermPropertiesFragment extends Fragment {
 
     private static final String LOG_TAG = TermPropertiesFragment.class.getName();
-    private TermViewModel viewModel;
+    private EditTermViewModel viewModel;
     private EditText termNameEditText;
     private TextView termStartTextView;
     private TextView termEndValueTextView;
     private TextView termNotesTextView;
+    private FloatingActionButton editNotesFloatingActionButton;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,6 +58,7 @@ public class TermPropertiesFragment extends Fragment {
         termStartTextView = view.findViewById(R.id.termStartTextView);
         termEndValueTextView = view.findViewById(R.id.termEndValueTextView);
         termNotesTextView = view.findViewById(R.id.termNotesTextView);
+        editNotesFloatingActionButton = view.findViewById(R.id.editNotesFloatingActionButton);
 
         return view;
     }
@@ -64,25 +67,8 @@ public class TermPropertiesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(TermViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onLoadSuccess);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onOptionsItemSelected");
-        int itemId = item.getItemId();
-        if (itemId == android.R.id.home) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onSaveInstanceState");
-        viewModel.saveState(outState);
-        super.onSaveInstanceState(outState);
     }
 
     private void onLoadSuccess(TermEntity entity) {
@@ -123,16 +109,17 @@ public class TermPropertiesFragment extends Fragment {
             termNotesTextView.setText(entity.getNotes());
         }
 
-        termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::onTermNameEditTextChanged));
+        termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
         termStartTextView.setOnClickListener(this::onStartClick);
         termEndValueTextView.setOnClickListener(this::onEndClick);
-        termNotesTextView.setOnClickListener(this::onTermNotesEditTextClick);
+
+        editNotesFloatingActionButton.setOnClickListener(this::onEditNotesFloatingActionButtonClick);
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getNameValidLiveData().observe(viewLifecycleOwner, this::onNameValidChanged);
         viewModel.getStartMessageLiveData().observe(viewLifecycleOwner, this::onStartValidationMessageChanged);
     }
 
-    private void onTermNotesEditTextClick(View view) {
+    private void onEditNotesFloatingActionButtonClick(View view) {
         Context context = requireContext();
         EditText editText = new EditText(context);
         String text = viewModel.getNotes();
@@ -146,7 +133,7 @@ public class TermPropertiesFragment extends Fragment {
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     String s = editText.getText().toString();
                     if (!text.equals(s)) {
-                        viewModel.onTermNotesEditTextChanged(s);
+                        viewModel.setNotes(s);
                         termNotesTextView.setText(s);
                     }
                 })
@@ -163,7 +150,7 @@ public class TermPropertiesFragment extends Fragment {
     }
 
     private void onStartValidationMessageChanged(Integer id) {
-        if (null == id || id == R.string.command_ok) {
+        if (null == id) {
             termStartTextView.setError(null);
         } else {
             termStartTextView.setError(getResources().getString(id));
@@ -189,13 +176,13 @@ public class TermPropertiesFragment extends Fragment {
     void onStartDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         LocalDate d = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
         termStartTextView.setText(FORMATTER.format(d));
-        viewModel.onStartDateChanged(d);
+        viewModel.setStart(d);
     }
 
     void onEndDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         LocalDate d = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
         termEndValueTextView.setText(FORMATTER.format(d));
-        viewModel.onEndDateChanged(d);
+        viewModel.setEnd(d);
     }
 
 }

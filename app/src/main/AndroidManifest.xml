@@ -15,8 +15,7 @@
         <activity android:name=".AddCourseActivity" />
         <activity
             android:name=".ViewCourseActivity"
-            android:label="@string/title_activity_view_course"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_view_course" />
         <activity
             android:name=".AddTermActivity"
             android:label="@string/title_activity_new_term" />
@@ -28,8 +27,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".ViewTermActivity"
-            android:label="@string/title_activity_view_term"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_view_term" />
         <activity
             android:name=".ManageDataActivity"
             android:label="@string/title_activity_manage_data" />

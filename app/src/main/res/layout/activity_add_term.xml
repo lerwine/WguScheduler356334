@@ -25,14 +25,14 @@
         android:contentDescription="@string/command_save_changes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/cancelImageButton"
-        app:srcCompat="@drawable/save_24" />
+        app:srcCompat="@drawable/save_icon" />
 
     <ImageButton
         android:id="@+id/cancelImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/command_cancel"
+        android:contentDescription="@android:string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/undo_24" />
+        app:srcCompat="@drawable/undo_icon" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -80,7 +80,7 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
             Intent intent = new Intent(mContext, EditMentorActivity.class);
             long id = mItem.getId();
             Log.i(getClass().getName(), String.format("Starting EditMentorActivity with %d", id));
-            intent.putExtra(EditMentorActivity.EXTRAS_KEY_MENTOR_ID, id);
+            intent.putExtra(EditMentorViewModel.ARGUMENT_KEY_MENTOR_ID, id);
             mContext.startActivity(intent);
         }
 

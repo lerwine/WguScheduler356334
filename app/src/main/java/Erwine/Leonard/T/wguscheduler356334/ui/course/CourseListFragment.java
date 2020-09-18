@@ -10,10 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
@@ -59,6 +62,12 @@ public class CourseListFragment extends Fragment {
         adapter = new CourseListAdapter(list);
         RecyclerView courseListingRecyclerView = view.findViewById(R.id.courseListingRecyclerView);
         courseListingRecyclerView.setAdapter(adapter);
+
+        courseListingRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) courseListingRecyclerView.getLayoutManager());
+        DividerItemDecoration decoration = new DividerItemDecoration(courseListingRecyclerView.getContext(), linearLayoutManager.getOrientation());
+        courseListingRecyclerView.addItemDecoration(decoration);
+
         view.findViewById(R.id.addCourseButton).setOnClickListener(this::onAddCourseButtonClick);
 
         return view;

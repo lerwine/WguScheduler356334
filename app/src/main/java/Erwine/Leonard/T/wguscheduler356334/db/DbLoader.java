@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
@@ -533,6 +535,56 @@ public class DbLoader {
     public Completable insertAllAssessments(List<AssessmentEntity> list) {
         return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess(ids -> applyInsertedIds(ids, list, AssessmentEntity::applyInsertedId)));
+    }
+
+    @NonNull
+    public Single<String> checkDbIntegrity() {
+        return Single.fromCallable(() -> {
+            List<Long> termIds;
+            List<Long> mentorIds;
+
+            try {
+                termIds = appDb.termDAO().getAllSynchronous().stream().map(AbstractEntity::getId).collect(Collectors.toList());
+            } catch (Exception e) {
+                return "Error accessing database";
+            }
+            try {
+                mentorIds = appDb.mentorDAO().getAllSynchronous().stream().map(AbstractEntity::getId).collect(Collectors.toList());
+            } catch (Exception e) {
+                return "Error accessing database";
+            }
+            List<Long> courseIds;
+            ArrayList<String> messages = new ArrayList<>();
+            try {
+                courseIds = appDb.courseDAO().getAllSynchronous().stream().map(t -> {
+                    Long id = t.getMentorId();
+                    if (null != id && !mentorIds.contains(id)) {
+                        messages.add(String.format(Locale.getDefault(), "%s: Row with primary key %d is using a non-existent mentorId of %d.", AppDb.TABLE_NAME_COURSES, t.getId(), id));
+                    }
+                    id = t.getTermId();
+                    if (!termIds.contains(id)) {
+                        messages.add(String.format(Locale.getDefault(), "%s: Row with primary key %d is using a non-existent termId of %d.", AppDb.TABLE_NAME_COURSES, t.getId(), id));
+                    }
+                    return t.getId();
+                }).collect(Collectors.toList());
+            } catch (Exception e) {
+                messages.add(String.format(Locale.getDefault(), "%s: Error reading from table.", AppDb.TABLE_NAME_COURSES));
+                return String.join("\n", messages);
+            }
+            List<AssessmentEntity> assessments;
+            try {
+                assessments = appDb.assessmentDAO().getAllSynchronous();
+                assessments.forEach(t -> {
+                    Long id = t.getCourseId();
+                    if (!courseIds.contains(id)) {
+                        messages.add(String.format(Locale.getDefault(), "%s: Row with primary key %d is using a non-existent courseId of %d.", AppDb.TABLE_NAME_ASSESSMENTS, t.getId(), id));
+                    }
+                });
+            } catch (Exception e) {
+                messages.add(String.format(Locale.getDefault(), "%s: Error reading from table.", AppDb.TABLE_NAME_ASSESSMENTS));
+            }
+            return (messages.isEmpty()) ? "" : String.join("\n", messages);
+        }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     private void resetDb() {

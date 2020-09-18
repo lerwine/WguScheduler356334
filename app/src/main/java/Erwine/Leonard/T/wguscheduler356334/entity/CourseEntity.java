@@ -169,6 +169,12 @@ public final class CourseEntity extends AbstractNotedEntity<CourseEntity> implem
         this(null, termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
     }
 
+    @Ignore
+    public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
+                        LocalDate expectedEnd, LocalDate actualEnd, int competencyUnits, String notes, Long mentorId) {
+        this(null, null, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+    }
+
     /**
      * Initializes a new {@code CourseEntity} object to represent a new row of data for the {@link AppDb#TABLE_NAME_COURSES "courses"} database table.
      *
@@ -400,7 +406,7 @@ public final class CourseEntity extends AbstractNotedEntity<CourseEntity> implem
     public synchronized int compareTo(CourseEntity o) {
         if (this == o) return 0;
         if (o == null) return -1;
-        CourseEntity that = (CourseEntity) o;
+        CourseEntity that = o;
         Pair<LocalDate, LocalDate> thisRange0, thisRange1;
         if (null != actualStart || null != actualEnd) {
             thisRange0 = new Pair<>(actualStart, actualEnd);

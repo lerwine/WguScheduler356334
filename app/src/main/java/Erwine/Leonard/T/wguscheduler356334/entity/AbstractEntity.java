@@ -33,7 +33,7 @@ public abstract class AbstractEntity<T extends AbstractEntity<T>> implements Has
      * @param id     The value from the {@link #COLNAME_ID "id"} database column, which gets applied to the {@link #id} field.
      * @throws IllegalArgumentException if the {@link #id} field was already set.
      */
-    public static void applyInsertedId(AbstractEntity target, long id) {
+    public static void applyInsertedId(AbstractEntity<?> target, long id) {
         if (null != target.getId()) {
             throw new IllegalStateException();
         }

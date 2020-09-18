@@ -27,12 +27,13 @@
         android:id="@+id/addMentorButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
         android:backgroundTint="@color/color_accent"
         android:clickable="true"
-        android:src="@drawable/add_circle_24"
+        android:src="@drawable/add_item_icon"
         android:tint="@color/color_accent_inverse"
-        app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="42dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
