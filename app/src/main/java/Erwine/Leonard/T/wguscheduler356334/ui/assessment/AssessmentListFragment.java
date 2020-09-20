@@ -31,7 +31,6 @@ import io.reactivex.disposables.CompositeDisposable;
 public class AssessmentListFragment extends Fragment {
 
     private static final String LOG_TAG = AssessmentListFragment.class.getName();
-    public static final String ARGUMENT_KEY_COURSE_ID = "course_id";
     private final CompositeDisposable compositeDisposable;
     private final ArrayList<AssessmentEntity> list;
     private AssessmentListAdapter adapter;

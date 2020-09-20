@@ -58,12 +58,17 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             statusTextView = view.findViewById(R.id.statusTextView);
             adjTextView = view.findViewById(R.id.adjTextView);
             dateTextView = view.findViewById(R.id.dateTextView);
+            view.setOnClickListener(this::onViewClick);
         }
 
         @NonNull
         @Override
         public String toString() {
             return super.toString() + " '" + statusTextView.getText() + "'";
+        }
+
+        private void onViewClick(View view) {
+            // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListAdapter.ViewHolder.onViewClick
         }
 
         public void setItem(AssessmentEntity item) {

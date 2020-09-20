@@ -86,35 +86,35 @@ public class EditCourseFragment extends Fragment {
     }
 
     private void onEntityLoaded(CourseEntity entity) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onEntityLoaded
     }
 
     private void onTermButtonClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onTermButtonClick
     }
 
     private void onMentorChipClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onMentorChipClick
     }
 
     private void onMentorChipCloseIconClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onMentorChipCloseIconClick
     }
 
     private void onStatusButtonClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onStatusButtonClick
     }
 
     private void onSaveCourseButtonClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onSaveCourseButtonClick
     }
 
     private void onDeleteCourseButtonClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onDeleteCourseButtonClick
     }
 
     private void onCancelButtonClick(View view) {
-
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onCancelButtonClick
     }
 
 }
