@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import androidx.annotation.StringRes;
+
 import Erwine.Leonard.T.wguscheduler356334.R;
 
 public enum CourseStatus {
@@ -12,10 +14,11 @@ public enum CourseStatus {
 
     private final int displayResourceId;
 
-    CourseStatus(int displayResourceId) {
+    CourseStatus(@StringRes int displayResourceId) {
         this.displayResourceId = displayResourceId;
     }
 
+    @StringRes
     public int displayResourceId() {
         return displayResourceId;
     }

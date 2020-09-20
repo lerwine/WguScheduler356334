@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import androidx.annotation.StringRes;
+
 import Erwine.Leonard.T.wguscheduler356334.R;
 
 public enum AssessmentType {
@@ -9,10 +11,11 @@ public enum AssessmentType {
 
     private final int displayResourceId;
 
-    AssessmentType(int displayResourceId) {
+    AssessmentType(@StringRes int displayResourceId) {
         this.displayResourceId = displayResourceId;
     }
 
+    @StringRes
     public int displayResourceId() {
         return displayResourceId;
     }

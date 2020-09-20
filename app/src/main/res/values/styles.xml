@@ -145,28 +145,29 @@
     <style name="list_item_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">@dimen/text_margin</item>
-        <item name="android:textAppearance">?attr/textAppearanceListItem</item>
-    </style>
-
-    <style name="list_item_text_primary">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">@dimen/text_margin</item>
-        <item name="android:layout_marginStart">@dimen/text_margin</item>
-        <item name="android:layout_marginEnd">@dimen/text_margin</item>
+        <item name="android:layout_marginStart">@dimen/control_margin</item>
+        <item name="android:layout_marginEnd">@dimen/control_margin</item>
+        <item name="android:layout_marginTop">@dimen/control_margin</item>
+        <item name="android:layout_marginBottom">@dimen/control_margin</item>
         <item name="android:textColor">@color/color_primary</item>
         <item name="android:textAppearance">?attr/textAppearanceListItem</item>
     </style>
 
-    <style name="list_item_secondary">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">@dimen/secondary_text_margin_left</item>
-        <item name="android:layout_marginEnd">@dimen/text_margin</item>
-        <item name="android:layout_marginBottom">@dimen/text_margin</item>
-        <item name="android:textAppearance">?attr/textAppearanceListItem</item>
+    <style name="list_item_text_primary" parent="list_item_text">
+        <item name="android:layout_marginBottom">0dp</item>
+    </style>
+
+    <style name="list_item_text_primary_indent" parent="list_item_text_primary">
+        <item name="android:layout_marginStart">@dimen/text_margin</item>
+    </style>
+
+    <style name="list_item_text_secondary" parent="list_item_text">
+        <item name="android:layout_marginTop">0dp</item>
         <item name="android:textColor">@color/color_secondary</item>
+    </style>
+
+    <style name="list_item_text_secondary_indent" parent="list_item_text_secondary">
+        <item name="android:layout_marginStart">@dimen/text_margin</item>
     </style>
 
     <style name="command_button">

@@ -13,7 +13,7 @@
 
     <TextView
         android:id="@+id/termRangeTextView"
-        style="@style/list_item_text_primary"
+        style="@style/list_item_text_secondary_indent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

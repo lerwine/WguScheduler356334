@@ -40,16 +40,18 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
     public abstract class AbstractViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView courseNumberTextView;
-        public final TextView courseNameTextView;
-        public final TextView dateRangeTextView;
+        public final TextView titleTextView;
+        public final TextView statusTextView;
+        public final TextView rangeTextView;
         public T item;
 
         protected AbstractViewHolder(View view) {
             super(view);
             this.view = view;
             courseNumberTextView = (TextView) view.findViewById(R.id.codeTextView);
-            courseNameTextView = (TextView) view.findViewById(R.id.statusTextView);
-            dateRangeTextView = (TextView) view.findViewById(R.id.rangeStartTextView);
+            titleTextView = (TextView) view.findViewById(R.id.titleTextView);
+            statusTextView = (TextView) view.findViewById(R.id.statusTextView);
+            rangeTextView = (TextView) view.findViewById(R.id.rangeTextView);
             view.setOnClickListener(this::onViewClick);
         }
 
@@ -69,13 +71,14 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
         @NonNull
         @Override
         public String toString() {
-            return super.toString() + " '" + courseNameTextView.getText() + "'";
+            return super.toString() + " '" + titleTextView.getText() + "'";
         }
 
         public void setItem(T courseEntity) {
             item = courseEntity;
             courseNumberTextView.setText(courseEntity.getNumber());
-            courseNameTextView.setText(courseEntity.getTitle());
+            titleTextView.setText(courseEntity.getTitle());
+            statusTextView.setText(courseEntity.getStatus().displayResourceId());
             LocalDate date = courseEntity.getActualStart();
             StringBuilder sb = new StringBuilder();
             boolean expected = null == date;
@@ -108,7 +111,7 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
                 }
                 sb.append(FORMATTER.format(date));
             }
-            dateRangeTextView.setText(sb.toString());
+            rangeTextView.setText(sb.toString());
         }
     }
 }

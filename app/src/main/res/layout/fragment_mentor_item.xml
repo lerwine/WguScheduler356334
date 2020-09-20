@@ -7,20 +7,14 @@
 
     <TextView
         android:id="@+id/mentorNameTextView"
+        style="@style/list_item_text_primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:textColor="@color/color_primary_dark"
-        android:textColorHighlight="@color/color_primary"
-        android:textColorLink="@color/color_accent"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/phoneOrEmailTextView"
+        style="@style/list_item_text_secondary_indent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textColor="@color/color_primary_dark"
-        android:textColorHighlight="@color/color_primary"
-        android:textColorLink="@color/color_accent" />
+        android:layout_height="wrap_content" />
 </LinearLayout>

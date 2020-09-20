@@ -50,33 +50,33 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final View mView;
-        private final TextView mTermNameTextView;
-        private final TextView mTermRangeTextView;
+        private final TextView termNameTextView;
+        private final TextView termRangeTextView;
         private TermListItem mItem;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
-            mTermNameTextView = itemView.findViewById(R.id.termNameTextView);
-            mTermRangeTextView = itemView.findViewById(R.id.termRangeTextView);
+            termNameTextView = itemView.findViewById(R.id.termNameTextView);
+            termRangeTextView = itemView.findViewById(R.id.termRangeTextView);
             mView.setOnClickListener(this::onViewClick);
         }
 
         public void setItem(TermListItem item) {
             mItem = item;
-            mTermNameTextView.setText(item.getName());
+            termNameTextView.setText(item.getName());
             LocalDate start = item.getStart();
             LocalDate end = item.getEnd();
             if (null == start) {
                 if (null == end) {
-                    mTermRangeTextView.setText("? to ?");
+                    termRangeTextView.setText("? to ?");
                 } else {
-                    mTermRangeTextView.setText(String.format("? to %s", FORMATTER.format(end)));
+                    termRangeTextView.setText(String.format("? to %s", FORMATTER.format(end)));
                 }
             } else if (null == end) {
-                mTermRangeTextView.setText(String.format("%s to ?", FORMATTER.format(start)));
+                termRangeTextView.setText(String.format("%s to ?", FORMATTER.format(start)));
             } else {
-                mTermRangeTextView.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
+                termRangeTextView.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
             }
         }
 
