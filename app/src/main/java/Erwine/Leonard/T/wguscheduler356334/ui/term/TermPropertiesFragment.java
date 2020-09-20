@@ -1,7 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,15 +19,19 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDate;
+import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
 import static Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel.FORMATTER;
 
 /**
- * Fragment for editing the properties of a {@link TermEntity}
+ * Fragment for editing the properties of a {@link TermEntity}.
+ * This is included in the layouts for {@link EditTermFragment} and {@link Erwine.Leonard.T.wguscheduler356334.AddTermActivity}.
+ * This assumes that the containing {@link Fragment} or {@link android.app.Activity} invokes {@link EditTermViewModel#initializeViewModelState(Bundle, Supplier)}
  */
 public class TermPropertiesFragment extends Fragment {
 
@@ -77,7 +79,7 @@ public class TermPropertiesFragment extends Fragment {
         }
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
 
-        if (viewModel.isFromInitializedState()) {
+        if (viewModel.isFromSavedState()) {
             termNameEditText.setText(viewModel.getName());
             LocalDate date = viewModel.getStart();
             if (null != date) {
@@ -120,25 +122,10 @@ public class TermPropertiesFragment extends Fragment {
     }
 
     private void onEditNotesFloatingActionButtonClick(View view) {
-        Context context = requireContext();
-        EditText editText = new EditText(context);
-        String text = viewModel.getNotes();
-        editText.setText(text);
-        editText.setSingleLine(false);
-        editText.setVerticalScrollBarEnabled(true);
-        editText.setBackgroundResource(android.R.drawable.edit_text);
-        AlertDialog dlg = new AlertDialog.Builder(context)
-                .setTitle(getResources().getString(R.string.title_edit_notes))
-                .setView(editText)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    String s = editText.getText().toString();
-                    if (!text.equals(s)) {
-                        viewModel.setNotes(s);
-                        termNotesTextView.setText(s);
-                    }
-                })
-                .setCancelable(false).create();
-        dlg.show();
+        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), requireContext(), s -> {
+            viewModel.setNotes(s);
+            termNotesTextView.setText(s);
+        });
     }
 
     private void onNameValidChanged(Boolean isValid) {

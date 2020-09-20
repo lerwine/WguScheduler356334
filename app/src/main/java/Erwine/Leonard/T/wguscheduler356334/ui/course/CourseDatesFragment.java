@@ -47,6 +47,7 @@ public class CourseDatesFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
         expectedStartChip.setOnClickListener(this::onExpectedStartChipClick);

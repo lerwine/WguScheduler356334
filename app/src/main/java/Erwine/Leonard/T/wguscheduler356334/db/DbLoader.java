@@ -1,11 +1,14 @@
 package Erwine.Leonard.T.wguscheduler356334.db;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.preference.PreferenceManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,8 +31,12 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -68,13 +75,14 @@ public class DbLoader {
     private static final Pattern PATTERN_SAMPLE_ASSESSMENT_DATA = Pattern.compile("^([^\\t]+)\\t([^\\t]+)\\t([^\\t]+)\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?" +
             "\\t([^\\t]+)\\t([^\\t]+)?\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?$");
 
+    private static final MutableLiveData<Boolean> preferEmailLiveData = new MutableLiveData<>(false);
     private static DbLoader instance;
     private final CompositeDisposable compositeDisposable;
     private final AppDb appDb;
     private final Scheduler scheduler;
     private final Executor dataExecutor;
-    private LiveData<List<TermEntity>> allTerms;
-    private LiveData<List<MentorEntity>> allMentors;
+    private LiveData<List<TermListItem>> allTerms;
+    private LiveData<List<MentorListItem>> allMentors;
     private LiveData<List<CourseEntity>> allCourses;
     private LiveData<List<AssessmentEntity>> allAssessments;
 
@@ -139,6 +147,12 @@ public class DbLoader {
         this.appDb = appDb;
         dataExecutor = Executors.newSingleThreadExecutor();
         scheduler = Schedulers.from(dataExecutor);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferEmailLiveData.postValue(sharedPreferences.getBoolean(context.getResources().getString(R.string.preference_prefer_email), false));
+    }
+
+    public static MutableLiveData<Boolean> getPreferEmailLiveData() {
+        return preferEmailLiveData;
     }
 
     /**
@@ -160,6 +174,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<TermEntity> getTermById(long id) {
+        Log.d(LOG_TAG, String.format("Called getTermById(%d)", id));
         return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -169,7 +184,8 @@ public class DbLoader {
      * @return A {@link LiveData} object that will contain the list of {@link TermEntity} objects retrieved from the underlying {@link AppDb}.
      */
     @NonNull
-    public LiveData<List<TermEntity>> getAllTerms() {
+    public LiveData<List<TermListItem>> getAllTerms() {
+        Log.d(LOG_TAG, "Called getAllTerms()");
         if (null == allTerms) {
             allTerms = appDb.termDAO().getAll();
         }
@@ -183,6 +199,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<Integer> getTermCount() {
+        Log.d(LOG_TAG, "Called getTermCount()");
         return appDb.termDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -197,6 +214,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable saveTerm(TermEntity entity) {
+        Log.d(LOG_TAG, String.format("Called saveTerm(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.termDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                     .doAfterSuccess(id -> TermEntity.applyInsertedId(entity, id)));
@@ -224,6 +242,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable deleteTerm(TermEntity entity) {
+        Log.d(LOG_TAG, String.format("Called deleteTerm(%s)", entity));
         return appDb.termDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -244,7 +263,8 @@ public class DbLoader {
      * @return A {@link LiveData} object that will contain the list of {@link MentorEntity} objects retrieved from the underlying {@link AppDb}.
      */
     @NonNull
-    public LiveData<List<MentorEntity>> getAllMentors() {
+    public LiveData<List<MentorListItem>> getAllMentors() {
+        Log.d(LOG_TAG, "Called getAllMentors()");
         if (null == allMentors) {
             allMentors = appDb.mentorDAO().getAll();
         }
@@ -258,6 +278,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<Integer> getMentorCount() {
+        Log.d(LOG_TAG, "Called getMentorCount()");
         return appDb.mentorDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -272,6 +293,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable saveMentor(MentorEntity entity) {
+        Log.d(LOG_TAG, String.format("Called saveMentor(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.mentorDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                     .doAfterSuccess(id -> MentorEntity.applyInsertedId(entity, id)));
@@ -299,6 +321,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable deleteMentor(MentorEntity entity) {
+        Log.d(LOG_TAG, String.format("Called deleteMentor(%s)", entity));
         return appDb.mentorDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -310,6 +333,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<MentorEntity> getMentorById(long id) {
+        Log.d(LOG_TAG, String.format("Called getMentorById(%d)", id));
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -321,6 +345,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable deleteCourse(CourseEntity entity) {
+        Log.d(LOG_TAG, String.format("Called deleteCourse(%s)", entity));
         return appDb.courseDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -343,6 +368,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<CourseEntity> getCourseById(long id) {
+        Log.d(LOG_TAG, String.format("Called getCourseById(%d)", id));
         return appDb.courseDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -353,6 +379,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<CourseEntity>> getAllCourses() {
+        Log.d(LOG_TAG, "Called getAllCourses()");
         if (null == allCourses) {
             allCourses = appDb.courseDAO().getAll();
         }
@@ -368,7 +395,8 @@ public class DbLoader {
      * specific {@link TermEntity}.
      */
     @NonNull
-    public LiveData<List<CourseEntity>> getCoursesByTermId(long termId) {
+    public LiveData<List<TermCourseListItem>> getCoursesByTermId(long termId) {
+        Log.d(LOG_TAG, String.format("Called getCoursesByTermId(%d)", termId));
         return appDb.courseDAO().getByTermId(termId);
     }
 
@@ -381,7 +409,8 @@ public class DbLoader {
      * specific {@link MentorEntity}.
      */
     @NonNull
-    public LiveData<List<CourseEntity>> getCoursesByMentorId(long mentorId) {
+    public LiveData<List<MentorCourseListItem>> getCoursesByMentorId(long mentorId) {
+        Log.d(LOG_TAG, String.format("Called getCoursesByMentorId(%d)", mentorId));
         return appDb.courseDAO().getByMentorId(mentorId);
     }
 
@@ -395,6 +424,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<CourseEntity>> getUnterminatedCoursesOnOrBefore(LocalDate date) {
+        Log.d(LOG_TAG, String.format("Called getUnterminatedCoursesOnOrBefore(%s)", date));
         return appDb.courseDAO().getUnterminatedOnOrBefore(date);
     }
 
@@ -405,6 +435,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<Integer> getCourseCount() {
+        Log.d(LOG_TAG, "Called getCourseCount()");
         return appDb.courseDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -419,6 +450,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable saveCourse(CourseEntity entity) {
+        Log.d(LOG_TAG, String.format("Called saveCourse(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.courseDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                     .doAfterSuccess(id -> CourseEntity.applyInsertedId(entity, id)));
@@ -446,6 +478,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable deleteAssessment(AssessmentEntity entity) {
+        Log.d(LOG_TAG, String.format("Called deleteAssessment(%s)", entity));
         return appDb.assessmentDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -468,6 +501,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<AssessmentEntity> getAssessmentById(long id) {
+        Log.d(LOG_TAG, String.format("Called getAssessmentById(%d)", id));
         return appDb.assessmentDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -481,6 +515,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<AssessmentEntity>> getAssessmentsByCourseId(long courseId) {
+        Log.d(LOG_TAG, String.format("Called getAssessmentsByCourseId(%d)", courseId));
         return appDb.assessmentDAO().getByCourseId(courseId);
     }
 
@@ -491,6 +526,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<AssessmentEntity>> getAllAssessments() {
+        Log.d(LOG_TAG, "Called getAllAssessments()");
         if (null == allAssessments) {
             allAssessments = appDb.assessmentDAO().getAll();
         }
@@ -504,6 +540,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<Integer> getAssessmentCount() {
+        Log.d(LOG_TAG, "Called getAssessmentCount()");
         return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -518,6 +555,7 @@ public class DbLoader {
      */
     @NonNull
     public Completable saveAssessment(AssessmentEntity entity) {
+        Log.d(LOG_TAG, String.format("Called saveAssessment(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.assessmentDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
                     .doAfterSuccess(id -> AssessmentEntity.applyInsertedId(entity, id)));
@@ -661,7 +699,7 @@ public class DbLoader {
             String c = cells.get(8);
             String m = cells.get(10);
             CourseEntity course = new CourseEntity(cells.get(1), cells.get(2), statusMap.get(cells.get(3)), parseDateCell.apply(cells.get(4)), parseDateCell.apply(cells.get(5)),
-                    parseDateCell.apply(cells.get(6)), parseDateCell.apply(cells.get(7)), (c.isEmpty()) ? null : Integer.parseInt(c), cells.get(9),
+                    parseDateCell.apply(cells.get(6)), parseDateCell.apply(cells.get(7)), (c.isEmpty()) ? 0 : Integer.parseInt(c), cells.get(9),
                     Objects.requireNonNull(sampleTerms.get(Integer.parseInt(cells.get(0)))), (m.isEmpty()) ? null : sampleMentors.get(Integer.parseInt(m)));
             Log.d(LOG_TAG, String.format("Creating: %s", course));
             entities.add(course);
@@ -700,7 +738,7 @@ public class DbLoader {
                 // 0=courseId, 1=code, 2=status, 3=goalDate, 4=type, 5=notes, 6=evaluationDate
                 List<String> cells = parseSampleDataCells(t, 7);
                 CourseEntity course = Objects.requireNonNull(sampleCourses.get(Integer.parseInt(cells.get(0))));
-                AssessmentEntity assessment = new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
+                @SuppressWarnings("ConstantConditions") AssessmentEntity assessment = new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
                         sampleCellToLocalDate(cells.get(6), course), course.getId());
                 Log.d(LOG_TAG, String.format("Creating: %s", assessment));
                 return assessment;

@@ -11,6 +11,7 @@ import androidx.room.Update;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -41,11 +42,11 @@ public interface TermDAO {
     @Query("SELECT * FROM terms WHERE id = :id")
     Single<TermEntity> getById(long id);
 
-    @Query("SELECT * FROM terms ORDER BY [start], [end]")
-    LiveData<List<TermEntity>> getAll();
+    @Query("SELECT * FROM termListView")
+    LiveData<List<TermListItem>> getAll();
 
-    @Query("SELECT * FROM terms")
-    List<TermEntity> getAllSynchronous();
+    @Query("SELECT * FROM termListView")
+    List<TermListItem> getAllSynchronous();
 
     @Query("SELECT COUNT(*) FROM terms")
     Single<Integer> getCount();

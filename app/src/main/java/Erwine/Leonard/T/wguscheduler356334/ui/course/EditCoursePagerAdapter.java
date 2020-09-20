@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
+
 public class EditCoursePagerAdapter extends FragmentPagerAdapter {
     private final Context context;
 
@@ -30,17 +32,17 @@ public class EditCoursePagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-//    @Override
-//    public CharSequence getPageTitle(int position) {
-//        switch (position) {
-//            case 0:
-//                return mContext.getResources().getString(R.string.title_courses);
-//            case 1:
-//                return mContext.getResources().getString(R.string.title_activity_edit);
-//            default:
-//                throw new IllegalStateException(String.format("Unexpected title position %d", position));
-//        }
-//    }
+    @Override
+    public CharSequence getPageTitle(int position) {
+        switch (position) {
+            case 0:
+                return context.getResources().getString(R.string.title_assessments);
+            case 1:
+                return context.getResources().getString(R.string.title_activity_edit);
+            default:
+                throw new IllegalStateException(String.format("Unexpected title position %d", position));
+        }
+    }
 
     @Override
     public int getCount() {

@@ -13,7 +13,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
  * Abstract class to represent a row of data from the an {@link AppDb} database table that includes an {@link AbstractEntity#COLNAME_ID "id" database column}, which is the primary key
  * and a {@link #COLNAME_NOTES "notes" database column}.
  */
-public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> extends AbstractEntity<T> implements HasNotesProperty {
+public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> extends AbstractEntity<T> implements NoteColumnIncludedEntity {
     /**
      * The name of the {@link #notes "notes"} database column, which contains user notes for the entity.
      */
@@ -36,6 +36,11 @@ public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> exte
     protected AbstractNotedEntity(Long id, String notes) {
         super(id);
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
+    }
+
+    protected AbstractNotedEntity(@NonNull AbstractNotedEntity<?> source) {
+        super(source.getId());
+        this.notes = source.notes;
     }
 
     /**

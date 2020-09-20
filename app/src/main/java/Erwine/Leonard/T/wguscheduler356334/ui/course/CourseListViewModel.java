@@ -9,12 +9,12 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractCourseEntity;
 
-public class CourseListViewModel extends AndroidViewModel {
+public abstract class CourseListViewModel<T extends AbstractCourseEntity<T>> extends AndroidViewModel {
 
     private final DbLoader dbLoader;
-    private LiveData<List<CourseEntity>> courses;
+    private LiveData<List<T>> courses;
     private long termId;
 
     public CourseListViewModel(@NonNull Application application) {
@@ -22,15 +22,17 @@ public class CourseListViewModel extends AndroidViewModel {
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
     }
 
-    public LiveData<List<CourseEntity>> getCourses() {
+    public LiveData<List<T>> getCourses() {
         return courses;
     }
 
-    public long getTermId() {
+    public long getId() {
         return termId;
     }
 
-    public void setTermId(long id) {
-        courses = dbLoader.getCoursesByTermId(id);
+    public void setId(long id) {
+        courses = getLiveData(dbLoader, id);
     }
+
+    protected abstract LiveData<List<T>> getLiveData(@NonNull DbLoader dbLoader, long id);
 }

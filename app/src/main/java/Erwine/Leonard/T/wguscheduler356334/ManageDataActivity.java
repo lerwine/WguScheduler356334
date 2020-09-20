@@ -1,16 +1,16 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class ManageDataActivity extends AppCompatActivity {
@@ -45,54 +45,40 @@ public class ManageDataActivity extends AppCompatActivity {
         compositeDisposable.clear();
         compositeDisposable.add(dbLoader.checkDbIntegrity().subscribe((s) -> {
             dialog.dismiss();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(R.string.title_database_integrity_check);
             if (null == s || s.trim().isEmpty()) {
-                builder.setMessage(R.string.validation_succeeded).setIcon(R.drawable.star_icon);
+                new AlertHelper(R.drawable.dialog_success, R.string.title_database_integrity_check, R.string.validation_succeeded, this).showDialog();
             } else {
-                builder.setMessage(s).setIcon(R.drawable.error_icon);
+                new AlertHelper(R.drawable.dialog_error, R.string.title_database_integrity_check, s, this).showDialog();
             }
-            AlertDialog dlg = builder.setCancelable(false).setPositiveButton(android.R.string.ok, (d, which) -> d.dismiss()).create();
-            dlg.show();
         }, throwable -> {
+            dialog.dismiss();
             String s = throwable.getMessage();
-            AlertDialog dlg = new AlertDialog.Builder(this)
-                    .setTitle(R.string.title_database_integrity_check)
-                    .setMessage((null == s || s.trim().isEmpty()) ? throwable.getClass().getName() : s)
-                    .setIcon(R.drawable.error_icon)
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, (d, which) -> d.dismiss()).create();
-            dlg.show();
+            new AlertHelper(R.drawable.dialog_error, R.string.title_database_integrity_check, (null == s || s.trim().isEmpty()) ? throwable.getClass().getName() : s, this).showDialog();
         }));
     }
 
-    @SuppressLint("CheckResult")
     private void onResetDatabaseButtonClick(View view) {
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.command_reset_database).setMessage(R.string.message_reset_db_confirm).setPositiveButton(R.string.response_yes,
-                (dialogInterface, i1) -> {
-                    compositeDisposable.clear();
-                    compositeDisposable.add(dbLoader.resetDatabase().subscribe(this::finish, (throwable) -> {
-                                Log.e(getClass().getName(), "Error on dbLoader.resetDatabase()", throwable);
-                                new AlertDialog.Builder(this).setTitle(R.string.title_reset_db_error)
-                                        .setMessage(getString(R.string.format_message_reset_db_error, throwable.getMessage())).setCancelable(true).show();
-                            }
-                    ));
-                }).setNegativeButton(R.string.response_no, null).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_warning, R.string.command_reset_database, R.string.message_reset_db_confirm, this).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(dbLoader.resetDatabase().subscribe(this::finish, (throwable) -> {
+                        Log.e(getClass().getName(), "Error on dbLoader.resetDatabase()", throwable);
+                        new AlertHelper(R.drawable.dialog_error, R.string.title_reset_db_error, getString(R.string.format_message_reset_db_error, throwable.getMessage()), this)
+                                .showDialog();
+                    }
+            ));
+        }, null);
     }
 
     private void onAddSampleDataButtonClick(View view) {
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.command_reset_with_sample_data).setMessage(R.string.message_add_sample_data_confirm).setPositiveButton(R.string.response_yes,
-                (dialogInterface, i1) -> {
-                    compositeDisposable.clear();
-                    compositeDisposable.add(dbLoader.populateSampleData(getResources()).subscribe(this::finish, (throwable) -> {
-                                Log.e(getClass().getName(), "Error on dbLoader.populateSampleData()", throwable);
-                                new AlertDialog.Builder(this).setTitle(R.string.title_add_sample_data_error)
-                                        .setMessage(getString(R.string.format_message_add_sample_data_error, throwable.getMessage())).setCancelable(true).show();
-                            }
-                    ));
-                }).setNegativeButton(R.string.response_no, null).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_warning, R.string.command_reset_with_sample_data, R.string.message_add_sample_data_confirm, this).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(dbLoader.populateSampleData(getResources()).subscribe(this::finish, (throwable) -> {
+                        Log.e(getClass().getName(), "Error on dbLoader.populateSampleData()", throwable);
+                        new AlertHelper(R.drawable.dialog_error, R.string.title_add_sample_data_error, getString(R.string.format_message_add_sample_data_error, throwable.getMessage()), this)
+                                .showDialog();
+                    }
+            ));
+        }, null);
     }
 
     @Override

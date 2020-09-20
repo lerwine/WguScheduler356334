@@ -9,11 +9,11 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
 
 public class MentorListViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
-    private final LiveData<List<MentorEntity>> mentors;
+    private final LiveData<List<MentorListItem>> mentors;
 
     public MentorListViewModel(@NonNull Application application) {
         super(application);
@@ -21,7 +21,7 @@ public class MentorListViewModel extends AndroidViewModel {
         mentors = dbLoader.getAllMentors();
     }
 
-    public LiveData<List<MentorEntity>> getMentors() {
+    public LiveData<List<MentorListItem>> getMentors() {
         return mentors;
     }
 }

@@ -34,7 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:labelFor="@id/phoneNumberEditText"
-        android:text="@android:string/emptyPhoneNumber"
+        android:text="@string/label_phone_number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mentorNameEditText" />

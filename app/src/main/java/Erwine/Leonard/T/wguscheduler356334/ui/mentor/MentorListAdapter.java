@@ -1,31 +1,28 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
 
 public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.ViewHolder> {
 
-    private final List<MentorEntity> mValues;
+    private final List<MentorListItem> mValues;
     private final Context mContext;
     private final boolean mPreferEmailAddress;
 
-    public MentorListAdapter(List<MentorEntity> items, Context context) {
+    public MentorListAdapter(List<MentorListItem> items, Context context) {
         mValues = items;
         mContext = context;
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -54,7 +51,7 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
         public final View mView;
         public final TextView mentorNameTextView;
         public final TextView phoneOrEmailTextView;
-        public MentorEntity mItem;
+        public MentorListItem mItem;
 
         public ViewHolder(View view) {
             super(view);
@@ -64,7 +61,7 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
             mView.setOnClickListener(this::onViewClick);
         }
 
-        public void setItem(MentorEntity item) {
+        public void setItem(MentorListItem item) {
             mItem = item;
             mentorNameTextView.setText(mItem.getName());
             if (mPreferEmailAddress) {
@@ -77,11 +74,7 @@ public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.Vi
         }
 
         private void onViewClick(View v) {
-            Intent intent = new Intent(mContext, EditMentorActivity.class);
-            long id = mItem.getId();
-            Log.i(getClass().getName(), String.format("Starting EditMentorActivity with %d", id));
-            intent.putExtra(EditMentorViewModel.ARGUMENT_KEY_MENTOR_ID, id);
-            mContext.startActivity(intent);
+            EditMentorViewModel.startEditMentorActivity(v.getContext(), mItem.getId());
         }
 
     }

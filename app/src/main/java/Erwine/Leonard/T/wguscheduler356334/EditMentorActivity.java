@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -61,8 +61,8 @@ public class EditMentorActivity extends AppCompatActivity {
         saveMentorImageButton = findViewById(R.id.saveMentorImageButton);
         deleteMentorImageButton = findViewById(R.id.deleteMentorImageButton);
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
-        viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras());
-        viewModel.getEntityLiveData().observe(this, this::onLoadSuccess);
+        compositeDisposable.clear();
+        compositeDisposable.add(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onLoadSuccess, this::onLoadFailed));
     }
 
     @Override
@@ -90,6 +90,7 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onLoadSuccess(MentorEntity entity) {
         if (null == entity) {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_mentor_not_found, this).showDialog(this::finish);
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
@@ -123,25 +124,15 @@ public class EditMentorActivity extends AppCompatActivity {
         viewModel.getContactValidLiveData().observe(this, this::onContactValidChanged);
     }
 
+    private void onLoadFailed(Throwable throwable) {
+        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
+    }
+
     private void onEditMentorNotesFloatingActionButtonClick(View view) {
-        EditText editText = new EditText(this);
-        String text = viewModel.getNotes();
-        editText.setText(text);
-        editText.setSingleLine(false);
-        editText.setVerticalScrollBarEnabled(true);
-        editText.setBackgroundResource(android.R.drawable.edit_text);
-        AlertDialog dlg = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.title_edit_notes))
-                .setView(editText)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    String s = editText.getText().toString();
-                    if (!text.equals(s)) {
-                        viewModel.setNotes(s);
-                        mentorNotesTextView.setText(s);
-                    }
-                })
-                .setCancelable(false).create();
-        dlg.show();
+        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), this, s -> {
+            viewModel.setNotes(s);
+            mentorNotesTextView.setText(s);
+        });
     }
 
     private void onNameValidChanged(Boolean isValid) {
@@ -170,35 +161,23 @@ public class EditMentorActivity extends AppCompatActivity {
         if (message.isEmpty()) {
             finish();
         } else {
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this).setTitle(R.string.title_save_error)
-                    .setMessage(message).setCancelable(true).create();
-            dlg.show();
+            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, message, this).showDialog();
         }
     }
 
     private void onSaveFailed(Throwable throwable) {
-        android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this).setTitle(R.string.title_save_error)
-                .setMessage(getString(R.string.format_message_save_error, throwable.getMessage())).setCancelable(true).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 
     private void onDeleteMentorImageButtonClick(View view) {
-        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(this)
-                .setTitle(R.string.title_delete_mentor)
-                .setMessage(R.string.message_delete_mentor_confirm)
-                .setPositiveButton(R.string.response_yes, (dialogInterface, i1) -> {
-                    compositeDisposable.clear();
-                    compositeDisposable.add(viewModel.delete().subscribe(this::finish, this::onDeleteFailed));
-                })
-                .setNegativeButton(R.string.response_no, null)
-                .setCancelable(true).create();
-        dialog.show();
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(viewModel.delete().subscribe(this::finish, this::onDeleteFailed));
+        }, null);
     }
 
     private void onDeleteFailed(Throwable throwable) {
-        android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this).setTitle(R.string.title_delete_error)
-                .setMessage(getString(R.string.format_message_delete_error, throwable.getMessage())).setCancelable(true).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
     }
 
     private void onCancelImageButtonClick(View view) {
@@ -207,17 +186,10 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void verifySaveChanges() {
         if (viewModel.isChanged()) {
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this)
-                    .setTitle(R.string.title_discard_changes)
-                    .setMessage(getString(R.string.message_discard_changes))
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.response_yes, (dialog, which) -> finish())
-                    .setNegativeButton(R.string.response_no, (dialog, which) -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
-                    })
-                    .create();
-            dlg.show();
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(() -> {
+                compositeDisposable.clear();
+                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+            }, this::finish, null);
         } else {
             finish();
         }

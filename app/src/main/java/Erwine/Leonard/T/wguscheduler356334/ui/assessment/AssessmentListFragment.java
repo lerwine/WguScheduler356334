@@ -1,19 +1,28 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.dummy.DummyContent;
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * A fragment representing a list of Items.
@@ -21,10 +30,12 @@ import Erwine.Leonard.T.wguscheduler356334.dummy.DummyContent;
 public class AssessmentListFragment extends Fragment {
 
     private static final String LOG_TAG = AssessmentListFragment.class.getName();
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
+    public static final String ARGUMENT_KEY_COURSE_ID = "course_id";
+    private final CompositeDisposable compositeDisposable;
+    private final ArrayList<AssessmentEntity> list;
+    private AssessmentListAdapter adapter;
+    private EditCourseViewModel editCourseViewModel;
+    private AssessmentListViewModel assessmentListViewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -32,42 +43,57 @@ public class AssessmentListFragment extends Fragment {
      */
     public AssessmentListFragment() {
         Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment");
-    }
-
-    public static AssessmentListFragment newInstance(int columnCount) {
-        AssessmentListFragment fragment = new AssessmentListFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onCreate");
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+        compositeDisposable = new CompositeDisposable();
+        list = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onCreateView");
-        View view = inflater.inflate(R.layout.fragment_assessment_list, container, false);
+        return inflater.inflate(R.layout.fragment_assessment_list, container, false);
+    }
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new AssessmentListAdapter(DummyContent.ITEMS));
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        adapter = new AssessmentListAdapter(requireContext(), list);
+        RecyclerView assessmentListRecyclerView = view.findViewById(R.id.assessmentListRecyclerView);
+        assessmentListRecyclerView.setAdapter(adapter);
+
+        assessmentListRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) assessmentListRecyclerView.getLayoutManager());
+        DividerItemDecoration decoration = new DividerItemDecoration(assessmentListRecyclerView.getContext(), linearLayoutManager.getOrientation());
+        assessmentListRecyclerView.addItemDecoration(decoration);
+
+        view.findViewById(R.id.addAssessmentButton).setOnClickListener(this::onAddAssessmentButtonClick);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Get shared view model, which is initialized by ViewCourseActivity
+        editCourseViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(EditCourseViewModel.class);
+        editCourseViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
+    }
+
+    private void onEntityLoaded(CourseEntity entity) {
+        Long courseId = entity.getId();
+        if (null != courseId) {
+            assessmentListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentListViewModel.class);
+            assessmentListViewModel.setId(courseId);
+            assessmentListViewModel.getAssessments().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);
         }
-        return view;
+    }
+
+    private void onAssessmentListChanged(List<AssessmentEntity> assessmentEntities) {
+        list.clear();
+        list.addAll(assessmentEntities);
+        if (null != adapter) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void onAddAssessmentButtonClick(View view) {
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onAddAssessmentButtonClick
     }
 }

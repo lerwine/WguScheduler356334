@@ -1,6 +1,8 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -12,6 +14,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.function.Supplier;
 
+import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
@@ -56,6 +59,14 @@ public class EditMentorViewModel extends AndroidViewModel {
         entityLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
         contactValidLiveData = new MutableLiveData<>(false);
+    }
+
+    public static void startEditMentorActivity(Context context, Long id) {
+        Intent intent = new Intent(context, EditMentorActivity.class);
+        if (null != id) {
+            intent.putExtra(ARGUMENT_KEY_MENTOR_ID, id);
+        }
+        context.startActivity(intent);
     }
 
     public Long getId() {
@@ -145,6 +156,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         return fromInitializedState;
     }
 
+    @SuppressWarnings("ConstantConditions")
     public synchronized Single<MentorEntity> restoreState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(ARGUMENT_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();

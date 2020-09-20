@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -48,14 +50,14 @@ public interface CourseDAO {
     @Query("SELECT * FROM courses")
     List<CourseEntity> getAllSynchronous();
 
-    @Query("SELECT * FROM courses WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
-    LiveData<List<CourseEntity>> getByTermId(long termId);
+    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    LiveData<List<TermCourseListItem>> getByTermId(long termId);
 
-    @Query("SELECT * FROM courses WHERE termId = :termId")
-    List<CourseEntity> getByTermIdSynchronous(long termId);
+    @Query("SELECT * FROM termCourseListView WHERE termId = :termId")
+    List<TermCourseListItem> getByTermIdSynchronous(long termId);
 
-    @Query("SELECT * FROM courses WHERE mentorId = :mentorId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
-    LiveData<List<CourseEntity>> getByMentorId(long mentorId);
+    @Query("SELECT * FROM mentorCourseListView WHERE mentorId = :mentorId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    LiveData<List<MentorCourseListItem>> getByMentorId(long mentorId);
 
     @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getUnterminatedOnOrBefore(LocalDate date);

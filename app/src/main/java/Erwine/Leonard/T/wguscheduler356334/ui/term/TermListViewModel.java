@@ -9,12 +9,12 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 
 public class TermListViewModel extends AndroidViewModel {
 
     private final DbLoader dbLoader;
-    private final LiveData<List<TermEntity>> terms;
+    private final LiveData<List<TermListItem>> terms;
 
     public TermListViewModel(@NonNull Application application) {
         super(application);
@@ -22,7 +22,7 @@ public class TermListViewModel extends AndroidViewModel {
         terms = dbLoader.getAllTerms();
     }
 
-    public LiveData<List<TermEntity>> getTerms() {
+    public LiveData<List<TermListItem>> getTerms() {
         return terms;
     }
 

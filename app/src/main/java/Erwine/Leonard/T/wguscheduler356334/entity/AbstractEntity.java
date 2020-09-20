@@ -14,7 +14,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
 /**
  * Abstract class to represent a row of data from the an {@link AppDb} database table that includes an {@link AbstractEntity#COLNAME_ID "id" database column}, which is the primary key.
  */
-public abstract class AbstractEntity<T extends AbstractEntity<T>> implements HasIdProperty {
+public abstract class AbstractEntity<T extends AbstractEntity<T>> implements IdIndexedEntity {
     /**
      * The name of the {@link #id "id"} database column, which is the primary key.
      * If this value is {@code null}, then the current {@code AbstractEntity} object represents a new row that has not yet been saved.

@@ -63,12 +63,15 @@ public final class StringHelper {
         Matcher matcher = PATTERN_CSV_CELL.matcher(source);
         int position = 0;
         while (matcher.find()) {
-            if (null != matcher.group(1)) {
-                currentLine.add(matcher.group(1).replace("\"\"", "\""));
+            String s = matcher.group(1);
+            if (null != s) {
+                currentLine.add(s.replace("\"\"", "\""));
             } else {
-                currentLine.add((null == matcher.group(2)) ? "" : matcher.group(2));
+                s = matcher.group(2);
+                currentLine.add((null == s) ? "" : s);
             }
-            if (null != matcher.group(3)) {
+            s = matcher.group(3);
+            if (null != s) {
                 currentLine = new ArrayList<>();
                 result.add(currentLine);
             } else if (null == matcher.group(4)) {
@@ -98,8 +101,6 @@ public final class StringHelper {
     );
 
     private static final HashMap<Integer, Function<String, String>> NORMALIZER_MAP = new HashMap<>();
-
-    private static final HashMap<Integer, Function<String, String>> STRING_NORMALIZER_MAP = new HashMap<>();
 
     private StringHelper() {
     }
@@ -462,5 +463,24 @@ public final class StringHelper {
             } while (iterator.hasNext());
             return sb.toString();
         }, nullToEmpty);
+    }
+
+    public static TextWatcher textWatcherForTextChanged(final Consumer<String> onTextChanged) {
+        return new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                onTextChanged.accept(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+
+        };
     }
 }

@@ -1,31 +1,33 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.dummy.DummyContent.DummyItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<AssessmentEntity> items;
+    private final Context context;
 
-    public AssessmentListAdapter(List<DummyItem> items) {
-        mValues = items;
+    public AssessmentListAdapter(@NonNull Context context, @NonNull List<AssessmentEntity> items) {
+        this.context = context;
+        this.items = items;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_assessment_item, parent, false);
         return new ViewHolder(view);
@@ -33,32 +35,58 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.setItem(items.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return items.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        private final View view;
+        private final TextView codeTextView;
+        private final TextView statusTextView;
+        private final TextView adjTextView;
+        private final TextView dateTextView;
+        private AssessmentEntity item;
 
         public ViewHolder(View view) {
             super(view);
-            mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            this.view = view;
+            codeTextView = view.findViewById(R.id.codeTextView);
+            statusTextView = view.findViewById(R.id.statusTextView);
+            adjTextView = view.findViewById(R.id.adjTextView);
+            dateTextView = view.findViewById(R.id.dateTextView);
         }
 
+        @NonNull
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + statusTextView.getText() + "'";
+        }
+
+        public void setItem(AssessmentEntity item) {
+            this.item = item;
+            codeTextView.setText(item.getCode());
+            statusTextView.setText(context.getString(item.getStatus().displayResourceId()));
+            LocalDate date;
+            switch (item.getStatus()) {
+                case NOT_STARTED:
+                case IN_PROGRESS:
+                    adjTextView.setText(R.string.label_goal);
+                    date = item.getGoalDate();
+                    break;
+                default:
+                    adjTextView.setText(R.string.label_completed);
+                    date = item.getCompletionDate();
+                    break;
+            }
+            if (null == date) {
+                dateTextView.setText(R.string.label_none);
+            } else {
+                dateTextView.setText(AssessmentListViewModel.FORMATTER.format(item.getCompletionDate()));
+            }
         }
     }
 }

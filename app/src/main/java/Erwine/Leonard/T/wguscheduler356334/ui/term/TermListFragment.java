@@ -1,6 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,27 +14,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import Erwine.Leonard.T.wguscheduler356334.AddTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 
 public class TermListFragment extends Fragment {
 
-    private final List<TermEntity> mItems;
+    private final List<TermListItem> mItems;
     private TermListAdapter mAdapter;
+    private TermListViewModel viewModel;
 
     public TermListFragment() {
         mItems = new ArrayList<>();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_term_list, container, false);
-        RecyclerView mTermsRecyclerView = root.findViewById(R.id.termsRecyclerView);
+        return inflater.inflate(R.layout.fragment_term_list, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        RecyclerView mTermsRecyclerView = view.findViewById(R.id.termsRecyclerView);
         mAdapter = new TermListAdapter(mItems, getContext());
         mTermsRecyclerView.setAdapter(mAdapter);
 
@@ -44,19 +50,18 @@ public class TermListFragment extends Fragment {
         DividerItemDecoration decoration = new DividerItemDecoration(mTermsRecyclerView.getContext(), linearLayoutManager.getOrientation());
         mTermsRecyclerView.addItemDecoration(decoration);
 
-        FloatingActionButton fab = root.findViewById(R.id.addTermButton);
+        FloatingActionButton fab = view.findViewById(R.id.addTermButton);
         fab.setOnClickListener(this::onAddTermButtonClick);
-        return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        TermListViewModel mTermListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermListViewModel.class);
-        mTermListViewModel.getTerms().observe(getViewLifecycleOwner(), this::onTermListChanged);
+        viewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermListViewModel.class);
+        viewModel.getTerms().observe(getViewLifecycleOwner(), this::onTermListChanged);
     }
 
-    private void onTermListChanged(List<TermEntity> list) {
+    private void onTermListChanged(List<TermListItem> list) {
         mItems.clear();
         mItems.addAll(list);
         if (null != mAdapter) {
@@ -64,9 +69,12 @@ public class TermListFragment extends Fragment {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void onAddTermButtonClick(View view) {
-        Intent intent = new Intent(getContext(), AddTermActivity.class);
-        startActivity(intent);
+        EditTermViewModel.startAddTermActivity(
+                requireContext(),
+                mItems.stream().map(AbstractTermEntity::getEnd).filter(Objects::nonNull).max(LocalDate::compareTo).map(t -> t.plusDays(1L)).orElseGet(LocalDate::now)
+        );
     }
 
 }

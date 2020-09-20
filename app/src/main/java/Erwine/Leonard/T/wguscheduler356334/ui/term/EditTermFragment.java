@@ -1,6 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
-import android.app.AlertDialog;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.StateHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class EditTermFragment extends Fragment {
@@ -28,11 +27,6 @@ public class EditTermFragment extends Fragment {
 
     private final CompositeDisposable compositeDisposable;
     private EditTermViewModel viewModel;
-
-    public static EditTermFragment newInstance(long termId) {
-        Log.d(LOG_TAG, String.format("Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.newInstance(%d)", termId));
-        return StateHelper.setIdArgs(EditTermViewModel.ARGUMENT_KEY_TERM_ID, termId, new EditTermFragment(), new Bundle());
-    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -46,11 +40,15 @@ public class EditTermFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onCreateView");
-        View view = inflater.inflate(R.layout.fragment_edit_term, container, false);
+        return inflater.inflate(R.layout.fragment_edit_term, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         view.findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveTermImageButtonClick);
         view.findViewById(R.id.deleteImageButton).setOnClickListener(this::onDeleteImageButtonClick);
         view.findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
-        return view;
     }
 
     @Override
@@ -58,8 +56,7 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.restoreState(savedInstanceState, this::getArguments).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
+        viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onTermLoaded);
     }
 
     @Override
@@ -76,24 +73,15 @@ public class EditTermFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveInstanceState");
-        viewModel.saveState(outState);
+        viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState);
     }
 
-    private void onTermLoadSuccess(TermEntity termEntity) {
+    private void onTermLoaded(TermEntity termEntity) {
         if (null == termEntity) {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", termEntity));
-    }
-
-    private void onTermLoadFailed(Throwable throwable) {
-        AlertDialog dlg = new AlertDialog.Builder(getContext())
-                .setTitle(R.string.title_read_error)
-                .setMessage(getString(R.string.format_message_read_error, throwable.getMessage()))
-                .setOnCancelListener(dialog -> requireActivity().finish())
-                .setCancelable(true).create();
-        dlg.show();
     }
 
     private void onSaveTermImageButtonClick(View view) {
@@ -121,27 +109,21 @@ public class EditTermFragment extends Fragment {
 
     private void onSaveFailed(Throwable throwable) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveFailed");
-        AlertDialog dlg = new AlertDialog.Builder(getContext()).setTitle(R.string.title_save_error)
-                .setMessage(getString(R.string.format_message_save_error, throwable.getMessage())).setCancelable(true).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
+                .showDialog(() -> requireActivity().finish());
     }
 
     private void onDeleteImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteImageButtonClick");
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setTitle(R.string.title_delete_term)
-                .setMessage(R.string.message_delete_term_confirm).setPositiveButton(R.string.response_yes, (dialogInterface, i1) -> {
-                    compositeDisposable.clear();
-                    compositeDisposable.add(viewModel.delete().subscribe(this::onDbOperationSucceeded, this::onDeleteFailed));
-                }).setNegativeButton(R.string.response_no, null).create();
-        dialog.show();
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, requireContext()).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(viewModel.delete().subscribe(this::onDbOperationSucceeded, this::onDeleteFailed));
+        }, null);
     }
 
     private void onDeleteFailed(Throwable throwable) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteFailed");
-        AlertDialog dlg = new AlertDialog.Builder(requireContext()).setTitle(R.string.title_delete_error)
-                .setMessage(getString(R.string.format_message_delete_error, throwable.getMessage())).setCancelable(true).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), requireContext()).showDialog();
     }
 
     private void onCancelTermEditImageButtonClick(View view) {
@@ -151,16 +133,13 @@ public class EditTermFragment extends Fragment {
 
     private void verifySaveChanges() {
         if (viewModel.isChanged()) {
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.title_discard_changes)
-                    .setMessage(getString(R.string.message_discard_changes))
-                    .setPositiveButton(R.string.response_yes, (dialog, which) -> requireActivity().finish())
-                    .setNegativeButton(R.string.response_no, (dialog, which) -> {
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
+                    () -> requireActivity().finish(),
+                    () -> {
                         compositeDisposable.clear();
                         compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-                    })
-                    .setCancelable(true).create();
-            dlg.show();
+                        requireActivity().finish();
+                    }, null);
         } else {
             requireActivity().finish();
         }

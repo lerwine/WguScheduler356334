@@ -1,9 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,19 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
 
 /**
  * A fragment representing a list of Items.
  */
 public class MentorListFragment extends Fragment {
 
-    private final List<MentorEntity> mItems;
+    private final List<MentorListItem> mItems;
     private MentorListViewModel mentorListViewModel;
-    private RecyclerView mMentorListRecyclerView;
     private MentorListAdapter mAdapter;
 
     public MentorListFragment() {
@@ -44,14 +39,14 @@ public class MentorListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_mentor_list, container, false);
 
-        mMentorListRecyclerView = root.findViewById(R.id.mentorListRecyclerView);
+        RecyclerView recyclerView = root.findViewById(R.id.mentorListRecyclerView);
         mAdapter = new MentorListAdapter(mItems, getContext());
-        mMentorListRecyclerView.setAdapter(mAdapter);
+        recyclerView.setAdapter(mAdapter);
 
-        mMentorListRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) mMentorListRecyclerView.getLayoutManager());
-        DividerItemDecoration decoration = new DividerItemDecoration(mMentorListRecyclerView.getContext(), linearLayoutManager.getOrientation());
-        mMentorListRecyclerView.addItemDecoration(decoration);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) recyclerView.getLayoutManager());
+        DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(decoration);
 
         FloatingActionButton fab = root.findViewById(R.id.addMentorButton);
         fab.setOnClickListener(this::onAddMentorButtonClick);
@@ -65,7 +60,7 @@ public class MentorListFragment extends Fragment {
         mentorListViewModel.getMentors().observe(getViewLifecycleOwner(), this::onMentorListChanged);
     }
 
-    private void onMentorListChanged(List<MentorEntity> list) {
+    private void onMentorListChanged(List<MentorListItem> list) {
         mItems.clear();
         mItems.addAll(list);
         if (null != mAdapter) {
@@ -74,10 +69,7 @@ public class MentorListFragment extends Fragment {
     }
 
     private void onAddMentorButtonClick(View view) {
-        Context context = requireActivity();
-        Intent intent = new Intent(context, EditMentorActivity.class);
-        Log.i(getClass().getName(), "Starting EditMentorActivity with no mentorId");
-        context.startActivity(intent);
+        EditMentorViewModel.startEditMentorActivity(requireContext(), null);
     }
 
 

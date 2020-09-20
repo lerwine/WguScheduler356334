@@ -8,7 +8,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -18,18 +17,18 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.ViewTermPagerAdapter;
-import Erwine.Leonard.T.wguscheduler356334.util.StateHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class ViewTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
-    public static final String EXTRAS_KEY_TERM_ID = "termId";
 
     private final CompositeDisposable compositeDisposable;
-    private ViewTermPagerAdapter sectionsPagerAdapter;
+    private ViewTermPagerAdapter adapter;
     private ViewPager viewPager;
     private EditTermViewModel viewModel;
 
@@ -47,55 +46,41 @@ public class ViewTermActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-        StateHelper.restoreState(EXTRAS_KEY_TERM_ID, savedInstanceState, () -> getIntent().getExtras(), this::onInitializePager, ((aBoolean, bundle) -> {
-            AlertDialog dlg = new AlertDialog.Builder(this)
-                    .setTitle("Not Found")
-                    .setMessage("Term ID not specified")
-                    .setOnCancelListener(dialog -> finish())
-                    .setCancelable(true)
-                    .create();
-            dlg.show();
-        }));
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
-//        FloatingActionButton fab = findViewById(R.id.saveFloatingActionButton);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        compositeDisposable.clear();
+        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoaded, this::onEntityLoadFailed));
     }
 
-    private void onInitializePager(Bundle bundle, long termId) {
-        sectionsPagerAdapter = new ViewTermPagerAdapter(termId, this, getSupportFragmentManager());
-        viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.viewTermTabLayout);
-        tabs.setupWithViewPager(viewPager);
+    private void onEntityLoaded(TermEntity termEntity) {
+        Long termId = termEntity.getId();
+        if (null == termId) {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_id_not_specified, this).showDialog(this::finish);
+        } else {
+            adapter = new ViewTermPagerAdapter(termId, this, getSupportFragmentManager());
+            viewPager = findViewById(R.id.view_pager);
+            viewPager.setAdapter(adapter);
+            TabLayout tabs = findViewById(R.id.viewTermTabLayout);
+            tabs.setupWithViewPager(viewPager);
+        }
+    }
+
+    private void onEntityLoadFailed(Throwable throwable) {
+        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        if (null != sectionsPagerAdapter) {
-            StateHelper.saveState(EXTRAS_KEY_TERM_ID, sectionsPagerAdapter.getTermId(), outState);
-        }
+        viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
     public void onBackPressed() {
         if (viewModel.isChanged()) {
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this)
-                    .setTitle(R.string.title_discard_changes)
-                    .setMessage(getString(R.string.message_discard_changes))
-                    .setPositiveButton(R.string.response_yes, (dialog, which) -> finish())
-                    .setNegativeButton(R.string.response_no, (dialog, which) -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
-                    })
-                    .setCancelable(true).create();
-            dlg.show();
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
+                compositeDisposable.clear();
+                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+            }, null);
         } else {
             finish();
         }
@@ -117,17 +102,15 @@ public class ViewTermActivity extends AppCompatActivity {
             finish();
         } else {
             Resources resources = getResources();
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this).setTitle(R.string.title_save_error)
-                    .setMessage(messageIds.stream().map(resources::getString).collect(Collectors.joining("; "))).setCancelable(true).create();
-            dlg.show();
+            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, messageIds.stream().map(resources::getString).collect(Collectors.joining("; ")), this)
+                    .showDialog();
         }
     }
 
     private void onSaveFailed(Throwable throwable) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveFailed");
-        android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this).setTitle(R.string.title_save_error)
-                .setMessage(getString(R.string.format_message_save_error, throwable.getMessage())).setCancelable(true).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
+                .showDialog();
     }
 
 }

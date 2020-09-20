@@ -1,12 +1,10 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
-import android.app.AlertDialog;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +15,7 @@ import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class AddTermActivity extends AppCompatActivity {
@@ -24,8 +23,7 @@ public class AddTermActivity extends AppCompatActivity {
     private static final String LOG_TAG = AddTermActivity.class.getName();
 
     private final CompositeDisposable compositeDisposable;
-    private EditTermViewModel mViewModel;
-    private ImageButton saveImageButton;
+    private EditTermViewModel viewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -41,12 +39,11 @@ public class AddTermActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_term);
-        saveImageButton = findViewById(R.id.saveImageButton);
-        saveImageButton.setOnClickListener(this::onSaveTermImageButtonClick);
+        findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveTermImageButtonClick);
         findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
-        mViewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
+        viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
         compositeDisposable.clear();
-        compositeDisposable.add(mViewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
+        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
     }
 
     private void onTermLoadSuccess(TermEntity termEntity) {
@@ -57,17 +54,7 @@ public class AddTermActivity extends AppCompatActivity {
     }
 
     private void onTermLoadFailed(Throwable throwable) {
-        AlertDialog dlg = new AlertDialog.Builder(this)
-                .setTitle(R.string.title_read_error)
-                .setMessage(getString(R.string.format_message_read_error, throwable.getMessage()))
-                .setOnCancelListener(dialog -> finish())
-                .setCancelable(true).create();
-        dlg.show();
-    }
-
-    private void onCanSaveLiveDataChanged(Boolean canSave) {
-        Log.d(LOG_TAG, String.format("Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onCanSaveLiveDataChanged(canSave: %s)", canSave));
-        saveImageButton.setEnabled(canSave);
+        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 
     @Override
@@ -84,14 +71,14 @@ public class AddTermActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveInstanceState");
-        mViewModel.saveState(outState);
+        viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState);
     }
 
     private void onSaveTermImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveTermImageButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(mViewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
@@ -100,17 +87,14 @@ public class AddTermActivity extends AppCompatActivity {
             finish();
         } else {
             Resources resources = getResources();
-            AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.title_save_error)
-                    .setMessage(messageIds.stream().map(resources::getString).collect(Collectors.joining("; "))).setCancelable(true).create();
-            dlg.show();
+            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, messageIds.stream().map(resources::getString).collect(Collectors.joining("; ")), this)
+                    .showDialog();
         }
     }
 
     private void onSaveFailed(Throwable throwable) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveFailed");
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.title_save_error)
-                .setMessage(getString(R.string.format_message_save_error, throwable.getMessage())).setCancelable(true).create();
-        dlg.show();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 
     private void onCancelTermEditImageButtonClick(View view) {

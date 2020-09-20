@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/courseNumberTextView"
+        android:id="@+id/codeTextView"
         style="@style/list_item_text_primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,23 +14,33 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/courseNameTextView"
+        android:id="@+id/statusTextView"
+        style="@style/list_item_text_primary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/control_margin"
+        android:layout_marginEnd="@dimen/control_margin"
+        app:layout_constraintStart_toEndOf="@+id/codeTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/mentorTextView"
         style="@style/list_item_text_primary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/control_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/courseNumberTextView"
+        app:layout_constraintStart_toEndOf="@+id/statusTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/dateRangeTextView"
+        android:id="@+id/rangeStartTextView"
         style="@style/list_item_secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/courseNameTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/statusTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,11 @@ import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreference;
+
+import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -38,10 +42,32 @@ public class SettingsActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void finish() {
+
+        super.finish();
+    }
+
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
+
+        public SettingsFragment() {
+            onPreferEmailChangeListener = this::onPreferenceChange;
+        }
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+            final SwitchPreference preference = findPreference(getResources().getString(R.string.preference_prefer_email));
+            if (null != preference) {
+                preference.setOnPreferenceChangeListener(onPreferEmailChangeListener);
+            }
         }
+
+        private boolean onPreferenceChange(Preference preference, Object newValue) {
+            DbLoader.getPreferEmailLiveData().postValue(null != newValue && (Boolean) newValue);
+            return true;
+        }
+
     }
 }

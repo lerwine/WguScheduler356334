@@ -1,6 +1,8 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,7 +22,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import Erwine.Leonard.T.wguscheduler356334.AddTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
@@ -34,21 +38,33 @@ public class EditTermViewModel extends AndroidViewModel {
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     static final String ARGUMENT_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String ARGUMENT_KEY_TERM_ID = "term_id";
-    public static final String ARGUMENT_KEY_NAME = "name";
-    public static final String ARGUMENT_KEY_START_DATE = "start_date";
-    public static final String ARGUMENT_KEY_END_DATE = "end_date";
-    public static final String ARGUMENT_KEY_NOTES = "notes";
-    public static final String ARGUMENT_KEY_ORIGINAL_NAME = "original_name";
-    public static final String ARGUMENT_KEY_ORIGINAL_START_DATE = "original_start_date";
-    public static final String ARGUMENT_KEY_ORIGINAL_END_DATE = "original_end_date";
-    public static final String ARGUMENT_KEY_ORIGINAL_NOTES = "original_notes";
+    static final String ARGUMENT_KEY_NAME = "name";
+    static final String ARGUMENT_KEY_START_DATE = "start_date";
+    static final String ARGUMENT_KEY_END_DATE = "end_date";
+    static final String ARGUMENT_KEY_NOTES = "notes";
+    static final String ARGUMENT_KEY_ORIGINAL_NAME = "o:" + ARGUMENT_KEY_NAME;
+    static final String ARGUMENT_KEY_ORIGINAL_START_DATE = "o:" + ARGUMENT_KEY_START_DATE;
+    static final String ARGUMENT_KEY_ORIGINAL_END_DATE = "o:" + ARGUMENT_KEY_END_DATE;
+    static final String ARGUMENT_KEY_ORIGINAL_NOTES = "o:" + ARGUMENT_KEY_NOTES;
+
+    public static void startAddTermActivity(Context context, @NonNull LocalDate termStart) {
+        Intent intent = new Intent(context, AddTermActivity.class);
+        intent.putExtra(ARGUMENT_KEY_START_DATE, termStart.toEpochDay());
+        context.startActivity(intent);
+    }
+
+    public static void startViewTermActivity(Context context, long termId) {
+        Intent intent = new Intent(context, ViewTermActivity.class);
+        intent.putExtra(ARGUMENT_KEY_TERM_ID, termId);
+        context.startActivity(intent);
+    }
 
     private TermEntity termEntity;
     private final MutableLiveData<TermEntity> entityLiveData;
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
-    private boolean fromInitializedState;
+    private boolean fromSavedState;
     private String name;
     private String normalizedName;
     private LocalDate start;
@@ -134,18 +150,18 @@ public class EditTermViewModel extends AndroidViewModel {
         return entityLiveData;
     }
 
-    public boolean isFromInitializedState() {
-        return fromInitializedState;
+    public boolean isFromSavedState() {
+        return fromSavedState;
     }
 
-    public synchronized Single<TermEntity> restoreState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
+    public synchronized Single<TermEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
-        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(ARGUMENT_KEY_STATE_INITIALIZED, false);
-        Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
+        fromSavedState = null != savedInstanceState && savedInstanceState.getBoolean(ARGUMENT_KEY_STATE_INITIALIZED, false);
+        Bundle state = (fromSavedState) ? savedInstanceState : getArguments.get();
         if (null == state) {
             termEntity = new TermEntity();
         } else if (state.containsKey(ARGUMENT_KEY_TERM_ID)) {
-            if (fromInitializedState) {
+            if (fromSavedState) {
                 termEntity = new TermEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NAME, ""),
                         (state.containsKey(ARGUMENT_KEY_ORIGINAL_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_START_DATE)) : null,
                         (state.containsKey(ARGUMENT_KEY_ORIGINAL_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_END_DATE)) : null,
@@ -157,7 +173,7 @@ public class EditTermViewModel extends AndroidViewModel {
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
-        } else if (fromInitializedState) {
+        } else if (fromSavedState) {
             termEntity = new TermEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NAME, ""),
                     (state.containsKey(ARGUMENT_KEY_ORIGINAL_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_START_DATE)) : null,
                     (state.containsKey(ARGUMENT_KEY_ORIGINAL_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_END_DATE)) : null,
@@ -167,18 +183,51 @@ public class EditTermViewModel extends AndroidViewModel {
             termEntity = new TermEntity();
         }
         entityLiveData.postValue(termEntity);
-        if (fromInitializedState && null != state) {
+        if (null == state) {
+            setName(termEntity.getName());
+            setStart(termEntity.getStart());
+            setEnd(termEntity.getEnd());
+            setNotes(termEntity.getNotes());
+        } else if (fromSavedState) {
             setName(state.getString(ARGUMENT_KEY_NAME, ""));
             setStart((state.containsKey(ARGUMENT_KEY_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_START_DATE)) : null);
             setEnd((state.containsKey(ARGUMENT_KEY_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_END_DATE)) : null);
             setNotes(state.getString(ARGUMENT_KEY_NOTES, ""));
         } else {
-            setName(termEntity.getName());
-            setStart(termEntity.getStart());
-            setEnd(termEntity.getEnd());
-            setNotes(termEntity.getNotes());
+            setName((state.containsKey(ARGUMENT_KEY_NAME)) ? state.getString(ARGUMENT_KEY_NAME) : termEntity.getName());
+            setStart((state.containsKey(ARGUMENT_KEY_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_START_DATE)) : termEntity.getStart());
+            setEnd((state.containsKey(ARGUMENT_KEY_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_END_DATE)) : termEntity.getEnd());
+            setNotes((state.containsKey(ARGUMENT_KEY_NOTES)) ? state.getString(ARGUMENT_KEY_NOTES) : termEntity.getNotes());
         }
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public void saveViewModelState(Bundle outState) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
+        outState.putBoolean(ARGUMENT_KEY_STATE_INITIALIZED, true);
+        if (null != termEntity.getId()) {
+            outState.putLong(ARGUMENT_KEY_TERM_ID, termEntity.getId());
+        }
+        outState.putString(ARGUMENT_KEY_NAME, name);
+        outState.putString(ARGUMENT_KEY_ORIGINAL_NAME, termEntity.getName());
+        LocalDate date = start;
+        if (null != date) {
+            outState.putLong(ARGUMENT_KEY_START_DATE, date.toEpochDay());
+        }
+        date = termEntity.getStart();
+        if (null != date) {
+            outState.putLong(ARGUMENT_KEY_ORIGINAL_START_DATE, date.toEpochDay());
+        }
+        date = end;
+        if (null != date) {
+            outState.putLong(ARGUMENT_KEY_END_DATE, date.toEpochDay());
+        }
+        date = termEntity.getEnd();
+        if (null != date) {
+            outState.putLong(ARGUMENT_KEY_ORIGINAL_END_DATE, date.toEpochDay());
+        }
+        outState.putString(ARGUMENT_KEY_ORIGINAL_NOTES, termEntity.getNotes());
+        outState.putString(ARGUMENT_KEY_NOTES, notes);
     }
 
     public synchronized Single<List<Integer>> save() {
@@ -222,34 +271,6 @@ public class EditTermViewModel extends AndroidViewModel {
         setEnd(entity.getEnd());
         setNotes(entity.getNotes());
         entityLiveData.postValue(entity);
-    }
-
-    public void saveState(Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
-        outState.putBoolean(ARGUMENT_KEY_STATE_INITIALIZED, true);
-        if (null != termEntity.getId()) {
-            outState.putLong(ARGUMENT_KEY_TERM_ID, termEntity.getId());
-        }
-        outState.putString(ARGUMENT_KEY_NAME, name);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NAME, termEntity.getName());
-        LocalDate date = start;
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_START_DATE, date.toEpochDay());
-        }
-        date = termEntity.getStart();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_START_DATE, date.toEpochDay());
-        }
-        date = end;
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_END_DATE, date.toEpochDay());
-        }
-        date = termEntity.getEnd();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_END_DATE, date.toEpochDay());
-        }
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NOTES, termEntity.getNotes());
-        outState.putString(ARGUMENT_KEY_NOTES, notes);
     }
 
     private synchronized Optional<Integer> validateDateRange(boolean saveMode) {

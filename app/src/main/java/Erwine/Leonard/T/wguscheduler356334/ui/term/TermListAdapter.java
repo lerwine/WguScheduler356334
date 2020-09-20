@@ -2,7 +2,6 @@ package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +16,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 
 public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHolder> {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
-    private final List<TermEntity> entityList;
+    private final List<TermListItem> entityList;
     private final Context context;
 
-    public TermListAdapter(List<TermEntity> items, Context context) {
+    public TermListAdapter(List<TermListItem> items, Context context) {
         this.entityList = items;
         this.context = context;
     }
@@ -54,7 +52,7 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
         private final View mView;
         private final TextView mTermNameTextView;
         private final TextView mTermRangeTextView;
-        private TermEntity mItem;
+        private TermListItem mItem;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,7 +62,7 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
             mView.setOnClickListener(this::onViewClick);
         }
 
-        public void setItem(TermEntity item) {
+        public void setItem(TermListItem item) {
             mItem = item;
             mTermNameTextView.setText(item.getName());
             LocalDate start = item.getStart();
@@ -82,10 +80,9 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
             }
         }
 
+        @SuppressWarnings("ConstantConditions")
         private void onViewClick(View v) {
-            Intent intent = new Intent(context, ViewTermActivity.class);
-            intent.putExtra(ViewTermActivity.EXTRAS_KEY_TERM_ID, mItem.getId());
-            context.startActivity(intent);
+            EditTermViewModel.startViewTermActivity(v.getContext(), mItem.getId());
         }
 
     }

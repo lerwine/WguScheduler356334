@@ -10,6 +10,7 @@ import androidx.room.Query;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -52,11 +53,11 @@ public interface MentorDAO {
     @Query("SELECT * FROM mentors WHERE id = :id")
     MentorEntity getByIdSynchronous(long id);
 
-    @Query("SELECT * FROM mentors ORDER BY [name]")
-    LiveData<List<MentorEntity>> getAll();
+    @Query("SELECT * FROM mentorListView")
+    LiveData<List<MentorListItem>> getAll();
 
-    @Query("SELECT * FROM mentors")
-    List<MentorEntity> getAllSynchronous();
+    @Query("SELECT * FROM mentorListView")
+    List<MentorListItem> getAllSynchronous();
 
     @Query("SELECT COUNT(*) FROM mentors")
     Single<Integer> getCount();

@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 
 public class CourseNotesFragment extends Fragment {
 
@@ -40,15 +41,21 @@ public class CourseNotesFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
     }
 
     private void onEntityLoaded(CourseEntity entity) {
-
+        if (null != entity) {
+            notesTextView.setText(viewModel.getNotes());
+        }
     }
 
     private void onEditNotesFloatingActionButtonClick(View view) {
-
+        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), requireContext(), s -> {
+            notesTextView.setText(s);
+            viewModel.setNotes(s);
+        });
     }
 }
