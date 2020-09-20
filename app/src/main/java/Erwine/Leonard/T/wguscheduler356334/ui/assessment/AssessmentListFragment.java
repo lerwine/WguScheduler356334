@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,7 +73,7 @@ public class AssessmentListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Get shared view model, which is initialized by ViewCourseActivity
-        editCourseViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(EditCourseViewModel.class);
+        editCourseViewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
         editCourseViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
     }
 
