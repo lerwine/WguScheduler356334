@@ -15,6 +15,8 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class ManageDataActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = ManageDataActivity.class.getName();
+
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final DbLoader dbLoader;
 
@@ -51,6 +53,7 @@ public class ManageDataActivity extends AppCompatActivity {
                 new AlertHelper(R.drawable.dialog_error, R.string.title_database_integrity_check, s, this).showDialog();
             }
         }, throwable -> {
+            Log.e(LOG_TAG, "Error saving course", throwable);
             dialog.dismiss();
             String s = throwable.getMessage();
             new AlertHelper(R.drawable.dialog_error, R.string.title_database_integrity_check, (null == s || s.trim().isEmpty()) ? throwable.getClass().getName() : s, this).showDialog();
@@ -61,9 +64,9 @@ public class ManageDataActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_warning, R.string.command_reset_database, R.string.message_reset_db_confirm, this).showYesNoDialog(() -> {
             compositeDisposable.clear();
             compositeDisposable.add(dbLoader.resetDatabase().subscribe(this::finish, (throwable) -> {
-                        Log.e(getClass().getName(), "Error on dbLoader.resetDatabase()", throwable);
-                        new AlertHelper(R.drawable.dialog_error, R.string.title_reset_db_error, getString(R.string.format_message_reset_db_error, throwable.getMessage()), this)
-                                .showDialog();
+                Log.e(LOG_TAG, "Error on dbLoader.resetDatabase()", throwable);
+                new AlertHelper(R.drawable.dialog_error, R.string.title_reset_db_error, getString(R.string.format_message_reset_db_error, throwable.getMessage()), this)
+                        .showDialog();
                     }
             ));
         }, null);
@@ -73,9 +76,9 @@ public class ManageDataActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_warning, R.string.command_reset_with_sample_data, R.string.message_add_sample_data_confirm, this).showYesNoDialog(() -> {
             compositeDisposable.clear();
             compositeDisposable.add(dbLoader.populateSampleData(getResources()).subscribe(this::finish, (throwable) -> {
-                        Log.e(getClass().getName(), "Error on dbLoader.populateSampleData()", throwable);
-                        new AlertHelper(R.drawable.dialog_error, R.string.title_add_sample_data_error, getString(R.string.format_message_add_sample_data_error, throwable.getMessage()), this)
-                                .showDialog();
+                Log.e(LOG_TAG, "Error on dbLoader.populateSampleData()", throwable);
+                new AlertHelper(R.drawable.dialog_error, R.string.title_add_sample_data_error, getString(R.string.format_message_add_sample_data_error, throwable.getMessage()), this)
+                        .showDialog();
                     }
             ));
         }, null);

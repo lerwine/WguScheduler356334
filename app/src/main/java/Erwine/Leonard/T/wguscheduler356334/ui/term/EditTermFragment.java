@@ -108,7 +108,7 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onSaveFailed(Throwable throwable) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveFailed");
+        Log.e(LOG_TAG, "Error saving term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
                 .showDialog(() -> requireActivity().finish());
     }
@@ -122,7 +122,7 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onDeleteFailed(Throwable throwable) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteFailed");
+        Log.e(LOG_TAG, "Error deleting term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), requireContext()).showDialog();
     }
 

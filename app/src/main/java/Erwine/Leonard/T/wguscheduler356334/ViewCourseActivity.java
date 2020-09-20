@@ -1,13 +1,19 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
@@ -17,7 +23,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class ViewCourseActivity extends AppCompatActivity {
 
-    public static final String ARGUMENT_KEY_COURSE_ID = "course_id";
+    private static final String LOG_TAG = ViewCourseActivity.class.getName();
 
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
@@ -41,6 +47,18 @@ public class ViewCourseActivity extends AppCompatActivity {
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoadSucceeded, this::onEntityLoadfailed));
     }
 
+    @Override
+    public void onBackPressed() {
+        if (viewModel.isChanged()) {
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
+                compositeDisposable.clear();
+                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+            }, null);
+        } else {
+            finish();
+        }
+    }
+
     private void onEntityLoadSucceeded(CourseEntity entity) {
         Long courseId = entity.getId();
         if (null == courseId) {
@@ -55,6 +73,25 @@ public class ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadfailed(Throwable throwable) {
-        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
+        Log.e(LOG_TAG, "Error loading course", throwable);
+        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage())
+                .showDialog(this::finish);
     }
+
+    private void onSaveOperationSucceeded(@NonNull List<Integer> messageIds) {
+        if (messageIds.isEmpty()) {
+            finish();
+        } else {
+            Resources resources = getResources();
+            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, messageIds.stream().map(resources::getString).collect(Collectors.joining("; ")), this)
+                    .showDialog();
+        }
+    }
+
+    private void onSaveFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error saving course", throwable);
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
+                .showDialog();
+    }
+
 }

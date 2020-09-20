@@ -65,7 +65,7 @@
     <string name="tab_title_phone">Phone</string>
     <string name="tab_title_email">Email</string>
     <string name="message_discard_changes">There are changes which have not been saved.\n\nDiscard unsaved changes?</string>
-    <string name="title_activity_view_course">ViewCourseActivity</string>
+    <string name="title_activity_view_course">View Course</string>
     <!-- TODO: Remove these -->
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>

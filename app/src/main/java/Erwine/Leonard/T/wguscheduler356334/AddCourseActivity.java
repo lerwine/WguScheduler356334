@@ -64,6 +64,7 @@ public class AddCourseActivity extends AppCompatActivity {
     }
 
     private void onCourseLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading course", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 

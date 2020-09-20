@@ -125,6 +125,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading mentor", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
 
@@ -166,6 +167,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onSaveFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error saving mentor", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 
@@ -177,6 +179,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onDeleteFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error deleting mentor", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
     }
 

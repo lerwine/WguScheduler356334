@@ -54,6 +54,7 @@ public class AddTermActivity extends AppCompatActivity {
     }
 
     private void onTermLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 
@@ -93,7 +94,7 @@ public class AddTermActivity extends AppCompatActivity {
     }
 
     private void onSaveFailed(Throwable throwable) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveFailed");
+        Log.e(LOG_TAG, "Error saving term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 

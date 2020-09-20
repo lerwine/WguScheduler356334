@@ -65,6 +65,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
 
@@ -108,7 +109,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onSaveFailed(Throwable throwable) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveFailed");
+        Log.e(LOG_TAG, "Error saving term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
                 .showDialog();
     }
