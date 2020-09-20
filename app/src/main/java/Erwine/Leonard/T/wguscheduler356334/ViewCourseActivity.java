@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -49,6 +50,20 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        confirmSave();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            confirmSave();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
                 compositeDisposable.clear();
@@ -67,7 +82,7 @@ public class ViewCourseActivity extends AppCompatActivity {
             adapter = new ViewCoursePagerAdapter(this, getSupportFragmentManager());
             ViewPager viewPager = findViewById(R.id.view_pager);
             viewPager.setAdapter(adapter);
-            TabLayout tabs = findViewById(R.id.editCourseTabLayout);
+            TabLayout tabs = findViewById(R.id.viewCourseTabLayout);
             tabs.setupWithViewPager(viewPager);
         }
     }

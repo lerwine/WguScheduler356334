@@ -29,7 +29,6 @@ public class ViewTermActivity extends AppCompatActivity {
 
     private final CompositeDisposable compositeDisposable;
     private ViewTermPagerAdapter adapter;
-    private ViewPager viewPager;
     private EditTermViewModel viewModel;
 
     public ViewTermActivity() {
@@ -57,7 +56,7 @@ public class ViewTermActivity extends AppCompatActivity {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_id_not_specified, this).showDialog(this::finish);
         } else {
             adapter = new ViewTermPagerAdapter(termId, this, getSupportFragmentManager());
-            viewPager = findViewById(R.id.view_pager);
+            ViewPager viewPager = findViewById(R.id.view_pager);
             viewPager.setAdapter(adapter);
             TabLayout tabs = findViewById(R.id.viewTermTabLayout);
             tabs.setupWithViewPager(viewPager);
@@ -77,6 +76,20 @@ public class ViewTermActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        confirmSave();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            confirmSave();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
                 compositeDisposable.clear();
@@ -85,16 +98,6 @@ public class ViewTermActivity extends AppCompatActivity {
         } else {
             finish();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void onSaveOperationSucceeded(@NonNull List<Integer> messageIds) {

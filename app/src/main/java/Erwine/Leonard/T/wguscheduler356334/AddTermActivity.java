@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -39,6 +40,11 @@ public class AddTermActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_term);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
         findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveTermImageButtonClick);
         findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
@@ -63,10 +69,15 @@ public class AddTermActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
-            finish();
+            confirmSave();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        confirmSave();
     }
 
     @Override
@@ -101,6 +112,17 @@ public class AddTermActivity extends AppCompatActivity {
     private void onCancelTermEditImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onCancelTermEditImageButtonClick");
         finish();
+    }
+
+    private void confirmSave() {
+        if (viewModel.isChanged()) {
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
+                compositeDisposable.clear();
+                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+            }, null);
+        } else {
+            finish();
+        }
     }
 
 }

@@ -36,9 +36,9 @@ public class EditCoursePagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return context.getResources().getString(R.string.title_assessments);
+                return context.getResources().getString(R.string.title_dates);
             case 1:
-                return context.getResources().getString(R.string.title_activity_edit);
+                return context.getResources().getString(R.string.label_notes);
             default:
                 throw new IllegalStateException(String.format("Unexpected title position %d", position));
         }
