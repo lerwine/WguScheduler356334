@@ -25,8 +25,11 @@ import java.util.function.Supplier;
 import Erwine.Leonard.T.wguscheduler356334.AddTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -40,13 +43,13 @@ public class EditTermViewModel extends AndroidViewModel {
 
     public static void startAddTermActivity(Context context, @NonNull LocalDate termStart) {
         Intent intent = new Intent(context, AddTermActivity.class);
-        intent.putExtra(TermEntity.STATE_KEY_START, termStart.toEpochDay());
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_START, false), termStart.toEpochDay());
         context.startActivity(intent);
     }
 
     public static void startViewTermActivity(Context context, long termId) {
         Intent intent = new Intent(context, ViewTermActivity.class);
-        intent.putExtra(TermEntity.STATE_KEY_ID, termId);
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_ID, false), termId);
         context.startActivity(intent);
     }
 
@@ -55,22 +58,20 @@ public class EditTermViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
+    private final CurrentValues currentValues;
     private boolean fromSavedState;
-    private String name;
     private String normalizedName;
-    private LocalDate start;
-    private LocalDate end;
-    private String notes;
     private String normalizedNotes;
 
     public EditTermViewModel(@NonNull Application application) {
         super(application);
         Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        normalizedName = name = notes = normalizedNotes = "";
+        normalizedName = normalizedNotes = "";
         entityLiveData = new MutableLiveData<>();
         startMessageLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
+        currentValues = new CurrentValues();
     }
 
     public Long getId() {
@@ -78,55 +79,45 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public String getName() {
-        return name;
+        return currentValues.getName();
     }
 
     public synchronized void setName(String value) {
-        name = (null == value) ? "" : value;
-        String oldValue = normalizedName;
-        normalizedName = TermEntity.SINGLE_LINE_NORMALIZER.apply(value);
-        if (normalizedName.isEmpty()) {
-            if (!oldValue.isEmpty()) {
-                nameValidLiveData.postValue(false);
-            }
-        } else if (oldValue.isEmpty()) {
-            nameValidLiveData.postValue(true);
-        }
+        currentValues.setName(value);
     }
 
     public LocalDate getStart() {
-        return start;
+        return currentValues.getStart();
     }
 
     public synchronized void setStart(LocalDate value) {
-        if (!Objects.equals(value, start)) {
-            start = value;
-            startMessageLiveData.postValue(validateDateRange(false).orElse(null));
-        }
+        currentValues.setStart(value);
     }
 
     public LocalDate getEnd() {
-        return end;
+        return currentValues.getEnd();
     }
 
     public synchronized void setEnd(LocalDate value) {
-        if (!Objects.equals(value, end)) {
-            end = value;
-            startMessageLiveData.postValue(validateDateRange(false).orElse(null));
-        }
+        currentValues.setEnd(value);
     }
 
     public String getNotes() {
-        return notes;
+        return currentValues.getNotes();
     }
 
     public synchronized void setNotes(String value) {
-        if (null == value || value.isEmpty()) {
-            normalizedNotes = notes = "";
-        } else if (!value.equals(notes)) {
-            notes = value;
-            normalizedNotes = null;
+        currentValues.setNotes(value);
+    }
+
+    public String getNormalizedNotes() {
+        if (null == normalizedNotes) {
+            normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
+            if (normalizedNotes.equals(currentValues.notes)) {
+                currentValues.notes = null;
+            }
         }
+        return normalizedNotes;
     }
 
     LiveData<Boolean> getNameValidLiveData() {
@@ -149,58 +140,32 @@ public class EditTermViewModel extends AndroidViewModel {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
         fromSavedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromSavedState) ? savedInstanceState : getArguments.get();
-        if (null == state) {
-            termEntity = new TermEntity();
-        } else if (state.containsKey(TermEntity.STATE_KEY_ID)) {
-            if (fromSavedState) {
-                termEntity = new TermEntity(state, true);
+        termEntity = new TermEntity();
+        if (null != state) {
+            currentValues.restoreState(state, false);
+            Long id = currentValues.getId();
+            if (null == id || fromSavedState) {
+                termEntity.restoreState(state, fromSavedState);
             } else {
-                return dbLoader.getTermById(state.getLong(TermEntity.STATE_KEY_ID))
+                return dbLoader.getTermById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
-        } else {
-            termEntity = new TermEntity(state, fromSavedState);
         }
         entityLiveData.postValue(termEntity);
-        if (null == state) {
-            setName(termEntity.getName());
-            setStart(termEntity.getStart());
-            setEnd(termEntity.getEnd());
-            setNotes(termEntity.getNotes());
-        } else if (fromSavedState) {
-            setName(state.getString(TermEntity.STATE_KEY_NAME, ""));
-            setStart((state.containsKey(TermEntity.STATE_KEY_START)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_START)) : null);
-            setEnd((state.containsKey(TermEntity.STATE_KEY_END)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_END)) : null);
-            setNotes(state.getString(TermEntity.STATE_KEY_NOTES, ""));
-        } else {
-            setName((state.containsKey(TermEntity.STATE_KEY_NAME)) ? state.getString(TermEntity.STATE_KEY_NAME) : termEntity.getName());
-            setStart((state.containsKey(TermEntity.STATE_KEY_START)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_START)) : termEntity.getStart());
-            setEnd((state.containsKey(TermEntity.STATE_KEY_END)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_END)) : termEntity.getEnd());
-            setNotes((state.containsKey(TermEntity.STATE_KEY_NOTES)) ? state.getString(TermEntity.STATE_KEY_NOTES) : termEntity.getNotes());
-        }
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void saveViewModelState(Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        currentValues.saveState(outState, false);
         termEntity.saveState(outState, true);
-        outState.putString(TermEntity.STATE_KEY_NAME, name);
-        LocalDate date = start;
-        if (null != date) {
-            outState.putLong(TermEntity.STATE_KEY_START, date.toEpochDay());
-        }
-        date = end;
-        if (null != date) {
-            outState.putLong(TermEntity.STATE_KEY_END, date.toEpochDay());
-        }
-        outState.putString(TermEntity.STATE_KEY_NOTES, notes);
     }
 
     public synchronized Single<List<Integer>> save() {
-        LocalDate newStart = start;
-        LocalDate newEnd = end;
+        LocalDate newStart = currentValues.start;
+        LocalDate newEnd = currentValues.end;
         ArrayList<Integer> messages = new ArrayList<>();
         if (normalizedName.isEmpty()) {
             messages.add(R.string.message_name_required);
@@ -216,7 +181,7 @@ public class EditTermViewModel extends AndroidViewModel {
         termEntity.setName(normalizedName);
         termEntity.setStart(newStart);
         termEntity.setEnd(newEnd);
-        termEntity.setNotes(notes);
+        termEntity.setNotes(currentValues.notes);
         return dbLoader.saveTerm(termEntity).doOnError(throwable -> {
             termEntity.setName(originalName);
             termEntity.setStart(originalStart);
@@ -238,15 +203,15 @@ public class EditTermViewModel extends AndroidViewModel {
         setStart(entity.getStart());
         setEnd(entity.getEnd());
         setNotes(entity.getNotes());
-        entityLiveData.postValue(entity);
+        entityLiveData.postValue(termEntity);
     }
 
     private synchronized Optional<Integer> validateDateRange(boolean saveMode) {
-        if (null != end) {
-            if (null == start) {
+        if (null != currentValues.end) {
+            if (null == currentValues.start) {
                 return Optional.of((saveMode) ? R.string.message_start_required_with_end : R.string.message_required);
             }
-            if (start.compareTo(end) > 0) {
+            if (currentValues.start.compareTo(currentValues.end) > 0) {
                 return Optional.of(R.string.message_start_after_end);
             }
         }
@@ -254,13 +219,97 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public boolean isChanged() {
-        if (null != termEntity.getId() && normalizedName.equals(termEntity.getName()) && Objects.equals(start, termEntity.getStart()) && Objects.equals(end, termEntity.getEnd())) {
-            if (null == normalizedNotes) {
-                normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(notes);
-            }
-            return !normalizedNotes.equals(termEntity.getNotes());
+        if (null != termEntity.getId() && normalizedName.equals(termEntity.getName()) && Objects.equals(currentValues.start, termEntity.getStart()) && Objects.equals(currentValues.end, termEntity.getEnd())) {
+            return !getNormalizedNotes().equals(termEntity.getNotes());
         }
         return true;
     }
 
+    private class CurrentValues implements Term {
+
+        private Long id;
+        private String name = "";
+        private LocalDate start;
+        private LocalDate end;
+        private String notes = "";
+
+        @Nullable
+        @Override
+        public Long getId() {
+            return (null == termEntity) ? id : termEntity.getId();
+        }
+
+        @Override
+        public void setId(Long id) {
+            if (null != termEntity) {
+                termEntity.setId(id);
+            }
+            this.id = id;
+        }
+
+        @NonNull
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public void setName(String name) {
+            this.name = (null == name) ? "" : name;
+            String oldValue = normalizedName;
+            normalizedName = TermEntity.SINGLE_LINE_NORMALIZER.apply(name);
+            if (normalizedName.isEmpty()) {
+                if (!oldValue.isEmpty()) {
+                    nameValidLiveData.postValue(false);
+                }
+            } else if (oldValue.isEmpty()) {
+                nameValidLiveData.postValue(true);
+            }
+        }
+
+        @Nullable
+        @Override
+        public LocalDate getStart() {
+            return start;
+        }
+
+        @Override
+        public void setStart(LocalDate start) {
+            if (!Objects.equals(this.start, start)) {
+                this.start = start;
+                startMessageLiveData.postValue(validateDateRange(false).orElse(null));
+            }
+        }
+
+        @Nullable
+        @Override
+        public LocalDate getEnd() {
+            return end;
+        }
+
+        @Override
+        public void setEnd(LocalDate end) {
+            if (!Objects.equals(this.end, end)) {
+                this.end = end;
+                startMessageLiveData.postValue(validateDateRange(false).orElse(null));
+            }
+        }
+
+        @NonNull
+        @Override
+        public String getNotes() {
+            return (null == notes) ? normalizedNotes : notes;
+        }
+
+        @Override
+        public void setNotes(String notes) {
+            if (null == notes || notes.isEmpty()) {
+                normalizedNotes = "";
+                this.notes = null;
+            } else if (!this.notes.equals(notes)) {
+                this.notes = notes;
+                normalizedNotes = null;
+            }
+        }
+    }
 }

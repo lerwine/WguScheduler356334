@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
@@ -64,6 +66,20 @@ public final class TermListItem extends AbstractTermEntity<TermListItem> impleme
 
     public void setTotalCompetencyUnits(int totalCompetencyUnits) {
         this.totalCompetencyUnits = Math.max(totalCompetencyUnits, 0);
+    }
+
+    @Override
+    public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.restoreState(bundle, isOriginal);
+        setCourseCount(bundle.getInt(stateKey(COLNAME_COURSE_COUNT, isOriginal), 0));
+        setTotalCompetencyUnits(bundle.getInt(stateKey(COLNAME_TOTAL_COMPETENCY_UNITS, isOriginal), 0));
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.saveState(bundle, isOriginal);
+        bundle.putInt(stateKey(COLNAME_COURSE_COUNT, isOriginal), courseCount);
+        bundle.putInt(stateKey(COLNAME_TOTAL_COMPETENCY_UNITS, isOriginal), totalCompetencyUnits);
     }
 
     @Override

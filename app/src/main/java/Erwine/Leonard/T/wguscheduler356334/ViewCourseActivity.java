@@ -22,6 +22,10 @@ import Erwine.Leonard.T.wguscheduler356334.ui.course.ViewCoursePagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
+/**
+ * Views course information in 2 tabs: {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment}.
+ * This initializes the shared view model {@link EditCourseViewModel}.
+ */
 public class ViewCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewCourseActivity.class.getName();

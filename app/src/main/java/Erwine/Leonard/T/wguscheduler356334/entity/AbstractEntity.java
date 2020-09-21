@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
@@ -16,29 +17,10 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
  */
 public abstract class AbstractEntity<T extends AbstractEntity<T>> implements IdIndexedEntity {
     /**
-     * The name of the {@link #id "id"} database column, which is the primary key.
-     * If this value is {@code null}, then the current {@code AbstractEntity} object represents a new row that has not yet been saved.
-     */
-    public static final String COLNAME_ID = "id";
-    /**
      * Normalizes string values by trimming whitespace and converting non-space whitespace characters into spaces as well as condensing multiple consecutive whitespace characters into
      * a single space character.
      */
     public static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
-
-    /**
-     * Updates the primary key value if it has not already been set.
-     *
-     * @param target The {@code AbstractEntity} object to apply the primary key value to.
-     * @param id     The value from the {@link #COLNAME_ID "id"} database column, which gets applied to the {@link #id} field.
-     * @throws IllegalArgumentException if the {@link #id} field was already set.
-     */
-    public static void applyInsertedId(AbstractEntity<?> target, long id) {
-        if (null != target.getId()) {
-            throw new IllegalStateException();
-        }
-        target.id = id;
-    }
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
@@ -54,14 +36,18 @@ public abstract class AbstractEntity<T extends AbstractEntity<T>> implements IdI
         this.id = id;
     }
 
-    /**
-     * Gets the value of the primary key for the database row represented by this {@code AbstractEntity}.
-     *
-     * @return The value of the primary key or {@code null} if this represents a row of data that has not yet been saved to the database.
-     */
     @Override
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public synchronized void setId(Long id) {
+        if (null == this.id) {
+            this.id = id;
+        } else if (!Objects.equals(id, this.id)) {
+            throw new IllegalStateException();
+        }
     }
 
     /**

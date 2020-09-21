@@ -1,7 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 
@@ -16,10 +14,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
  * and a {@link #COLNAME_NOTES "notes" database column}.
  */
 public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> extends AbstractEntity<T> implements NoteColumnIncludedEntity {
-    /**
-     * The name of the {@link #notes "notes"} database column, which contains user notes for the entity.
-     */
-    public static final String COLNAME_NOTES = "notes";
+
     /**
      * Normalizes string values by converting line break sequences into newline characters, trimming whitespace from the end of each line, converting non-space whitespace characters
      * into spaces as well as condensing multiple consecutive whitespace characters into a single space character.
@@ -43,11 +38,6 @@ public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> exte
     protected AbstractNotedEntity(@NonNull AbstractNotedEntity<?> source) {
         super(source.getId());
         this.notes = source.notes;
-    }
-
-    protected AbstractNotedEntity(@NonNull String idKey, @NonNull String notesKey, @NonNull Bundle bundle) {
-        super((bundle.containsKey(idKey)) ? bundle.getLong(idKey) : null);
-        this.notes = bundle.getString(notesKey, "");
     }
 
     /**

@@ -1,7 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -61,10 +59,5 @@ public final class TermEntity extends AbstractTermEntity<TermEntity> {
     @Ignore
     public TermEntity() {
         super(null, null, null, null, null);
-    }
-
-    @Ignore
-    public TermEntity(@NonNull Bundle bundle, boolean original) {
-        super(bundle, original);
     }
 }

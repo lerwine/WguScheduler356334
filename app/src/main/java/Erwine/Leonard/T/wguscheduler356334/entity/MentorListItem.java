@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
@@ -44,6 +46,18 @@ public class MentorListItem extends AbstractMentorEntity<MentorListItem> impleme
 
     public void setCourseCount(int courseCount) {
         this.courseCount = Math.max(courseCount, 0);
+    }
+
+    @Override
+    public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.restoreState(bundle, isOriginal);
+        setCourseCount(bundle.getInt(stateKey(COLNAME_COURSE_COUNT, isOriginal), 0));
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.saveState(bundle, isOriginal);
+        bundle.putInt(stateKey(COLNAME_COURSE_COUNT, isOriginal), courseCount);
     }
 
     @Override

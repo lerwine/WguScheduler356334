@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -105,6 +106,24 @@ public final class TermCourseListItem extends AbstractCourseEntity<TermCourseLis
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
+    }
+
+    @Override
+    public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.restoreState(bundle, isOriginal);
+        setAssessmentCount(bundle.getInt(stateKey(COLNAME_ASSESSMENT_COUNT, isOriginal), 0));
+        setMentorName(bundle.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_NAME, isOriginal), ""));
+        setPhoneNumber(bundle.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_PHONE_NUMBER, isOriginal), ""));
+        setEmailAddress(bundle.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_EMAIL_ADDRESS, isOriginal), ""));
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.saveState(bundle, isOriginal);
+        bundle.putInt(stateKey(COLNAME_ASSESSMENT_COUNT, isOriginal), assessmentCount);
+        bundle.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_NAME, isOriginal), mentorName);
+        bundle.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_PHONE_NUMBER, isOriginal), phoneNumber);
+        bundle.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_EMAIL_ADDRESS, isOriginal), emailAddress);
     }
 
     @Override

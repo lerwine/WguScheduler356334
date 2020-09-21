@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -24,36 +25,46 @@ import java.util.function.Supplier;
 import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractMentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+/**
+ * View model shared by {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity}, {@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity},
+ * {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment}, {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment},
+ * {@link Erwine.Leonard.T.wguscheduler356334.ui.course.CourseDatesFragment} and {@link Erwine.Leonard.T.wguscheduler356334.ui.course.CourseNotesFragment}
+ */
 public class EditCourseViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditTermViewModel.class.getName();
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
-    public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + CourseDetails.STATE_KEY_COMPETENCY_UNITS;
+    public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_COMPETENCY_UNITS, false);
 
     public static void startAddCourseActivity(@NonNull Context context, long termId, @NonNull LocalDate nextStart) {
         Intent intent = new Intent(context, AddCourseActivity.class);
-        intent.putExtra(TermEntity.STATE_KEY_ID, termId);
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false), termId);
         intent.putExtra(CourseDetails.COLNAME_EXPECTED_START, nextStart.toEpochDay());
         context.startActivity(intent);
     }
 
     public static void startViewCourseActivity(@NonNull Context context, long courseId) {
         Intent intent = new Intent(context, ViewCourseActivity.class);
-        intent.putExtra(CourseDetails.STATE_KEY_ID, courseId);
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false), courseId);
         context.startActivity(intent);
     }
 
@@ -70,30 +81,23 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> actualStartMessageLiveData;
     private final MutableLiveData<Boolean> actualEndValidLiveData;
     private final MutableLiveData<Integer> competencyUnitsMessageLiveData;
+    private final CurrentValues currentValues;
+    private Observer<List<TermListItem>> termsLoadedObserver;
+    private Observer<List<MentorListItem>> mentorsLoadedObserver;
     private boolean fromInitializedState;
-    private String number;
     private AbstractTermEntity<?> term;
     private AbstractMentorEntity<?> mentor;
     private String normalizedNumber;
-    private String title;
     private String normalizedTitle;
-    private LocalDate expectedStart;
-    private LocalDate actualStart;
-    private LocalDate expectedEnd;
-    private LocalDate actualEnd;
-    private CourseStatus status;
-    private String competencyUnitsText;
-    private Integer competencyUnitsValue;
-    private String notes;
     private String normalizedNotes;
+    private String competencyUnitsText;
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         termsLiveData = dbLoader.getAllTerms();
         mentorsLiveData = dbLoader.getAllMentors();
-        number = normalizedNumber = title = normalizedTitle = competencyUnitsText = notes = normalizedNotes = "";
-        status = CourseStatus.UNPLANNED;
+        currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
         termValidLiveData = new MutableLiveData<>(false);
         numberValidLiveData = new MutableLiveData<>(false);
@@ -106,16 +110,17 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public Long getId() {
-        return (null == courseEntity) ? null : courseEntity.getId();
+        return currentValues.getId();
     }
 
     public AbstractTermEntity<?> getTerm() {
         return term;
     }
 
-    public void setTerm(AbstractTermEntity<?> term) {
+    public synchronized void setTerm(AbstractTermEntity<?> term) {
         if (!Objects.equals(this.term, term)) {
             this.term = term;
+            currentValues.termId = (null == term) ? null : term.getId();
             termValidLiveData.postValue(null != term && null != term.getId());
         }
     }
@@ -124,105 +129,59 @@ public class EditCourseViewModel extends AndroidViewModel {
         return mentor;
     }
 
-    public void setMentor(@Nullable AbstractMentorEntity<?> mentor) {
-        this.mentor = mentor;
+    public synchronized void setMentor(@Nullable AbstractMentorEntity<?> mentor) {
+        if (!Objects.equals(this.mentor, mentor)) {
+            this.mentor = mentor;
+            currentValues.mentorId = (null == mentor) ? null : mentor.getId();
+        }
     }
 
     public String getNumber() {
-        return number;
+        return currentValues.getNumber();
     }
 
     public synchronized void setNumber(String value) {
-        number = (null == value) ? "" : value;
-        String oldValue = normalizedNumber;
-        normalizedNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(value);
-        if (normalizedNumber.isEmpty()) {
-            if (!oldValue.isEmpty()) {
-                numberValidLiveData.postValue(false);
-            }
-        } else if (oldValue.isEmpty()) {
-            numberValidLiveData.postValue(true);
-        }
+        currentValues.setNumber(value);
     }
 
     public String getTitle() {
-        return title;
+        return currentValues.getTitle();
     }
 
     public synchronized void setTitle(String value) {
-        title = (null == value) ? "" : value;
-        String oldValue = normalizedTitle;
-        normalizedTitle = TermEntity.SINGLE_LINE_NORMALIZER.apply(value);
-        if (normalizedTitle.isEmpty()) {
-            if (!oldValue.isEmpty()) {
-                titleValidLiveData.postValue(false);
-            }
-        } else if (oldValue.isEmpty()) {
-            titleValidLiveData.postValue(true);
-        }
+        currentValues.setTitle(value);
     }
 
     public LocalDate getExpectedStart() {
-        if (status == CourseStatus.UNPLANNED) {
-            return null;
-        }
-        return expectedStart;
+        return currentValues.getExpectedStart();
     }
 
     public synchronized void setExpectedStart(LocalDate value) {
-        if (!Objects.equals(value, expectedStart)) {
-            expectedStart = value;
-            expectedStartMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
-        }
+        currentValues.setExpectedStart(value);
     }
 
     public LocalDate getActualStart() {
-        switch (status) {
-            case UNPLANNED:
-            case PLANNED:
-                return null;
-            default:
-                return actualStart;
-        }
+        return currentValues.getActualStart();
     }
 
     public synchronized void setActualStart(LocalDate value) {
-        if (!Objects.equals(value, actualStart)) {
-            actualStart = value;
-            expectedStartMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
-        }
+        currentValues.setActualStart(value);
     }
 
     public LocalDate getExpectedEnd() {
-        if (status == CourseStatus.UNPLANNED) {
-            return null;
-        }
-        return expectedEnd;
+        return currentValues.getExpectedEnd();
     }
 
     public synchronized void setExpectedEnd(LocalDate value) {
-        if (!Objects.equals(value, expectedEnd)) {
-            expectedEnd = value;
-            expectedEndValidLiveData.postValue(validateExpectedEnd());
-        }
+        currentValues.setExpectedEnd(value);
     }
 
     public LocalDate getActualEnd() {
-        switch (status) {
-            case UNPLANNED:
-            case PLANNED:
-            case IN_PROGRESS:
-                return null;
-            default:
-                return actualEnd;
-        }
+        return currentValues.getActualEnd();
     }
 
     public synchronized void setActualEnd(LocalDate value) {
-        if (!Objects.equals(value, actualEnd)) {
-            actualEnd = value;
-            actualEndValidLiveData.postValue(validateActualEnd());
-        }
+        currentValues.setActualEnd(value);
     }
 
     public String getCompetencyUnitsText() {
@@ -235,48 +194,45 @@ public class EditCourseViewModel extends AndroidViewModel {
                 return;
             }
             competencyUnitsText = "";
+            currentValues.competencyUnits = null;
         } else {
             if (competencyUnitsText.equals(value)) {
                 return;
             }
             competencyUnitsText = value;
             try {
-                competencyUnitsValue = Integer.parseInt(competencyUnitsText.trim());
+                currentValues.setCompetencyUnits(Integer.parseInt(competencyUnitsText.trim()));
             } catch (NumberFormatException ex) {
-                competencyUnitsValue = null;
+                currentValues.competencyUnits = null;
             }
         }
         competencyUnitsMessageLiveData.postValue(validateCompetencyUnits(false).orElse(null));
     }
 
     public CourseStatus getStatus() {
-        return status;
+        return currentValues.getStatus();
     }
 
     public synchronized void setStatus(CourseStatus status) {
-        if (null == status) {
-            status = CourseStatus.UNPLANNED;
-        }
-        if (status != this.status) {
-            this.status = status;
-            expectedStartMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
-            actualStartMessageLiveData.postValue(validateActualStart(false).orElse(null));
-            expectedEndValidLiveData.postValue(validateExpectedEnd());
-            actualEndValidLiveData.postValue(validateActualEnd());
-        }
+        currentValues.setStatus(status);
     }
 
     public String getNotes() {
-        return notes;
+        return currentValues.getNotes();
     }
 
     public synchronized void setNotes(String value) {
-        if (null == value || value.isEmpty()) {
-            normalizedNotes = notes = "";
-        } else if (!value.equals(notes)) {
-            notes = value;
-            normalizedNotes = null;
+        currentValues.setNotes(value);
+    }
+
+    public String getNormalizedNotes() {
+        if (null == normalizedNotes) {
+            normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
+            if (normalizedNotes.equals(currentValues.notes)) {
+                currentValues.notes = null;
+            }
         }
+        return normalizedNotes;
     }
 
     public MutableLiveData<CourseDetails> getEntityLiveData() {
@@ -327,93 +283,37 @@ public class EditCourseViewModel extends AndroidViewModel {
         return fromInitializedState;
     }
 
+    public void saveViewModelState(Bundle outState) {
+        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        currentValues.saveState(outState, false);
+        courseEntity.saveState(outState, true);
+    }
+
     public synchronized Single<CourseDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
-        if (null == state) {
-            courseEntity = new CourseDetails(null);
-        } else if (state.containsKey(CourseDetails.STATE_KEY_ID)) {
-            if (fromInitializedState) {
-                courseEntity = new CourseDetails(state, true);
+        courseEntity = new CourseDetails(null);
+        if (null != state) {
+            currentValues.restoreState(state, false);
+            Long id = currentValues.getId();
+            if (null == id || fromInitializedState) {
+                courseEntity.restoreState(state, fromInitializedState);
             } else {
-                return dbLoader.getCourseById(state.getLong(CourseDetails.STATE_KEY_ID))
+                competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
+                return dbLoader.getCourseById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
+            if (fromInitializedState) {
+                setCompetencyUnitsText(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
+            } else {
+                competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
+            }
         } else {
-            courseEntity = new CourseDetails(state, fromInitializedState && state.containsKey(CourseDetails.STATE_KEY_ORIGINAL_TERM_ID));
+            competencyUnitsText = "";
         }
-        if (null == state) {
-            setNumber(courseEntity.getNumber());
-            setTitle(courseEntity.getTitle());
-            setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(courseEntity.getCompetencyUnits()));
-            setStatus(courseEntity.getStatus());
-            setTerm(courseEntity.getTerm());
-            setMentor(courseEntity.getMentor());
-            setExpectedStart(courseEntity.getExpectedStart());
-            setExpectedEnd(courseEntity.getExpectedEnd());
-            setActualStart(courseEntity.getActualStart());
-            setActualEnd(courseEntity.getActualEnd());
-            setNotes(courseEntity.getNotes());
-        } else if (fromInitializedState) {
-            setNumber(state.getString(CourseDetails.STATE_KEY_NUMBER, ""));
-            setTitle(state.getString(CourseDetails.STATE_KEY_TITLE, ""));
-            setCompetencyUnitsText(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
-            setStatus(CourseStatus.valueOf(state.getString(CourseDetails.STATE_KEY_STATUS, CourseStatus.UNPLANNED.name())));
-            setTerm((state.containsKey(TermEntity.STATE_KEY_ID)) ? new TermEntity(state, false) : null);
-            setMentor((state.containsKey(MentorEntity.STATE_KEY_ID)) ? new MentorEntity(state, false) : null);
-            setExpectedStart((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_START)) : null);
-            setExpectedEnd((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_END)) : null);
-            setActualStart((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_START)) : null);
-            setActualEnd((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_END)) : null);
-            setNotes(state.getString(CourseDetails.STATE_KEY_NOTES, ""));
-        } else {
-            setNumber((state.containsKey(CourseDetails.STATE_KEY_NUMBER)) ? state.getString(CourseDetails.STATE_KEY_NUMBER) : courseEntity.getNumber());
-            setTitle((state.containsKey(CourseDetails.STATE_KEY_TITLE)) ? state.getString(CourseDetails.STATE_KEY_TITLE) : courseEntity.getTitle());
-            setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(courseEntity.getCompetencyUnits()));
-            setStatus((state.containsKey(CourseDetails.STATE_KEY_STATUS)) ? CourseStatus.valueOf(state.getString(CourseDetails.STATE_KEY_STATUS, CourseStatus.UNPLANNED.name())) : courseEntity.getStatus());
-            setTerm((state.containsKey(TermEntity.STATE_KEY_ID)) ? new TermEntity(state, false) : courseEntity.getTerm());
-            setMentor((state.containsKey(MentorEntity.STATE_KEY_ID)) ? new MentorEntity(state, false) : courseEntity.getMentor());
-            setExpectedStart((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_START)) : courseEntity.getExpectedStart());
-            setExpectedEnd((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_END)) : courseEntity.getExpectedEnd());
-            setActualStart((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_START)) : courseEntity.getActualStart());
-            setActualEnd((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_END)) : courseEntity.getActualEnd());
-            setNotes((state.containsKey(CourseDetails.STATE_KEY_NOTES)) ? state.getString(CourseDetails.STATE_KEY_NOTES) : courseEntity.getNotes());
-        }
-        entityLiveData.postValue(courseEntity);
+        onEntityLoaded();
         return Single.just(courseEntity).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public void saveViewModelState(Bundle outState) {
-        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        courseEntity.saveState(outState, true);
-        if (null != courseEntity.getId()) {
-            outState.putLong(CourseDetails.STATE_KEY_ID, courseEntity.getId());
-        }
-        outState.putString(CourseDetails.STATE_KEY_STATUS, status.name());
-        Integer i = getCompetencyUnitsMessageLiveData().getValue();
-        if (null != i) {
-            outState.putInt(CourseDetails.STATE_KEY_COMPETENCY_UNITS, i);
-        }
-        outState.putString(STATE_KEY_COMPETENCY_UNITS_TEXT, getCompetencyUnitsText());
-        outState.putString(CourseDetails.STATE_KEY_NUMBER, number);
-        LocalDate date = getExpectedStart();
-        if (null != date) {
-            outState.putLong(CourseDetails.STATE_KEY_EXPECTED_START, date.toEpochDay());
-        }
-        date = getExpectedEnd();
-        if (null != date) {
-            outState.putLong(CourseDetails.STATE_KEY_EXPECTED_END, date.toEpochDay());
-        }
-        date = getActualStart();
-        if (null != date) {
-            outState.putLong(CourseDetails.STATE_KEY_ACTUAL_START, date.toEpochDay());
-        }
-        date = getActualEnd();
-        if (null != date) {
-            outState.putLong(CourseDetails.STATE_KEY_ACTUAL_END, date.toEpochDay());
-        }
-        outState.putString(CourseDetails.STATE_KEY_NOTES, notes);
     }
 
     private void onEntityLoadedFromDb(CourseDetails entity) {
@@ -429,20 +329,56 @@ public class EditCourseViewModel extends AndroidViewModel {
         setActualEnd(entity.getActualEnd());
         setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
         setNotes(entity.getNotes());
-        entityLiveData.postValue(entity);
+        onEntityLoaded();
+    }
+
+    private void onEntityLoaded() {
+        Long id = courseEntity.getTermId();
+        if (null != id) {
+            termsLoadedObserver = this::onTermsLoaded;
+            termsLiveData.observeForever(termsLoadedObserver);
+        }
+        id = courseEntity.getMentorId();
+        if (null != id) {
+            mentorsLoadedObserver = this::onMentorsLoaded;
+            mentorsLiveData.observeForever(mentorsLoadedObserver);
+        }
+        entityLiveData.postValue(courseEntity);
+    }
+
+    private void onTermsLoaded(List<TermListItem> termListItems) {
+        if (null == termListItems) {
+            return;
+        }
+        termsLiveData.removeObserver(termsLoadedObserver);
+        EntityHelper.findById(courseEntity.getTermId(), termListItems).ifPresent(t -> {
+            courseEntity.setTerm(t);
+            setTerm(t);
+        });
+    }
+
+    private void onMentorsLoaded(List<MentorListItem> mentorListItems) {
+        if (null == mentorListItems) {
+            return;
+        }
+        mentorsLiveData.removeObserver(mentorsLoadedObserver);
+        EntityHelper.findById(courseEntity.getMentorId(), mentorListItems).ifPresent(t -> {
+            courseEntity.setMentor(t);
+            setMentor(t);
+        });
     }
 
     private synchronized Optional<Integer> validateExpectedStart(boolean saveMode) {
-        if (null == expectedStart) {
-            if (status == CourseStatus.PLANNED) {
+        if (null == currentValues.expectedStart) {
+            if (currentValues.status == CourseStatus.PLANNED) {
                 return Optional.of((saveMode) ? R.string.message_expected_start_required : R.string.message_required);
             }
         } else {
-            switch (status) {
+            switch (currentValues.status) {
                 case PLANNED:
                 case PASSED:
                 case NOT_PASSED:
-                    if (null != expectedEnd && expectedStart.compareTo(expectedEnd) > 0) {
+                    if (null != currentValues.expectedEnd && currentValues.expectedStart.compareTo(currentValues.expectedEnd) > 0) {
                         return Optional.of((saveMode) ? R.string.message_expected_start_after_end : R.string.message_start_after_end);
                     }
                     break;
@@ -454,12 +390,12 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private synchronized boolean validateExpectedEnd() {
-        return null != expectedEnd || status != CourseStatus.IN_PROGRESS;
+        return null != currentValues.expectedEnd || currentValues.status != CourseStatus.IN_PROGRESS;
     }
 
     private synchronized Optional<Integer> validateActualStart(boolean saveMode) {
-        if (null == actualStart) {
-            switch (status) {
+        if (null == currentValues.actualStart) {
+            switch (currentValues.status) {
                 case IN_PROGRESS:
                 case PASSED:
                 case NOT_PASSED:
@@ -468,10 +404,10 @@ public class EditCourseViewModel extends AndroidViewModel {
                     break;
             }
         } else {
-            switch (status) {
+            switch (currentValues.status) {
                 case PASSED:
                 case NOT_PASSED:
-                    if (null != actualEnd && actualStart.compareTo(actualEnd) > 0) {
+                    if (null != currentValues.actualEnd && currentValues.actualStart.compareTo(currentValues.actualEnd) > 0) {
                         return Optional.of((saveMode) ? R.string.message_actual_start_after_end : R.string.message_start_after_end);
                     }
                     break;
@@ -483,8 +419,8 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private synchronized boolean validateActualEnd() {
-        if (null == actualEnd) {
-            switch (status) {
+        if (null == currentValues.actualEnd) {
+            switch (currentValues.status) {
                 case PASSED:
                 case NOT_PASSED:
                     return false;
@@ -500,7 +436,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (competencyUnitsText.trim().isEmpty()) {
             return Optional.of((saveMode) ? R.string.message_competency_units_required : R.string.message_required);
         }
-        if (null == competencyUnitsValue) {
+        if (null == currentValues.competencyUnits) {
             Optional.of((saveMode) ? R.string.message_invalid_competency_units_value : R.string.message_invalid_number);
         }
         return Optional.empty();
@@ -530,38 +466,17 @@ public class EditCourseViewModel extends AndroidViewModel {
             return Single.just(errors);
         }
         CourseEntity entity = courseEntity.toEntity();
-        entity.setTermId(term.getId());
-        entity.setMentorId(mentor.getId());
+        entity.setTermId(Objects.requireNonNull(Objects.requireNonNull(term).getId()));
+        entity.setMentorId(Objects.requireNonNull(mentor).getId());
         entity.setNumber(normalizedNumber);
         entity.setTitle(normalizedTitle);
-        entity.setStatus(status);
-        switch (status) {
-            case UNPLANNED:
-                entity.setExpectedStart(null);
-                entity.setExpectedEnd(null);
-                entity.setActualStart(null);
-                entity.setActualEnd(null);
-                break;
-            case IN_PROGRESS:
-                entity.setExpectedStart(expectedStart);
-                entity.setExpectedEnd(expectedEnd);
-                entity.setActualStart(actualStart);
-                entity.setActualEnd(null);
-            case PLANNED:
-                entity.setExpectedStart(expectedStart);
-                entity.setExpectedEnd(expectedEnd);
-                entity.setActualStart(null);
-                entity.setActualEnd(null);
-                break;
-            default:
-                entity.setExpectedStart(expectedStart);
-                entity.setExpectedEnd(expectedEnd);
-                entity.setActualStart(actualStart);
-                entity.setActualEnd(actualEnd);
-                break;
-        }
-        entity.setCompetencyUnits(competencyUnitsValue);
-        entity.setNotes(notes);
+        entity.setStatus(currentValues.getStatus());
+        entity.setExpectedStart(currentValues.getExpectedStart());
+        entity.setExpectedEnd(currentValues.getExpectedEnd());
+        entity.setActualStart(currentValues.getActualStart());
+        entity.setActualEnd(currentValues.getActualEnd());
+        entity.setCompetencyUnits(currentValues.getCompetencyUnits());
+        entity.setNotes(currentValues.getNotes());
         return dbLoader.saveCourse(courseEntity.toEntity()).toSingleDefault(Collections.emptyList());
     }
 
@@ -574,13 +489,241 @@ public class EditCourseViewModel extends AndroidViewModel {
     public boolean isChanged() {
         if (null != courseEntity.getId() && normalizedNumber.equals(courseEntity.getNumber()) && normalizedTitle.equals(courseEntity.getTitle()) && Objects.equals(getExpectedStart(), courseEntity.getExpectedStart()) &&
                 Objects.equals(getExpectedEnd(), courseEntity.getExpectedEnd()) && Objects.equals(getActualStart(), courseEntity.getActualStart()) && Objects.equals(getActualEnd(), courseEntity.getActualEnd()) &&
-                status == courseEntity.getStatus() && null != competencyUnitsValue && competencyUnitsValue == courseEntity.getCompetencyUnits()) {
-            if (null == normalizedNotes) {
-                normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(notes);
-            }
-            return !normalizedNotes.equals(courseEntity.getNotes());
+                currentValues.status == courseEntity.getStatus() && null != currentValues.competencyUnits && currentValues.competencyUnits == courseEntity.getCompetencyUnits()) {
+            return !getNormalizedNotes().equals(courseEntity.getNotes());
         }
         return true;
     }
 
+    public AbstractTermEntity<?> initializeTermProperty(List<TermListItem> termListItems) {
+        if (null == termListItems || null == courseEntity) {
+            return null;
+        }
+        Optional<TermListItem> result = EntityHelper.findById(courseEntity.getId(), termListItems);
+        result.ifPresent(t -> courseEntity.setTerm(t));
+        return result.orElse(null);
+    }
+
+    public AbstractMentorEntity<?> initializeMentorProperty(List<MentorListItem> mentorListItems) {
+        if (null == mentorListItems || null == courseEntity) {
+            return null;
+        }
+        Optional<MentorListItem> result = EntityHelper.findById(courseEntity.getId(), mentorListItems);
+        result.ifPresent(t -> courseEntity.setMentor(t));
+        return result.orElse(null);
+    }
+
+    private class CurrentValues implements Course {
+
+        private Long id;
+        private String number = "";
+        private Long termId;
+        private Long mentorId;
+        private String title = "";
+        private LocalDate expectedStart;
+        private LocalDate actualStart;
+        private LocalDate expectedEnd;
+        private LocalDate actualEnd;
+        private CourseStatus status = CourseStatus.UNPLANNED;
+        private Integer competencyUnits;
+        private String notes = "";
+
+        @Nullable
+        @Override
+        public Long getId() {
+            return (null == courseEntity) ? id : courseEntity.getId();
+        }
+
+        @Override
+        public void setId(Long id) {
+            if (null != courseEntity) {
+                courseEntity.setId(id);
+            }
+            this.id = id;
+        }
+
+        @NonNull
+        @Override
+        public String getNumber() {
+            return number;
+        }
+
+        @Override
+        public void setNumber(String number) {
+            this.number = (null == number) ? "" : number;
+            String oldValue = normalizedNumber;
+            normalizedNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(number);
+            if (normalizedNumber.isEmpty()) {
+                if (!oldValue.isEmpty()) {
+                    numberValidLiveData.postValue(false);
+                }
+            } else if (oldValue.isEmpty()) {
+                numberValidLiveData.postValue(true);
+            }
+        }
+
+        @Nullable
+        @Override
+        public Long getTermId() {
+            return termId;
+        }
+
+        @Override
+        public void setTermId(long termId) {
+            this.termId = termId;
+        }
+
+        @Nullable
+        @Override
+        public Long getMentorId() {
+            return mentorId;
+        }
+
+        @Override
+        public void setMentorId(Long mentorId) {
+            this.mentorId = mentorId;
+        }
+
+        @NonNull
+        @Override
+        public String getTitle() {
+            return title;
+        }
+
+        @Override
+        public void setTitle(String title) {
+            this.title = (null == title) ? "" : title;
+            String oldValue = normalizedTitle;
+            normalizedTitle = TermEntity.SINGLE_LINE_NORMALIZER.apply(title);
+            if (normalizedTitle.isEmpty()) {
+                if (!oldValue.isEmpty()) {
+                    titleValidLiveData.postValue(false);
+                }
+            } else if (oldValue.isEmpty()) {
+                titleValidLiveData.postValue(true);
+            }
+        }
+
+        @Nullable
+        @Override
+        public LocalDate getExpectedStart() {
+            if (status == CourseStatus.UNPLANNED) {
+                return null;
+            }
+            return expectedStart;
+        }
+
+        @Override
+        public void setExpectedStart(LocalDate expectedStart) {
+            if (!Objects.equals(this.expectedStart, expectedStart)) {
+                this.expectedStart = expectedStart;
+                expectedStartMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
+            }
+        }
+
+        @Nullable
+        @Override
+        public LocalDate getActualStart() {
+            switch (status) {
+                case UNPLANNED:
+                case PLANNED:
+                    return null;
+                default:
+                    return actualStart;
+            }
+        }
+
+        @Override
+        public void setActualStart(LocalDate actualStart) {
+            if (!Objects.equals(this.actualStart, actualStart)) {
+                this.actualStart = actualStart;
+                expectedStartMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
+            }
+        }
+
+        @Nullable
+        @Override
+        public LocalDate getExpectedEnd() {
+            if (status == CourseStatus.UNPLANNED) {
+                return null;
+            }
+            return expectedEnd;
+        }
+
+        @Override
+        public void setExpectedEnd(LocalDate expectedEnd) {
+            if (!Objects.equals(this.expectedEnd, expectedEnd)) {
+                this.expectedEnd = expectedEnd;
+                expectedEndValidLiveData.postValue(validateExpectedEnd());
+            }
+        }
+
+        @Nullable
+        @Override
+        public LocalDate getActualEnd() {
+            switch (status) {
+                case UNPLANNED:
+                case PLANNED:
+                case IN_PROGRESS:
+                    return null;
+                default:
+                    return actualEnd;
+            }
+        }
+
+        @Override
+        public void setActualEnd(LocalDate actualEnd) {
+            if (!Objects.equals(this.actualEnd, actualEnd)) {
+                this.actualEnd = actualEnd;
+                actualEndValidLiveData.postValue(validateActualEnd());
+            }
+        }
+
+        @NonNull
+        @Override
+        public CourseStatus getStatus() {
+            return status;
+        }
+
+        @Override
+        public void setStatus(CourseStatus status) {
+            if (null == status) {
+                status = CourseStatus.UNPLANNED;
+            }
+            if (status != this.status) {
+                this.status = status;
+                expectedStartMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
+                actualStartMessageLiveData.postValue(validateActualStart(false).orElse(null));
+                expectedEndValidLiveData.postValue(validateExpectedEnd());
+                actualEndValidLiveData.postValue(validateActualEnd());
+            }
+        }
+
+        @Override
+        public int getCompetencyUnits() {
+            return (null == competencyUnits) ? 0 : competencyUnits;
+        }
+
+        @Override
+        public void setCompetencyUnits(int competencyUnits) {
+            this.competencyUnits = competencyUnits;
+        }
+
+        @NonNull
+        @Override
+        public String getNotes() {
+            return (null == notes) ? normalizedNotes : notes;
+        }
+
+        @Override
+        public void setNotes(String notes) {
+            if (null == notes || notes.isEmpty()) {
+                normalizedNotes = "";
+                this.notes = null;
+            } else if (!this.notes.equals(notes)) {
+                this.notes = notes;
+                normalizedNotes = null;
+            }
+        }
+    }
 }

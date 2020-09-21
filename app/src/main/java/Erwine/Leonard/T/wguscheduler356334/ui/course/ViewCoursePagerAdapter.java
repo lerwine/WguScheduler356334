@@ -10,6 +10,9 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment;
 
+/**
+ * Pager adapter for {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity}.
+ */
 public class ViewCoursePagerAdapter extends FragmentPagerAdapter {
 
     private final Context context;

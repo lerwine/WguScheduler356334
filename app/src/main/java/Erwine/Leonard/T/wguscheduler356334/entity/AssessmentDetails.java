@@ -127,17 +127,22 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
         }
     }
 
-    @Ignore
-    public AssessmentDetails(@NonNull Bundle bundle, boolean original) {
-        super(bundle, original);
-        if (bundle.containsKey(AbstractCourseEntity.STATE_KEY_ID)) {
-            setCourse(new CourseEntity(bundle, original));
+    @Override
+    public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.restoreState(bundle, isOriginal);
+        CourseEntity c = new CourseEntity();
+        if (bundle.containsKey(c.stateKey(Course.COLNAME_ID, isOriginal)) || bundle.containsKey(c.stateKey(Course.COLNAME_STATUS, isOriginal))) {
+            c.restoreState(bundle, isOriginal);
+            setCourse(c);
         }
     }
 
     @Override
-    public void saveState(@NonNull Bundle bundle, boolean original) {
-        super.saveState(bundle, original);
+    public synchronized void saveState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.saveState(bundle, isOriginal);
+        if (null != course) {
+            course.saveState(bundle, isOriginal);
+        }
     }
 
     public AbstractCourseEntity<?> getCourse() {

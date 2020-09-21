@@ -19,6 +19,10 @@ import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
+/**
+ * Adds a new course using {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment}.
+ * This initializes the shared view model {@link EditCourseViewModel}.
+ */
 public class AddCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddCourseActivity.class.getName();

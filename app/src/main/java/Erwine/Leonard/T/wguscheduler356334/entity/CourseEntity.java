@@ -1,7 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
-import android.os.Bundle;
-
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -102,11 +100,6 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
     @Ignore
     public CourseEntity() {
         super(null, null, null, null, null, null, null, null, null, null, 0, null);
-    }
-
-    @Ignore
-    public CourseEntity(Bundle bundle, boolean original) {
-        super(bundle, original);
     }
 
     @Override

@@ -18,13 +18,22 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractMentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
+/**
+ * Fragment for editing the properties of a {@link Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity}.
+ * Date ranges and notes are edited in separate tab-controlled views: {@link CourseDatesFragment} and {@link CourseNotesFragment}.
+ * This assumes that the parent activity ({@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity} or {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity})
+ * calls {@link EditCourseViewModel#initializeViewModelState(Bundle, Supplier)}.
+ */
 public class EditCourseFragment extends Fragment {
 
     private static final String LOG_TAG = EditCourseFragment.class.getName();
@@ -86,21 +95,53 @@ public class EditCourseFragment extends Fragment {
         sectionsPagerAdapter = new EditCoursePagerAdapter(requireContext(), requireActivity().getSupportFragmentManager());
         otherViewPager.setAdapter(sectionsPagerAdapter);
         otherTabLayout.setupWithViewPager(otherViewPager);
+    }
+
+    private void onEntityLoaded(CourseDetails entity) {
+        if (null == entity) {
+            return;
+        }
+        viewModel.initializeTermProperty(viewModel.getTermsLiveData().getValue());
+        onTermChanged(viewModel.getTerm());
+        viewModel.initializeMentorProperty(viewModel.getMentorsLiveData().getValue());
+        onMentorChanged(viewModel.getMentor());
+        courseCodeEditText.setText(viewModel.getNumber());
+        competencyUnitsEditText.setText(viewModel.getCompetencyUnitsText());
+        titleEditText.setText(viewModel.getTitle());
+        statusButton.setText(viewModel.getStatus().displayResourceId());
         courseCodeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNumber));
         competencyUnitsEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCompetencyUnitsText));
         titleEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setTitle));
     }
 
-    private void onEntityLoaded(CourseDetails entity) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onEntityLoaded
-    }
-
     private void onTermsLoaded(List<TermListItem> termListItems) {
-
+        AbstractTermEntity<?> term = viewModel.initializeTermProperty(termListItems);
+        if (null != term) {
+            onTermChanged(term);
+        }
     }
 
     private void onMentorsLoaded(List<MentorListItem> mentorListItems) {
+        AbstractMentorEntity<?> mentor = viewModel.initializeMentorProperty(mentorListItems);
+        if (null != mentor) {
+            onMentorChanged(mentor);
+        }
+    }
 
+    private void onTermChanged(AbstractTermEntity<?> term) {
+        if (null == term) {
+            termButton.setText(R.string.label_none);
+        } else {
+            termButton.setText(term.getName());
+        }
+    }
+
+    private void onMentorChanged(AbstractMentorEntity<?> mentor) {
+        if (null == mentor) {
+            mentorChip.setText(R.string.label_none);
+        } else {
+            mentorChip.setText(mentor.getName());
+        }
     }
 
     private void onTermButtonClick(View view) {

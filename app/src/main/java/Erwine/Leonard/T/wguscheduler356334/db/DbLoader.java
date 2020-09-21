@@ -219,7 +219,7 @@ public class DbLoader {
         Log.d(LOG_TAG, String.format("Called saveTerm(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.termDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> TermEntity.applyInsertedId(entity, id)));
+                    .doAfterSuccess(entity::setId));
         }
         return appDb.termDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -233,7 +233,7 @@ public class DbLoader {
     @NonNull
     public Completable insertAllTerms(List<TermEntity> list) {
         return Completable.fromSingle(appDb.termDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, TermEntity::applyInsertedId)));
+                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
     }
 
     /**
@@ -298,7 +298,7 @@ public class DbLoader {
         Log.d(LOG_TAG, String.format("Called saveMentor(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.mentorDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> MentorEntity.applyInsertedId(entity, id)));
+                    .doAfterSuccess(entity::setId));
         }
         return appDb.mentorDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -312,7 +312,7 @@ public class DbLoader {
     @NonNull
     public Completable insertAllMentors(List<MentorEntity> list) {
         return Completable.fromSingle(appDb.mentorDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, MentorEntity::applyInsertedId)));
+                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
     }
 
     /**
@@ -455,7 +455,7 @@ public class DbLoader {
         Log.d(LOG_TAG, String.format("Called saveCourse(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.courseDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> CourseEntity.applyInsertedId(entity, id)));
+                    .doAfterSuccess(entity::setId));
         }
         return appDb.courseDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -469,7 +469,7 @@ public class DbLoader {
     @NonNull
     public Completable insertAllCourses(List<CourseEntity> list) {
         return Completable.fromSingle(appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, CourseEntity::applyInsertedId)));
+                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
     }
 
     /**
@@ -560,7 +560,7 @@ public class DbLoader {
         Log.d(LOG_TAG, String.format("Called saveAssessment(%s)", entity));
         if (null == entity.getId()) {
             return Completable.fromSingle(appDb.assessmentDAO().insert(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess(id -> AssessmentEntity.applyInsertedId(entity, id)));
+                    .doAfterSuccess(entity::setId));
         }
         return appDb.assessmentDAO().update(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -574,7 +574,7 @@ public class DbLoader {
     @NonNull
     public Completable insertAllAssessments(List<AssessmentEntity> list) {
         return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AssessmentEntity::applyInsertedId)));
+                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
     }
 
     @NonNull
@@ -659,7 +659,7 @@ public class DbLoader {
         while (index < ids.size()) {
             long id = ids.get(index);
             TermEntity term = entities.get(index);
-            TermEntity.applyInsertedId(term, id);
+            term.setId(id);
             Log.d(LOG_TAG, String.format("ID %d applied to %s", id, term));
             result.put(++index, id);
         }
@@ -681,7 +681,7 @@ public class DbLoader {
         while (index < ids.size()) {
             long id = ids.get(index);
             MentorEntity mentor = entities.get(index);
-            MentorEntity.applyInsertedId(mentor, id);
+            mentor.setId(id);
             Log.d(LOG_TAG, String.format("ID %d applied to %s", id, mentor));
             result.put(++index, id);
         }
@@ -712,7 +712,7 @@ public class DbLoader {
         while (index < ids.size()) {
             CourseEntity e = entities.get(index);
             Long id = ids.get(index);
-            CourseEntity.applyInsertedId(e, id);
+            e.setId(id);
             Log.d(LOG_TAG, String.format("ID %d applied to %s", id, e));
             result.put(++index, e);
         }

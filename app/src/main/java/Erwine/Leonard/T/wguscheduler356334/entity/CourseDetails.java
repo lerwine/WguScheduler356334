@@ -115,17 +115,6 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
         setMentor(null);
     }
 
-    @Ignore
-    public CourseDetails(@NonNull Bundle bundle, boolean original) {
-        super(bundle, original);
-        if (null != getTermId()) {
-            setTerm(new TermEntity(bundle, original));
-        }
-        if (null != getMentorId()) {
-            setMentor(new MentorEntity(bundle, original));
-        }
-    }
-
     @Nullable
     public AbstractTermEntity<?> getTerm() {
         return term;
@@ -167,6 +156,32 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
         }
     }
 
+    @Override
+    public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.restoreState(bundle, isOriginal);
+        TermEntity t = new TermEntity();
+        if (bundle.containsKey(t.stateKey(Term.COLNAME_ID, isOriginal)) || bundle.containsKey(t.stateKey(Term.COLNAME_NAME, isOriginal))) {
+            t.restoreState(bundle, isOriginal);
+            setTerm(t);
+        }
+        MentorEntity m = new MentorEntity();
+        if (bundle.containsKey(m.stateKey(Mentor.COLNAME_ID, isOriginal)) || bundle.containsKey(m.stateKey(Mentor.COLNAME_NAME, isOriginal))) {
+            m.restoreState(bundle, isOriginal);
+            setMentor(m);
+        }
+    }
+
+    @Override
+    public synchronized void saveState(@NonNull Bundle bundle, boolean isOriginal) {
+        super.saveState(bundle, isOriginal);
+        if (null != term) {
+            term.saveState(bundle, isOriginal);
+        }
+        if (null != mentor) {
+            mentor.saveState(bundle, isOriginal);
+        }
+    }
+
     public CourseEntity toEntity() {
         return new CourseEntity(this);
     }
@@ -182,7 +197,7 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
         Long mentorId = source.getMentorId();
         AbstractMentorEntity<?> newMentor = (null == mentorId) ? null : mentors.stream().filter(t -> mentorId.equals(t.getId())).findFirst().orElseThrow(() -> new IllegalArgumentException("Matching mentor not found"));
         if (null == currentId) {
-            applyInsertedId(this, sourceId);
+            setId(sourceId);
         }
         setTerm(newTerm);
         setMentor(newMentor);
