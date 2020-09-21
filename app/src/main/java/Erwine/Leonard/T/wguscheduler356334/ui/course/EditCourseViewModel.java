@@ -25,6 +25,8 @@ import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractMentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
@@ -70,8 +72,8 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> competencyUnitsMessageLiveData;
     private boolean fromInitializedState;
     private String number;
-    private Long termId;
-    private Long mentorId;
+    private AbstractTermEntity<?> term;
+    private AbstractMentorEntity<?> mentor;
     private String normalizedNumber;
     private String title;
     private String normalizedTitle;
@@ -107,23 +109,23 @@ public class EditCourseViewModel extends AndroidViewModel {
         return (null == courseEntity) ? null : courseEntity.getId();
     }
 
-    public Long getTermId() {
-        return termId;
+    public AbstractTermEntity<?> getTerm() {
+        return term;
     }
 
-    public void setTermId(@Nullable Long termId) {
-        if (!Objects.equals(this.termId, termId)) {
-            this.termId = termId;
-            termValidLiveData.postValue(null != termId);
+    public void setTerm(AbstractTermEntity<?> term) {
+        if (!Objects.equals(this.term, term)) {
+            this.term = term;
+            termValidLiveData.postValue(null != term && null != term.getId());
         }
     }
 
-    public Long getMentorId() {
-        return mentorId;
+    public AbstractMentorEntity<?> getMentor() {
+        return mentor;
     }
 
-    public void setMentorId(@Nullable Long mentorId) {
-        this.mentorId = mentorId;
+    public void setMentor(@Nullable AbstractMentorEntity<?> mentor) {
+        this.mentor = mentor;
     }
 
     public String getNumber() {
@@ -346,8 +348,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             setTitle(courseEntity.getTitle());
             setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(courseEntity.getCompetencyUnits()));
             setStatus(courseEntity.getStatus());
-            setTermId(courseEntity.getTermId());
-            setMentorId(courseEntity.getMentorId());
+            setTerm(courseEntity.getTerm());
+            setMentor(courseEntity.getMentor());
             setExpectedStart(courseEntity.getExpectedStart());
             setExpectedEnd(courseEntity.getExpectedEnd());
             setActualStart(courseEntity.getActualStart());
@@ -358,8 +360,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             setTitle(state.getString(CourseDetails.STATE_KEY_TITLE, ""));
             setCompetencyUnitsText(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
             setStatus(CourseStatus.valueOf(state.getString(CourseDetails.STATE_KEY_STATUS, CourseStatus.UNPLANNED.name())));
-            setTermId((state.containsKey(TermEntity.STATE_KEY_ID)) ? state.getLong(TermEntity.STATE_KEY_ID) : null);
-            setMentorId((state.containsKey(MentorEntity.STATE_KEY_ID)) ? state.getLong(MentorEntity.STATE_KEY_ID) : null);
+            setTerm((state.containsKey(TermEntity.STATE_KEY_ID)) ? new TermEntity(state, false) : null);
+            setMentor((state.containsKey(MentorEntity.STATE_KEY_ID)) ? new MentorEntity(state, false) : null);
             setExpectedStart((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_START)) : null);
             setExpectedEnd((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_END)) : null);
             setActualStart((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_START)) : null);
@@ -370,8 +372,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             setTitle((state.containsKey(CourseDetails.STATE_KEY_TITLE)) ? state.getString(CourseDetails.STATE_KEY_TITLE) : courseEntity.getTitle());
             setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(courseEntity.getCompetencyUnits()));
             setStatus((state.containsKey(CourseDetails.STATE_KEY_STATUS)) ? CourseStatus.valueOf(state.getString(CourseDetails.STATE_KEY_STATUS, CourseStatus.UNPLANNED.name())) : courseEntity.getStatus());
-            setTermId((state.containsKey(TermEntity.STATE_KEY_ID)) ? state.getLong(TermEntity.STATE_KEY_ID) : courseEntity.getTermId());
-            setMentorId((state.containsKey(MentorEntity.STATE_KEY_ID)) ? (Long) state.getLong(MentorEntity.STATE_KEY_ID) : courseEntity.getMentorId());
+            setTerm((state.containsKey(TermEntity.STATE_KEY_ID)) ? new TermEntity(state, false) : courseEntity.getTerm());
+            setMentor((state.containsKey(MentorEntity.STATE_KEY_ID)) ? new MentorEntity(state, false) : courseEntity.getMentor());
             setExpectedStart((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_START)) : courseEntity.getExpectedStart());
             setExpectedEnd((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_END)) : courseEntity.getExpectedEnd());
             setActualStart((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_START)) : courseEntity.getActualStart());
@@ -387,14 +389,6 @@ public class EditCourseViewModel extends AndroidViewModel {
         courseEntity.saveState(outState, true);
         if (null != courseEntity.getId()) {
             outState.putLong(CourseDetails.STATE_KEY_ID, courseEntity.getId());
-        }
-        Long id = termId;
-        if (null != id) {
-            outState.putLong(TermEntity.STATE_KEY_ID, id);
-        }
-        id = mentorId;
-        if (null != id) {
-            outState.putLong(MentorEntity.STATE_KEY_ID, id);
         }
         outState.putString(CourseDetails.STATE_KEY_STATUS, status.name());
         Integer i = getCompetencyUnitsMessageLiveData().getValue();
@@ -424,8 +418,8 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     private void onEntityLoadedFromDb(CourseDetails entity) {
         courseEntity = entity;
-        setTermId(entity.getTermId());
-        setMentorId(entity.getMentorId());
+        setTerm(entity.getTerm());
+        setMentor(entity.getMentor());
         setNumber(entity.getNumber());
         setTitle(entity.getTitle());
         setStatus(entity.getStatus());
@@ -514,7 +508,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public synchronized Single<List<Integer>> save() {
         ArrayList<Integer> errors = new ArrayList<>();
-        if (null == termId) {
+        if (null == term) {
             errors.add(R.string.message_term_not_selected);
         }
         if (normalizedNumber.isEmpty()) {
@@ -536,8 +530,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             return Single.just(errors);
         }
         CourseEntity entity = courseEntity.toEntity();
-        entity.setTermId(termId);
-        entity.setMentorId(mentorId);
+        entity.setTermId(term.getId());
+        entity.setMentorId(mentor.getId());
         entity.setNumber(normalizedNumber);
         entity.setTitle(normalizedTitle);
         entity.setStatus(status);
