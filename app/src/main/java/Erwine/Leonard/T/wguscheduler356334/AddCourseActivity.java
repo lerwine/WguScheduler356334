@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
@@ -85,7 +85,7 @@ public class AddCourseActivity extends AppCompatActivity {
         }
     }
 
-    private void onCourseLoadSuccess(CourseEntity entity) {
+    private void onCourseLoadSuccess(CourseDetails entity) {
 
     }
 

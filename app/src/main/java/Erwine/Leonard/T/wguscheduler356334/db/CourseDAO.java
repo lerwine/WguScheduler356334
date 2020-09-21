@@ -11,6 +11,7 @@ import androidx.room.Update;
 import java.time.LocalDate;
 import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
@@ -41,8 +42,8 @@ public interface CourseDAO {
     @Query("SELECT * FROM courses WHERE ROWID = :rowId")
     Single<CourseEntity> getByRowId(int rowId);
 
-    @Query("SELECT * FROM courses WHERE id = :id")
-    Single<CourseEntity> getById(long id);
+    @Query("SELECT * FROM courseDetailView WHERE id = :id")
+    Single<CourseDetails> getById(long id);
 
     @Query("SELECT * FROM courses ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getAll();

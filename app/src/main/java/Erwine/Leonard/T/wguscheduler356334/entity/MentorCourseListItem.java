@@ -21,12 +21,12 @@ import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 public class MentorCourseListItem extends AbstractCourseEntity<MentorCourseListItem> implements Comparable<MentorCourseListItem> {
 
     /**
-     * The name of the {@link #assessmentCount "assessmentCount"} database column, which contains the number of assessments for the course.
+     * The name of the {@link #assessmentCount "assessmentCount"} view column, which contains the number of assessments for the course.
      */
     public static final String COLNAME_ASSESSMENT_COUNT = "assessmentCount";
 
     /**
-     * The name of the {@link #termName "termName"} database column, which contains the name of the term.
+     * The name of the {@link #termName "termName"} view column, which contains the name of the term.
      */
     public static final String COLNAME_TERM_NAME = "termName";
 

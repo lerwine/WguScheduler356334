@@ -16,7 +16,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.ViewCoursePagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
@@ -74,7 +74,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
     }
 
-    private void onEntityLoadSucceeded(CourseEntity entity) {
+    private void onEntityLoadSucceeded(CourseDetails entity) {
         Long courseId = entity.getId();
         if (null == courseId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_course_id_not_specified, this).showDialog(this::finish);

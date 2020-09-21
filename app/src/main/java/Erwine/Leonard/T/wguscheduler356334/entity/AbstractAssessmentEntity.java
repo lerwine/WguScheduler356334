@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -8,6 +10,8 @@ import androidx.room.Ignore;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 
 public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntity<T>> extends AbstractNotedEntity<T> {
 
@@ -37,6 +41,21 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
      */
     public static final String COLNAME_COMPLETION_DATE = "completionDate";
 
+    public static final String STATE_KEY_ID = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_ID;
+    public static final String STATE_KEY_CODE = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_CODE;
+    public static final String STATE_KEY_STATUS = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_STATUS;
+    public static final String STATE_KEY_GOAL_DATE = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_GOAL_DATE;
+    public static final String STATE_KEY_COMPLETION_DATE = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_COMPLETION_DATE;
+    public static final String STATE_KEY_TYPE = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_TYPE;
+    public static final String STATE_KEY_NOTES = AppDb.TABLE_NAME_ASSESSMENTS + "." + COLNAME_NOTES;
+    public static final String STATE_KEY_ORIGINAL_COURSE_ID = "o:" + AbstractCourseEntity.STATE_KEY_ID;
+    public static final String STATE_KEY_ORIGINAL_CODE = "o:" + STATE_KEY_CODE;
+    public static final String STATE_KEY_ORIGINAL_STATUS = "o:" + STATE_KEY_STATUS;
+    public static final String STATE_KEY_ORIGINAL_GOAL_DATE = "o:" + STATE_KEY_GOAL_DATE;
+    public static final String STATE_KEY_ORIGINAL_COMPLETION_DATE = "o:" + STATE_KEY_COMPLETION_DATE;
+    public static final String STATE_KEY_ORIGINAL_TYPE = "o:" + STATE_KEY_TYPE;
+    public static final String STATE_KEY_ORIGINAL_NOTES = "o:" + STATE_KEY_NOTES;
+
     @ForeignKey(entity = CourseEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_COURSE_ID)
     private long courseId;
@@ -60,6 +79,56 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
         this.status = (null == status) ? AssessmentStatus.NOT_STARTED : status;
         this.goalDate = goalDate;
         this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
+    }
+
+    protected AbstractAssessmentEntity(AbstractAssessmentEntity<?> source) {
+        super(source);
+        this.courseId = source.courseId;
+        this.completionDate = source.completionDate;
+        this.code = source.code;
+        this.status = source.status;
+        this.goalDate = source.goalDate;
+        this.type = source.type;
+    }
+
+    @Ignore
+    protected AbstractAssessmentEntity(@NonNull Bundle bundle, boolean original) {
+        super(STATE_KEY_ID, (original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, bundle);
+        if (bundle.containsKey(AbstractCourseEntity.STATE_KEY_ID)) {
+            courseId = bundle.getLong(AbstractCourseEntity.STATE_KEY_ID);
+        }
+        if (bundle.containsKey(STATE_KEY_GOAL_DATE)) {
+            goalDate = LocalDate.ofEpochDay(bundle.getLong(STATE_KEY_GOAL_DATE));
+        }
+        if (bundle.containsKey(STATE_KEY_COMPLETION_DATE)) {
+            completionDate = LocalDate.ofEpochDay(bundle.getLong(STATE_KEY_COMPLETION_DATE));
+        }
+        code = bundle.getString(STATE_KEY_CODE, "");
+        status = (bundle.containsKey(STATE_KEY_STATUS)) ? AssessmentStatus.valueOf(bundle.getString(STATE_KEY_STATUS)) : AssessmentStatus.NOT_STARTED;
+        type = (bundle.containsKey(STATE_KEY_TYPE)) ? AssessmentType.valueOf(bundle.getString(STATE_KEY_TYPE)) : AssessmentType.OBJECTIVE_ASSESSMENT;
+    }
+
+    public void saveState(@NonNull Bundle bundle, boolean original) {
+        Long id = getId();
+        if (null != id) {
+            bundle.putLong(STATE_KEY_ID, getId());
+        }
+        id = courseId;
+        if (null != id) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_COURSE_ID : AbstractCourseEntity.STATE_KEY_ID, id);
+        }
+        LocalDate d = goalDate;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_GOAL_DATE : STATE_KEY_GOAL_DATE, d.toEpochDay());
+        }
+        d = completionDate;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_COMPLETION_DATE : STATE_KEY_COMPLETION_DATE, d.toEpochDay());
+        }
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_CODE : STATE_KEY_CODE, code);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_STATUS : STATE_KEY_STATUS, status.name());
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_TYPE : STATE_KEY_TYPE, type.name());
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, getNotes());
     }
 
     /**

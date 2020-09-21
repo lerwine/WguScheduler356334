@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.chip.Chip;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 
 public class CourseDatesFragment extends Fragment {
 
@@ -60,8 +60,8 @@ public class CourseDatesFragment extends Fragment {
         actualEndChip.setOnCloseIconClickListener(this::onActualEndChipCloseIconClick);
     }
 
-    private void onEntityLoaded(CourseEntity entity) {
-
+    private void onEntityLoaded(CourseDetails entity) {
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.CourseDatesFragment.onEntityLoaded
     }
 
     private void onExpectedStartChipClick(View view) {

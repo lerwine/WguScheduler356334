@@ -21,22 +21,22 @@ import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 public final class TermCourseListItem extends AbstractCourseEntity<TermCourseListItem> implements Comparable<TermCourseListItem> {
 
     /**
-     * The name of the {@link #assessmentCount "assessmentCount"} database column, which contains the number of assessments for the course.
+     * The name of the {@link #assessmentCount "assessmentCount"} view column, which contains the number of assessments for the course.
      */
     public static final String COLNAME_ASSESSMENT_COUNT = "assessmentCount";
 
     /**
-     * The name of the {@link #mentorName "mentorName"} database column, which contains the name of the course mentor.
+     * The name of the {@link #mentorName "mentorName"} view column, which contains the name of the course mentor.
      */
     public static final String COLNAME_MENTOR_NAME = "mentorName";
 
     /**
-     * The name of the {@link #phoneNumber "phoneNumber"} database column, which contains the phone number for the course mentor.
+     * The name of the {@link #phoneNumber "phoneNumber"} view column, which contains the phone number for the course mentor.
      */
     public static final String COLNAME_PHONE_NUMBER = "phoneNumber";
 
     /**
-     * The name of the {@link #emailAddress "emailAddress"} database column, which contains the email address for the course mentor.
+     * The name of the {@link #emailAddress "emailAddress"} view column, which contains the email address for the course mentor.
      */
     public static final String COLNAME_EMAIL_ADDRESS = "emailAddress";
 

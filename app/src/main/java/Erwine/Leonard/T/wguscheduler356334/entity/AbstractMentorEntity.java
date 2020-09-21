@@ -1,10 +1,14 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 
 import java.util.Objects;
+
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 
 public abstract class AbstractMentorEntity<T extends AbstractMentorEntity<T>> extends AbstractNotedEntity<T> {
 
@@ -20,6 +24,16 @@ public abstract class AbstractMentorEntity<T extends AbstractMentorEntity<T>> ex
      * The name of the {@link #emailAddress "emailAddress"} database column, which contains the course mentor's email address.
      */
     public static final String COLNAME_EMAIL_ADDRESS = "emailAddress";
+
+    public static final String STATE_KEY_ID = AppDb.TABLE_NAME_MENTORS + "." + COLNAME_ID;
+    public static final String STATE_KEY_NAME = AppDb.TABLE_NAME_MENTORS + "." + COLNAME_NAME;
+    public static final String STATE_KEY_PHONE_NUMBER = AppDb.TABLE_NAME_MENTORS + "." + COLNAME_PHONE_NUMBER;
+    public static final String STATE_KEY_EMAIL_ADDRESS = AppDb.TABLE_NAME_MENTORS + "." + COLNAME_EMAIL_ADDRESS;
+    public static final String STATE_KEY_NOTES = AppDb.TABLE_NAME_MENTORS + "." + COLNAME_NOTES;
+    public static final String STATE_KEY_ORIGINAL_NAME = "o:" + STATE_KEY_NAME;
+    public static final String STATE_KEY_ORIGINAL_PHONE_NUMBER = "o:" + STATE_KEY_PHONE_NUMBER;
+    public static final String STATE_KEY_ORIGINAL_EMAIL_ADDRESS = "o:" + STATE_KEY_EMAIL_ADDRESS;
+    public static final String STATE_KEY_ORIGINAL_NOTES = "o:" + STATE_KEY_NOTES;
 
     @ColumnInfo(name = COLNAME_NAME, collate = ColumnInfo.NOCASE)
     private String name;
@@ -38,11 +52,29 @@ public abstract class AbstractMentorEntity<T extends AbstractMentorEntity<T>> ex
         this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
     }
 
-    protected AbstractMentorEntity(AbstractMentorEntity<?> source) {
+    protected AbstractMentorEntity(@NonNull AbstractMentorEntity<?> source) {
         super(source);
         this.name = source.name;
         this.phoneNumber = source.phoneNumber;
         this.emailAddress = source.emailAddress;
+    }
+
+    protected AbstractMentorEntity(@NonNull Bundle bundle, boolean original) {
+        super(STATE_KEY_ID, (original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, bundle);
+        name = bundle.getString((original) ? STATE_KEY_ORIGINAL_NAME : STATE_KEY_NAME, "");
+        phoneNumber = bundle.getString((original) ? STATE_KEY_ORIGINAL_PHONE_NUMBER : STATE_KEY_PHONE_NUMBER, "");
+        emailAddress = bundle.getString((original) ? STATE_KEY_ORIGINAL_EMAIL_ADDRESS : STATE_KEY_EMAIL_ADDRESS, "");
+    }
+
+    public void saveState(@NonNull Bundle bundle, boolean original) {
+        Long id = getId();
+        if (null != id) {
+            bundle.putLong(STATE_KEY_ID, getId());
+        }
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NAME : STATE_KEY_NAME, name);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_PHONE_NUMBER : STATE_KEY_PHONE_NUMBER, phoneNumber);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_EMAIL_ADDRESS : STATE_KEY_EMAIL_ADDRESS, emailAddress);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, name);
     }
 
     /**

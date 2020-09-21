@@ -10,6 +10,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -41,8 +42,8 @@ public interface AssessmentDAO {
     @Query("SELECT * FROM assessments WHERE ROWID = :rowId")
     Single<AssessmentEntity> getByRowId(int rowId);
 
-    @Query("SELECT * FROM assessments WHERE id = :id")
-    Single<AssessmentEntity> getById(long id);
+    @Query("SELECT * FROM assessmentDetailView WHERE id = :id")
+    Single<AssessmentDetails> getById(long id);
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
     LiveData<List<AssessmentEntity>> getByCourseId(long courseId);

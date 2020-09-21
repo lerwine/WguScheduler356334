@@ -14,8 +14,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +25,7 @@ import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
@@ -40,48 +39,25 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class EditCourseViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditTermViewModel.class.getName();
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
-    static final String ARGUMENT_KEY_STATE_INITIALIZED = "state_initialized";
-    public static final String ARGUMENT_KEY_COURSE_ID = "course_id";
-    public static final String ARGUMENT_KEY_TERM_ID = "term_id";
-    public static final String ARGUMENT_KEY_MENTOR_ID = "mentor_id";
-    public static final String ARGUMENT_KEY_NUMBER = "number";
-    public static final String ARGUMENT_KEY_TITLE = "title";
-    public static final String ARGUMENT_KEY_EXPECTED_START = "expected_start";
-    public static final String ARGUMENT_KEY_ACTUAL_START = "actual_start";
-    public static final String ARGUMENT_KEY_EXPECTED_END = "expected_end";
-    public static final String ARGUMENT_KEY_ACTUAL_END = "actual_end";
-    public static final String ARGUMENT_KEY_STATUS = "status";
-    public static final String ARGUMENT_KEY_COMPETENCY_UNITS = "competency_units";
-    public static final String ARGUMENT_KEY_NOTES = "notes";
-    public static final String ARGUMENT_KEY_ORIGINAL_TERM_ID = "o:" + ARGUMENT_KEY_TERM_ID;
-    public static final String ARGUMENT_KEY_ORIGINAL_MENTOR_ID = "o:" + ARGUMENT_KEY_MENTOR_ID;
-    public static final String ARGUMENT_KEY_ORIGINAL_NUMBER = "o:" + ARGUMENT_KEY_NUMBER;
-    public static final String ARGUMENT_KEY_ORIGINAL_TITLE = "o:" + ARGUMENT_KEY_TITLE;
-    public static final String ARGUMENT_KEY_ORIGINAL_EXPECTED_START = "o:" + ARGUMENT_KEY_EXPECTED_START;
-    public static final String ARGUMENT_KEY_ORIGINAL_ACTUAL_START = "o:" + ARGUMENT_KEY_ACTUAL_START;
-    public static final String ARGUMENT_KEY_ORIGINAL_EXPECTED_END = "o:" + ARGUMENT_KEY_EXPECTED_END;
-    public static final String ARGUMENT_KEY_ORIGINAL_ACTUAL_END = "o:" + ARGUMENT_KEY_ACTUAL_END;
-    public static final String ARGUMENT_KEY_ORIGINAL_STATUS = "o:" + ARGUMENT_KEY_STATUS;
-    public static final String ARGUMENT_KEY_ORIGINAL_COMPETENCY_UNITS = "o:" + ARGUMENT_KEY_COMPETENCY_UNITS;
-    public static final String ARGUMENT_KEY_ORIGINAL_NOTES = "o:" + ARGUMENT_KEY_NOTES;
+    static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
+    public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + CourseDetails.STATE_KEY_COMPETENCY_UNITS;
 
     public static void startAddCourseActivity(@NonNull Context context, long termId, @NonNull LocalDate nextStart) {
         Intent intent = new Intent(context, AddCourseActivity.class);
-        intent.putExtra(ARGUMENT_KEY_TERM_ID, termId);
-        intent.putExtra(ARGUMENT_KEY_ORIGINAL_EXPECTED_START, nextStart.toEpochDay());
+        intent.putExtra(TermEntity.STATE_KEY_ID, termId);
+        intent.putExtra(CourseDetails.COLNAME_EXPECTED_START, nextStart.toEpochDay());
         context.startActivity(intent);
     }
 
     public static void startViewCourseActivity(@NonNull Context context, long courseId) {
         Intent intent = new Intent(context, ViewCourseActivity.class);
-        intent.putExtra(ARGUMENT_KEY_COURSE_ID, courseId);
+        intent.putExtra(CourseDetails.STATE_KEY_ID, courseId);
         context.startActivity(intent);
     }
 
     private final DbLoader dbLoader;
-    private CourseEntity courseEntity;
-    private final MutableLiveData<CourseEntity> entityLiveData;
+    private CourseDetails courseEntity;
+    private final MutableLiveData<CourseDetails> entityLiveData;
     private final LiveData<List<TermListItem>> termsLiveData;
     private final LiveData<List<MentorListItem>> mentorsLiveData;
     private final MutableLiveData<Boolean> termValidLiveData;
@@ -301,7 +277,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
     }
 
-    public MutableLiveData<CourseEntity> getEntityLiveData() {
+    public MutableLiveData<CourseDetails> getEntityLiveData() {
         return entityLiveData;
     }
 
@@ -349,55 +325,21 @@ public class EditCourseViewModel extends AndroidViewModel {
         return fromInitializedState;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public synchronized Single<CourseEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
-        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(ARGUMENT_KEY_STATE_INITIALIZED, false);
+    public synchronized Single<CourseDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
+        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         if (null == state) {
-            courseEntity = new CourseEntity();
-        } else if (state.containsKey(ARGUMENT_KEY_COURSE_ID)) {
+            courseEntity = new CourseDetails(null);
+        } else if (state.containsKey(CourseDetails.STATE_KEY_ID)) {
             if (fromInitializedState) {
-                courseEntity = new CourseEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NUMBER, ""), state.getString(ARGUMENT_KEY_ORIGINAL_TITLE, ""),
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_STATUS)) ? CourseStatus.valueOf(CourseStatus.class,
-                                state.getString(ARGUMENT_KEY_ORIGINAL_STATUS, CourseStatus.UNPLANNED.name())) : CourseStatus.UNPLANNED,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_START)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_START)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_END)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_END)) : null,
-                        state.getInt(ARGUMENT_KEY_ORIGINAL_COMPETENCY_UNITS, 0), state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, ""),
-                        state.getLong(ARGUMENT_KEY_ORIGINAL_TERM_ID), (state.containsKey(ARGUMENT_KEY_ORIGINAL_MENTOR_ID)) ? state.getLong(ARGUMENT_KEY_ORIGINAL_MENTOR_ID) : null,
-                        state.getLong(ARGUMENT_KEY_COURSE_ID));
+                courseEntity = new CourseDetails(state, true);
             } else {
-                return dbLoader.getCourseById(state.getLong(ARGUMENT_KEY_COURSE_ID))
+                return dbLoader.getCourseById(state.getLong(CourseDetails.STATE_KEY_ID))
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
-        } else if (fromInitializedState) {
-            if (state.containsKey(ARGUMENT_KEY_ORIGINAL_TERM_ID)) {
-                courseEntity = new CourseEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NUMBER, ""), state.getString(ARGUMENT_KEY_ORIGINAL_TITLE, ""),
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_STATUS)) ? CourseStatus.valueOf(CourseStatus.class,
-                                state.getString(ARGUMENT_KEY_ORIGINAL_STATUS, CourseStatus.UNPLANNED.name())) : CourseStatus.UNPLANNED,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_START)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_START)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_END)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_END)) : null,
-                        state.getInt(ARGUMENT_KEY_ORIGINAL_COMPETENCY_UNITS, 0), state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, ""),
-                        state.getLong(ARGUMENT_KEY_ORIGINAL_TERM_ID), (state.containsKey(ARGUMENT_KEY_ORIGINAL_MENTOR_ID)) ? state.getLong(ARGUMENT_KEY_ORIGINAL_MENTOR_ID) : null);
-            } else {
-                courseEntity = new CourseEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NUMBER, ""), state.getString(ARGUMENT_KEY_ORIGINAL_TITLE, ""),
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_STATUS)) ? CourseStatus.valueOf(CourseStatus.class,
-                                state.getString(ARGUMENT_KEY_ORIGINAL_STATUS, CourseStatus.UNPLANNED.name())) : CourseStatus.UNPLANNED,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_START)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_START)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_END)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_END)) : null,
-                        state.getInt(ARGUMENT_KEY_ORIGINAL_COMPETENCY_UNITS, 0), state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, ""),
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_MENTOR_ID)) ? state.getLong(ARGUMENT_KEY_ORIGINAL_MENTOR_ID) : null);
-            }
-        } else if (state.containsKey(ARGUMENT_KEY_TERM_ID)) {
-            courseEntity = new CourseEntity(state.getLong(ARGUMENT_KEY_TERM_ID));
         } else {
-            courseEntity = new CourseEntity();
+            courseEntity = new CourseDetails(state, fromInitializedState && state.containsKey(CourseDetails.STATE_KEY_ORIGINAL_TERM_ID));
         }
         if (null == state) {
             setNumber(courseEntity.getNumber());
@@ -412,96 +354,75 @@ public class EditCourseViewModel extends AndroidViewModel {
             setActualEnd(courseEntity.getActualEnd());
             setNotes(courseEntity.getNotes());
         } else if (fromInitializedState) {
-            setNumber(state.getString(ARGUMENT_KEY_NUMBER, ""));
-            setTitle(state.getString(ARGUMENT_KEY_TITLE, ""));
-            setCompetencyUnitsText(state.getString(ARGUMENT_KEY_COMPETENCY_UNITS, ""));
-            setStatus(CourseStatus.valueOf(state.getString(ARGUMENT_KEY_STATUS, CourseStatus.UNPLANNED.name())));
-            setTermId((state.containsKey(ARGUMENT_KEY_TERM_ID)) ? state.getLong(ARGUMENT_KEY_TERM_ID) : null);
-            setMentorId((state.containsKey(ARGUMENT_KEY_MENTOR_ID)) ? state.getLong(ARGUMENT_KEY_MENTOR_ID) : null);
-            setExpectedStart((state.containsKey(ARGUMENT_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_EXPECTED_START)) : null);
-            setExpectedEnd((state.containsKey(ARGUMENT_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_EXPECTED_END)) : null);
-            setActualStart((state.containsKey(ARGUMENT_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ACTUAL_START)) : null);
-            setActualEnd((state.containsKey(ARGUMENT_KEY_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ACTUAL_END)) : null);
-            setNotes(state.getString(ARGUMENT_KEY_NOTES, ""));
+            setNumber(state.getString(CourseDetails.STATE_KEY_NUMBER, ""));
+            setTitle(state.getString(CourseDetails.STATE_KEY_TITLE, ""));
+            setCompetencyUnitsText(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
+            setStatus(CourseStatus.valueOf(state.getString(CourseDetails.STATE_KEY_STATUS, CourseStatus.UNPLANNED.name())));
+            setTermId((state.containsKey(TermEntity.STATE_KEY_ID)) ? state.getLong(TermEntity.STATE_KEY_ID) : null);
+            setMentorId((state.containsKey(MentorEntity.STATE_KEY_ID)) ? state.getLong(MentorEntity.STATE_KEY_ID) : null);
+            setExpectedStart((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_START)) : null);
+            setExpectedEnd((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_END)) : null);
+            setActualStart((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_START)) : null);
+            setActualEnd((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_END)) : null);
+            setNotes(state.getString(CourseDetails.STATE_KEY_NOTES, ""));
         } else {
-            setNumber((state.containsKey(ARGUMENT_KEY_NUMBER)) ? state.getString(ARGUMENT_KEY_NUMBER) : courseEntity.getNumber());
-            setTitle((state.containsKey(ARGUMENT_KEY_TITLE)) ? state.getString(ARGUMENT_KEY_TITLE) : courseEntity.getTitle());
+            setNumber((state.containsKey(CourseDetails.STATE_KEY_NUMBER)) ? state.getString(CourseDetails.STATE_KEY_NUMBER) : courseEntity.getNumber());
+            setTitle((state.containsKey(CourseDetails.STATE_KEY_TITLE)) ? state.getString(CourseDetails.STATE_KEY_TITLE) : courseEntity.getTitle());
             setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(courseEntity.getCompetencyUnits()));
-            setStatus((state.containsKey(ARGUMENT_KEY_STATUS)) ? CourseStatus.valueOf(state.getString(ARGUMENT_KEY_STATUS, CourseStatus.UNPLANNED.name())) : courseEntity.getStatus());
-            setTermId((state.containsKey(ARGUMENT_KEY_TERM_ID)) ? state.getLong(ARGUMENT_KEY_TERM_ID) : courseEntity.getTermId());
-            setMentorId((state.containsKey(ARGUMENT_KEY_MENTOR_ID)) ? (Long) state.getLong(ARGUMENT_KEY_MENTOR_ID) : courseEntity.getMentorId());
-            setExpectedStart((state.containsKey(ARGUMENT_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_EXPECTED_START)) : courseEntity.getExpectedStart());
-            setExpectedEnd((state.containsKey(ARGUMENT_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_EXPECTED_END)) : courseEntity.getExpectedEnd());
-            setActualStart((state.containsKey(ARGUMENT_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ACTUAL_START)) : courseEntity.getActualStart());
-            setActualEnd((state.containsKey(ARGUMENT_KEY_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ACTUAL_END)) : courseEntity.getActualEnd());
-            setNotes((state.containsKey(ARGUMENT_KEY_NOTES)) ? state.getString(ARGUMENT_KEY_NOTES) : courseEntity.getNotes());
+            setStatus((state.containsKey(CourseDetails.STATE_KEY_STATUS)) ? CourseStatus.valueOf(state.getString(CourseDetails.STATE_KEY_STATUS, CourseStatus.UNPLANNED.name())) : courseEntity.getStatus());
+            setTermId((state.containsKey(TermEntity.STATE_KEY_ID)) ? state.getLong(TermEntity.STATE_KEY_ID) : courseEntity.getTermId());
+            setMentorId((state.containsKey(MentorEntity.STATE_KEY_ID)) ? (Long) state.getLong(MentorEntity.STATE_KEY_ID) : courseEntity.getMentorId());
+            setExpectedStart((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_START)) : courseEntity.getExpectedStart());
+            setExpectedEnd((state.containsKey(CourseDetails.STATE_KEY_EXPECTED_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_EXPECTED_END)) : courseEntity.getExpectedEnd());
+            setActualStart((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_START)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_START)) : courseEntity.getActualStart());
+            setActualEnd((state.containsKey(CourseDetails.STATE_KEY_ACTUAL_END)) ? LocalDate.ofEpochDay(state.getLong(CourseDetails.STATE_KEY_ACTUAL_END)) : courseEntity.getActualEnd());
+            setNotes((state.containsKey(CourseDetails.STATE_KEY_NOTES)) ? state.getString(CourseDetails.STATE_KEY_NOTES) : courseEntity.getNotes());
         }
         entityLiveData.postValue(courseEntity);
         return Single.just(courseEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
-    @SuppressWarnings("ConstantConditions")
     public void saveViewModelState(Bundle outState) {
-        outState.putBoolean(ARGUMENT_KEY_STATE_INITIALIZED, true);
+        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        courseEntity.saveState(outState, true);
         if (null != courseEntity.getId()) {
-            outState.putLong(ARGUMENT_KEY_COURSE_ID, courseEntity.getId());
+            outState.putLong(CourseDetails.STATE_KEY_ID, courseEntity.getId());
         }
         Long id = termId;
         if (null != id) {
-            outState.putLong(ARGUMENT_KEY_TERM_ID, id);
+            outState.putLong(TermEntity.STATE_KEY_ID, id);
         }
-        outState.putLong(ARGUMENT_KEY_ORIGINAL_TERM_ID, courseEntity.getTermId());
         id = mentorId;
         if (null != id) {
-            outState.putLong(ARGUMENT_KEY_MENTOR_ID, id);
+            outState.putLong(MentorEntity.STATE_KEY_ID, id);
         }
-        id = courseEntity.getMentorId();
-        if (null != id) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_MENTOR_ID, id);
+        outState.putString(CourseDetails.STATE_KEY_STATUS, status.name());
+        Integer i = getCompetencyUnitsMessageLiveData().getValue();
+        if (null != i) {
+            outState.putInt(CourseDetails.STATE_KEY_COMPETENCY_UNITS, i);
         }
-        outState.putString(ARGUMENT_KEY_STATUS, status.name());
-        outState.putString(ARGUMENT_KEY_ORIGINAL_STATUS, courseEntity.getStatus().name());
-        outState.putString(ARGUMENT_KEY_COMPETENCY_UNITS, getCompetencyUnitsText());
-        outState.putInt(ARGUMENT_KEY_ORIGINAL_COMPETENCY_UNITS, courseEntity.getCompetencyUnits());
-        outState.putString(ARGUMENT_KEY_NUMBER, number);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NUMBER, courseEntity.getNumber());
+        outState.putString(STATE_KEY_COMPETENCY_UNITS_TEXT, getCompetencyUnitsText());
+        outState.putString(CourseDetails.STATE_KEY_NUMBER, number);
         LocalDate date = getExpectedStart();
         if (null != date) {
-            outState.putLong(ARGUMENT_KEY_EXPECTED_START, date.toEpochDay());
-        }
-        date = courseEntity.getExpectedStart();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_START, date.toEpochDay());
+            outState.putLong(CourseDetails.STATE_KEY_EXPECTED_START, date.toEpochDay());
         }
         date = getExpectedEnd();
         if (null != date) {
-            outState.putLong(ARGUMENT_KEY_EXPECTED_END, date.toEpochDay());
-        }
-        date = courseEntity.getExpectedEnd();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_EXPECTED_END, date.toEpochDay());
+            outState.putLong(CourseDetails.STATE_KEY_EXPECTED_END, date.toEpochDay());
         }
         date = getActualStart();
         if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ACTUAL_START, date.toEpochDay());
-        }
-        date = courseEntity.getActualStart();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_START, date.toEpochDay());
+            outState.putLong(CourseDetails.STATE_KEY_ACTUAL_START, date.toEpochDay());
         }
         date = getActualEnd();
         if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ACTUAL_END, date.toEpochDay());
+            outState.putLong(CourseDetails.STATE_KEY_ACTUAL_END, date.toEpochDay());
         }
-        date = courseEntity.getActualEnd();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_ACTUAL_END, date.toEpochDay());
-        }
-        outState.putString(ARGUMENT_KEY_NOTES, notes);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NOTES, courseEntity.getNotes());
+        outState.putString(CourseDetails.STATE_KEY_NOTES, notes);
     }
 
-    private void onEntityLoadedFromDb(CourseEntity entity) {
+    private void onEntityLoadedFromDb(CourseDetails entity) {
         courseEntity = entity;
         setTermId(entity.getTermId());
         setMentorId(entity.getMentorId());
@@ -591,7 +512,6 @@ public class EditCourseViewModel extends AndroidViewModel {
         return Optional.empty();
     }
 
-    @SuppressWarnings("ConstantConditions")
     public synchronized Single<List<Integer>> save() {
         ArrayList<Integer> errors = new ArrayList<>();
         if (null == termId) {
@@ -615,67 +535,46 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (!errors.isEmpty()) {
             return Single.just(errors);
         }
-        long originalTermId = courseEntity.getTermId();
-        Long originalMentorId = courseEntity.getMentorId();
-        String originalNumber = courseEntity.getNumber();
-        String originalTitle = courseEntity.getTitle();
-        LocalDate originalExpectedStart = courseEntity.getExpectedStart();
-        LocalDate originalActualStart = courseEntity.getExpectedEnd();
-        LocalDate originalExpectedEnd = courseEntity.getActualStart();
-        LocalDate originalActualEnd = courseEntity.getActualEnd();
-        CourseStatus originalStatus = courseEntity.getStatus();
-        int originalCompetencyUnits = courseEntity.getCompetencyUnits();
-        String originalNotes = courseEntity.getNotes();
-        courseEntity.setTermId(termId);
-        courseEntity.setMentorId(mentorId);
-        courseEntity.setNumber(normalizedNumber);
-        courseEntity.setTitle(normalizedTitle);
-        courseEntity.setStatus(status);
+        CourseEntity entity = courseEntity.toEntity();
+        entity.setTermId(termId);
+        entity.setMentorId(mentorId);
+        entity.setNumber(normalizedNumber);
+        entity.setTitle(normalizedTitle);
+        entity.setStatus(status);
         switch (status) {
             case UNPLANNED:
-                courseEntity.setExpectedStart(null);
-                courseEntity.setExpectedEnd(null);
-                courseEntity.setActualStart(null);
-                courseEntity.setActualEnd(null);
+                entity.setExpectedStart(null);
+                entity.setExpectedEnd(null);
+                entity.setActualStart(null);
+                entity.setActualEnd(null);
                 break;
             case IN_PROGRESS:
-                courseEntity.setExpectedStart(expectedStart);
-                courseEntity.setExpectedEnd(expectedEnd);
-                courseEntity.setActualStart(actualStart);
-                courseEntity.setActualEnd(null);
+                entity.setExpectedStart(expectedStart);
+                entity.setExpectedEnd(expectedEnd);
+                entity.setActualStart(actualStart);
+                entity.setActualEnd(null);
             case PLANNED:
-                courseEntity.setExpectedStart(expectedStart);
-                courseEntity.setExpectedEnd(expectedEnd);
-                courseEntity.setActualStart(null);
-                courseEntity.setActualEnd(null);
+                entity.setExpectedStart(expectedStart);
+                entity.setExpectedEnd(expectedEnd);
+                entity.setActualStart(null);
+                entity.setActualEnd(null);
                 break;
             default:
-                courseEntity.setExpectedStart(expectedStart);
-                courseEntity.setExpectedEnd(expectedEnd);
-                courseEntity.setActualStart(actualStart);
-                courseEntity.setActualEnd(actualEnd);
+                entity.setExpectedStart(expectedStart);
+                entity.setExpectedEnd(expectedEnd);
+                entity.setActualStart(actualStart);
+                entity.setActualEnd(actualEnd);
                 break;
         }
-        courseEntity.setCompetencyUnits(competencyUnitsValue);
-        courseEntity.setNotes(notes);
-        return dbLoader.saveCourse(courseEntity).doOnError(throwable -> {
-            courseEntity.setTermId(originalTermId);
-            courseEntity.setMentorId(originalMentorId);
-            courseEntity.setNumber(originalNumber);
-            courseEntity.setTitle(originalTitle);
-            courseEntity.setStatus(originalStatus);
-            courseEntity.setExpectedStart(originalExpectedStart);
-            courseEntity.setExpectedEnd(originalExpectedEnd);
-            courseEntity.setActualStart(originalActualStart);
-            courseEntity.setActualEnd(originalActualEnd);
-            courseEntity.setCompetencyUnits(originalCompetencyUnits);
-            courseEntity.setNotes(originalNotes);
-        }).toSingleDefault(Collections.emptyList());
+        entity.setCompetencyUnits(competencyUnitsValue);
+        entity.setNotes(notes);
+        return dbLoader.saveCourse(courseEntity.toEntity()).toSingleDefault(Collections.emptyList());
     }
 
     public Completable delete() {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.delete");
-        return dbLoader.deleteCourse(entityLiveData.getValue()).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting term", throwable));
+        return dbLoader.deleteCourse(Objects.requireNonNull(entityLiveData.getValue()).toEntity()).doOnError(throwable -> Log.e(getClass().getName(),
+                "Error deleting course", throwable));
     }
 
     public boolean isChanged() {

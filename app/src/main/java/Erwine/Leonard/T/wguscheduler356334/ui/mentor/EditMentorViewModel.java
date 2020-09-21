@@ -25,16 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 public class EditMentorViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditMentorViewModel.class.getName();
-    static final String ARGUMENT_KEY_STATE_INITIALIZED = "state_initialized";
-    public static final String ARGUMENT_KEY_MENTOR_ID = "mentor_id";
-    public static final String ARGUMENT_KEY_NAME = "name";
-    public static final String ARGUMENT_KEY_PHONE_NUMBER = "phone_number";
-    public static final String ARGUMENT_KEY_EMAIL_ADDRESS = "email_address";
-    public static final String ARGUMENT_KEY_NOTES = "notes";
-    public static final String ARGUMENT_KEY_ORIGINAL_NAME = "original_name";
-    public static final String ARGUMENT_KEY_ORIGINAL_PHONE_NUMBER = "original_phone_number";
-    public static final String ARGUMENT_KEY_ORIGINAL_EMAIL_ADDRESS = "original_email_address";
-    public static final String ARGUMENT_KEY_ORIGINAL_NOTES = "original_notes";
+    static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
 
     private final MutableLiveData<MentorEntity> entityLiveData;
     private final DbLoader dbLoader;
@@ -64,7 +55,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     public static void startEditMentorActivity(Context context, Long id) {
         Intent intent = new Intent(context, EditMentorActivity.class);
         if (null != id) {
-            intent.putExtra(ARGUMENT_KEY_MENTOR_ID, id);
+            intent.putExtra(MentorEntity.STATE_KEY_ID, id);
         }
         context.startActivity(intent);
     }
@@ -158,32 +149,27 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     @SuppressWarnings("ConstantConditions")
     public synchronized Single<MentorEntity> restoreState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
-        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(ARGUMENT_KEY_STATE_INITIALIZED, false);
+        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         if (null == state) {
             mentorEntity = new MentorEntity();
-        } else if (state.containsKey(ARGUMENT_KEY_MENTOR_ID)) {
+        } else if (state.containsKey(MentorEntity.STATE_KEY_ID)) {
             if (fromInitializedState) {
-                mentorEntity = new MentorEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NAME, ""), state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, ""),
-                        state.getString(ARGUMENT_KEY_ORIGINAL_PHONE_NUMBER, ""), state.getString(ARGUMENT_KEY_ORIGINAL_EMAIL_ADDRESS, ""),
-                        state.getLong(ARGUMENT_KEY_MENTOR_ID));
+                mentorEntity = new MentorEntity(state, true);
             } else {
-                return dbLoader.getMentorById(state.getLong(ARGUMENT_KEY_MENTOR_ID))
+                return dbLoader.getMentorById(state.getLong(MentorEntity.STATE_KEY_ID))
                         .doOnSuccess(this::onEntityLoaded)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
             }
-        } else if (fromInitializedState) {
-            mentorEntity = new MentorEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NAME, ""), state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, ""),
-                    state.getString(ARGUMENT_KEY_ORIGINAL_PHONE_NUMBER, ""), state.getString(ARGUMENT_KEY_ORIGINAL_EMAIL_ADDRESS, ""));
         } else {
-            mentorEntity = new MentorEntity();
+            mentorEntity = new MentorEntity(state, fromInitializedState);
         }
         entityLiveData.postValue(mentorEntity);
         if (fromInitializedState) {
-            setName(state.getString(ARGUMENT_KEY_NAME, ""));
-            setPhoneNumber(state.getString(ARGUMENT_KEY_PHONE_NUMBER, ""));
-            setEmailAddress(state.getString(ARGUMENT_KEY_EMAIL_ADDRESS, ""));
-            setNotes(state.getString(ARGUMENT_KEY_NOTES, ""));
+            setName(state.getString(MentorEntity.STATE_KEY_NAME, ""));
+            setPhoneNumber(state.getString(MentorEntity.STATE_KEY_PHONE_NUMBER, ""));
+            setEmailAddress(state.getString(MentorEntity.STATE_KEY_EMAIL_ADDRESS, ""));
+            setNotes(state.getString(MentorEntity.STATE_KEY_NOTES, ""));
         } else {
             setName(mentorEntity.getName());
             setPhoneNumber(mentorEntity.getPhoneNumber());
@@ -239,18 +225,12 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     public void saveState(Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
-        outState.putBoolean(ARGUMENT_KEY_STATE_INITIALIZED, true);
-        if (null != mentorEntity.getId()) {
-            outState.putLong(ARGUMENT_KEY_MENTOR_ID, mentorEntity.getId());
-        }
-        outState.putString(ARGUMENT_KEY_NAME, name);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NAME, mentorEntity.getName());
-        outState.putString(ARGUMENT_KEY_PHONE_NUMBER, phoneNumber);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_PHONE_NUMBER, mentorEntity.getPhoneNumber());
-        outState.putString(ARGUMENT_KEY_EMAIL_ADDRESS, emailAddress);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_EMAIL_ADDRESS, mentorEntity.getEmailAddress());
-        outState.putString(ARGUMENT_KEY_NOTES, notes);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NOTES, mentorEntity.getNotes());
+        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        mentorEntity.saveState(outState, true);
+        outState.putString(MentorEntity.STATE_KEY_NAME, name);
+        outState.putString(MentorEntity.STATE_KEY_PHONE_NUMBER, phoneNumber);
+        outState.putString(MentorEntity.STATE_KEY_EMAIL_ADDRESS, emailAddress);
+        outState.putString(MentorEntity.STATE_KEY_NOTES, notes);
     }
 
     public boolean isChanged() {

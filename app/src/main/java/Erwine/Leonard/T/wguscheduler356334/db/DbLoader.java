@@ -26,9 +26,11 @@ import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
@@ -361,13 +363,13 @@ public class DbLoader {
     }
 
     /**
-     * Asynchronously gets a {@link CourseEntity} from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb} by its unique identifier.
+     * Asynchronously gets a {@link CourseDetails} from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb} by its unique identifier.
      *
-     * @param id The unique identifier of the  {@link CourseEntity} to retrieve.
-     * @return The {@link Single} object that can be used to observe the result {@link CourseEntity} object.
+     * @param id The unique identifier of the  {@link CourseDetails} to retrieve.
+     * @return The {@link Single} object that can be used to observe the result {@link CourseDetails} object.
      */
     @NonNull
-    public Single<CourseEntity> getCourseById(long id) {
+    public Single<CourseDetails> getCourseById(long id) {
         Log.d(LOG_TAG, String.format("Called getCourseById(%d)", id));
         return appDb.courseDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
@@ -500,7 +502,7 @@ public class DbLoader {
      * @return The {@link Single} object that can be used to observe the result {@link AssessmentEntity} object.
      */
     @NonNull
-    public Single<AssessmentEntity> getAssessmentById(long id) {
+    public Single<AssessmentDetails> getAssessmentById(long id) {
         Log.d(LOG_TAG, String.format("Called getAssessmentById(%d)", id));
         return appDb.assessmentDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }

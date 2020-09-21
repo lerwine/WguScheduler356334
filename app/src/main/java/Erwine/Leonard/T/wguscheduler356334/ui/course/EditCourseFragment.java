@@ -17,8 +17,12 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.tabs.TabLayout;
 
+import java.util.List;
+
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
 public class EditCourseFragment extends Fragment {
@@ -77,6 +81,8 @@ public class EditCourseFragment extends Fragment {
         // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
+        viewModel.getTermsLiveData().observe(getViewLifecycleOwner(), this::onTermsLoaded);
+        viewModel.getMentorsLiveData().observe(getViewLifecycleOwner(), this::onMentorsLoaded);
         sectionsPagerAdapter = new EditCoursePagerAdapter(requireContext(), requireActivity().getSupportFragmentManager());
         otherViewPager.setAdapter(sectionsPagerAdapter);
         otherTabLayout.setupWithViewPager(otherViewPager);
@@ -85,8 +91,16 @@ public class EditCourseFragment extends Fragment {
         titleEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setTitle));
     }
 
-    private void onEntityLoaded(CourseEntity entity) {
+    private void onEntityLoaded(CourseDetails entity) {
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onEntityLoaded
+    }
+
+    private void onTermsLoaded(List<TermListItem> termListItems) {
+
+    }
+
+    private void onMentorsLoaded(List<MentorListItem> mentorListItems) {
+
     }
 
     private void onTermButtonClick(View view) {

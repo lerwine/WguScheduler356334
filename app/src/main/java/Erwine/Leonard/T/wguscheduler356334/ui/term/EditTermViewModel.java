@@ -36,26 +36,17 @@ public class EditTermViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditTermViewModel.class.getName();
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
-    static final String ARGUMENT_KEY_STATE_INITIALIZED = "state_initialized";
-    public static final String ARGUMENT_KEY_TERM_ID = "term_id";
-    static final String ARGUMENT_KEY_NAME = "name";
-    static final String ARGUMENT_KEY_START_DATE = "start_date";
-    static final String ARGUMENT_KEY_END_DATE = "end_date";
-    static final String ARGUMENT_KEY_NOTES = "notes";
-    static final String ARGUMENT_KEY_ORIGINAL_NAME = "o:" + ARGUMENT_KEY_NAME;
-    static final String ARGUMENT_KEY_ORIGINAL_START_DATE = "o:" + ARGUMENT_KEY_START_DATE;
-    static final String ARGUMENT_KEY_ORIGINAL_END_DATE = "o:" + ARGUMENT_KEY_END_DATE;
-    static final String ARGUMENT_KEY_ORIGINAL_NOTES = "o:" + ARGUMENT_KEY_NOTES;
+    static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
 
     public static void startAddTermActivity(Context context, @NonNull LocalDate termStart) {
         Intent intent = new Intent(context, AddTermActivity.class);
-        intent.putExtra(ARGUMENT_KEY_START_DATE, termStart.toEpochDay());
+        intent.putExtra(TermEntity.STATE_KEY_START, termStart.toEpochDay());
         context.startActivity(intent);
     }
 
     public static void startViewTermActivity(Context context, long termId) {
         Intent intent = new Intent(context, ViewTermActivity.class);
-        intent.putExtra(ARGUMENT_KEY_TERM_ID, termId);
+        intent.putExtra(TermEntity.STATE_KEY_ID, termId);
         context.startActivity(intent);
     }
 
@@ -156,31 +147,20 @@ public class EditTermViewModel extends AndroidViewModel {
 
     public synchronized Single<TermEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
-        fromSavedState = null != savedInstanceState && savedInstanceState.getBoolean(ARGUMENT_KEY_STATE_INITIALIZED, false);
+        fromSavedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromSavedState) ? savedInstanceState : getArguments.get();
         if (null == state) {
             termEntity = new TermEntity();
-        } else if (state.containsKey(ARGUMENT_KEY_TERM_ID)) {
+        } else if (state.containsKey(TermEntity.STATE_KEY_ID)) {
             if (fromSavedState) {
-                termEntity = new TermEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NAME, ""),
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_START_DATE)) : null,
-                        (state.containsKey(ARGUMENT_KEY_ORIGINAL_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_END_DATE)) : null,
-                        state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, ""),
-                        state.getLong(ARGUMENT_KEY_TERM_ID)
-                );
+                termEntity = new TermEntity(state, true);
             } else {
-                return dbLoader.getTermById(state.getLong(ARGUMENT_KEY_TERM_ID))
+                return dbLoader.getTermById(state.getLong(TermEntity.STATE_KEY_ID))
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
-        } else if (fromSavedState) {
-            termEntity = new TermEntity(state.getString(ARGUMENT_KEY_ORIGINAL_NAME, ""),
-                    (state.containsKey(ARGUMENT_KEY_ORIGINAL_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_START_DATE)) : null,
-                    (state.containsKey(ARGUMENT_KEY_ORIGINAL_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_ORIGINAL_END_DATE)) : null,
-                    state.getString(ARGUMENT_KEY_ORIGINAL_NOTES, "")
-            );
         } else {
-            termEntity = new TermEntity();
+            termEntity = new TermEntity(state, fromSavedState);
         }
         entityLiveData.postValue(termEntity);
         if (null == state) {
@@ -189,45 +169,33 @@ public class EditTermViewModel extends AndroidViewModel {
             setEnd(termEntity.getEnd());
             setNotes(termEntity.getNotes());
         } else if (fromSavedState) {
-            setName(state.getString(ARGUMENT_KEY_NAME, ""));
-            setStart((state.containsKey(ARGUMENT_KEY_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_START_DATE)) : null);
-            setEnd((state.containsKey(ARGUMENT_KEY_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_END_DATE)) : null);
-            setNotes(state.getString(ARGUMENT_KEY_NOTES, ""));
+            setName(state.getString(TermEntity.STATE_KEY_NAME, ""));
+            setStart((state.containsKey(TermEntity.STATE_KEY_START)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_START)) : null);
+            setEnd((state.containsKey(TermEntity.STATE_KEY_END)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_END)) : null);
+            setNotes(state.getString(TermEntity.STATE_KEY_NOTES, ""));
         } else {
-            setName((state.containsKey(ARGUMENT_KEY_NAME)) ? state.getString(ARGUMENT_KEY_NAME) : termEntity.getName());
-            setStart((state.containsKey(ARGUMENT_KEY_START_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_START_DATE)) : termEntity.getStart());
-            setEnd((state.containsKey(ARGUMENT_KEY_END_DATE)) ? LocalDate.ofEpochDay(state.getLong(ARGUMENT_KEY_END_DATE)) : termEntity.getEnd());
-            setNotes((state.containsKey(ARGUMENT_KEY_NOTES)) ? state.getString(ARGUMENT_KEY_NOTES) : termEntity.getNotes());
+            setName((state.containsKey(TermEntity.STATE_KEY_NAME)) ? state.getString(TermEntity.STATE_KEY_NAME) : termEntity.getName());
+            setStart((state.containsKey(TermEntity.STATE_KEY_START)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_START)) : termEntity.getStart());
+            setEnd((state.containsKey(TermEntity.STATE_KEY_END)) ? LocalDate.ofEpochDay(state.getLong(TermEntity.STATE_KEY_END)) : termEntity.getEnd());
+            setNotes((state.containsKey(TermEntity.STATE_KEY_NOTES)) ? state.getString(TermEntity.STATE_KEY_NOTES) : termEntity.getNotes());
         }
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void saveViewModelState(Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
-        outState.putBoolean(ARGUMENT_KEY_STATE_INITIALIZED, true);
-        if (null != termEntity.getId()) {
-            outState.putLong(ARGUMENT_KEY_TERM_ID, termEntity.getId());
-        }
-        outState.putString(ARGUMENT_KEY_NAME, name);
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NAME, termEntity.getName());
+        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        termEntity.saveState(outState, true);
+        outState.putString(TermEntity.STATE_KEY_NAME, name);
         LocalDate date = start;
         if (null != date) {
-            outState.putLong(ARGUMENT_KEY_START_DATE, date.toEpochDay());
-        }
-        date = termEntity.getStart();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_START_DATE, date.toEpochDay());
+            outState.putLong(TermEntity.STATE_KEY_START, date.toEpochDay());
         }
         date = end;
         if (null != date) {
-            outState.putLong(ARGUMENT_KEY_END_DATE, date.toEpochDay());
+            outState.putLong(TermEntity.STATE_KEY_END, date.toEpochDay());
         }
-        date = termEntity.getEnd();
-        if (null != date) {
-            outState.putLong(ARGUMENT_KEY_ORIGINAL_END_DATE, date.toEpochDay());
-        }
-        outState.putString(ARGUMENT_KEY_ORIGINAL_NOTES, termEntity.getNotes());
-        outState.putString(ARGUMENT_KEY_NOTES, notes);
+        outState.putString(TermEntity.STATE_KEY_NOTES, notes);
     }
 
     public synchronized Single<List<Integer>> save() {

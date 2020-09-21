@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -7,6 +9,8 @@ import androidx.room.ForeignKey;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 
 public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> extends AbstractNotedEntity<T> {
 
@@ -50,6 +54,28 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
      * The name of the {@link #competencyUnits "competencyUnits"} database column, which contains the competencyUnits attributed to the course.
      */
     public static final String COLNAME_COMPETENCY_UNITS = "competencyUnits";
+
+    public static final String STATE_KEY_ID = AppDb.TABLE_NAME_COURSES + "." + COLNAME_ID;
+    public static final String STATE_KEY_NUMBER = AppDb.TABLE_NAME_COURSES + "." + COLNAME_NUMBER;
+    public static final String STATE_KEY_TITLE = AppDb.TABLE_NAME_COURSES + "." + COLNAME_TITLE;
+    public static final String STATE_KEY_EXPECTED_START = AppDb.TABLE_NAME_COURSES + "." + COLNAME_EXPECTED_START;
+    public static final String STATE_KEY_ACTUAL_START = AppDb.TABLE_NAME_COURSES + "." + COLNAME_ACTUAL_START;
+    public static final String STATE_KEY_EXPECTED_END = AppDb.TABLE_NAME_COURSES + "." + COLNAME_EXPECTED_END;
+    public static final String STATE_KEY_ACTUAL_END = AppDb.TABLE_NAME_COURSES + "." + COLNAME_ACTUAL_END;
+    public static final String STATE_KEY_STATUS = AppDb.TABLE_NAME_COURSES + "." + COLNAME_STATUS;
+    public static final String STATE_KEY_COMPETENCY_UNITS = AppDb.TABLE_NAME_COURSES + "." + COLNAME_COMPETENCY_UNITS;
+    public static final String STATE_KEY_NOTES = AppDb.TABLE_NAME_COURSES + "." + COLNAME_NOTES;
+    public static final String STATE_KEY_ORIGINAL_TERM_ID = "o:" + AbstractTermEntity.STATE_KEY_ID;
+    public static final String STATE_KEY_ORIGINAL_MENTOR_ID = "o:" + AbstractMentorEntity.STATE_KEY_ID;
+    public static final String STATE_KEY_ORIGINAL_NUMBER = "o:" + STATE_KEY_NUMBER;
+    public static final String STATE_KEY_ORIGINAL_TITLE = "o:" + STATE_KEY_TITLE;
+    public static final String STATE_KEY_ORIGINAL_EXPECTED_START = "o:" + STATE_KEY_EXPECTED_START;
+    public static final String STATE_KEY_ORIGINAL_ACTUAL_START = "o:" + STATE_KEY_ACTUAL_START;
+    public static final String STATE_KEY_ORIGINAL_EXPECTED_END = "o:" + STATE_KEY_EXPECTED_END;
+    public static final String STATE_KEY_ORIGINAL_ACTUAL_END = "o:" + STATE_KEY_ACTUAL_END;
+    public static final String STATE_KEY_ORIGINAL_STATUS = "o:" + STATE_KEY_STATUS;
+    public static final String STATE_KEY_ORIGINAL_COMPETENCY_UNITS = "o:" + STATE_KEY_COMPETENCY_UNITS;
+    public static final String STATE_KEY_ORIGINAL_NOTES = "o:" + STATE_KEY_NOTES;
 
     @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_TERM_ID)
@@ -102,6 +128,76 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
         super(source);
     }
 
+    protected AbstractCourseEntity(@NonNull Bundle bundle, boolean original) {
+        super(STATE_KEY_ID, (original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, bundle);
+        Long id = termId;
+        String key = (original) ? STATE_KEY_ORIGINAL_TERM_ID : AbstractTermEntity.STATE_KEY_ID;
+        if (bundle.containsKey(key)) {
+            termId = bundle.getLong(key);
+        }
+        key = (original) ? STATE_KEY_ORIGINAL_MENTOR_ID : AbstractMentorEntity.STATE_KEY_ID;
+        if (bundle.containsKey(key)) {
+            mentorId = bundle.getLong(key);
+        }
+        number = bundle.getString((original) ? STATE_KEY_ORIGINAL_NUMBER : STATE_KEY_NUMBER, "");
+        title = bundle.getString((original) ? STATE_KEY_ORIGINAL_TITLE : STATE_KEY_TITLE, "");
+        key = (original) ? STATE_KEY_ORIGINAL_STATUS : STATE_KEY_STATUS;
+        status = (bundle.containsKey(key)) ? CourseStatus.valueOf(bundle.getString(key)) : CourseStatus.UNPLANNED;
+        key = (original) ? STATE_KEY_ORIGINAL_EXPECTED_START : STATE_KEY_EXPECTED_START;
+        if (bundle.containsKey(key)) {
+            expectedStart = LocalDate.ofEpochDay(bundle.getLong(key));
+        }
+        key = (original) ? STATE_KEY_ORIGINAL_ACTUAL_START : STATE_KEY_ACTUAL_START;
+        if (bundle.containsKey(key)) {
+            actualStart = LocalDate.ofEpochDay(bundle.getLong(key));
+        }
+        key = (original) ? STATE_KEY_ORIGINAL_EXPECTED_END : STATE_KEY_EXPECTED_END;
+        if (bundle.containsKey(key)) {
+            expectedEnd = LocalDate.ofEpochDay(bundle.getLong(key));
+        }
+        key = (original) ? STATE_KEY_ORIGINAL_ACTUAL_END : STATE_KEY_ACTUAL_END;
+        if (bundle.containsKey(key)) {
+            actualEnd = LocalDate.ofEpochDay(bundle.getLong(key));
+        }
+        competencyUnits = bundle.getInt((original) ? STATE_KEY_ORIGINAL_COMPETENCY_UNITS : STATE_KEY_COMPETENCY_UNITS, 0);
+    }
+
+    public void saveState(@NonNull Bundle bundle, boolean original) {
+        Long id = getId();
+        if (null != id) {
+            bundle.putLong(STATE_KEY_ID, getId());
+        }
+        id = termId;
+        if (null != id) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_TERM_ID : AbstractTermEntity.STATE_KEY_ID, id);
+        }
+        id = termId;
+        if (null != id) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_MENTOR_ID : AbstractMentorEntity.STATE_KEY_ID, id);
+        }
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NUMBER : STATE_KEY_NUMBER, number);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_TITLE : STATE_KEY_TITLE, title);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_STATUS : STATE_KEY_STATUS, status.name());
+        LocalDate d = expectedStart;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_EXPECTED_START : STATE_KEY_EXPECTED_START, d.toEpochDay());
+        }
+        d = actualStart;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_ACTUAL_START : STATE_KEY_ACTUAL_START, d.toEpochDay());
+        }
+        d = expectedEnd;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_EXPECTED_END : STATE_KEY_EXPECTED_END, d.toEpochDay());
+        }
+        d = actualEnd;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_ACTUAL_END : STATE_KEY_ACTUAL_END, d.toEpochDay());
+        }
+        bundle.putInt((original) ? STATE_KEY_ORIGINAL_COMPETENCY_UNITS : STATE_KEY_COMPETENCY_UNITS, competencyUnits);
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, getNotes());
+    }
+
     /**
      * Gets the value of the {@link TermEntity#COLNAME_ID primary key} for the {@link TermEntity term} associated with the course.
      *
@@ -137,7 +233,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
      *
      * @param mentorId The new {@link MentorEntity#COLNAME_ID primary key} value for the {@link MentorEntity course mentor} to be associated with the course.
      */
-    protected void setMentorId(Long mentorId) {
+    protected void setMentorId(@Nullable Long mentorId) {
         this.mentorId = mentorId;
     }
 
@@ -213,7 +309,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
      *
      * @param expectedStart The date that the user expects to start the course or {@code null} if the expected start date has not been determined.
      */
-    public void setExpectedStart(LocalDate expectedStart) {
+    public void setExpectedStart(@Nullable LocalDate expectedStart) {
         this.expectedStart = expectedStart;
     }
 
@@ -232,7 +328,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
      *
      * @param actualStart The date that the user actually started the course or {@code null} if the course hasn't been started, yet.
      */
-    public void setActualStart(LocalDate actualStart) {
+    public void setActualStart(@Nullable LocalDate actualStart) {
         this.actualStart = actualStart;
     }
 
@@ -251,7 +347,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
      *
      * @param expectedEnd The date that the user expects to finish the course or {@code null} if the expected finish date has not yet been determined.
      */
-    public void setExpectedEnd(LocalDate expectedEnd) {
+    public void setExpectedEnd(@Nullable LocalDate expectedEnd) {
         this.expectedEnd = expectedEnd;
     }
 
@@ -270,7 +366,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
      *
      * @param actualEnd The date that the course was actually concluded or {@code null} if the course hasn't yet concluded.
      */
-    public void setActualEnd(LocalDate actualEnd) {
+    public void setActualEnd(@Nullable LocalDate actualEnd) {
         this.actualEnd = actualEnd;
     }
 

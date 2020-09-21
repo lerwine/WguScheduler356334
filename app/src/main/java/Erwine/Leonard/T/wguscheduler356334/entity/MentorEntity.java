@@ -1,5 +1,8 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -42,9 +45,10 @@ public final class MentorEntity extends AbstractMentorEntity<MentorEntity> {
      */
     @Ignore
     public MentorEntity(String name, String notes, String phoneNumber, String emailAddress) {
-        super((Long) null, name, notes, phoneNumber, emailAddress);
+        super(null, name, notes, phoneNumber, emailAddress);
     }
 
+    @Ignore
     public MentorEntity(AbstractMentorEntity<?> source) {
         super(source);
     }
@@ -57,4 +61,8 @@ public final class MentorEntity extends AbstractMentorEntity<MentorEntity> {
         super(null, null, null, null, null);
     }
 
+    @Ignore
+    public MentorEntity(@NonNull Bundle bundle, boolean original) {
+        super(bundle, original);
+    }
 }

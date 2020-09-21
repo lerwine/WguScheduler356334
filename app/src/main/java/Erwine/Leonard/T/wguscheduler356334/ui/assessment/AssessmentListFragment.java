@@ -21,7 +21,7 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -76,7 +76,7 @@ public class AssessmentListFragment extends Fragment {
         editCourseViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
     }
 
-    private void onEntityLoaded(CourseEntity entity) {
+    private void onEntityLoaded(CourseDetails entity) {
         Long courseId = entity.getId();
         if (null != courseId) {
             assessmentListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentListViewModel.class);

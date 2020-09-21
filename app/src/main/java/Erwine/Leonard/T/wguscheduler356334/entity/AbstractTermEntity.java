@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -7,6 +9,8 @@ import androidx.room.Ignore;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 
 public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extends AbstractNotedEntity<T> implements NoteColumnIncludedEntity {
 
@@ -22,6 +26,17 @@ public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extend
      * The name of the {@link #end "end"} database column, which contains the inclusive end date for the term.
      */
     public static final String COLNAME_END = "end";
+
+    public static final String STATE_KEY_ID = AppDb.TABLE_NAME_TERMS + "." + COLNAME_ID;
+    public static final String STATE_KEY_NAME = AppDb.TABLE_NAME_TERMS + "." + COLNAME_NAME;
+    public static final String STATE_KEY_START = AppDb.TABLE_NAME_TERMS + "." + COLNAME_START;
+    public static final String STATE_KEY_END = AppDb.TABLE_NAME_TERMS + "." + COLNAME_END;
+    public static final String STATE_KEY_NOTES = AppDb.TABLE_NAME_TERMS + "." + COLNAME_NOTES;
+    public static final String STATE_KEY_ORIGINAL_NAME = "o:" + STATE_KEY_NAME;
+    public static final String STATE_KEY_ORIGINAL_START = "o:" + STATE_KEY_START;
+    public static final String STATE_KEY_ORIGINAL_END = "o:" + STATE_KEY_END;
+    public static final String STATE_KEY_ORIGINAL_NOTES = "o:" + STATE_KEY_NOTES;
+
     @ColumnInfo(name = COLNAME_NAME, collate = ColumnInfo.NOCASE)
     private String name;
     @ColumnInfo(name = COLNAME_START)
@@ -42,6 +57,36 @@ public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extend
         this.name = source.name;
         this.start = source.start;
         this.end = source.end;
+    }
+
+    protected AbstractTermEntity(@NonNull Bundle bundle, boolean original) {
+        super(STATE_KEY_ID, (original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, bundle);
+        name = bundle.getString((original) ? STATE_KEY_ORIGINAL_NAME : STATE_KEY_NAME, "");
+        String key = (original) ? STATE_KEY_ORIGINAL_START : STATE_KEY_START;
+        if (bundle.containsKey(key)) {
+            start = LocalDate.ofEpochDay(bundle.getLong(key));
+        }
+        key = (original) ? STATE_KEY_ORIGINAL_END : STATE_KEY_END;
+        if (bundle.containsKey(key)) {
+            end = LocalDate.ofEpochDay(bundle.getLong(key));
+        }
+    }
+
+    public void saveState(@NonNull Bundle bundle, boolean original) {
+        Long id = getId();
+        if (null != id) {
+            bundle.putLong(STATE_KEY_ID, getId());
+        }
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NAME : STATE_KEY_NAME, name);
+        LocalDate d = start;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_START : STATE_KEY_START, d.toEpochDay());
+        }
+        d = end;
+        if (null != d) {
+            bundle.putLong((original) ? STATE_KEY_ORIGINAL_END : STATE_KEY_END, d.toEpochDay());
+        }
+        bundle.putString((original) ? STATE_KEY_ORIGINAL_NOTES : STATE_KEY_NOTES, name);
     }
 
     /**
@@ -78,7 +123,7 @@ public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extend
      *
      * @param start The new inclusive start date of the term or {@code null} if the start date has not been determined.
      */
-    public void setStart(LocalDate start) {
+    public void setStart(@Nullable LocalDate start) {
         this.start = start;
     }
 
@@ -97,7 +142,7 @@ public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extend
      *
      * @param end The new inclusive end date of the term or {@code null} if the end date has not been determined.
      */
-    public void setEnd(LocalDate end) {
+    public void setEnd(@Nullable LocalDate end) {
         this.end = end;
     }
 

@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 
 public class CourseNotesFragment extends Fragment {
@@ -46,7 +46,7 @@ public class CourseNotesFragment extends Fragment {
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
     }
 
-    private void onEntityLoaded(CourseEntity entity) {
+    private void onEntityLoaded(CourseDetails entity) {
         if (null != entity) {
             notesTextView.setText(viewModel.getNotes());
         }

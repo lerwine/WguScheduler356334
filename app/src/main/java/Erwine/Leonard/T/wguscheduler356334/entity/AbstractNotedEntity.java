@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 
@@ -41,6 +43,11 @@ public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> exte
     protected AbstractNotedEntity(@NonNull AbstractNotedEntity<?> source) {
         super(source.getId());
         this.notes = source.notes;
+    }
+
+    protected AbstractNotedEntity(@NonNull String idKey, @NonNull String notesKey, @NonNull Bundle bundle) {
+        super((bundle.containsKey(idKey)) ? bundle.getLong(idKey) : null);
+        this.notes = bundle.getString(notesKey, "");
     }
 
     /**

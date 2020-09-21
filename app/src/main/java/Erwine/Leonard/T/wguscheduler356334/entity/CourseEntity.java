@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import android.os.Bundle;
+
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -89,12 +91,22 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
         super(null, termId, null, null, null, CourseStatus.UNPLANNED, null, null, null, null, 0, null);
     }
 
+    @Ignore
+    public CourseEntity(AbstractCourseEntity<?> source) {
+        super(source);
+    }
+
     /**
      * Initializes a new {@code CourseEntity} object with empty values to represent a new row of data for the {@link AppDb#TABLE_NAME_COURSES "courses"} database table.
      */
     @Ignore
     public CourseEntity() {
         super(null, null, null, null, null, null, null, null, null, null, 0, null);
+    }
+
+    @Ignore
+    public CourseEntity(Bundle bundle, boolean original) {
+        super(bundle, original);
     }
 
     @Override
