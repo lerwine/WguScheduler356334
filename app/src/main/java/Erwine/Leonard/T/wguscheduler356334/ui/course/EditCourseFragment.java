@@ -7,16 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.chip.Chip;
-import com.google.android.material.tabs.TabLayout;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -26,6 +26,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
 /**
@@ -45,9 +46,11 @@ public class EditCourseFragment extends Fragment {
     private EditText titleEditText;
     private Chip mentorChip;
     private Button statusButton;
-    private TabLayout otherTabLayout;
-    private ViewPager otherViewPager;
-    private EditCoursePagerAdapter sectionsPagerAdapter;
+    private Chip expectedStartChip;
+    private Chip expectedEndChip;
+    private Chip actualStartChip;
+    private Chip actualEndChip;
+    private TextView notesTextView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -71,13 +74,25 @@ public class EditCourseFragment extends Fragment {
         titleEditText = view.findViewById(R.id.titleEditText);
         mentorChip = view.findViewById(R.id.mentorChip);
         statusButton = view.findViewById(R.id.statusButton);
-        otherTabLayout = view.findViewById(R.id.otherTabLayout);
-        otherViewPager = view.findViewById(R.id.otherViewPager);
+        expectedStartChip = view.findViewById(R.id.expectedStartChip);
+        expectedEndChip = view.findViewById(R.id.expectedEndChip);
+        actualStartChip = view.findViewById(R.id.actualStartChip);
+        actualEndChip = view.findViewById(R.id.actualEndChip);
+        notesTextView = view.findViewById(R.id.notesTextView);
 
         termButton.setOnClickListener(this::onTermButtonClick);
         mentorChip.setOnClickListener(this::onMentorChipClick);
         mentorChip.setOnCloseIconClickListener(this::onMentorChipCloseIconClick);
         statusButton.setOnClickListener(this::onStatusButtonClick);
+        expectedStartChip.setOnClickListener(this::onExpectedStartChipClick);
+        expectedStartChip.setOnCloseIconClickListener(this::onExpectedStartChipCloseIconClick);
+        expectedEndChip.setOnClickListener(this::onExpectedEndChipClick);
+        expectedEndChip.setOnCloseIconClickListener(this::onExpectedEndChipCloseIconClick);
+        actualStartChip.setOnClickListener(this::onActualStartChipClick);
+        actualStartChip.setOnCloseIconClickListener(this::onActualStartChipCloseIconClick);
+        actualEndChip.setOnClickListener(this::onActualEndChipClick);
+        actualEndChip.setOnCloseIconClickListener(this::onActualEndChipCloseIconClick);
+        view.findViewById(R.id.editNotesFloatingActionButton).setOnClickListener(this::onEditNotesFloatingActionButtonClick);
         view.findViewById(R.id.saveCourseButton).setOnClickListener(this::onSaveCourseButtonClick);
         view.findViewById(R.id.deleteCourseButton).setOnClickListener(this::onDeleteCourseButtonClick);
         view.findViewById(R.id.cancelButton).setOnClickListener(this::onCancelButtonClick);
@@ -92,9 +107,6 @@ public class EditCourseFragment extends Fragment {
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
         viewModel.getTermsLiveData().observe(getViewLifecycleOwner(), this::onTermsLoaded);
         viewModel.getMentorsLiveData().observe(getViewLifecycleOwner(), this::onMentorsLoaded);
-        sectionsPagerAdapter = new EditCoursePagerAdapter(requireContext(), requireActivity().getSupportFragmentManager());
-        otherViewPager.setAdapter(sectionsPagerAdapter);
-        otherTabLayout.setupWithViewPager(otherViewPager);
     }
 
     private void onEntityLoaded(CourseDetails entity) {
@@ -112,6 +124,31 @@ public class EditCourseFragment extends Fragment {
         courseCodeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNumber));
         competencyUnitsEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCompetencyUnitsText));
         titleEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setTitle));
+        LocalDate d = viewModel.getExpectedStart();
+        if (null == d) {
+            expectedStartChip.setText("");
+        } else {
+            expectedStartChip.setText(EditCourseViewModel.FORMATTER.format(d));
+        }
+        d = viewModel.getActualStart();
+        if (null == d) {
+            actualStartChip.setText("");
+        } else {
+            actualStartChip.setText(EditCourseViewModel.FORMATTER.format(d));
+        }
+        d = viewModel.getExpectedEnd();
+        if (null == d) {
+            expectedEndChip.setText("");
+        } else {
+            expectedEndChip.setText(EditCourseViewModel.FORMATTER.format(d));
+        }
+        d = viewModel.getActualEnd();
+        if (null == d) {
+            actualEndChip.setText("");
+        } else {
+            actualEndChip.setText(EditCourseViewModel.FORMATTER.format(d));
+        }
+        notesTextView.setText(viewModel.getNotes());
     }
 
     private void onTermsLoaded(List<TermListItem> termListItems) {
@@ -145,30 +182,76 @@ public class EditCourseFragment extends Fragment {
     }
 
     private void onTermButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onTermButtonClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onTermButtonClick
     }
 
     private void onMentorChipClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onMentorChipClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onMentorChipClick
     }
 
     private void onMentorChipCloseIconClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onMentorChipCloseIconClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onMentorChipCloseIconClick
     }
 
     private void onStatusButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onStatusButtonClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onStatusButtonClick
     }
 
+    private void onExpectedStartChipClick(View view) {
+
+    }
+
+    private void onExpectedStartChipCloseIconClick(View view) {
+
+    }
+
+    private void onExpectedEndChipClick(View view) {
+
+    }
+
+    private void onExpectedEndChipCloseIconClick(View view) {
+
+    }
+
+    private void onActualStartChipClick(View view) {
+
+    }
+
+    private void onActualStartChipCloseIconClick(View view) {
+
+    }
+
+    private void onActualEndChipClick(View view) {
+
+    }
+
+    private void onEditNotesFloatingActionButtonClick(View view) {
+        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), requireContext(), s -> {
+            notesTextView.setText(s);
+            viewModel.setNotes(s);
+        });
+    }
+
+    private void onActualEndChipCloseIconClick(View view) {
+
+    }
+
     private void onSaveCourseButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onSaveCourseButtonClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onSaveCourseButtonClick
     }
 
     private void onDeleteCourseButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onDeleteCourseButtonClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onDeleteCourseButtonClick
     }
 
     private void onCancelButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onCancelButtonClick");
         // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onCancelButtonClick
     }
 

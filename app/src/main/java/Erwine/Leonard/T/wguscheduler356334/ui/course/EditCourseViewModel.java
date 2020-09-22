@@ -15,6 +15,8 @@ import androidx.lifecycle.Observer;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +54,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  */
 public class EditCourseViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditTermViewModel.class.getName();
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_COMPETENCY_UNITS, false);
 
@@ -87,10 +90,10 @@ public class EditCourseViewModel extends AndroidViewModel {
     private boolean fromInitializedState;
     private AbstractTermEntity<?> term;
     private AbstractMentorEntity<?> mentor;
-    private String normalizedNumber;
-    private String normalizedTitle;
-    private String normalizedNotes;
-    private String competencyUnitsText;
+    private String normalizedNumber = "";
+    private String normalizedTitle = "";
+    private String normalizedNotes = "";
+    private String competencyUnitsText = "";
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
@@ -720,7 +723,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (null == notes || notes.isEmpty()) {
                 normalizedNotes = "";
                 this.notes = null;
-            } else if (!this.notes.equals(notes)) {
+            } else if (!getNotes().equals(notes)) {
                 this.notes = notes;
                 normalizedNotes = null;
             }

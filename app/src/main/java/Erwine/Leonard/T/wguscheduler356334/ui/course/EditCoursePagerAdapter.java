@@ -1,7 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.course;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -21,7 +20,6 @@ public class EditCoursePagerAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        Bundle arguments = new Bundle();
         switch (position) {
             case 0:
                 return new CourseDatesFragment();

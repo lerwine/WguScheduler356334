@@ -60,8 +60,8 @@ public class EditTermViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> startMessageLiveData;
     private final CurrentValues currentValues;
     private boolean fromSavedState;
-    private String normalizedName;
-    private String normalizedNotes;
+    private String normalizedName = "";
+    private String normalizedNotes = "";
 
     public EditTermViewModel(@NonNull Application application) {
         super(application);
@@ -306,7 +306,7 @@ public class EditTermViewModel extends AndroidViewModel {
             if (null == notes || notes.isEmpty()) {
                 normalizedNotes = "";
                 this.notes = null;
-            } else if (!this.notes.equals(notes)) {
+            } else if (!getNotes().equals(notes)) {
                 this.notes = notes;
                 normalizedNotes = null;
             }

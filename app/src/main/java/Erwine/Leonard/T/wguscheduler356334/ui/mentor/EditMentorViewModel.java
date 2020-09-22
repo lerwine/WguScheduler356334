@@ -37,10 +37,10 @@ public class EditMentorViewModel extends AndroidViewModel {
     private final CurrentValues currentValues;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
-    private String normalizedNotes;
-    private String normalizedName;
-    private String normalizedPhoneNumber;
-    private String normalizedEmailAddress;
+    private String normalizedNotes = "";
+    private String normalizedName = "";
+    private String normalizedPhoneNumber = "";
+    private String normalizedEmailAddress = "";
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
@@ -291,7 +291,7 @@ public class EditMentorViewModel extends AndroidViewModel {
             if (null == notes || notes.isEmpty()) {
                 normalizedNotes = "";
                 this.notes = null;
-            } else if (!this.notes.equals(notes)) {
+            } else if (!getNotes().equals(notes)) {
                 this.notes = notes;
                 normalizedNotes = null;
             }
