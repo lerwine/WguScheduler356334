@@ -51,6 +51,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
+        onNameChanged(termEntity.getName());
         Long termId = termEntity.getId();
         if (null == termId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_id_not_specified, this).showDialog(this::finish);
@@ -61,6 +62,13 @@ public class ViewTermActivity extends AppCompatActivity {
             TabLayout tabs = findViewById(R.id.viewTermTabLayout);
             tabs.setupWithViewPager(viewPager);
         }
+        viewModel.getNameLiveData().observe(this, this::onNameChanged);
+    }
+
+    private void onNameChanged(String s) {
+        String v = getResources().getString(R.string.format_term, s);
+        int i = v.indexOf(':');
+        setTitle((i > 0 && s.startsWith(v.substring(0, i))) ? s : v);
     }
 
     private void onEntityLoadFailed(Throwable throwable) {

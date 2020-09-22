@@ -41,7 +41,8 @@ public interface Assessment extends NoteColumnIncludedEntity {
      *
      * @return The value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      */
-    long getCourseId();
+    @Nullable
+    Long getCourseId();
 
     /**
      * Sets the {@link CourseEntity#COLNAME_ID primary key} value for the {@link CourseEntity course} to be associated with the assessment.

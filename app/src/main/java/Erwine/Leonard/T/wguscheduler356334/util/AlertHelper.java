@@ -11,7 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 
@@ -54,6 +58,59 @@ public class AlertHelper {
                 .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setCancelable(false).create();
         dlg.show();
+    }
+
+    public static <T> void showSingleSelectDialog(@StringRes int titleId, @Nullable T defaultOption, @NonNull List<? extends T> options, @NonNull Context context, @NonNull Function<T, String> toDisplayText, @NonNull Consumer<T> onSelected) {
+        showSingleSelectDialog(titleId, defaultOption, options, context, toDisplayText, onSelected, null);
+    }
+
+    public static <T> void showSingleSelectDialog(@StringRes int titleId, @Nullable T defaultOption, @NonNull List<? extends T> options, @NonNull Context context, @NonNull Function<T, String> toDisplayText, @NonNull Consumer<T> onSelected, @Nullable Runnable onCancel) {
+        LinkedList<T> allOptions = new LinkedList<>();
+        List<String> displayText = options.stream().map(t -> {
+            allOptions.addLast(t);
+            return toDisplayText.apply(t);
+        }).collect(Collectors.toList());
+        int optionIndex = allOptions.indexOf(defaultOption);
+        if (optionIndex < 0 && null != defaultOption) {
+            optionIndex = 0;
+            allOptions.addFirst(defaultOption);
+            displayText.add(0, toDisplayText.apply(defaultOption));
+        }
+        showSingleSelectDialog(titleId, optionIndex, displayText.toArray(new String[displayText.size()]), context, i -> onSelected.accept((i < 0) ? null : allOptions.get(i)), onCancel);
+    }
+
+    public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull String[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected) {
+        showSingleSelectDialog(titleId, defaultOption, options, context, onSelected, null);
+    }
+
+    public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull String[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected, @Nullable Runnable onCancel) {
+        if (options.length == 0) {
+            onSelected.accept(-1);
+        } else if (options.length == 1) {
+            onSelected.accept((defaultOption == 0) ? 0 : -1);
+        } else {
+            SingleSelector selector = new SingleSelector(defaultOption, options);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    .setTitle(titleId)
+                    .setSingleChoiceItems(selector.options, selector.selectedIndex, selector::onItemSelected)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                        onSelected.accept(selector.selectedIndex);
+                        dialogInterface.dismiss();
+                    });
+
+            if (null != onCancel)
+                builder.setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
+                    onCancel.run();
+                    dialogInterface.dismiss();
+                });
+            else
+                builder.setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss());
+            builder.setCancelable(false).create().show();
+        }
+    }
+
+    private AlertHelper(@StringRes int titleId, @NonNull Context context) {
+        builder = new AlertDialog.Builder(context);
     }
 
     public AlertHelper(@DrawableRes int iconId, @StringRes int titleId, @NonNull View view, @NonNull Context context) {
@@ -153,4 +210,19 @@ public class AlertHelper {
     public void showDialog() {
         createDialog().show();
     }
+
+    private static class SingleSelector {
+        private final String[] options;
+        private int selectedIndex;
+
+        SingleSelector(int defaultOption, @NonNull String[] options) {
+            this.options = options;
+            selectedIndex = (defaultOption < 0 || defaultOption >= options.length) ? -1 : defaultOption;
+        }
+
+        public void onItemSelected(DialogInterface dialogInterface, int i) {
+            selectedIndex = i;
+        }
+    }
+
 }

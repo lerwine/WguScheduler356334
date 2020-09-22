@@ -13,21 +13,15 @@
         tools:ignore="AllowBackup">
         <activity android:name=".EditAssessmentActivity" />
         <activity android:name=".AddCourseActivity" />
-        <activity
-            android:name=".ViewCourseActivity"
-            android:label="@string/title_activity_view_course" />
+        <activity android:name=".ViewCourseActivity" />
         <activity
             android:name=".AddTermActivity"
             android:label="@string/title_activity_new_term" />
-        <activity
-            android:name=".EditMentorActivity"
-            android:label="@string/title_activity_edit_mentor" />
+        <activity android:name=".EditMentorActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".ViewTermActivity"
-            android:label="@string/title_activity_view_term" />
+        <activity android:name=".ViewTermActivity" />
         <activity
             android:name=".ManageDataActivity"
             android:label="@string/title_activity_manage_data" />

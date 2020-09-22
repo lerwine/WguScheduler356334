@@ -34,6 +34,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Boolean> contactValidLiveData;
+    private final MutableLiveData<String> nameLiveData;
     private final CurrentValues currentValues;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
@@ -50,6 +51,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         entityLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
         contactValidLiveData = new MutableLiveData<>(false);
+        nameLiveData = new MutableLiveData<>("");
         currentValues = new CurrentValues();
     }
 
@@ -117,6 +119,10 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     public LiveData<MentorEntity> getEntityLiveData() {
         return entityLiveData;
+    }
+
+    public MutableLiveData<String> getNameLiveData() {
+        return nameLiveData;
     }
 
     public boolean isFromInitializedState() {

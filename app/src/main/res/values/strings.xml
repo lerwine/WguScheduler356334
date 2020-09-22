@@ -46,6 +46,8 @@
     <string name="label_unplanned">Unplanned</string>
     <string name="message_actual_end_required">Actual end date is required</string>
     <string name="message_actual_start_after_end">Actual start cannot occur after actual end</string>
+    <string name="message_after_term_end">Date occurs after term end date</string>
+    <string name="message_before_term_start">Date occurs before term start date</string>
     <string name="message_actual_start_required">Actual start date is required</string>
     <string name="message_add_sample_data_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>
     <string name="message_all_data_delete_warning">Warning! These next two options will delete all data stored by this app!</string>
@@ -85,7 +87,7 @@
     <string name="tab_title_general">General</string>
     <string name="tab_title_phone">Phone</string>
     <string name="title_activity_edit">Edit</string>
-    <string name="title_activity_edit_mentor">Edit Mentor</string>
+    <string name="format_mentor">Mentor: %s</string>
     <string name="title_activity_edit_phone_numbers">Edit Phone Numbers</string>
     <string name="title_activity_edit_term">Edit Term</string>
     <string name="title_activity_manage_data">Manage Data</string>
@@ -93,8 +95,8 @@
     <string name="title_activity_new_mentor">Add New Mentor</string>
     <string name="title_activity_new_term">Add New Term</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_view_course">View Course</string>
-    <string name="title_activity_view_term">View Term</string>
+    <string name="format_course">Course: %s</string>
+    <string name="format_term">Term: %s</string>
     <string name="title_actual">Actual:</string>
     <string name="title_add_sample_data_error">Add Sample Data Error</string>
     <string name="title_assessments">Assessments</string>
@@ -123,5 +125,10 @@
     <string name="tooltip_clear_database">Removes all data from the database</string>
     <string name="tooltip_reset_with_sample_data">Deletes all existing data and populates database with sample data</string>
     <string name="validation_succeeded">Validation succeeded.</string>
+    <string name="title_select_term">Select Term</string>
+    <string name="title_select_mentor">Select Mentor</string>
+    <string name="title_select_status">Select Status</string>
+    <string name="title_not_ready">Not Ready</string>
+    <string name="message_db_read_operation_in_progress">Data still being read from database... Please try again in a couple seconds.</string>
 
 </resources>

@@ -58,6 +58,7 @@ public class EditTermViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
+    private final MutableLiveData<String> nameLiveData;
     private final CurrentValues currentValues;
     private boolean fromSavedState;
     private String normalizedName = "";
@@ -71,6 +72,7 @@ public class EditTermViewModel extends AndroidViewModel {
         entityLiveData = new MutableLiveData<>();
         startMessageLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
+        nameLiveData = new MutableLiveData<>("");
         currentValues = new CurrentValues();
     }
 
@@ -130,6 +132,10 @@ public class EditTermViewModel extends AndroidViewModel {
 
     public MutableLiveData<TermEntity> getEntityLiveData() {
         return entityLiveData;
+    }
+
+    public MutableLiveData<String> getNameLiveData() {
+        return nameLiveData;
     }
 
     public boolean isFromSavedState() {

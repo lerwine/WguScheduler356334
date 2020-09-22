@@ -94,7 +94,7 @@ public class EditMentorActivity extends AppCompatActivity {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
-
+        onNameChanged(entity.getName());
         if (viewModel.isFromInitializedState()) {
             mentorNameEditText.setText(viewModel.getName());
             phoneNumberEditText.setText(viewModel.getPhoneNumber());
@@ -116,12 +116,19 @@ public class EditMentorActivity extends AppCompatActivity {
             deleteMentorImageButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
         } else {
-            setTitle(R.string.title_activity_edit_mentor);
+            setTitle(R.string.format_mentor);
             deleteMentorImageButton.setOnClickListener(this::onDeleteMentorImageButtonClick);
         }
         findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
         viewModel.getNameValidLiveData().observe(this, this::onNameValidChanged);
         viewModel.getContactValidLiveData().observe(this, this::onContactValidChanged);
+        viewModel.getNameLiveData().observe(this, this::onNameChanged);
+    }
+
+    private void onNameChanged(String s) {
+        String v = getResources().getString(R.string.format_mentor, s);
+        int i = v.indexOf(':');
+        setTitle((i > 0 && s.startsWith(v.substring(0, i))) ? s : v);
     }
 
     private void onLoadFailed(Throwable throwable) {

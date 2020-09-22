@@ -80,6 +80,7 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private void onEntityLoadSucceeded(CourseDetails entity) {
         Long courseId = entity.getId();
+        onTitleChanged(entity.getTitle());
         if (null == courseId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_course_id_not_specified, this).showDialog(this::finish);
         } else {
@@ -88,7 +89,14 @@ public class ViewCourseActivity extends AppCompatActivity {
             viewPager.setAdapter(adapter);
             TabLayout tabs = findViewById(R.id.viewCourseTabLayout);
             tabs.setupWithViewPager(viewPager);
+            viewModel.getTitleLiveData().observe(this, this::onTitleChanged);
         }
+    }
+
+    private void onTitleChanged(String s) {
+        String v = getResources().getString(R.string.format_course, s);
+        int i = v.indexOf(':');
+        setTitle((i > 0 && s.startsWith(v.substring(0, i))) ? s : v);
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
