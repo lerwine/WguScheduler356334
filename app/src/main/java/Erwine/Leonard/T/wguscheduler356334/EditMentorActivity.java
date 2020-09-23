@@ -40,12 +40,13 @@ public class EditMentorActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public EditMentorActivity() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.EditMentorActivity");
+        Log.d(LOG_TAG, "Constructing EditMentorActivity");
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter savedInstanceState");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_mentor);
         ActionBar actionBar = getSupportActionBar();
@@ -67,7 +68,7 @@ public class EditMentorActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.EditMentorActivity.onOptionsItemSelected");
+        Log.d(LOG_TAG, "Enter onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             verifySaveChanges();
@@ -78,12 +79,13 @@ public class EditMentorActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Log.d(LOG_TAG, "Enter onBackPressed");
         verifySaveChanges();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.EditMentorActivity.onSaveInstanceState");
+        Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -165,7 +167,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onSaveOperationSucceeded(@NonNull String message) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.EditMentorActivity.onSaveOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onSaveOperationSucceeded");
         if (message.isEmpty()) {
             finish();
         } else {

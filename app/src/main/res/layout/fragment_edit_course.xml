@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.course.EditCourseFragment">
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/coursePropertiesFragment"
         android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment"
         android:layout_width="0dp"

@@ -37,7 +37,7 @@ public class ViewTermActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ViewTermActivity.onCreate");
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_term);
         ActionBar actionBar = getSupportActionBar();
@@ -111,7 +111,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onSaveOperationSucceeded(@NonNull List<Integer> messageIds) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDbOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
         if (messageIds.isEmpty()) {
             finish();
         } else {

@@ -46,13 +46,13 @@ public class CourseListFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public CourseListFragment() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment");
+        Log.d(LOG_TAG, "Constructing CourseListFragment");
         list = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment.onCreateView");
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_course_list, container, false);
     }
 
@@ -75,7 +75,7 @@ public class CourseListFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment.onActivityCreated");
+        Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
@@ -92,7 +92,7 @@ public class CourseListFragment extends Fragment {
     }
 
     private void onCourseListChanged(List<TermCourseListItem> courseEntities) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.CourseListFragment.onCourseListChanged");
+        Log.d(LOG_TAG, "Enter onCourseListChanged");
         list.clear();
         if (courseEntities.isEmpty()) {
             noCoursesTextView.setVisibility(View.VISIBLE);

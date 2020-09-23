@@ -61,12 +61,12 @@ public class EditTermViewModel extends AndroidViewModel {
     private final MutableLiveData<String> nameLiveData;
     private final CurrentValues currentValues;
     private boolean fromSavedState;
-    private String normalizedName = "";
-    private String normalizedNotes = "";
+    private String normalizedName;
+    private String normalizedNotes;
 
     public EditTermViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel");
+        Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
         normalizedName = normalizedNotes = "";
         entityLiveData = new MutableLiveData<>();

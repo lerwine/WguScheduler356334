@@ -4,13 +4,11 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.material.chip.Chip;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -28,23 +26,11 @@ import io.reactivex.disposables.CompositeDisposable;
  * calls {@link EditCourseViewModel#initializeViewModelState(Bundle, Supplier)}.
  */
 public class EditCourseFragment extends Fragment {
-    // TODO: Create nested CoursePropertiesFragment and put save/delete/cancel buttons on this fragment
     private static final String LOG_TAG = EditCourseFragment.class.getName();
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
-    private Button termButton;
-    private EditText courseCodeEditText;
-    private EditText competencyUnitsEditText;
-    private EditText titleEditText;
-    private Chip mentorChip;
-    private Button statusButton;
-    private Chip expectedStartChip;
-    private Chip expectedEndChip;
-    private Chip actualStartChip;
-    private Chip actualEndChip;
-    private TextView notesTextView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -55,22 +41,38 @@ public class EditCourseFragment extends Fragment {
         compositeDisposable = new CompositeDisposable();
     }
 
-    private void onSaveCourseButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onSaveCourseButtonClick");
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onViewCreated");
+        view.findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
+        view.findViewById(R.id.deleteImageButton).setOnClickListener(this::onDeleteImageButtonClick);
+        view.findViewById(R.id.saveImageButton).setOnClickListener(this::onCancelImageButtonClick);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onActivityCreated");
+        super.onActivityCreated(savedInstanceState);
+        // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
+        viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
+    }
+
+    private void onSaveImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
-    private void onDeleteCourseButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onDeleteCourseButtonClick");
+    private void onDeleteImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, requireContext()).showYesNoDialog(() -> {
             compositeDisposable.clear();
             compositeDisposable.add(viewModel.delete().subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
         }, null);
     }
 
-    private void onCancelButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onCancelButtonClick");
+    private void onCancelImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onCancelImageButtonClick");
         verifySaveChanges();
     }
 

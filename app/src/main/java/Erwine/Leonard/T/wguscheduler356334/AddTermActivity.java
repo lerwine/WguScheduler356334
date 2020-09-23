@@ -31,13 +31,13 @@ public class AddTermActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public AddTermActivity() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.AddTermActivity");
+        Log.d(LOG_TAG, "Constructing AddTermActivity");
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onCreate");
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_term);
         ActionBar actionBar = getSupportActionBar();
@@ -66,7 +66,7 @@ public class AddTermActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onOptionsItemSelected");
+        Log.d(LOG_TAG, "Enter onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             confirmSave();
@@ -82,19 +82,19 @@ public class AddTermActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveInstanceState");
+        Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState);
     }
 
     private void onSaveTermImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveTermImageButtonClick");
+        Log.d(LOG_TAG, "Enter onSaveTermImageButtonClick");
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onDbOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
         if (messageIds.isEmpty()) {
             finish();
         } else {
@@ -110,7 +110,7 @@ public class AddTermActivity extends AppCompatActivity {
     }
 
     private void onCancelTermEditImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onCancelTermEditImageButtonClick");
+        Log.d(LOG_TAG, "Enter onCancelTermEditImageButtonClick");
         finish();
     }
 

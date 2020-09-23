@@ -69,8 +69,8 @@ public class TermListFragment extends Fragment {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void onAddTermButtonClick(View view) {
+        //noinspection ConstantConditions
         EditTermViewModel.startAddTermActivity(
                 requireContext(),
                 mItems.stream().map(AbstractTermEntity::getEnd).filter(Objects::nonNull).max(LocalDate::compareTo).map(t -> t.plusDays(1L)).orElseGet(LocalDate::now)

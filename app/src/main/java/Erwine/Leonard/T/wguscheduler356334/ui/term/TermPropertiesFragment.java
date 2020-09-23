@@ -48,12 +48,12 @@ public class TermPropertiesFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public TermPropertiesFragment() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment");
+        Log.d(LOG_TAG, "Constructing TermPropertiesFragment");
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onCreateView");
+        Log.d(LOG_TAG, "Enter onCreateView");
         View view = inflater.inflate(R.layout.fragment_term_properties, container, false);
 
         termNameEditText = view.findViewById(R.id.termNameEditText);
@@ -67,7 +67,7 @@ public class TermPropertiesFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment.onActivityCreated");
+        Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onLoadSuccess);

@@ -30,18 +30,18 @@ public class AddCourseActivity extends AppCompatActivity {
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
 
-
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public AddCourseActivity() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.AddCourseActivity");
+        Log.d(LOG_TAG, "Constructing AddCourseActivity");
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_course);
         ActionBar actionBar = getSupportActionBar();
@@ -49,8 +49,8 @@ public class AddCourseActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-        findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveTermImageButtonClick);
-        findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
+        findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
+        findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onCourseLoadSuccess, this::onCourseLoadFailed));
@@ -58,6 +58,7 @@ public class AddCourseActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.d(LOG_TAG, "Enter onCreate");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             confirmSave();
@@ -68,12 +69,13 @@ public class AddCourseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Log.d(LOG_TAG, "Enter onCreate");
         confirmSave();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onSaveInstanceState");
+        Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -82,7 +84,7 @@ public class AddCourseActivity extends AppCompatActivity {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
                 compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
             }, null);
         } else {
             finish();
@@ -90,6 +92,7 @@ public class AddCourseActivity extends AppCompatActivity {
     }
 
     private void onCourseLoadSuccess(CourseDetails entity) {
+        Log.d(LOG_TAG, "Enter onCourseLoadSuccess");
 
     }
 
@@ -98,15 +101,19 @@ public class AddCourseActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 
-    private void onSaveTermImageButtonClick(View view) {
-
+    private void onSaveImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
+        compositeDisposable.clear();
+        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
-    private void onCancelTermEditImageButtonClick(View view) {
-
+    private void onCancelImageButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onCancelImageButtonClick");
+        verifySaveChanges();
     }
 
-    private void onSaveOperationSucceeded(@NonNull List<Integer> messageIds) {
+    private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
+        Log.d(LOG_TAG, String.format("Enter onSaveOperationFinished with %d messages", messageIds.size()));
         if (messageIds.isEmpty()) {
             finish();
         } else {
@@ -120,6 +127,16 @@ public class AddCourseActivity extends AppCompatActivity {
         Log.e(LOG_TAG, "Error saving course", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
                 .showDialog();
+    }
+
+    private void verifySaveChanges() {
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
+                this::finish,
+                () -> {
+                    compositeDisposable.clear();
+                    compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                    finish();
+                }, null);
     }
 
 }

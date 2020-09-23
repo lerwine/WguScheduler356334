@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,7 +44,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class CoursePropertiesFragment extends Fragment {
 
-    private static final String LOG_TAG = EditCourseFragment.class.getName();
+    private static final String LOG_TAG = CoursePropertiesFragment.class.getName();
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
     private final CompositeDisposable compositeDisposable;
@@ -158,7 +159,7 @@ public class CoursePropertiesFragment extends Fragment {
             expectedStartChip.setError(null);
         } else {
             Log.d(LOG_TAG, String.format("Enter onExpectedStartErrorMessageChanged(null); warning=%d", id));
-            expectedStartChip.setError(getResources().getString(id), getResources().getDrawable(R.drawable.dialog_warning, requireActivity().getTheme()));
+            expectedStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
         }
     }
 
@@ -169,7 +170,7 @@ public class CoursePropertiesFragment extends Fragment {
                 expectedStartChip.setError(null);
             } else {
                 Log.d(LOG_TAG, String.format("Enter onExpectedStartWarningMessageChanged(%d)", id));
-                expectedStartChip.setError(getResources().getString(id), getResources().getDrawable(R.drawable.dialog_warning, requireActivity().getTheme()));
+                expectedStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
             }
         } else {
             Log.d(LOG_TAG, (null == id) ? "Enter onExpectedStartWarningMessageChanged(null); error != null" : String.format("Enter onExpectedStartWarningMessageChanged(%d); error != null", id));
@@ -186,7 +187,7 @@ public class CoursePropertiesFragment extends Fragment {
             if (id == R.string.message_required) {
                 expectedEndChip.setError(message);
             } else {
-                expectedEndChip.setError(message, getResources().getDrawable(R.drawable.dialog_warning, requireActivity().getTheme()));
+                expectedEndChip.setError(message, ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
             }
         }
     }
@@ -200,7 +201,7 @@ public class CoursePropertiesFragment extends Fragment {
             actualStartChip.setError(null);
         } else {
             Log.d(LOG_TAG, String.format("Enter onActualStartErrorMessageChanged(null); warning=%d", id));
-            actualStartChip.setError(getResources().getString(id), getResources().getDrawable(R.drawable.dialog_warning, requireActivity().getTheme()));
+            actualStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
         }
     }
 
@@ -211,7 +212,7 @@ public class CoursePropertiesFragment extends Fragment {
                 actualStartChip.setError(null);
             } else {
                 Log.d(LOG_TAG, String.format("Enter onActualStartWarningMessageChanged(%d)", id));
-                actualStartChip.setError(getResources().getString(id), getResources().getDrawable(R.drawable.dialog_warning, requireActivity().getTheme()));
+                actualStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
             }
         } else {
             Log.d(LOG_TAG, (null == id) ? "Enter onActualStartWarningMessageChanged(null); error != null" : String.format("Enter onActualStartWarningMessageChanged(%d); error != null", id));
@@ -228,7 +229,7 @@ public class CoursePropertiesFragment extends Fragment {
             if (id == R.string.message_required) {
                 actualEndChip.setError(message);
             } else {
-                actualEndChip.setError(message, getResources().getDrawable(R.drawable.dialog_warning, requireActivity().getTheme()));
+                actualEndChip.setError(message, ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
             }
         }
     }

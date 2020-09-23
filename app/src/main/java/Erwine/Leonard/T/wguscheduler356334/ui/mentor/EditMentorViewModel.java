@@ -38,16 +38,16 @@ public class EditMentorViewModel extends AndroidViewModel {
     private final CurrentValues currentValues;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
-    private String normalizedNotes = "";
-    private String normalizedName = "";
-    private String normalizedPhoneNumber = "";
-    private String normalizedEmailAddress = "";
+    private String normalizedNotes;
+    private String normalizedName;
+    private String normalizedPhoneNumber;
+    private String normalizedEmailAddress;
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel");
+        Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        normalizedName = normalizedPhoneNumber = normalizedEmailAddress = "";
+        normalizedNotes = normalizedName = normalizedPhoneNumber = normalizedEmailAddress = "";
         entityLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
         contactValidLiveData = new MutableLiveData<>(false);
@@ -178,12 +178,12 @@ public class EditMentorViewModel extends AndroidViewModel {
     }
 
     public Completable delete() {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.delete");
+        Log.d(LOG_TAG, "Enter delete");
         return dbLoader.deleteMentor(mentorEntity).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting mentor", throwable));
     }
 
     private void onEntityLoaded(MentorEntity entity) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.onEntityLoaded");
+        Log.d(LOG_TAG, "Enter onEntityLoaded");
         mentorEntity = entity;
         setName(entity.getName());
         setPhoneNumber(entity.getPhoneNumber());
@@ -193,7 +193,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     }
 
     public void saveState(Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
+        Log.d(LOG_TAG, "Enter saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         currentValues.saveState(outState, false);
         mentorEntity.saveState(outState, true);

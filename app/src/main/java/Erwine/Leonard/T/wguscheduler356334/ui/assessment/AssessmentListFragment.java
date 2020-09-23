@@ -42,14 +42,14 @@ public class AssessmentListFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public AssessmentListFragment() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment");
+        Log.d(LOG_TAG, "Constructing AssessmentListFragment");
         compositeDisposable = new CompositeDisposable();
         list = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onCreateView");
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_assessment_list, container, false);
     }
 
@@ -94,6 +94,6 @@ public class AssessmentListFragment extends Fragment {
     }
 
     private void onAddAssessmentButtonClick(View view) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment.onAddAssessmentButtonClick
+        // TODO: Implement onAddAssessmentButtonClick
     }
 }

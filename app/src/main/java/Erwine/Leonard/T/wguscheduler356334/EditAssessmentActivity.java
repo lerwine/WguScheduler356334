@@ -21,12 +21,13 @@ public class EditAssessmentActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public EditAssessmentActivity() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.EditAssessmentActivity");
+        Log.d(LOG_TAG, "Constructing EditAssessmentActivity");
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_assessment);
         ActionBar actionBar = getSupportActionBar();
@@ -38,7 +39,7 @@ public class EditAssessmentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.AddTermActivity.onOptionsItemSelected");
+        Log.d(LOG_TAG, "Enter onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             confirmSave();
