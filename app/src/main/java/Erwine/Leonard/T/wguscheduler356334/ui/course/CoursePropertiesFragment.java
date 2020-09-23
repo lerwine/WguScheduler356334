@@ -14,7 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.content.res.ResourcesCompat;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -159,7 +159,7 @@ public class CoursePropertiesFragment extends Fragment {
             expectedStartChip.setError(null);
         } else {
             Log.d(LOG_TAG, String.format("Enter onExpectedStartErrorMessageChanged(null); warning=%d", id));
-            expectedStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
+            expectedStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
         }
     }
 
@@ -170,7 +170,7 @@ public class CoursePropertiesFragment extends Fragment {
                 expectedStartChip.setError(null);
             } else {
                 Log.d(LOG_TAG, String.format("Enter onExpectedStartWarningMessageChanged(%d)", id));
-                expectedStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
+                expectedStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
             }
         } else {
             Log.d(LOG_TAG, (null == id) ? "Enter onExpectedStartWarningMessageChanged(null); error != null" : String.format("Enter onExpectedStartWarningMessageChanged(%d); error != null", id));
@@ -187,7 +187,7 @@ public class CoursePropertiesFragment extends Fragment {
             if (id == R.string.message_required) {
                 expectedEndChip.setError(message);
             } else {
-                expectedEndChip.setError(message, ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
+                expectedEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
             }
         }
     }
@@ -201,7 +201,7 @@ public class CoursePropertiesFragment extends Fragment {
             actualStartChip.setError(null);
         } else {
             Log.d(LOG_TAG, String.format("Enter onActualStartErrorMessageChanged(null); warning=%d", id));
-            actualStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
+            actualStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
         }
     }
 
@@ -212,7 +212,7 @@ public class CoursePropertiesFragment extends Fragment {
                 actualStartChip.setError(null);
             } else {
                 Log.d(LOG_TAG, String.format("Enter onActualStartWarningMessageChanged(%d)", id));
-                actualStartChip.setError(getResources().getString(id), ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
+                actualStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
             }
         } else {
             Log.d(LOG_TAG, (null == id) ? "Enter onActualStartWarningMessageChanged(null); error != null" : String.format("Enter onActualStartWarningMessageChanged(%d); error != null", id));
@@ -229,7 +229,7 @@ public class CoursePropertiesFragment extends Fragment {
             if (id == R.string.message_required) {
                 actualEndChip.setError(message);
             } else {
-                actualEndChip.setError(message, ResourcesCompat.getDrawable(getResources(), R.drawable.dialog_warning, null));
+                actualEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
             }
         }
     }
