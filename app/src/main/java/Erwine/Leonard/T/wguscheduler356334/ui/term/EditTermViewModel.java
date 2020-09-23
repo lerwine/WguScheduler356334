@@ -271,6 +271,7 @@ public class EditTermViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 nameValidLiveData.postValue(true);
             }
+            nameLiveData.postValue(normalizedName);
         }
 
         @Nullable

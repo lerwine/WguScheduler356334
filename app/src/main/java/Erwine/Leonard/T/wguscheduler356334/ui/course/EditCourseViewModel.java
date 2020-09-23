@@ -41,6 +41,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -55,6 +56,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_COMPETENCY_UNITS, false);
 
     public static void startAddCourseActivity(@NonNull Context context, long termId, @NonNull LocalDate expectedStart) {
+        Log.d(LOG_TAG, String.format("Enter startAddCourseActivity(context, %d, %s)", termId, expectedStart));
         Intent intent = new Intent(context, AddCourseActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false), termId);
         intent.putExtra(CourseDetails.COLNAME_EXPECTED_START, expectedStart.toEpochDay());
@@ -62,6 +64,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public static void startViewCourseActivity(@NonNull Context context, long courseId) {
+        Log.d(LOG_TAG, String.format("Enter startViewCourseActivity(context, %d)", courseId));
         Intent intent = new Intent(context, ViewCourseActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false), courseId);
         context.startActivity(intent);
@@ -99,6 +102,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
+        Log.d(LOG_TAG, "Constructing EditCourseViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
         termsLiveData = dbLoader.getAllTerms();
         mentorsLiveData = dbLoader.getAllMentors();
@@ -117,9 +121,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         titleLiveData = new MutableLiveData<>("");
         coursesForTerm = new ArrayList<>();
         termsLoadedObserver = this::onTermsLoaded;
-        termsLiveData.observeForever(termsLoadedObserver);
         mentorsLoadedObserver = this::onMentorsLoaded;
-        mentorsLiveData.observeForever(mentorsLoadedObserver);
     }
 
     public Long getId() {
@@ -132,6 +134,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public synchronized void setSelectedTerm(AbstractTermEntity<?> selectedTerm) {
         if (!Objects.equals(this.selectedTerm, selectedTerm)) {
+            Log.d(LOG_TAG, String.format("selectedTerm changing from:\n\t%s\n\tto\n\t%s", this.selectedTerm, selectedTerm));
             this.selectedTerm = selectedTerm;
             coursesForTerm.clear();
             if (null != coursesLiveData) {
@@ -166,6 +169,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public synchronized void setSelectedMentor(@Nullable AbstractMentorEntity<?> selectedMentor) {
         if (!Objects.equals(this.selectedMentor, selectedMentor)) {
+            Log.d(LOG_TAG, String.format("selectedMentor changing from:\n\t%s\n\tto\n\t%s", this.selectedMentor, selectedMentor));
             this.selectedMentor = selectedMentor;
             currentValues.mentorId = (null == selectedMentor) ? null : selectedMentor.getId();
         }
@@ -228,12 +232,14 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (competencyUnitsText.isEmpty()) {
                 return;
             }
+            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"\"", StringHelper.toEscapedString(this.competencyUnitsText)));
             competencyUnitsText = "";
             currentValues.competencyUnits = null;
         } else {
             if (competencyUnitsText.equals(value)) {
                 return;
             }
+            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"%s\"", StringHelper.toEscapedString(this.competencyUnitsText), StringHelper.toEscapedString(competencyUnitsText)));
             competencyUnitsText = value;
             try {
                 currentValues.setCompetencyUnits(Integer.parseInt(competencyUnitsText.trim()));
@@ -287,22 +293,18 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<Boolean> getTermValidLiveData() {
-        // TODO: Attach listener in view
         return termValidLiveData;
     }
 
     public MutableLiveData<Boolean> getNumberValidLiveData() {
-        // TODO: Attach listener in view
         return numberValidLiveData;
     }
 
     public MutableLiveData<Boolean> getTitleValidLiveData() {
-        // TODO: Attach listener in view
         return titleValidLiveData;
     }
 
     public MutableLiveData<Integer> getExpectedStartErrorMessageLiveData() {
-        // TODO: Attach listener in view
         return expectedStartErrorMessageLiveData;
     }
 
@@ -311,12 +313,10 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<Integer> getExpectedEndMessageLiveData() {
-        // TODO: Attach listener in view
         return expectedEndMessageLiveData;
     }
 
     public MutableLiveData<Integer> getActualStartErrorMessageLiveData() {
-        // TODO: Attach listener in view
         return actualStartErrorMessageLiveData;
     }
 
@@ -325,12 +325,10 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<Integer> getActualEndMessageLiveData() {
-        // TODO: Attach listener in view
         return actualEndMessageLiveData;
     }
 
     public MutableLiveData<Integer> getCompetencyUnitsMessageLiveData() {
-        // TODO: Attach listener in view
         return competencyUnitsMessageLiveData;
     }
 
@@ -342,33 +340,33 @@ public class EditCourseViewModel extends AndroidViewModel {
         return fromInitializedState;
     }
 
-    public void saveViewModelState(Bundle outState) {
-        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        currentValues.saveState(outState, false);
-        courseEntity.saveState(outState, true);
-    }
-
     public synchronized Single<CourseDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         courseEntity = new CourseDetails(null);
         if (null != state) {
+            Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
             currentValues.restoreState(state, false);
             Long id = currentValues.getId();
             if (null == id || fromInitializedState) {
+                Log.d(LOG_TAG, "Restoring courseEntity from saved state");
                 courseEntity.restoreState(state, fromInitializedState);
             } else {
+                Log.d(LOG_TAG, "Loading courseEntity from database");
                 competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
                 return dbLoader.getCourseById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
             if (fromInitializedState) {
+                Log.d(LOG_TAG, "Restoring competencyUnitsText from saved state");
                 setCompetencyUnitsText(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
             } else {
+                Log.d(LOG_TAG, "Initializing competencyUnitsText from currentValues");
                 competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
             }
         } else {
+            Log.d(LOG_TAG, "No saved state or arguments");
             competencyUnitsText = "";
         }
         onEntityLoaded();
@@ -376,6 +374,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private void onEntityLoadedFromDb(CourseDetails entity) {
+        Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
         courseEntity = entity;
         setSelectedTerm(entity.getTerm());
         setSelectedMentor(entity.getMentor());
@@ -394,12 +393,21 @@ public class EditCourseViewModel extends AndroidViewModel {
     private void onEntityLoaded() {
         titleLiveData.postValue(courseEntity.getTitle());
         entityLiveData.postValue(courseEntity);
+        termsLiveData.observeForever(termsLoadedObserver);
+        mentorsLiveData.observeForever(mentorsLoadedObserver);
+    }
+
+    public void saveViewModelState(Bundle outState) {
+        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        currentValues.saveState(outState, false);
+        courseEntity.saveState(outState, true);
     }
 
     private void onTermsLoaded(List<TermListItem> termListItems) {
         if (null == termListItems) {
             return;
         }
+        Log.d(LOG_TAG, String.format("Loaded %d terms from database", termListItems.size()));
         termsLiveData.removeObserver(termsLoadedObserver);
         EntityHelper.findById(courseEntity.getTermId(), termListItems).ifPresent(t -> {
             courseEntity.setTerm(t);
@@ -411,6 +419,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (null == mentorListItems) {
             return;
         }
+        Log.d(LOG_TAG, String.format("Loaded %d mentors from database", mentorListItems.size()));
         mentorsLiveData.removeObserver(mentorsLoadedObserver);
         EntityHelper.findById(courseEntity.getMentorId(), mentorListItems).ifPresent(t -> {
             courseEntity.setMentor(t);
@@ -420,6 +429,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     private synchronized void onAllCoursesLoaded(List<TermCourseListItem> termCourseListItems) {
         if (null != termCourseListItems) {
+            Log.d(LOG_TAG, String.format("Loaded %d courses from database", termCourseListItems.size()));
             coursesLiveData.removeObserver(coursesLoadedObserver);
             coursesLiveData = null;
             coursesForTerm.clear();
@@ -429,15 +439,19 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     private synchronized Optional<Integer> validateExpectedStart(boolean saveMode) {
         if (null == currentValues.expectedStart) {
+            Log.d(LOG_TAG, String.format("Validating expectedStart(null); status=%s", currentValues.status.name()));
             if (currentValues.status == CourseStatus.PLANNED) {
+                Log.d(LOG_TAG, (saveMode) ? "validateExpectedStart: Returning R.string.message_expected_start_required" : "Returning R.string.message_required");
                 return Optional.of((saveMode) ? R.string.message_expected_start_required : R.string.message_required);
             }
         } else {
+            Log.d(LOG_TAG, String.format("Validating expectedStart(%s); status=%s", currentValues.expectedStart, currentValues.status.name()));
             switch (currentValues.status) {
                 case PLANNED:
                 case PASSED:
                 case NOT_PASSED:
                     if (null != currentValues.expectedEnd && currentValues.expectedStart.compareTo(currentValues.expectedEnd) > 0) {
+                        Log.d(LOG_TAG, (saveMode) ? "validateExpectedStart: Returning R.string.message_expected_start_after_end" : "Returning R.string.message_start_after_end");
                         return Optional.of((saveMode) ? R.string.message_expected_start_after_end : R.string.message_start_after_end);
                     }
                     break;
@@ -445,41 +459,58 @@ public class EditCourseViewModel extends AndroidViewModel {
                     break;
             }
         }
+        Log.d(LOG_TAG, "validateExpectedStart: Returning empty");
         return Optional.empty();
     }
 
     private synchronized Optional<Integer> validateExpectedEnd() {
         if (null == currentValues.expectedEnd && currentValues.status == CourseStatus.IN_PROGRESS) {
+            Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_required");
             return Optional.of(R.string.message_required);
         }
         if (null != selectedTerm) {
-            LocalDate d = selectedTerm.getStart();
-            if (null != d && d.compareTo(currentValues.expectedEnd) > 0) {
-                return Optional.of(R.string.message_before_term_start);
+            if (null != currentValues.expectedEnd) {
+                Log.d(LOG_TAG, String.format("Validating expectedEnd(%s); status=%s; selectedTerm=%s", currentValues.expectedStart, currentValues.status.name(), selectedTerm));
+                LocalDate d = selectedTerm.getStart();
+                if (null != d && d.compareTo(currentValues.expectedEnd) > 0) {
+                    Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_before_term_start");
+                    return Optional.of(R.string.message_before_term_start);
+                }
+                d = selectedTerm.getEnd();
+                if (null != d && d.compareTo(currentValues.expectedEnd) < 0) {
+                    Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_after_term_end");
+                    return Optional.of(R.string.message_after_term_end);
+                }
+            } else {
+                Log.d(LOG_TAG, String.format("Validating expectedEnd(null); status=%s; selectedTerm=%s", currentValues.status.name(), selectedTerm));
             }
-            d = selectedTerm.getEnd();
-            if (null != d && d.compareTo(currentValues.expectedEnd) < 0) {
-                return Optional.of(R.string.message_after_term_end);
-            }
+        } else {
+            Log.d(LOG_TAG, (null == currentValues.expectedEnd) ? String.format("Validating expectedEnd(null); status=%s; selectedTerm=null", currentValues.status.name()) :
+                    String.format("Validating expectedEnd(%s); status=%s; selectedTerm=null", currentValues.expectedEnd, currentValues.status.name()));
         }
+        Log.d(LOG_TAG, "validateExpectedEnd: Returning empty");
         return Optional.empty();
     }
 
     private synchronized Optional<Integer> validateActualStart(boolean saveMode) {
         if (null == currentValues.actualStart) {
+            Log.d(LOG_TAG, String.format("Validating actualStart(null); status=%s", currentValues.status.name()));
             switch (currentValues.status) {
                 case IN_PROGRESS:
                 case PASSED:
                 case NOT_PASSED:
+                    Log.d(LOG_TAG, (saveMode) ? "validateActualStart: Returning R.string.message_actual_start_required" : "Returning R.string.message_required");
                     return Optional.of((saveMode) ? R.string.message_actual_start_required : R.string.message_required);
                 default:
                     break;
             }
         } else {
+            Log.d(LOG_TAG, String.format("Validating actualStart(%s); status=%s", currentValues.actualStart, currentValues.status.name()));
             switch (currentValues.status) {
                 case PASSED:
                 case NOT_PASSED:
                     if (null != currentValues.actualEnd && currentValues.actualStart.compareTo(currentValues.actualEnd) > 0) {
+                        Log.d(LOG_TAG, (saveMode) ? "validateActualStart: Returning R.string.message_actual_start_after_end" : "Returning R.string.message_start_after_end");
                         return Optional.of((saveMode) ? R.string.message_actual_start_after_end : R.string.message_start_after_end);
                     }
                     break;
@@ -487,6 +518,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                     break;
             }
         }
+        Log.d(LOG_TAG, "validateActualStart: Returning empty");
         return Optional.empty();
     }
 
@@ -495,32 +527,43 @@ public class EditCourseViewModel extends AndroidViewModel {
             switch (currentValues.status) {
                 case PASSED:
                 case NOT_PASSED:
+                    Log.d(LOG_TAG, "validateActualEnd: Returning R.string.message_required");
                     return Optional.of(R.string.message_required);
                 default:
                     break;
             }
-        }
-        if (null != selectedTerm) {
+        } else if (null != selectedTerm) {
+            Log.d(LOG_TAG, String.format("Validating actualEnd(%s); status=%s; selectedTerm=%s", currentValues.actualEnd, currentValues.status.name(), selectedTerm));
             LocalDate d = selectedTerm.getStart();
-            if (null != d && d.compareTo(currentValues.expectedEnd) > 0) {
+            if (null != d && d.compareTo(currentValues.actualEnd) > 0) {
+                Log.d(LOG_TAG, "validateActualEnd: Returning R.string.message_before_term_start");
                 return Optional.of(R.string.message_before_term_start);
             }
             d = selectedTerm.getEnd();
-            if (null != d && d.compareTo(currentValues.expectedEnd) < 0) {
+            if (null != d && d.compareTo(currentValues.actualEnd) < 0) {
+                Log.d(LOG_TAG, "validateActualEnd: Returning R.string.message_after_term_end");
                 return Optional.of(R.string.message_after_term_end);
             }
+        } else {
+            Log.d(LOG_TAG, String.format("Validating actualEnd(null); status=%s; selectedTerm=%s", currentValues.status.name(), selectedTerm));
         }
 
+        Log.d(LOG_TAG, "validateActualEnd: Returning empty");
         return Optional.empty();
     }
 
     private synchronized Optional<Integer> validateCompetencyUnits(boolean saveMode) {
+        Log.d(LOG_TAG, (null == currentValues.competencyUnits) ? String.format("Validating competencyUnits(null); text=%s", StringHelper.toEscapedString(competencyUnitsText)) :
+                String.format("Validating competencyUnits(%d); text=%s", currentValues.competencyUnits, StringHelper.toEscapedString(competencyUnitsText)));
         if (competencyUnitsText.trim().isEmpty()) {
+            Log.d(LOG_TAG, (saveMode) ? "validateCompetencyUnits: Returning R.string.message_competency_units_required" : "validateCompetencyUnits: Returning R.string.message_required");
             return Optional.of((saveMode) ? R.string.message_competency_units_required : R.string.message_required);
         }
-        if (null == currentValues.competencyUnits) {
+        if (null == currentValues.competencyUnits || currentValues.competencyUnits < 0) {
+            Log.d(LOG_TAG, (saveMode) ? "validateCompetencyUnits: Returning R.string.message_invalid_competency_units_value" : "validateCompetencyUnits: Returning R.string.message_invalid_number");
             Optional.of((saveMode) ? R.string.message_invalid_competency_units_value : R.string.message_invalid_number);
         }
+        Log.d(LOG_TAG, "validateCompetencyUnits: Returning empty");
         return Optional.empty();
     }
 
@@ -549,11 +592,12 @@ public class EditCourseViewModel extends AndroidViewModel {
         });
         validateCompetencyUnits(true).ifPresent(errors::add);
         if (!errors.isEmpty()) {
+            Log.d(LOG_TAG, String.format("Returning %d errors", errors.size()));
             return Single.just(errors);
         }
         CourseEntity entity = courseEntity.toEntity();
         entity.setTermId(Objects.requireNonNull(Objects.requireNonNull(selectedTerm).getId()));
-        entity.setMentorId(Objects.requireNonNull(selectedMentor).getId());
+        entity.setMentorId((null == selectedMentor) ? null : selectedMentor.getId());
         entity.setNumber(normalizedNumber);
         entity.setTitle(normalizedTitle);
         entity.setStatus(currentValues.getStatus());
@@ -563,11 +607,12 @@ public class EditCourseViewModel extends AndroidViewModel {
         entity.setActualEnd(currentValues.getActualEnd());
         entity.setCompetencyUnits(currentValues.getCompetencyUnits());
         entity.setNotes(currentValues.getNotes());
+        Log.d(LOG_TAG, String.format("Saving %s to database", entity));
         return dbLoader.saveCourse(courseEntity.toEntity()).toSingleDefault(Collections.emptyList());
     }
 
     public Completable delete() {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.delete");
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
         return dbLoader.deleteCourse(Objects.requireNonNull(entityLiveData.getValue()).toEntity()).doOnError(throwable -> Log.e(getClass().getName(),
                 "Error deleting course", throwable));
     }
@@ -585,6 +630,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (null == termListItems || null == courseEntity) {
             return null;
         }
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeTermProperty");
         Optional<TermListItem> result = EntityHelper.findById(courseEntity.getId(), termListItems);
         result.ifPresent(t -> courseEntity.setTerm(t));
         return result.orElse(null);
@@ -594,6 +640,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (null == mentorListItems || null == courseEntity) {
             return null;
         }
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeMentorProperty");
         Optional<MentorListItem> result = EntityHelper.findById(courseEntity.getId(), mentorListItems);
         result.ifPresent(t -> courseEntity.setMentor(t));
         return result.orElse(null);
@@ -622,6 +669,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         @Override
         public void setId(Long id) {
+            Log.d(LOG_TAG, (null == id) ? "Setting id to null" : String.format("Setting id to %d", id));
             if (null != courseEntity) {
                 courseEntity.setId(id);
             }
@@ -636,16 +684,20 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         @Override
         public void setNumber(String number) {
+            Log.d(LOG_TAG, String.format("Number changing from %s to %s", StringHelper.toEscapedString(this.number), StringHelper.toEscapedString(number)));
             this.number = (null == number) ? "" : number;
             String oldValue = normalizedNumber;
             normalizedNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(number);
             if (normalizedNumber.isEmpty()) {
                 if (!oldValue.isEmpty()) {
+                    Log.d(LOG_TAG, "Setting numberValidLiveData to false");
                     numberValidLiveData.postValue(false);
                 }
             } else if (oldValue.isEmpty()) {
+                Log.d(LOG_TAG, "Setting numberValidLiveData to true");
                 numberValidLiveData.postValue(true);
             }
+            Log.d(LOG_TAG, "Number change complete");
         }
 
         @Nullable
@@ -678,19 +730,24 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         @Override
         public void setTitle(String title) {
+            Log.d(LOG_TAG, String.format("Title changing from %s to %s", StringHelper.toEscapedString(this.title), StringHelper.toEscapedString(title)));
             this.title = (null == title) ? "" : title;
             String oldValue = normalizedTitle;
             normalizedTitle = TermEntity.SINGLE_LINE_NORMALIZER.apply(title);
             if (normalizedTitle.isEmpty()) {
                 if (!oldValue.isEmpty()) {
+                    Log.d(LOG_TAG, "Setting titleValidLiveData to false");
                     titleValidLiveData.postValue(false);
                 }
             } else {
                 titleLiveData.postValue(normalizedTitle);
                 if (oldValue.isEmpty()) {
+                    Log.d(LOG_TAG, "Setting titleValidLiveData to true");
                     titleValidLiveData.postValue(true);
                 }
             }
+            titleLiveData.postValue(normalizedTitle);
+            Log.d(LOG_TAG, "Title change complete");
         }
 
         @Nullable
@@ -726,7 +783,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         public void setActualStart(LocalDate actualStart) {
             if (!Objects.equals(this.actualStart, actualStart)) {
                 this.actualStart = actualStart;
-                expectedStartErrorMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
+                actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
             }
         }
 
@@ -780,6 +837,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 status = CourseStatus.UNPLANNED;
             }
             if (status != this.status) {
+                Log.d(LOG_TAG, String.format("Status changing from %s to %s", this.status.name(), status.name()));
                 this.status = status;
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
                 actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));

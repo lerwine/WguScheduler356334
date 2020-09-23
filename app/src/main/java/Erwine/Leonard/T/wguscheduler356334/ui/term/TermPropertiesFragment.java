@@ -149,7 +149,7 @@ public class TermPropertiesFragment extends Fragment {
         if (null == date && null == (date = viewModel.getEnd())) {
             date = LocalDate.now();
         }
-        new DatePickerDialog(requireActivity(), this::onStartDateChanged, date.getYear(), date.getMonthValue(), date.getDayOfMonth()).show();
+        new DatePickerDialog(requireActivity(), this::onStartDateChanged, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     private void onEndClick(View view) {
@@ -157,7 +157,7 @@ public class TermPropertiesFragment extends Fragment {
         if (null == date && null == (date = viewModel.getStart())) {
             date = LocalDate.now();
         }
-        new DatePickerDialog(requireActivity(), this::onEndDateChanged, date.getYear(), date.getMonthValue(), date.getDayOfMonth()).show();
+        new DatePickerDialog(requireActivity(), this::onEndDateChanged, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     void onStartDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {

@@ -465,6 +465,49 @@ public final class StringHelper {
         }, nullToEmpty);
     }
 
+    public static String toEscapedString(String value) {
+        if (null == value) {
+            return "null";
+        }
+        if (value.isEmpty()) {
+            return "\"\"";
+        }
+        StringBuilder sb = new StringBuilder("\"");
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                default:
+                    if (Character.isISOControl(c) || Character.isWhitespace(c))
+                        sb.append(String.format("\\u%04x", (int) c));
+                    else
+                        sb.append(c);
+                    break;
+            }
+        }
+        return sb.append("\"").toString();
+    }
+
     public static TextWatcher textWatcherForTextChanged(final Consumer<String> onTextChanged) {
         return new TextWatcher() {
 

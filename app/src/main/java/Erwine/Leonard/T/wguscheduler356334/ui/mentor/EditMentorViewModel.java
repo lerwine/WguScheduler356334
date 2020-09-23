@@ -244,6 +244,7 @@ public class EditMentorViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 nameValidLiveData.postValue(true);
             }
+            nameLiveData.postValue(normalizedName);
         }
 
         @NonNull

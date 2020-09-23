@@ -33,13 +33,13 @@ public class EditTermFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public EditTermFragment() {
-        Log.d(LOG_TAG, "Constructing Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment");
+        Log.d(LOG_TAG, "Constructing EditTermFragment");
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onCreateView");
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_edit_term, container, false);
     }
 
@@ -53,7 +53,7 @@ public class EditTermFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onActivityCreated");
+        Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
         viewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onTermLoaded);
@@ -61,7 +61,7 @@ public class EditTermFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onOptionsItemSelected");
+        Log.d(LOG_TAG, "Enter onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             verifySaveChanges();
@@ -72,7 +72,7 @@ public class EditTermFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveInstanceState");
+        Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -85,13 +85,13 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onSaveTermImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onSaveTermImageButtonClick");
+        Log.d(LOG_TAG, "Enter onSaveTermImageButtonClick");
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDbOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onSaveOperationFinished");
         if (messageIds.isEmpty()) {
             requireActivity().finish();
         } else {
@@ -103,7 +103,7 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onDbOperationSucceeded() {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDbOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
         requireActivity().finish();
     }
 
@@ -114,7 +114,7 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onDeleteImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onDeleteImageButtonClick");
+        Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, requireContext()).showYesNoDialog(() -> {
             compositeDisposable.clear();
             compositeDisposable.add(viewModel.delete().subscribe(this::onDbOperationSucceeded, this::onDeleteFailed));
@@ -127,7 +127,7 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onCancelTermEditImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onCancelTermEditImageButtonClick");
+        Log.d(LOG_TAG, "Enter onCancelTermEditImageButtonClick");
         verifySaveChanges();
     }
 

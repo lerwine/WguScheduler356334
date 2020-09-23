@@ -51,7 +51,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
      *
      * @return The value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      */
-    public long getCourseId() {
+    public Long getCourseId() {
         return courseId;
     }
 
