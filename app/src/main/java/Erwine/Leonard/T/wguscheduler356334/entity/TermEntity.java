@@ -8,6 +8,7 @@ import androidx.room.Index;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
  * Represents a row of data from the {@link AppDb#TABLE_NAME_TERMS "terms"} database table.
@@ -60,4 +61,11 @@ public final class TermEntity extends AbstractTermEntity<TermEntity> {
     public TermEntity() {
         super(null, null, null, null, null);
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return ToStringBuilder.toEscapedString(this, false);
+    }
+
 }

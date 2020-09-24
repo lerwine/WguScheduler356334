@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public interface Term extends NoteColumnIncludedEntity {
 
@@ -105,4 +106,14 @@ public interface Term extends NoteColumnIncludedEntity {
             bundle.putLong(stateKey(COLNAME_END, isOriginal), d.toEpochDay());
         }
     }
+
+    @Override
+    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+        NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
+        sb.append(COLNAME_NAME, getName())
+                .append(COLNAME_START, getStart())
+                .append(COLNAME_END, getEnd())
+                .append(COLNAME_NOTES, getNotes());
+    }
+
 }

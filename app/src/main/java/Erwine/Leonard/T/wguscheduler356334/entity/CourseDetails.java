@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+
 @DatabaseView(
         viewName = "courseDetailView",
         value = "SELECT courses.*," +
@@ -211,4 +213,17 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
         setCompetencyUnits(source.getCompetencyUnits());
         setNotes(source.getNotes());
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return ToStringBuilder.toEscapedString(this, false);
+    }
+
+    @Override
+    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+        super.appendPropertiesAsStrings(sb);
+        sb.append("term", term, false).append("mentor", mentor, false);
+    }
+
 }

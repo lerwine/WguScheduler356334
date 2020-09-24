@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -7,6 +8,7 @@ import androidx.room.Index;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
  * Represents a row of data from the {@link AppDb#TABLE_NAME_COURSES "courses"} database table.
@@ -110,6 +112,12 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
     @Override
     public void setMentorId(Long mentorId) {
         super.setMentorId(mentorId);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return ToStringBuilder.toEscapedString(this, false);
     }
 
 }

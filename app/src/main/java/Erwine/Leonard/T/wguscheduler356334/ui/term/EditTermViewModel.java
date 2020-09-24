@@ -31,6 +31,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -318,5 +319,12 @@ public class EditTermViewModel extends AndroidViewModel {
                 normalizedNotes = null;
             }
         }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return ToStringBuilder.toEscapedString(this, false);
+        }
+
     }
 }

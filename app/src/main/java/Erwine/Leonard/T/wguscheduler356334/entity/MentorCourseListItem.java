@@ -11,6 +11,7 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = "mentorCourseListView",
@@ -157,18 +158,13 @@ public class MentorCourseListItem extends AbstractCourseEntity<MentorCourseListI
     @NonNull
     @Override
     public String toString() {
-        return "MentorCourseListItem{" +
-                "id=" + getId() +
-                ", termId=" + getTermId() +
-                ", mentorId=" + getMentorId() +
-                ", number='" + getNumber() + '\'' +
-                ", title='" + getTitle() + '\'' +
-                ", expectedStart=" + getExpectedStart() +
-                ", actualStart=" + getActualStart() +
-                ", expectedEnd=" + getExpectedEnd() +
-                ", actualEnd=" + getActualEnd() +
-                ", status=" + getStatus() +
-                ", notes='" + getNotes() + '\'' +
-                '}';
+        return ToStringBuilder.toEscapedString(this, false);
     }
+
+    @Override
+    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+        super.appendPropertiesAsStrings(sb);
+        sb.append("assessmentCount", assessmentCount).append("termName", termName);
+    }
+
 }

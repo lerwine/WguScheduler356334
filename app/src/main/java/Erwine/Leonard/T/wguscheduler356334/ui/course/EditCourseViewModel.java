@@ -41,7 +41,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -232,14 +232,14 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (competencyUnitsText.isEmpty()) {
                 return;
             }
-            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"\"", StringHelper.toEscapedString(this.competencyUnitsText)));
+            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"\"", ToStringBuilder.toEscapedString(this.competencyUnitsText)));
             competencyUnitsText = "";
             currentValues.competencyUnits = null;
         } else {
             if (competencyUnitsText.equals(value)) {
                 return;
             }
-            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"%s\"", StringHelper.toEscapedString(this.competencyUnitsText), StringHelper.toEscapedString(competencyUnitsText)));
+            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"%s\"", ToStringBuilder.toEscapedString(this.competencyUnitsText), ToStringBuilder.toEscapedString(competencyUnitsText)));
             competencyUnitsText = value;
             try {
                 currentValues.setCompetencyUnits(Integer.parseInt(competencyUnitsText.trim()));
@@ -553,8 +553,8 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private synchronized Optional<Integer> validateCompetencyUnits(boolean saveMode) {
-        Log.d(LOG_TAG, (null == currentValues.competencyUnits) ? String.format("Validating competencyUnits(null); text=%s", StringHelper.toEscapedString(competencyUnitsText)) :
-                String.format("Validating competencyUnits(%d); text=%s", currentValues.competencyUnits, StringHelper.toEscapedString(competencyUnitsText)));
+        Log.d(LOG_TAG, (null == currentValues.competencyUnits) ? String.format("Validating competencyUnits(null); text=%s", ToStringBuilder.toEscapedString(competencyUnitsText)) :
+                String.format("Validating competencyUnits(%d); text=%s", currentValues.competencyUnits, ToStringBuilder.toEscapedString(competencyUnitsText)));
         if (competencyUnitsText.trim().isEmpty()) {
             Log.d(LOG_TAG, (saveMode) ? "validateCompetencyUnits: Returning R.string.message_competency_units_required" : "validateCompetencyUnits: Returning R.string.message_required");
             return Optional.of((saveMode) ? R.string.message_competency_units_required : R.string.message_required);
@@ -684,7 +684,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         @Override
         public void setNumber(String number) {
-            Log.d(LOG_TAG, String.format("Number changing from %s to %s", StringHelper.toEscapedString(this.number), StringHelper.toEscapedString(number)));
+            Log.d(LOG_TAG, String.format("Number changing from %s to %s", ToStringBuilder.toEscapedString(this.number), ToStringBuilder.toEscapedString(number)));
             this.number = (null == number) ? "" : number;
             String oldValue = normalizedNumber;
             normalizedNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(number);
@@ -730,7 +730,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         @Override
         public void setTitle(String title) {
-            Log.d(LOG_TAG, String.format("Title changing from %s to %s", StringHelper.toEscapedString(this.title), StringHelper.toEscapedString(title)));
+            Log.d(LOG_TAG, String.format("Title changing from %s to %s", ToStringBuilder.toEscapedString(this.title), ToStringBuilder.toEscapedString(title)));
             this.title = (null == title) ? "" : title;
             String oldValue = normalizedTitle;
             normalizedTitle = TermEntity.SINGLE_LINE_NORMALIZER.apply(title);
@@ -872,5 +872,12 @@ public class EditCourseViewModel extends AndroidViewModel {
                 normalizedNotes = null;
             }
         }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return ToStringBuilder.toEscapedString(this, false);
+        }
+
     }
 }

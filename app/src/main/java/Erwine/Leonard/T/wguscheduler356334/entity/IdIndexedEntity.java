@@ -7,7 +7,10 @@ import androidx.annotation.Nullable;
 
 import java.util.Objects;
 
-public interface IdIndexedEntity {
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuildable;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+
+public interface IdIndexedEntity extends ToStringBuildable {
     /**
      * The name of the {@code "id"} database column, which is the primary key.
      * If this value is {@code null}, then the current {@code IdIndexedEntity} object represents a new row that has not yet been saved.
@@ -60,5 +63,10 @@ public interface IdIndexedEntity {
                 bundle.putLong(stateKey(COLNAME_ID, false), getId());
             }
         }
+    }
+
+    @Override
+    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+        sb.appendRaw(COLNAME_ID).append("=").append(getId());
     }
 }

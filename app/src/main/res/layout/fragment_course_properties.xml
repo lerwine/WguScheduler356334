@@ -15,6 +15,7 @@
             android:id="@+id/termTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:labelFor="@id/termButton"
             android:text="@string/label_term"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +32,7 @@
             app:layout_constraintTop_toBottomOf="@+id/termTextView" />
 
         <TableLayout
-            android:id="@+id/tableLayout2"
+            android:id="@+id/tableLayout1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:stretchColumns="1"
@@ -51,6 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_column="0"
                     android:layout_weight="65"
+                    android:labelFor="@id/courseCodeEditText"
                     android:text="@string/label_course_number"
                     android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
@@ -60,6 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_column="1"
                     android:layout_weight="35"
+                    android:labelFor="@id/competencyUnitsEditText"
                     android:text="@string/label_competency_units"
                     android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
@@ -94,14 +97,15 @@
         </TableLayout>
 
         <TextView
-            android:id="@+id/textView19"
+            android:id="@+id/titleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:labelFor="@id/titleEditText"
             android:text="@string/label_title"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
+            app:layout_constraintTop_toBottomOf="@+id/tableLayout1" />
 
         <EditText
             android:id="@+id/titleEditText"
@@ -112,12 +116,13 @@
             android:inputType="textShortMessage|text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView19" />
+            app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
         <TextView
             android:id="@+id/mentorTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:labelFor="@id/mentorChip"
             android:text="@string/label_mentor"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel"
             app:layout_constraintEnd_toEndOf="parent"
@@ -139,6 +144,7 @@
             android:id="@+id/statusTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:labelFor="@id/statusButton"
             android:text="@string/label_status"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel"
             app:layout_constraintStart_toStartOf="parent"
@@ -208,7 +214,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="2"
-                    android:text="@string/label_to_lc" />
+                    android:text="-"
+                    android:textStyle="bold" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/expectedEndChip"
@@ -243,7 +250,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="2"
-                    android:text="@string/label_to_lc" />
+                    android:text="-"
+                    android:textStyle="bold" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/actualEndChip"
@@ -260,31 +268,25 @@
             android:id="@+id/notesLabelTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:labelFor="@id/notesEditText"
             android:text="@string/label_notes"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/datesTableLayout" />
 
-        <TextView
-            android:id="@+id/notesTextView"
+        <EditText
+            android:id="@+id/notesEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minHeight="64dp"
+            android:ems="10"
+            android:inputType="textShortMessage|text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/notesLabelTextView" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/editNotesFloatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:src="@drawable/edit_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:maxImageSize="42dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

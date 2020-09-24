@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public interface Assessment extends NoteColumnIncludedEntity {
     /**
@@ -180,4 +181,17 @@ public interface Assessment extends NoteColumnIncludedEntity {
             bundle.putLong(stateKey(COLNAME_COMPLETION_DATE, isOriginal), d.toEpochDay());
         }
     }
+
+    @Override
+    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+        NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
+        sb.append(COLNAME_COURSE_ID, getCourseId())
+                .append(COLNAME_CODE, getCode())
+                .append(COLNAME_STATUS, getStatus())
+                .append(COLNAME_GOAL_DATE, getGoalDate())
+                .append(COLNAME_TYPE, getType())
+                .append(COLNAME_COMPLETION_DATE, getCompletionDate())
+                .append(COLNAME_NOTES, getNotes());
+    }
+
 }

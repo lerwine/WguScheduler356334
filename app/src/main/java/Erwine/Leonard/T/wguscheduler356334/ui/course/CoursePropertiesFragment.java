@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,7 +58,7 @@ public class CoursePropertiesFragment extends Fragment {
     private Chip expectedEndChip;
     private Chip actualStartChip;
     private Chip actualEndChip;
-    private TextView notesTextView;
+    private EditText notesEditText;
 
     public CoursePropertiesFragment() {
         compositeDisposable = new CompositeDisposable();
@@ -85,7 +84,7 @@ public class CoursePropertiesFragment extends Fragment {
         expectedEndChip = view.findViewById(R.id.expectedEndChip);
         actualStartChip = view.findViewById(R.id.actualStartChip);
         actualEndChip = view.findViewById(R.id.actualEndChip);
-        notesTextView = view.findViewById(R.id.notesTextView);
+        notesEditText = view.findViewById(R.id.notesEditText);
         termButton.setOnClickListener(this::onTermButtonClick);
         mentorChip.setOnClickListener(this::onMentorChipClick);
         mentorChip.setOnCloseIconClickListener(this::onMentorChipCloseIconClick);
@@ -98,7 +97,6 @@ public class CoursePropertiesFragment extends Fragment {
         actualStartChip.setOnCloseIconClickListener(this::onActualStartChipCloseIconClick);
         actualEndChip.setOnClickListener(this::onActualEndChipClick);
         actualEndChip.setOnCloseIconClickListener(this::onActualEndChipCloseIconClick);
-        view.findViewById(R.id.editNotesFloatingActionButton).setOnClickListener(this::onEditNotesFloatingActionButtonClick);
     }
 
     @Override
@@ -260,11 +258,12 @@ public class CoursePropertiesFragment extends Fragment {
         courseCodeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNumber));
         competencyUnitsEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCompetencyUnitsText));
         titleEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setTitle));
+        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
         onExpectedStartChanged();
         onActualStartChanged();
         onExpectedEndChanged();
         onActualEndChanged();
-        notesTextView.setText(viewModel.getNotes());
+        notesEditText.setText(viewModel.getNotes());
     }
 
     private void onTermsLoaded(List<TermListItem> termListItems) {
@@ -483,14 +482,6 @@ public class CoursePropertiesFragment extends Fragment {
             viewModel.setActualEnd(null);
             onActualEndChanged();
         }
-    }
-
-    private void onEditNotesFloatingActionButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onEditNotesFloatingActionButtonClick");
-        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), requireContext(), s -> {
-            notesTextView.setText(s);
-            viewModel.setNotes(s);
-        });
     }
 
     private void onTermChanged(AbstractTermEntity<?> term) {

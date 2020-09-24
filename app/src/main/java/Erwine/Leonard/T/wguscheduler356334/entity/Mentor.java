@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public interface Mentor extends NoteColumnIncludedEntity {
 
@@ -86,4 +87,14 @@ public interface Mentor extends NoteColumnIncludedEntity {
         bundle.putString(stateKey(COLNAME_PHONE_NUMBER, isOriginal), getPhoneNumber());
         bundle.putString(stateKey(COLNAME_EMAIL_ADDRESS, isOriginal), getEmailAddress());
     }
+
+    @Override
+    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+        NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
+        sb.append(COLNAME_NAME, getName())
+                .append(COLNAME_PHONE_NUMBER, getPhoneNumber())
+                .append(COLNAME_EMAIL_ADDRESS, getEmailAddress())
+                .append(COLNAME_NOTES, getNotes());
+    }
+
 }

@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = "mentorListView",
@@ -77,12 +78,13 @@ public class MentorListItem extends AbstractMentorEntity<MentorListItem> impleme
     @NonNull
     @Override
     public String toString() {
-        return "MentorListItem{" +
-                "id=" + getId() +
-                ", name='" + getName() + '\'' +
-                ", phoneNumber=" + getPhoneNumber() +
-                ", emailAddress=" + getEmailAddress() +
-                ", notes='" + getNotes() + '\'' +
-                '}';
+        return ToStringBuilder.toEscapedString(this, false);
     }
+
+    @Override
+    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+        super.appendPropertiesAsStrings(sb);
+        sb.append("courseCount", courseCount);
+    }
+
 }

@@ -1,10 +1,12 @@
 package Erwine.Leonard.T.wguscheduler356334.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
  * Represents a row of data from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} database table.
@@ -56,6 +58,12 @@ public final class MentorEntity extends AbstractMentorEntity<MentorEntity> {
     @Ignore
     public MentorEntity() {
         super(null, null, null, null, null);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return ToStringBuilder.toEscapedString(this, false);
     }
 
 }

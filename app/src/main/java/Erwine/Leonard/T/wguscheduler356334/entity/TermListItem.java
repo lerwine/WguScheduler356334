@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = "termListView",
@@ -101,12 +102,13 @@ public final class TermListItem extends AbstractTermEntity<TermListItem> impleme
     @NonNull
     @Override
     public String toString() {
-        return "TermListItem{" +
-                "id=" + getId() +
-                ", name='" + getName() + '\'' +
-                ", start=" + getStart() +
-                ", end=" + getEnd() +
-                ", notes='" + getNotes() + '\'' +
-                '}';
+        return ToStringBuilder.toEscapedString(this, false);
     }
+
+    @Override
+    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+        super.appendPropertiesAsStrings(sb);
+        sb.append("courseCount", courseCount).append("totalCompetencyUnits", totalCompetencyUnits);
+    }
+
 }

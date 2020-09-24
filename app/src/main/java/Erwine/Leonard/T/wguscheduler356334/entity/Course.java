@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public interface Course extends NoteColumnIncludedEntity {
     /**
@@ -280,4 +281,21 @@ public interface Course extends NoteColumnIncludedEntity {
         }
         bundle.putInt(stateKey(COLNAME_COMPETENCY_UNITS, isOriginal), getCompetencyUnits());
     }
+
+    @Override
+    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+        NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
+        sb.append(COLNAME_TERM_ID, getTermId())
+                .append(COLNAME_MENTOR_ID, getMentorId())
+                .append(COLNAME_NUMBER, getNumber())
+                .append(COLNAME_TITLE, getTitle())
+                .append(COLNAME_EXPECTED_START, getExpectedStart())
+                .append(COLNAME_ACTUAL_START, getActualStart())
+                .append(COLNAME_EXPECTED_END, getExpectedEnd())
+                .append(COLNAME_ACTUAL_END, getActualEnd())
+                .append(COLNAME_STATUS, getStatus())
+                .append(COLNAME_COMPETENCY_UNITS, getCompetencyUnits())
+                .append(COLNAME_NOTES, getNotes());
+    }
+
 }

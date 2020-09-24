@@ -9,6 +9,8 @@ import androidx.room.Ignore;
 
 import java.time.LocalDate;
 
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+
 @DatabaseView(
         viewName = "assessmentDetailView",
         value = "SELECT assessments.*," +
@@ -173,4 +175,17 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     public void setCourseId(long courseId) {
         throw new UnsupportedOperationException();
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return ToStringBuilder.toEscapedString(this, false);
+    }
+
+    @Override
+    public synchronized void appendPropertiesAsStrings(ToStringBuilder sb) {
+        super.appendPropertiesAsStrings(sb);
+        sb.append("course", course, false);
+    }
+
 }

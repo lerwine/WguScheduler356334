@@ -8,6 +8,7 @@ import androidx.room.Index;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
  * Represents a row of data from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} database table.
@@ -133,15 +134,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
     @NonNull
     @Override
     public String toString() {
-        return "AssessmentEntity{" +
-                "id=" + getId() +
-                ", courseId=" + getCourseId() +
-                ", number='" + getCode() + '\'' +
-                ", status=" + getStatus() +
-                ", goalDate=" + getGoalDate() +
-                ", completionDat=" + getCompletionDate() +
-                ", type=" + getType() +
-                ", notes='" + getNotes() + '\'' +
-                '}';
+        return ToStringBuilder.toEscapedString(this, false);
     }
+
 }
