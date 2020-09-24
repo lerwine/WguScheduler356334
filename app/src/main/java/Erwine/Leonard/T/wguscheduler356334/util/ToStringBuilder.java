@@ -317,6 +317,9 @@ public class ToStringBuilder implements Appendable, CharSequence {
     @Override
     public ToStringBuilder append(char c) {
         switch (c) {
+            case ' ':
+                backingBuilder.append("' '");
+                break;
             case '\b':
                 backingBuilder.append("'\\b'");
                 break;
@@ -339,7 +342,7 @@ public class ToStringBuilder implements Appendable, CharSequence {
                 backingBuilder.append("'\\\\'");
                 break;
             default:
-                if (Character.isISOControl(c) || Character.isWhitespace(c))
+                if (Character.isISOControl(c) || Character.isWhitespace(c) || (int) c > 126)
                     backingBuilder.append(String.format("'\\u%04x'", (int) c));
                 else
                     backingBuilder.append('\'').append(c).append('\'');
@@ -587,92 +590,6 @@ public class ToStringBuilder implements Appendable, CharSequence {
     }
 
     @NonNull
-    private ToStringBuilder appendImpl(@NonNull LocalDate obj, boolean omitTypeName) {
-        if (omitTypeName) {
-            backingBuilder.append('{');
-        } else {
-            backingBuilder.append(obj.getClass().getName()).append('{');
-        }
-        backingBuilder.append(obj).append('}');
-        return this;
-    }
-
-    @NonNull
-    private ToStringBuilder appendImpl(@NonNull Object obj, boolean omitTypeName, boolean omitElementType) {
-        if (obj instanceof Enum) {
-            if (!omitTypeName) {
-                backingBuilder.append(obj.getClass().getName()).append(".");
-            }
-            backingBuilder.append(((Enum<?>) obj).name());
-        } else {
-            if (obj instanceof String) {
-                return appendImpl((String) obj, omitTypeName);
-            }
-            if (obj instanceof ToStringBuildable) {
-                return appendImpl((ToStringBuildable) obj, omitTypeName);
-            }
-            if (obj instanceof Optional) {
-                return appendImpl((Optional<?>) obj, omitTypeName, omitElementType);
-            }
-            if (obj instanceof CharSequence) {
-                return appendImpl((CharSequence) obj, omitTypeName);
-            }
-            if (obj instanceof boolean[]) {
-                return appendImpl((boolean[]) obj, omitTypeName);
-            }
-            if (obj instanceof byte[]) {
-                return appendImpl((byte[]) obj, omitTypeName);
-            }
-            if (obj instanceof short[]) {
-                return appendImpl((short[]) obj, omitTypeName);
-            }
-            if (obj instanceof char[]) {
-                return appendImpl((char[]) obj, omitTypeName);
-            }
-            if (obj instanceof int[]) {
-                return appendImpl((int[]) obj, omitTypeName);
-            }
-            if (obj instanceof long[]) {
-                return appendImpl((long[]) obj, omitTypeName);
-            }
-            if (obj instanceof float[]) {
-                return appendImpl((float[]) obj, omitTypeName);
-            }
-            if (obj instanceof double[]) {
-                return appendImpl((double[]) obj, omitTypeName);
-            }
-            if (obj instanceof Object[]) {
-                Class<?> t = obj.getClass().getComponentType();
-                return appendImpl(Arrays.stream((Object[]) obj).iterator(), (omitTypeName || null == t) ? "" : t.getName(), true, omitElementType);
-            }
-            if (obj instanceof Iterable<?>) {
-                return appendImpl(((Iterable<?>) obj).iterator(), (omitTypeName) ? "" : obj.getClass().getName(), false, omitElementType);
-            }
-            if (obj instanceof Stream<?>) {
-                return appendImpl(((Stream<?>) obj).iterator(), (omitTypeName) ? "" : obj.getClass().getName(), false, omitElementType);
-            }
-            Class<?> c = obj.getClass();
-            if (c.isPrimitive()) {
-                if (omitTypeName) {
-                    if (c == Character.TYPE) {
-                        return append((char) obj);
-                    }
-                    backingBuilder.append(obj);
-                } else if (c == Character.TYPE) {
-                    backingBuilder.append(c.getSimpleName()).append("{");
-                    append((char) obj);
-                    backingBuilder.append("}");
-                } else {
-                    backingBuilder.append(c.getSimpleName()).append("{").append(obj).append("}");
-                }
-            } else {
-                backingBuilder.append(obj);
-            }
-        }
-        return this;
-    }
-
-    @NonNull
     public ToStringBuilder append(@NonNull String name, @Nullable String str) {
         backingBuilder.append(", ").append(name).append("=");
         return append(str);
@@ -893,6 +810,92 @@ public class ToStringBuilder implements Appendable, CharSequence {
     }
 
     @NonNull
+    private ToStringBuilder appendImpl(@NonNull LocalDate obj, boolean omitTypeName) {
+        if (omitTypeName) {
+            backingBuilder.append('{');
+        } else {
+            backingBuilder.append(obj.getClass().getName()).append('{');
+        }
+        backingBuilder.append(obj).append('}');
+        return this;
+    }
+
+    @NonNull
+    private ToStringBuilder appendImpl(@NonNull Object obj, boolean omitTypeName, boolean omitElementType) {
+        if (obj instanceof Enum) {
+            if (!omitTypeName) {
+                backingBuilder.append(obj.getClass().getName()).append(".");
+            }
+            backingBuilder.append(((Enum<?>) obj).name());
+        } else {
+            if (obj instanceof String) {
+                return appendImpl((String) obj, omitTypeName);
+            }
+            if (obj instanceof ToStringBuildable) {
+                return appendImpl((ToStringBuildable) obj, omitTypeName);
+            }
+            if (obj instanceof Optional) {
+                return appendImpl((Optional<?>) obj, omitTypeName, omitElementType);
+            }
+            if (obj instanceof CharSequence) {
+                return appendImpl((CharSequence) obj, omitTypeName);
+            }
+            if (obj instanceof boolean[]) {
+                return appendImpl((boolean[]) obj, omitTypeName);
+            }
+            if (obj instanceof byte[]) {
+                return appendImpl((byte[]) obj, omitTypeName);
+            }
+            if (obj instanceof short[]) {
+                return appendImpl((short[]) obj, omitTypeName);
+            }
+            if (obj instanceof char[]) {
+                return appendImpl((char[]) obj, omitTypeName);
+            }
+            if (obj instanceof int[]) {
+                return appendImpl((int[]) obj, omitTypeName);
+            }
+            if (obj instanceof long[]) {
+                return appendImpl((long[]) obj, omitTypeName);
+            }
+            if (obj instanceof float[]) {
+                return appendImpl((float[]) obj, omitTypeName);
+            }
+            if (obj instanceof double[]) {
+                return appendImpl((double[]) obj, omitTypeName);
+            }
+            if (obj instanceof Object[]) {
+                Class<?> t = obj.getClass().getComponentType();
+                return appendImpl(Arrays.stream((Object[]) obj).iterator(), (omitTypeName || null == t) ? "" : t.getName(), true, omitElementType);
+            }
+            if (obj instanceof Iterable<?>) {
+                return appendImpl(((Iterable<?>) obj).iterator(), (omitTypeName) ? "" : obj.getClass().getName(), false, omitElementType);
+            }
+            if (obj instanceof Stream<?>) {
+                return appendImpl(((Stream<?>) obj).iterator(), (omitTypeName) ? "" : obj.getClass().getName(), false, omitElementType);
+            }
+            Class<?> c = obj.getClass();
+            if (c.isPrimitive()) {
+                if (omitTypeName) {
+                    if (c == Character.TYPE) {
+                        return append((char) obj);
+                    }
+                    backingBuilder.append(obj);
+                } else if (c == Character.TYPE) {
+                    backingBuilder.append(c.getSimpleName()).append("{");
+                    append((char) obj);
+                    backingBuilder.append("}");
+                } else {
+                    backingBuilder.append(c.getSimpleName()).append("{").append(obj).append("}");
+                }
+            } else {
+                backingBuilder.append(obj);
+            }
+        }
+        return this;
+    }
+
+    @NonNull
     private ToStringBuilder appendImpl(@NonNull String str) {
         if (str.isEmpty()) {
             backingBuilder.append("\"\"");
@@ -925,6 +928,9 @@ public class ToStringBuilder implements Appendable, CharSequence {
 
     private void appendUnquoted(char c) {
         switch (c) {
+            case ' ':
+                backingBuilder.append(' ');
+                break;
             case '\b':
                 backingBuilder.append("\\b");
                 break;
@@ -947,7 +953,7 @@ public class ToStringBuilder implements Appendable, CharSequence {
                 backingBuilder.append("\\\\");
                 break;
             default:
-                if (Character.isISOControl(c) || Character.isWhitespace(c))
+                if (Character.isISOControl(c) || Character.isWhitespace(c) || (int) c > 126)
                     backingBuilder.append(String.format("\\u%04x", (int) c));
                 else
                     backingBuilder.append(c);

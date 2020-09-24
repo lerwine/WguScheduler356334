@@ -59,6 +59,16 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
 
     protected AbstractCourseEntity(@NonNull AbstractCourseEntity<?> source) {
         super(source);
+        this.termId = source.termId;
+        this.mentorId = source.mentorId;
+        this.number = source.number;
+        this.title = source.title;
+        this.status = source.status;
+        this.expectedStart = source.expectedStart;
+        this.actualStart = source.actualStart;
+        this.expectedEnd = source.expectedEnd;
+        this.actualEnd = source.actualEnd;
+        this.competencyUnits = source.competencyUnits;
     }
 
     @Override
@@ -96,7 +106,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
 
     @Override
     public void setNumber(String number) {
-        this.number = SINGLE_LINE_NORMALIZER.apply(title);
+        this.number = SINGLE_LINE_NORMALIZER.apply(number);
     }
 
     /**

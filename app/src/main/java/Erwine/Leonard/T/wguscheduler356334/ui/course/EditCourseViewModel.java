@@ -48,7 +48,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * View model shared by {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity}, {@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity},
- * {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment}
+ * {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link EditCourseFragment}
  */
 public class EditCourseViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditCourseViewModel.class.getName();
@@ -598,6 +598,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         CourseEntity entity = courseEntity.toEntity();
         entity.setTermId(Objects.requireNonNull(Objects.requireNonNull(selectedTerm).getId()));
         entity.setMentorId((null == selectedMentor) ? null : selectedMentor.getId());
+        Log.d(LOG_TAG, String.format("Setting number from %s to %s", ToStringBuilder.toEscapedString(entity.getNumber()), ToStringBuilder.toEscapedString(normalizedNumber)));
         entity.setNumber(normalizedNumber);
         entity.setTitle(normalizedTitle);
         entity.setStatus(currentValues.getStatus());
@@ -608,7 +609,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         entity.setCompetencyUnits(currentValues.getCompetencyUnits());
         entity.setNotes(currentValues.getNotes());
         Log.d(LOG_TAG, String.format("Saving %s to database", entity));
-        return dbLoader.saveCourse(courseEntity.toEntity()).toSingleDefault(Collections.emptyList());
+        return dbLoader.saveCourse(entity).toSingleDefault(Collections.emptyList());
     }
 
     public Completable delete() {
@@ -631,7 +632,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             return null;
         }
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeTermProperty");
-        Optional<TermListItem> result = EntityHelper.findById(courseEntity.getId(), termListItems);
+        Optional<TermListItem> result = EntityHelper.findById(courseEntity.getTermId(), termListItems);
         result.ifPresent(t -> courseEntity.setTerm(t));
         return result.orElse(null);
     }
@@ -641,7 +642,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             return null;
         }
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeMentorProperty");
-        Optional<MentorListItem> result = EntityHelper.findById(courseEntity.getId(), mentorListItems);
+        Optional<MentorListItem> result = EntityHelper.findById(courseEntity.getMentorId(), mentorListItems);
         result.ifPresent(t -> courseEntity.setMentor(t));
         return result.orElse(null);
     }

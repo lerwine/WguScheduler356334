@@ -2,12 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.course.EditCourseFragment">
 
-    <androidx.fragment.app.FragmentContainerView
+    <fragment
         android:id="@+id/coursePropertiesFragment"
         android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment"
         android:layout_width="0dp"
@@ -22,27 +21,27 @@
         android:id="@+id/saveImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/save_icon"
         android:contentDescription="@string/command_save_changes"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/deleteImageButton"
-        app:srcCompat="@drawable/save_icon" />
+        app:layout_constraintEnd_toStartOf="@+id/deleteImageButton" />
 
     <ImageButton
         android:id="@+id/deleteImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/delete_icon"
         android:contentDescription="@string/command_delete"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cancelImageButton"
-        app:srcCompat="@drawable/delete_icon" />
+        app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
 
     <ImageButton
         android:id="@+id/cancelImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/undo_icon"
         android:contentDescription="@android:string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/undo_icon" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

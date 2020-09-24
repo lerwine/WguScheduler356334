@@ -53,7 +53,7 @@ public class ManageDataActivity extends AppCompatActivity {
                 new AlertHelper(R.drawable.dialog_error, R.string.title_database_integrity_check, s, this).showDialog();
             }
         }, throwable -> {
-            Log.e(LOG_TAG, "Error saving course", throwable);
+            Log.e(LOG_TAG, "Error checking DB integrity", throwable);
             dialog.dismiss();
             String s = throwable.getMessage();
             new AlertHelper(R.drawable.dialog_error, R.string.title_database_integrity_check, (null == s || s.trim().isEmpty()) ? throwable.getClass().getName() : s, this).showDialog();

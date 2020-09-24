@@ -7,9 +7,9 @@
     android:layout_margin="@dimen/control_margin"
     tools:context=".AddCourseActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/editCourseFragment"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment"
+    <fragment
+        android:id="@+id/coursePropertiesFragment"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/saveImageButton"
@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        tools:layout="@layout/fragment_edit_course" />
+        tools:layout="@layout/fragment_course_properties" />
 
     <ImageButton
         android:id="@+id/saveImageButton"

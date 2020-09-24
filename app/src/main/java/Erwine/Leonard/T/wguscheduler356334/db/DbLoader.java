@@ -586,12 +586,12 @@ public class DbLoader {
             try {
                 termIds = appDb.termDAO().getAllSynchronous().stream().map(AbstractEntity::getId).collect(Collectors.toList());
             } catch (Exception e) {
-                return "Error accessing database";
+                throw new RuntimeException("Error accessing terms table", e);
             }
             try {
                 mentorIds = appDb.mentorDAO().getAllSynchronous().stream().map(AbstractEntity::getId).collect(Collectors.toList());
             } catch (Exception e) {
-                return "Error accessing database";
+                throw new RuntimeException("Error accessing mentors table", e);
             }
             List<Long> courseIds;
             ArrayList<String> messages = new ArrayList<>();
@@ -608,8 +608,7 @@ public class DbLoader {
                     return t.getId();
                 }).collect(Collectors.toList());
             } catch (Exception e) {
-                messages.add(String.format(Locale.getDefault(), "%s: Error reading from table.", AppDb.TABLE_NAME_COURSES));
-                return String.join("\n", messages);
+                throw new RuntimeException("Error accessing courses table", e);
             }
             List<AssessmentEntity> assessments;
             try {
@@ -621,7 +620,7 @@ public class DbLoader {
                     }
                 });
             } catch (Exception e) {
-                messages.add(String.format(Locale.getDefault(), "%s: Error reading from table.", AppDb.TABLE_NAME_ASSESSMENTS));
+                throw new RuntimeException("Error accessing assessments table", e);
             }
             return (messages.isEmpty()) ? "" : String.join("\n", messages);
         }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
