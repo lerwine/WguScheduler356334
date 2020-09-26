@@ -464,7 +464,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private synchronized Optional<Integer> validateExpectedEnd() {
-        if (null == currentValues.expectedEnd && currentValues.status == CourseStatus.IN_PROGRESS) {
+        if (null == currentValues.expectedEnd && null != currentValues.expectedStart && currentValues.status == CourseStatus.IN_PROGRESS) {
             Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_required");
             return Optional.of(R.string.message_required);
         }
@@ -765,6 +765,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (!Objects.equals(this.expectedStart, expectedStart)) {
                 this.expectedStart = expectedStart;
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
+                expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
             }
         }
 
@@ -785,6 +786,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (!Objects.equals(this.actualStart, actualStart)) {
                 this.actualStart = actualStart;
                 actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
+                actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
             }
         }
 
@@ -802,6 +804,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (!Objects.equals(this.expectedEnd, expectedEnd)) {
                 this.expectedEnd = expectedEnd;
                 expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
+                expectedStartErrorMessageLiveData.postValue(validateExpectedStart(false).orElse(null));
             }
         }
 
@@ -811,7 +814,6 @@ public class EditCourseViewModel extends AndroidViewModel {
             switch (status) {
                 case UNPLANNED:
                 case PLANNED:
-                case IN_PROGRESS:
                     return null;
                 default:
                     return actualEnd;
@@ -823,6 +825,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (!Objects.equals(this.actualEnd, actualEnd)) {
                 this.actualEnd = actualEnd;
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
+                actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
             }
         }
 

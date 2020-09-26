@@ -318,7 +318,6 @@ public class CoursePropertiesFragment extends Fragment {
         AlertHelper.showSingleSelectDialog(R.string.title_select_status, viewModel.getStatus(), Arrays.asList(CourseStatus.values()), requireContext(), t -> resources.getString(t.displayResourceId()), t -> {
             if (viewModel.getStatus() != t) {
                 viewModel.setStatus(t);
-                statusButton.setText(t.displayResourceId());
                 onStatusChanged();
             }
         });
@@ -350,6 +349,10 @@ public class CoursePropertiesFragment extends Fragment {
             LocalDate v = LocalDate.of(y, m + 1, d);
             if (!v.equals(viewModel.getExpectedStart())) {
                 viewModel.setExpectedStart(v);
+                if (viewModel.getStatus() == CourseStatus.UNPLANNED) {
+                    viewModel.setStatus(CourseStatus.PLANNED);
+                    onStatusChanged();
+                }
                 onExpectedStartChanged();
             }
         }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
@@ -359,7 +362,12 @@ public class CoursePropertiesFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onExpectedStartChipCloseIconClick");
         if (null != viewModel.getExpectedStart()) {
             viewModel.setExpectedStart(null);
-            onExpectedStartChanged();
+            if (viewModel.getStatus() == CourseStatus.PLANNED && null == viewModel.getExpectedEnd()) {
+                viewModel.setStatus(CourseStatus.UNPLANNED);
+                onStatusChanged();
+            } else {
+                onExpectedStartChanged();
+            }
         }
     }
 
@@ -389,7 +397,12 @@ public class CoursePropertiesFragment extends Fragment {
             LocalDate v = LocalDate.of(y, m + 1, d);
             if (!v.equals(viewModel.getExpectedEnd())) {
                 viewModel.setExpectedEnd(v);
-                onExpectedEndChanged();
+                if (viewModel.getStatus() == CourseStatus.UNPLANNED) {
+                    viewModel.setStatus(CourseStatus.PLANNED);
+                    onStatusChanged();
+                } else {
+                    onExpectedEndChanged();
+                }
             }
         }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
@@ -398,7 +411,12 @@ public class CoursePropertiesFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onExpectedEndChipCloseIconClick");
         if (null != viewModel.getExpectedEnd()) {
             viewModel.setExpectedEnd(null);
-            onExpectedEndChanged();
+            if (viewModel.getStatus() == CourseStatus.PLANNED && null == viewModel.getExpectedStart()) {
+                viewModel.setStatus(CourseStatus.UNPLANNED);
+                onStatusChanged();
+            } else {
+                onExpectedEndChanged();
+            }
         }
     }
 
@@ -430,7 +448,16 @@ public class CoursePropertiesFragment extends Fragment {
             LocalDate v = LocalDate.of(y, m + 1, d);
             if (!v.equals(viewModel.getActualStart())) {
                 viewModel.setActualStart(v);
-                onActualStartChanged();
+                switch (viewModel.getStatus()) {
+                    case PLANNED:
+                    case UNPLANNED:
+                        viewModel.setStatus(CourseStatus.IN_PROGRESS);
+                        onStatusChanged();
+                        break;
+                    default:
+                        onActualStartChanged();
+                        break;
+                }
             }
         }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
@@ -439,7 +466,13 @@ public class CoursePropertiesFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onActualStartChipCloseIconClick");
         if (null != viewModel.getActualStart()) {
             viewModel.setActualStart(null);
-            onActualStartChanged();
+            if (viewModel.getStatus() == CourseStatus.IN_PROGRESS && null == viewModel.getActualEnd()) {
+                viewModel.setStatus((null == viewModel.getExpectedStart() && null == viewModel.getExpectedEnd()) ?
+                        CourseStatus.UNPLANNED : CourseStatus.PLANNED);
+                onStatusChanged();
+            } else {
+                onActualStartChanged();
+            }
         }
     }
 
@@ -471,7 +504,16 @@ public class CoursePropertiesFragment extends Fragment {
             LocalDate v = LocalDate.of(y, m + 1, d);
             if (!v.equals(viewModel.getActualEnd())) {
                 viewModel.setActualEnd(v);
-                onActualEndChanged();
+                switch (viewModel.getStatus()) {
+                    case PLANNED:
+                    case UNPLANNED:
+                        viewModel.setStatus(CourseStatus.IN_PROGRESS);
+                        onStatusChanged();
+                        break;
+                    default:
+                        onActualEndChanged();
+                        break;
+                }
             }
         }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
@@ -480,7 +522,13 @@ public class CoursePropertiesFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onActualEndChipCloseIconClick");
         if (null != viewModel.getActualEnd()) {
             viewModel.setActualEnd(null);
-            onActualEndChanged();
+            if (viewModel.getStatus() == CourseStatus.IN_PROGRESS && null == viewModel.getActualStart()) {
+                viewModel.setStatus((null == viewModel.getExpectedStart() && null == viewModel.getExpectedEnd()) ?
+                        CourseStatus.UNPLANNED : CourseStatus.PLANNED);
+                onStatusChanged();
+            } else {
+                onActualEndChanged();
+            }
         }
     }
 
