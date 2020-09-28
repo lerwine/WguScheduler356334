@@ -49,6 +49,11 @@ public interface CourseAlert extends IdIndexedEntity {
 
     void setEndAlert(boolean isEndAlert);
 
+    /**
+     * Gets alert lead time in days.
+     *
+     * @return Number of days before course date to show alert.
+     */
     int getLeadTime();
 
     void setLeadTime(int days);

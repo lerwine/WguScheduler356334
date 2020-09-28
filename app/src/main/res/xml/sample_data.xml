@@ -1112,9 +1112,12 @@
                     title="Mobile Application Development"
                     status="IN_PROGRESS"
                     expectedStart="2020-08-21"
-                    expectedEnd="2020-09-10"
+                    expectedEnd="2020-09-30"
                     competencyUnits="3"
                     mentorId="23">
+                    <courseAlert
+                        endAlert="true"
+                        leadTime="3" />
                     <assessments>
                         <item
                             code="ABM1"
@@ -1123,20 +1126,34 @@
                             type="PERFORMANCE_EVALUATION" />
                     </assessments>
                 </item>
+            </courses>
+        </item>
+        <item
+            name="Term 11"
+            start="2020-10-01"
+            end="2020-03-31">
+            <notes>Part-time status</notes>
+            <courses>
                 <item
                     number="C769"
                     title="IT Capstone Written Project"
                     status="PLANNED"
-                    expectedStart="2020-09-10"
-                    expectedEnd="2020-09-30"
+                    expectedStart="2020-10-01"
+                    expectedEnd="2020-12-31"
                     competencyUnits="4">
+                    <courseAlert
+                        endAlert="false"
+                        leadTime="4" />
                     <assessments>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-09-13"
+                            goalDate="2020-10-15"
                             type="PERFORMANCE_EVALUATION">
                             <notes>Task 1</notes>
+                            <assessmentAlert
+                                goalAlert="true"
+                                leadTime="4" />
                         </item>
                         <item
                             code="ROM2"

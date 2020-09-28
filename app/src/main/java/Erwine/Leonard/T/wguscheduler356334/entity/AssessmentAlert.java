@@ -44,6 +44,11 @@ public interface AssessmentAlert extends IdIndexedEntity {
 
     void setGoalAlert(boolean isGoalAlert);
 
+    /**
+     * Gets alert lead time in days.
+     *
+     * @return Number of days before date assessment to show alert.
+     */
     int getLeadTime();
 
     void setLeadTime(int days);
