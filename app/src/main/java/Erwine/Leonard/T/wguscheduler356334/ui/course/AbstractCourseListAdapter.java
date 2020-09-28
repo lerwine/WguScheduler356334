@@ -50,7 +50,7 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
             this.view = view;
             courseNumberTextView = (TextView) view.findViewById(R.id.codeTextView);
             titleTextView = (TextView) view.findViewById(R.id.titleTextView);
-            statusTextView = (TextView) view.findViewById(R.id.statusTextView);
+            statusTextView = (TextView) view.findViewById(R.id.typeTextView);
             rangeTextView = (TextView) view.findViewById(R.id.rangeTextView);
             view.setOnClickListener(this::onViewClick);
         }

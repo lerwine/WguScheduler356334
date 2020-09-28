@@ -79,7 +79,7 @@ public class CoursePropertiesFragment extends Fragment {
         competencyUnitsEditText = view.findViewById(R.id.competencyUnitsEditText);
         titleEditText = view.findViewById(R.id.titleEditText);
         mentorChip = view.findViewById(R.id.mentorChip);
-        statusButton = view.findViewById(R.id.statusButton);
+        statusButton = view.findViewById(R.id.typeButton);
         expectedStartChip = view.findViewById(R.id.expectedStartChip);
         expectedEndChip = view.findViewById(R.id.expectedEndChip);
         actualStartChip = view.findViewById(R.id.actualStartChip);

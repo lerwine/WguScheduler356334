@@ -4,56 +4,42 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.material.chip.Chip;
+
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
+import io.reactivex.disposables.CompositeDisposable;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AssessmentPropertiesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AssessmentPropertiesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String LOG_TAG = AssessmentPropertiesFragment.class.getName();
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final CompositeDisposable compositeDisposable;
+    private EditAssessmentViewModel viewModel;
+    private Button courseButton;
+    private EditText codeEditText;
+    private Button typeButton;
+    private Button statusButton;
+    private Chip goalDateChip;
+    private Chip completionDateChip;
+    private EditText notesEditText;
 
     public AssessmentPropertiesFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AssessmentPropertiesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AssessmentPropertiesFragment newInstance(String param1, String param2) {
-        AssessmentPropertiesFragment fragment = new AssessmentPropertiesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -61,4 +47,68 @@ public class AssessmentPropertiesFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_assessment_properties, container, false);
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        courseButton = view.findViewById(R.id.courseButton);
+        codeEditText = view.findViewById(R.id.codeEditText);
+        typeButton = view.findViewById(R.id.typeButton);
+        statusButton = view.findViewById(R.id.statusButton);
+        goalDateChip = view.findViewById(R.id.goalDateChip);
+        completionDateChip = view.findViewById(R.id.completionDateChip);
+        notesEditText = view.findViewById(R.id.notesEditText);
+        courseButton.setOnClickListener(this::onCourseButtonClick);
+        typeButton.setOnClickListener(this::onTypeButtonClick);
+        statusButton.setOnClickListener(this::onStatusButtonClick);
+        goalDateChip.setOnClickListener(this::onGoalDateChipClick);
+        goalDateChip.setOnCloseIconClickListener(this::onGoalDateChipCloseIconClick);
+        completionDateChip.setOnClickListener(this::onCmpletionDateChipClick);
+        completionDateChip.setOnCloseIconClickListener(this::onCompletionDateChipCloseIconClick);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
+        LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
+        viewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onEntityLoaded);
+    }
+
+    private void onEntityLoaded(AssessmentDetails assessmentDetails) {
+
+        codeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCode));
+        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
+        codeEditText.setText(viewModel.getCode());
+        notesEditText.setText(viewModel.getNotes());
+    }
+
+    private void onCourseButtonClick(View view) {
+
+    }
+
+    private void onTypeButtonClick(View view) {
+
+    }
+
+    private void onStatusButtonClick(View view) {
+
+    }
+
+    private void onGoalDateChipClick(View view) {
+
+    }
+
+    private void onGoalDateChipCloseIconClick(View view) {
+
+    }
+
+    private void onCmpletionDateChipClick(View view) {
+
+    }
+
+    private void onCompletionDateChipCloseIconClick(View view) {
+
+    }
+
 }

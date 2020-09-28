@@ -86,6 +86,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         coursesForTerm = new ArrayList<>();
     }
 
+    public LiveData<AssessmentDetails> getEntityLiveData() {
+        return entityLiveData;
+    }
+
     public Long getId() {
         return currentValues.getId();
     }

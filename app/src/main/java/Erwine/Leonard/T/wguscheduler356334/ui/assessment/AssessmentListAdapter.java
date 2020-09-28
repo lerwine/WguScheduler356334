@@ -55,7 +55,7 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             super(view);
             this.view = view;
             codeTextView = view.findViewById(R.id.codeTextView);
-            statusTextView = view.findViewById(R.id.statusTextView);
+            statusTextView = view.findViewById(R.id.typeTextView);
             adjTextView = view.findViewById(R.id.adjTextView);
             dateTextView = view.findViewById(R.id.dateTextView);
             view.setOnClickListener(this::onViewClick);
