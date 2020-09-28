@@ -25,6 +25,7 @@ public abstract class AbstractMentorEntity<T extends AbstractMentorEntity<T>> ex
         this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
     }
 
+    @Ignore
     protected AbstractMentorEntity(@NonNull AbstractMentorEntity<?> source) {
         super(source);
         this.name = source.name;

@@ -1,0 +1,1173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SampleData>
+    <mentors>
+        <item
+            id="1"
+            name="Scott Stromberg, M.CS.">
+            <phoneNumber>
+                <item>1-877-435-7948 ext. 4750</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>sstromberg@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="2"
+            name="Andy Doren">
+            <emailAddress>
+                <item>andy.doren@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="3"
+            name="Katie Craig, MBA">
+            <phoneNumber>
+                <item>1-877-435-7948 ext. 6695</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>Katie.Craig@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="4"
+            name="Steven Harris, PhD">
+            <phoneNumber>
+                <item>1-877-435-7948 x4023</item>
+            </phoneNumber>
+        </item>
+        <item
+            id="5"
+            name="Sabrena Parton">
+            <phoneNumber>
+                <item>1-877-435-7948 ext 6467</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>sabrena.parton@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="6"
+            name="Abigail Scheg">
+            <emailAddress>
+                <item>abigail.scheg@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="7"
+            name="Constance Blanson">
+            <emailAddress>
+                <item>constance.blanson@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="8"
+            name="Jeff Edmunds, Ph.D.">
+            <phoneNumber>
+                <item>877-435-7948, ext 5925</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>jeff.edmunds@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="9"
+            name="Jessica Shields">
+            <phoneNumber>
+                <item>1.877.435.7948 Ext. 4198</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>cmweb@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="10"
+            name="Michael Smith">
+            <emailAddress>
+                <item>m.smith@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="11"
+            name="Ed Lavieri">
+            <emailAddress>
+                <item>ed.lavieri@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="12"
+            name="Mason McWatters">
+            <phoneNumber>
+                <item>1.877.435.7948 Ext. 5532</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>mason.mcwatters@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="13"
+            name="Kandi Duff">
+            <phoneNumber>
+                <item>1.877.435.7948 Ext. 4090</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>kandi.duff@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="14"
+            name="Jim Jividen, JD, MA">
+            <phoneNumber>
+                <item>801-924-4510</item>
+                <item>1-877-435-7948 x4510</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>jim.jividen@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="15"
+            name="Nick Meyer, PhD">
+            <phoneNumber>
+                <item>1-877-435-7948 ext. 2337</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>nick.meyer@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="16"
+            name="Randy Rutledge">
+            <phoneNumber>
+                <item>1.877.435.7948 Ext. 8246</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>randy.rutledge@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="17"
+            name="Maria Schenk">
+            <phoneNumber>
+                <item>1.877.435.7948 Ext. 4029</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>maria.schenk@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="18"
+            name="Joe Barnhart, Ph.D.">
+            <phoneNumber>
+                <item>1.877.435.7948 Ext. 4889</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>joe.barnhart@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="19"
+            name="Wanda Burwick">
+            <emailAddress>
+                <item>wanda.burwick@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="20"
+            name="Charles Lively">
+            <phoneNumber>
+                <item>(385) 428-4645</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>charles.lively@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="21"
+            name="Malcolm Wabara">
+            <phoneNumber>
+                <item>(385) 428-5006</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>malcolm.wabara@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="22"
+            name="Mark Kinkead">
+            <phoneNumber>
+                <item>1-385-428-3617</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>mark.kinkead@wgu.edu</item>
+            </emailAddress>
+        </item>
+        <item
+            id="23"
+            name="Alvaro Escobar">
+            <phoneNumber>
+                <item>(385) 428-8835</item>
+            </phoneNumber>
+            <emailAddress>
+                <item>alvaro.escobar@wgu.edu</item>
+            </emailAddress>
+        </item>
+    </mentors>
+    <terms>
+        <item
+            name="Term 1"
+            start="2015-05-01"
+            end="2015-10-31">
+            <notes><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Posuere ac ut consequat semper viverra. Mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Libero justo laoreet sit amet cursus. Tortor id aliquet lectus proin nibh nisl condimentum. Euismod elementum nisi quis eleifend quam. Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Turpis tincidunt id aliquet risus. Placerat duis ultricies lacus sed turpis. Fermentum posuere urna nec tincidunt. Montes nascetur ridiculus mus mauris vitae ultricies. Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus. In eu mi bibendum neque egestas.
+\nAenean euismod elementum nisi quis eleifend quam. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Diam in arcu cursus euismod quis. Odio euismod lacinia at quis risus sed. Malesuada fames ac turpis egestas maecenas. Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nunc mi ipsum faucibus vitae aliquet. Eget egestas purus viverra accumsan in. Suscipit tellus mauris a diam maecenas sed enim ut. Aliquet risus feugiat in ante metus dictum at tempor commodo. Id semper risus in hendrerit. Tristique senectus et netus et malesuada fames ac turpis. Sit amet justo donec enim diam vulputate ut pharetra. Gravida cum sociis natoque penatibus et. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Aliquet sagittis id consectetur purus ut. Dui id ornare arcu odio.
+\nVolutpat commodo sed egestas egestas fringilla. Egestas purus viverra accumsan in. Nisi vitae suscipit tellus mauris a diam maecenas sed. Aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Arcu risus quis varius quam quisque. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus sit. Risus feugiat in ante metus dictum at.
+\nDignissim diam quis enim lobortis scelerisque fermentum dui faucibus in. Mattis aliquam faucibus purus in massa tempor nec. Felis bibendum ut tristique et egestas. Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ultrices sagittis. Amet tellus cras adipiscing enim eu. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor. Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget. Quis hendrerit dolor magna eget est lorem ipsum. Donec et odio pellentesque diam. Amet aliquam id diam maecenas ultricies mi eget mauris.
+\nPraesent tristique magna sit amet purus gravida quis blandit turpis. Magnis dis parturient montes nascetur ridiculus. Quis commodo odio aenean sed adipiscing. Nulla facilisi morbi tempus iaculis urna id volutpat lacus. Turpis egestas integer eget aliquet nibh praesent tristique. Nisl rhoncus mattis rhoncus urna neque. Proin fermentum leo vel orci porta non pulvinar neque laoreet. Ut enim blandit volutpat maecenas. In ornare quam viverra orci sagittis eu. Maecenas ultricies mi eget mauris pharetra et ultrices neque ornare. Ut diam quam nulla porttitor massa id neque. Enim neque volutpat ac tincidunt. Arcu cursus euismod quis viverra nibh cras pulvinar mattis. Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
+            <courses>
+                <item
+                    number="ORA"
+                    title="Orientation"
+                    status="PASSED"
+                    expectedStart="2015-04-15"
+                    actualStart="2015-04-15"
+                    expectedEnd="2015-04-21"
+                    actualEnd="2015-04-30"
+                    competencyUnits="0">
+                    <assessments>
+                        <!-- courseId, code, status, goalDate, type, notes, evaluationDate : date = yyyy-mm-dd|expectedEnd|actualEnd -->
+                        <item
+                            code="ORA1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="2015-04-21" />
+                    </assessments>
+                </item>
+                <item
+                    number="C182"
+                    title="Introduction to IT"
+                    status="PASSED"
+                    expectedStart="2015-09-01"
+                    actualStart="2015-05-01"
+                    expectedEnd="2015-09-30"
+                    actualEnd="2015-06-09"
+                    competencyUnits="4"
+                    mentorId="1">
+                    <assessments>
+                        <item
+                            code="PAG5"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2015-05-04" />
+                        <item
+                            code="GSC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C483"
+                    title="Principles of Management"
+                    status="PASSED"
+                    expectedStart="2015-08-01"
+                    actualStart="2015-06-10"
+                    expectedEnd="2015-08-31"
+                    actualEnd="2015-08-28"
+                    competencyUnits="4"
+                    mentorId="2">
+                    <assessments>
+                        <item
+                            code="PIAC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2015-08-23" />
+                        <item
+                            code="IAC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C176"
+                    title="Business of IT - Project Management"
+                    status="PASSED"
+                    expectedStart="2015-07-01"
+                    actualStart="2015-08-29"
+                    expectedEnd="2015-07-31"
+                    actualEnd="2015-10-23"
+                    competencyUnits="4"
+                    mentorId="3">
+                    <assessments>
+                        <item
+                            code="EKV1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd">
+                            <notes>CompTIA - Project+</notes>
+                        </item>
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 2"
+            start="2016-01-01"
+            end="2016-06-30">
+            <courses>
+                <item
+                    number="C168"
+                    title="Critical Thinking and Logic"
+                    status="PASSED"
+                    expectedStart="2016-01-01"
+                    actualStart="2016-01-01"
+                    expectedEnd="2016-02-22"
+                    actualEnd="2016-02-22"
+                    competencyUnits="3"
+                    mentorId="4">
+                    <notes>was \"Reasoning and Problem Solving\"</notes>
+                    <assessments>
+                        <item
+                            code="PLMC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2016-01-17" />
+                        <item
+                            code="LMC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C132"
+                    title="Elements of Effective Communication"
+                    status="PASSED"
+                    expectedStart="2016-02-23"
+                    actualStart="2016-02-23"
+                    expectedEnd="2016-05-07"
+                    actualEnd="2016-05-07"
+                    competencyUnits="3"
+                    mentorId="5">
+                    <assessments>
+                        <item
+                            code="PYJC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2016-05-05" />
+                        <item
+                            code="YJC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="2016-05-07" />
+                        <item
+                            code="YJT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C455"
+                    title="English Composition I"
+                    status="PASSED"
+                    expectedStart="2016-05-06"
+                    actualStart="2016-05-06"
+                    expectedEnd="2016-06-05"
+                    actualEnd="2016-06-05"
+                    competencyUnits="3"
+                    mentorId="6">
+                    <assessments>
+                        <item
+                            code="DIT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="2016-05-15">
+                            <notes>Task 1</notes>
+                        </item>
+                        <item
+                            code="DIT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="2016-05-22">
+                            <notes>Task 2</notes>
+                        </item>
+                        <item
+                            code="DIT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="2016-05-28">
+                            <notes>Task 3</notes>
+                        </item>
+                        <item
+                            code="DIT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd">
+                            <notes>Task 4</notes>
+                        </item>
+                    </assessments>
+                </item>
+                <item
+                    number="C456"
+                    title="English Composition II"
+                    status="PASSED"
+                    expectedStart="2016-06-06"
+                    actualStart="2016-06-06"
+                    expectedEnd="2016-07-05"
+                    actualEnd="2016-07-05"
+                    competencyUnits="3"
+                    mentorId="6">
+                    <assessments>
+                        <item
+                            code="DJT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd">
+                            <notes>Task 1</notes>
+                        </item>
+                        <item
+                            code="DJT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd">
+                            <notes>Task 2</notes>
+                        </item>
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 3"
+            start="2016-07-01"
+            end="2016-12-31">
+            <courses>
+                <item
+                    number="C393"
+                    title="IT Foundations"
+                    status="PASSED"
+                    expectedStart="2016-07-01"
+                    actualStart="2016-07-06"
+                    expectedEnd="2016-10-22"
+                    actualEnd="2016-10-22"
+                    competencyUnits="4"
+                    mentorId="7">
+                    <assessments>
+                        <item
+                            code="KEV1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd">
+                            <notes>CompTIA A+ Part 1/2</notes>
+                        </item>
+                    </assessments>
+                </item>
+                <item
+                    number="C278"
+                    title="College Algebra"
+                    status="PASSED"
+                    expectedStart="2016-10-23"
+                    actualStart="2016-10-23"
+                    expectedEnd="2016-12-28"
+                    actualEnd="2016-12-28"
+                    competencyUnits="4"
+                    mentorId="8">
+                    <assessments>
+                        <item
+                            code="PCEC"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2016-12-13" />
+                        <item
+                            code="CEC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C394"
+                    title="IT Applications"
+                    status="PASSED"
+                    expectedStart="2016-12-28"
+                    actualStart="2016-12-28"
+                    expectedEnd="2016-12-28"
+                    actualEnd="2016-12-28"
+                    competencyUnits="4"
+                    mentorId="7">
+                    <assessments>
+                        <item
+                            code="KFV1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd">
+                            <notes>CompTIA - A+</notes>
+                        </item>
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 4"
+            start="2017-02-01"
+            end="2017-07-31">
+            <courses>
+                <item
+                    number="C173"
+                    title="Scripting and Programming - Foundations"
+                    status="PASSED"
+                    expectedStart="2017-02-01"
+                    actualStart="2017-02-01"
+                    expectedEnd="2017-02-14"
+                    actualEnd="2017-02-22"
+                    competencyUnits="3"
+                    mentorId="9">
+                    <assessments>
+                        <item
+                            code="PCGO"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-01-05" />
+                        <item
+                            code="CGO1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C100"
+                    title="Introduction to Humanities"
+                    status="PASSED"
+                    expectedStart="2017-02-15"
+                    actualStart="2017-02-23"
+                    expectedEnd="2017-04-06"
+                    actualEnd="2017-05-08"
+                    competencyUnits="3"
+                    mentorId="10">
+                    <assessments>
+                        <item
+                            code="PCKC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-02-22" />
+                        <item
+                            code="PCKC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-05-03" />
+                        <item
+                            code="CKC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="2017-05-08" />
+                        <item
+                            code="UXT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C169"
+                    title="Scripting and Programming - Applications"
+                    status="PASSED"
+                    expectedStart="2017-03-01"
+                    actualStart="2017-05-09"
+                    expectedEnd="2017-04-29"
+                    actualEnd="2017-05-23"
+                    competencyUnits="4"
+                    mentorId="11">
+                    <assessments>
+                        <item
+                            code="PDQC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-05-09" />
+                        <item
+                            code="VGT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="2017-05-21" />
+                        <item
+                            code="DQC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C255"
+                    title="Introduction to Geography"
+                    status="PASSED"
+                    expectedStart="2017-04-07"
+                    actualStart="2017-05-24"
+                    expectedEnd="2017-05-29"
+                    actualEnd="2017-07-22"
+                    competencyUnits="3"
+                    mentorId="12">
+                    <assessments>
+                        <item
+                            code="PJQC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-07-19" />
+                        <item
+                            code="JQC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 5"
+            start="2017-08-01"
+            end="2018-01-31">
+            <courses>
+                <item
+                    number="C165"
+                    title="Integrated Physical Sciences"
+                    status="PASSED"
+                    expectedStart="2017-08-01"
+                    actualStart="2017-08-01"
+                    expectedEnd="2017-08-11"
+                    actualEnd="2017-08-11"
+                    competencyUnits="3"
+                    mentorId="13">
+                    <assessments>
+                        <item
+                            code="PHTC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-08-02" />
+                        <item
+                            code="HTC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C683"
+                    title="Natural Science Lab"
+                    status="PASSED"
+                    expectedStart="2017-08-12"
+                    actualStart="2017-08-13"
+                    expectedEnd="2017-10-30"
+                    actualEnd="2017-10-30"
+                    competencyUnits="2"
+                    mentorId="9">
+                    <assessments>
+                        <item
+                            code="BRP1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C779"
+                    title="Web Development Foundations"
+                    status="PASSED"
+                    expectedStart="2017-10-31"
+                    actualStart="2017-10-31"
+                    expectedEnd="2017-11-29"
+                    actualEnd="2017-11-29"
+                    competencyUnits="3"
+                    mentorId="9">
+                    <assessments>
+                        <item
+                            code="HCV1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C484"
+                    title="Organizational Behavior and Leadership"
+                    status="PASSED"
+                    expectedStart="2017-11-30"
+                    actualStart="2017-11-30"
+                    expectedEnd="2018-01-03"
+                    actualEnd="2018-01-03"
+                    competencyUnits="3"
+                    mentorId="14">
+                    <assessments>
+                        <item
+                            code="PIBC"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2017-12-26" />
+                        <item
+                            code="IBC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C459"
+                    title="Introduction to Probability and Statistics"
+                    status="PASSED"
+                    expectedStart="2018-01-04"
+                    actualStart="2018-01-04"
+                    expectedEnd="2018-01-31"
+                    actualEnd="2018-01-31"
+                    competencyUnits="3"
+                    mentorId="15">
+                    <assessments>
+                        <item
+                            code="GVC1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 6"
+            start="2018-02-01"
+            end="2018-07-31">
+            <courses>
+                <item
+                    number="C175"
+                    title="Data Management - Foundations"
+                    status="PASSED"
+                    expectedStart="2018-02-01"
+                    actualStart="2018-02-01"
+                    expectedEnd="2018-06-14"
+                    actualEnd="2018-05-15"
+                    competencyUnits="3"
+                    mentorId="16">
+                    <assessments>
+                        <item
+                            code="PFKO"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2018-04-13" />
+                        <item
+                            code="FKO1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C170"
+                    title="Data Management - Applications"
+                    status="PASSED"
+                    expectedStart="2018-06-14"
+                    actualStart="2018-05-16"
+                    expectedEnd="2018-07-31"
+                    actualEnd="2018-07-28"
+                    competencyUnits="4"
+                    mentorId="17">
+                    <assessments>
+                        <item
+                            code="PFJO"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2018-05-15" />
+                        <item
+                            code="FJO1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="2018-06-02" />
+                        <item
+                            code="VHT1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C773"
+                    title="User Interface Design"
+                    status="PASSED"
+                    expectedStart="2018-03-01"
+                    actualStart="2018-07-29"
+                    expectedEnd="2018-03-31"
+                    actualEnd="2018-07-27"
+                    competencyUnits="4"
+                    mentorId="9">
+                    <assessments>
+                        <item
+                            code="FPV1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C768"
+                    title="Technical Communication"
+                    status="PASSED"
+                    expectedStart="2018-02-15"
+                    actualStart="2018-07-28"
+                    expectedEnd="2018-02-28"
+                    actualEnd="2018-08-09"
+                    competencyUnits="3"
+                    mentorId="18">
+                    <assessments>
+                        <item
+                            code="EWP1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 7"
+            start="2018-08-01"
+            end="2019-01-31">
+            <courses>
+                <item
+                    number="C188"
+                    title="Software Engineering"
+                    status="NOT_PASSED"
+                    expectedStart="2018-08-01"
+                    actualStart="2018-08-01"
+                    expectedEnd="2018-09-30"
+                    actualEnd="2018-11-20"
+                    competencyUnits="4"
+                    mentorId="19">
+                    <assessments>
+                        <item
+                            code="FRV1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C191"
+                    title="Operating Systems for Programmers"
+                    status="PASSED"
+                    expectedStart="2018-12-01"
+                    actualStart="2018-11-21"
+                    expectedEnd="2018-01-31"
+                    actualEnd="2019-01-30"
+                    competencyUnits="3"
+                    mentorId="19">
+                    <assessments>
+                        <item
+                            code="PAG7"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2018-10-31" />
+                        <item
+                            code="ACO1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C777"
+                    title="Web Development Applications"
+                    status="PASSED"
+                    expectedStart="2018-10-01"
+                    actualStart="2019-01-31"
+                    expectedEnd="2018-11-30"
+                    actualEnd="2019-02-01"
+                    competencyUnits="6"
+                    mentorId="9">
+                    <assessments>
+                        <item
+                            code="AAO1"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="2019-01-31" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 8"
+            start="2019-02-01"
+            end="2019-07-31">
+            <courses>
+                <item
+                    number="C482"
+                    title="Software I"
+                    status="PASSED"
+                    expectedStart="2019-02-01"
+                    actualStart="2019-02-01"
+                    expectedEnd="2019-08-10"
+                    actualEnd="2019-05-28"
+                    competencyUnits="6"
+                    mentorId="19">
+                    <assessments>
+                        <item
+                            code="GYP1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C179"
+                    title="Business of IT - Applications"
+                    status="PASSED"
+                    expectedStart="2019-07-10"
+                    actualStart="2019-05-29"
+                    expectedEnd="2019-08-10"
+                    actualEnd="2019-07-04"
+                    competencyUnits="4"
+                    mentorId="19">
+                    <assessments>
+                        <item
+                            code="DIP1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C188"
+                    title="Software Engineering"
+                    status="PASSED"
+                    expectedStart="2019-07-10"
+                    actualStart="2019-07-05"
+                    expectedEnd="2019-08-10"
+                    actualEnd="2019-07-31"
+                    competencyUnits="4"
+                    mentorId="19">
+                    <assessments>
+                        <item
+                            code="PAG8"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2019-01-30" />
+                        <item
+                            code="AAO1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 9"
+            start="2019-10-01"
+            end="2020-03-31">
+            <courses>
+                <item
+                    number="C193"
+                    title="Client-Server Application Development"
+                    status="PASSED"
+                    expectedStart="2019-10-01"
+                    actualStart="2019-10-01"
+                    expectedEnd="2019-11-30"
+                    actualEnd="2019-10-10"
+                    competencyUnits="3"
+                    mentorId="20">
+                    <assessments>
+                        <item
+                            code="PAG9"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2019-10-02" />
+                        <item
+                            code="AEO1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C195"
+                    title="Software II - Advanced Java Concepts"
+                    status="NOT_PASSED"
+                    expectedStart="2019-12-01"
+                    actualStart="2019-10-11"
+                    expectedEnd="2019-02-28"
+                    actualEnd="2020-05-08"
+                    competencyUnits="6"
+                    mentorId="21">
+                    <assessments>
+                        <item
+                            code="GZP1"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C192"
+                    title="Data Management for Programmers"
+                    status="NOT_PASSED"
+                    expectedStart="2019-03-01"
+                    actualStart="2019-10-11"
+                    expectedEnd="2020-03-31"
+                    actualEnd="2020-05-08"
+                    competencyUnits="3"
+                    mentorId="21">
+                    <assessments>
+                        <item
+                            code="PADO"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="PRE_ASSESSMENT"
+                            evaluationDate="2019-10-02" />
+                        <item
+                            code="ADO1"
+                            status="NOT_PASSED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+        <item
+            name="Term 10"
+            start="2020-04-01"
+            end="2020-09-30">
+            <courses>
+                <item
+                    number="C195"
+                    title="Software II - Advanced Java Concepts"
+                    status="PASSED"
+                    expectedStart="2020-04-01"
+                    actualStart="2020-04-01"
+                    expectedEnd="2020-06-30"
+                    actualEnd="2020-08-05"
+                    competencyUnits="6"
+                    mentorId="22">
+                    <assessments>
+                        <item
+                            code="GZP1"
+                            status="PASSED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION"
+                            evaluationDate="actualEnd" />
+                    </assessments>
+                </item>
+                <item
+                    number="C196"
+                    title="Mobile Application Development"
+                    status="IN_PROGRESS"
+                    expectedStart="2020-08-21"
+                    expectedEnd="2020-09-10"
+                    competencyUnits="3"
+                    mentorId="23">
+                    <assessments>
+                        <item
+                            code="ABM1"
+                            status="IN_PROGRESS"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION" />
+                    </assessments>
+                </item>
+                <item
+                    number="C769"
+                    title="IT Capstone Written Project"
+                    status="PLANNED"
+                    expectedStart="2020-09-10"
+                    expectedEnd="2020-09-30"
+                    competencyUnits="4">
+                    <assessments>
+                        <item
+                            code="ROM2"
+                            status="NOT_STARTED"
+                            goalDate="2020-09-13"
+                            type="PERFORMANCE_EVALUATION">
+                            <notes>Task 1</notes>
+                        </item>
+                        <item
+                            code="ROM2"
+                            status="NOT_STARTED"
+                            goalDate="2020-09-20"
+                            type="PERFORMANCE_EVALUATION">
+                            <notes>Task 2</notes>
+                        </item>
+                        <item
+                            code="ROM2"
+                            status="NOT_STARTED"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION">
+                            <notes>Task 3</notes>
+                        </item>
+                    </assessments>
+                </item>
+                <item
+                    number="C192"
+                    title="Data Management for Programmers"
+                    status="UNPLANNED"
+                    competencyUnits="3">
+                    <assessments>
+                        <item
+                            code="ADO1"
+                            status="NOT_STARTED"
+                            goalDate="expectedEnd"
+                            type="OBJECTIVE_ASSESSMENT" />
+                    </assessments>
+                </item>
+            </courses>
+        </item>
+    </terms>
+</SampleData>

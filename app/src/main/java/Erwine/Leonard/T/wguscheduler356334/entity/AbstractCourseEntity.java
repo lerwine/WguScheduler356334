@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -57,6 +58,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
         this.competencyUnits = Math.max(competencyUnits, 0);
     }
 
+    @Ignore
     protected AbstractCourseEntity(@NonNull AbstractCourseEntity<?> source) {
         super(source);
         this.termId = source.termId;

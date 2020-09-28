@@ -24,6 +24,9 @@ public interface CourseDAO {
     @Insert
     Single<Long> insert(CourseEntity course);
 
+    @Insert
+    Long insertSynchronous(CourseEntity course);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(CourseEntity course);
 

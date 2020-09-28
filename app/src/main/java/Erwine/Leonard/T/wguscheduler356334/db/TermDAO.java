@@ -21,6 +21,9 @@ public interface TermDAO {
     @Insert
     Single<Long> insert(TermEntity term);
 
+    @Insert
+    Long insertSynchronous(TermEntity term);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(TermEntity term);
 

@@ -12,7 +12,6 @@ import androidx.preference.PreferenceManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -28,8 +27,6 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
@@ -51,8 +48,6 @@ import io.reactivex.schedulers.Schedulers;
  * A singleton helper object for database I/O.
  */
 public class DbLoader {
-
-    //<editor-fold defaultstate="collapsed" desc="Fields">
 
     private static final String LOG_TAG = DbLoader.class.getName();
 
@@ -87,8 +82,6 @@ public class DbLoader {
     private LiveData<List<MentorListItem>> allMentors;
     private LiveData<List<CourseEntity>> allCourses;
     private LiveData<List<AssessmentEntity>> allAssessments;
-
-    //</editor-fold>
 
     /**
      * Gets the singleton {@code DbLoader} instance.
@@ -155,6 +148,10 @@ public class DbLoader {
 
     public static MutableLiveData<Boolean> getPreferEmailLiveData() {
         return preferEmailLiveData;
+    }
+
+    AppDb getAppDb() {
+        return appDb;
     }
 
     /**
@@ -626,14 +623,18 @@ public class DbLoader {
         }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    private void resetDb() {
+    void resetDb() {
+        Log.d(LOG_TAG, "Clearing all tables");
         appDb.clearAllTables();
         for (String t : new String[]{
+                AppDb.TABLE_NAME_ASSESSMENT_ALERTS,
                 AppDb.TABLE_NAME_ASSESSMENTS,
+                AppDb.TABLE_NAME_COURSE_ALERTS,
                 AppDb.TABLE_NAME_COURSES,
                 AppDb.TABLE_NAME_TERMS,
                 AppDb.TABLE_NAME_MENTORS
         }) {
+            Log.d(LOG_TAG, String.format("Resetting default sequence of %s", t));
             appDb.query(String.format("UPDATE sqlite_sequence SET seq = 1 WHERE name = '%s'", t), null).close();
         }
     }
@@ -720,31 +721,47 @@ public class DbLoader {
 
     @NonNull
     public Completable populateSampleData(Resources resources) {
-        return Completable.fromAction(() -> {
-            resetDb();
-            HashMap<Integer, Long> sampleTerms = createSampleTerms(resources);
-            HashMap<Integer, Long> sampleMentors = createSampleMentors(resources);
-            HashMap<Integer, CourseEntity> sampleCourses = createSampleCourses(resources, sampleTerms, sampleMentors);
-
-            AssessmentDAO assessmentDAO = appDb.assessmentDAO();
-            HashMap<String, AssessmentStatus> am = new HashMap<>();
-            for (AssessmentStatus a : AssessmentStatus.values()) {
-                am.put(a.name(), a);
-            }
-            HashMap<String, AssessmentType> at = new HashMap<>();
-            for (AssessmentType a : AssessmentType.values()) {
-                at.put(a.name(), a);
-            }
-            assessmentDAO.insertAllSynchronous(Arrays.stream(resources.getStringArray(R.array.sample_assessments)).map(t -> {
-                // 0=courseId, 1=code, 2=status, 3=goalDate, 4=type, 5=notes, 6=evaluationDate
-                List<String> cells = parseSampleDataCells(t, 7);
-                CourseEntity course = Objects.requireNonNull(sampleCourses.get(Integer.parseInt(cells.get(0))));
-                @SuppressWarnings("ConstantConditions") AssessmentEntity assessment = new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
-                        sampleCellToLocalDate(cells.get(6), course), course.getId());
-                Log.d(LOG_TAG, String.format("Creating: %s", assessment));
-                return assessment;
-            }).collect(Collectors.toList()));
-        }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
+        return Completable.fromAction(new SampleDataLoader(this, resources)).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
+//        return Completable.fromAction(() -> {
+//            resetDb();
+//            XmlResourceParser sampleDataParser = resources.getXml(R.xml.sample_data);
+//            int eventType = sampleDataParser.nextTag();
+//            if (eventType != XmlPullParser.START_TAG || (eventType = sampleDataParser.nextTag()) != XmlPullParser.START_TAG) {
+//                throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d", eventType));
+//            }
+//            HashMap<String, MentorEntity> mentorMap = populateSampleMentors(sampleDataParser);
+//            if ((eventType = sampleDataParser.nextTag()) != XmlPullParser.START_TAG) {
+//                throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d", eventType));
+//            }
+//            if (!sampleDataParser.getName().equals(AppDb.TABLE_NAME_TERMS)) {
+//                throw new UnsupportedOperationException(String.format("Unsupported element name: %s", sampleDataParser.getName()));
+//            }
+//            while ((eventType = sampleDataParser.nextTag()) == XmlPullParser.START_TAG) {
+//                populateSampleTerm(mentorMap, sampleDataParser);
+//            }
+//            HashMap<Integer, Long> sampleTerms = createSampleTerms(resources);
+//            HashMap<Integer, Long> sampleMentors = createSampleMentors(resources);
+//            HashMap<Integer, CourseEntity> sampleCourses = createSampleCourses(resources, sampleTerms, sampleMentors);
+//
+//            AssessmentDAO assessmentDAO = appDb.assessmentDAO();
+//            HashMap<String, AssessmentStatus> am = new HashMap<>();
+//            for (AssessmentStatus a : AssessmentStatus.values()) {
+//                am.put(a.name(), a);
+//            }
+//            HashMap<String, AssessmentType> at = new HashMap<>();
+//            for (AssessmentType a : AssessmentType.values()) {
+//                at.put(a.name(), a);
+//            }
+//            assessmentDAO.insertAllSynchronous(Arrays.stream(resources.getStringArray(R.array.sample_assessments)).map(t -> {
+//                // 0=courseId, 1=code, 2=status, 3=goalDate, 4=type, 5=notes, 6=evaluationDate
+//                List<String> cells = parseSampleDataCells(t, 7);
+//                CourseEntity course = Objects.requireNonNull(sampleCourses.get(Integer.parseInt(cells.get(0))));
+//                @SuppressWarnings("ConstantConditions") AssessmentEntity assessment = new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
+//                        sampleCellToLocalDate(cells.get(6), course), course.getId());
+//                Log.d(LOG_TAG, String.format("Creating: %s", assessment));
+//                return assessment;
+//            }).collect(Collectors.toList()));
+//        }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
 }

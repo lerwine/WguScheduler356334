@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntity<T>> extends AbstractNotedEntity<T> implements Assessment {
 
-    @ForeignKey(entity = CourseEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
+    @ForeignKey(entity = CourseEntity.class, parentColumns = {CourseEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_COURSE_ID)
     private long courseId;
     @ColumnInfo(name = COLNAME_CODE, collate = ColumnInfo.NOCASE)
@@ -36,6 +36,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
         this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
     }
 
+    @Ignore
     protected AbstractAssessmentEntity(AbstractAssessmentEntity<?> source) {
         super(source);
         this.courseId = source.courseId;

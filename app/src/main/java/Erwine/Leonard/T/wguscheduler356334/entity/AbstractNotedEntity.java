@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Ignore;
 
 import java.util.function.Function;
 
@@ -35,6 +36,7 @@ public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> exte
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }
 
+    @Ignore
     protected AbstractNotedEntity(@NonNull AbstractNotedEntity<?> source) {
         super(source.getId());
         this.notes = source.notes;

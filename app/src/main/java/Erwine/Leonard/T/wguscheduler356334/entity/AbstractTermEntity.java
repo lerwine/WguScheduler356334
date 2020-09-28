@@ -25,6 +25,7 @@ public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extend
         this.end = end;
     }
 
+    @Ignore
     protected AbstractTermEntity(@NonNull AbstractTermEntity<?> source) {
         super(source);
         this.name = source.name;

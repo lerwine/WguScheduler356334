@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,7 @@ public class AssessmentListFragment extends Fragment {
     private AssessmentListAdapter adapter;
     private EditCourseViewModel editCourseViewModel;
     private AssessmentListViewModel assessmentListViewModel;
+    private TextView noAssessmentsTextView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,7 +66,7 @@ public class AssessmentListFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) assessmentListRecyclerView.getLayoutManager());
         DividerItemDecoration decoration = new DividerItemDecoration(assessmentListRecyclerView.getContext(), linearLayoutManager.getOrientation());
         assessmentListRecyclerView.addItemDecoration(decoration);
-
+        noAssessmentsTextView = view.findViewById(R.id.noAssessmentsTextView);
         view.findViewById(R.id.addAssessmentButton).setOnClickListener(this::onAddAssessmentButtonClick);
     }
 
@@ -87,7 +89,12 @@ public class AssessmentListFragment extends Fragment {
 
     private void onAssessmentListChanged(List<AssessmentEntity> assessmentEntities) {
         list.clear();
-        list.addAll(assessmentEntities);
+        if (assessmentEntities.isEmpty()) {
+            noAssessmentsTextView.setVisibility(View.VISIBLE);
+        } else {
+            noAssessmentsTextView.setVisibility(View.GONE);
+            list.addAll(assessmentEntities);
+        }
         if (null != adapter) {
             adapter.notifyDataSetChanged();
         }

@@ -7,8 +7,10 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentAlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.CourseAlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
@@ -19,7 +21,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 
 @Database(
-        entities = {TermEntity.class, MentorEntity.class, CourseEntity.class, AssessmentEntity.class},
+        entities = {TermEntity.class, MentorEntity.class, CourseEntity.class, CourseAlertEntity.class, AssessmentEntity.class, AssessmentAlertEntity.class},
         views = {TermListItem.class, MentorListItem.class, TermCourseListItem.class, MentorCourseListItem.class, CourseDetails.class, AssessmentDetails.class},
         version = 1, exportSchema = false
 )
@@ -31,6 +33,8 @@ public abstract class AppDb extends RoomDatabase {
     public static final String TABLE_NAME_MENTORS = "mentors";
     public static final String TABLE_NAME_COURSES = "courses";
     public static final String TABLE_NAME_ASSESSMENTS = "assessments";
+    public static final String TABLE_NAME_COURSE_ALERTS = "courseAlerts";
+    public static final String TABLE_NAME_ASSESSMENT_ALERTS = "assessmentAlerts";
     private static volatile AppDb instance;
     private static final Object SYNC_ROOT = new Object();
 
@@ -40,7 +44,11 @@ public abstract class AppDb extends RoomDatabase {
 
     public abstract CourseDAO courseDAO();
 
+    public abstract CourseAlertDAO courseAlertDAO();
+
     public abstract AssessmentDAO assessmentDAO();
+
+    public abstract AssessmentAlertDAO assessmentAlertDAO();
 
     static AppDb getInstance(Context context) {
         if (null == instance) {
