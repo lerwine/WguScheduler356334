@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SampleData>
+<SampleData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="sample_data_schema.xsd">
     <mentors>
         <item
             id="1"
@@ -217,11 +218,8 @@
             name="Term 1"
             start="2015-05-01"
             end="2015-10-31">
-            <notes><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Posuere ac ut consequat semper viverra. Mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Libero justo laoreet sit amet cursus. Tortor id aliquet lectus proin nibh nisl condimentum. Euismod elementum nisi quis eleifend quam. Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Turpis tincidunt id aliquet risus. Placerat duis ultricies lacus sed turpis. Fermentum posuere urna nec tincidunt. Montes nascetur ridiculus mus mauris vitae ultricies. Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus. In eu mi bibendum neque egestas.
-\nAenean euismod elementum nisi quis eleifend quam. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Diam in arcu cursus euismod quis. Odio euismod lacinia at quis risus sed. Malesuada fames ac turpis egestas maecenas. Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nunc mi ipsum faucibus vitae aliquet. Eget egestas purus viverra accumsan in. Suscipit tellus mauris a diam maecenas sed enim ut. Aliquet risus feugiat in ante metus dictum at tempor commodo. Id semper risus in hendrerit. Tristique senectus et netus et malesuada fames ac turpis. Sit amet justo donec enim diam vulputate ut pharetra. Gravida cum sociis natoque penatibus et. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Aliquet sagittis id consectetur purus ut. Dui id ornare arcu odio.
-\nVolutpat commodo sed egestas egestas fringilla. Egestas purus viverra accumsan in. Nisi vitae suscipit tellus mauris a diam maecenas sed. Aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Arcu risus quis varius quam quisque. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus sit. Risus feugiat in ante metus dictum at.
-\nDignissim diam quis enim lobortis scelerisque fermentum dui faucibus in. Mattis aliquam faucibus purus in massa tempor nec. Felis bibendum ut tristique et egestas. Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ultrices sagittis. Amet tellus cras adipiscing enim eu. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor. Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget. Quis hendrerit dolor magna eget est lorem ipsum. Donec et odio pellentesque diam. Amet aliquam id diam maecenas ultricies mi eget mauris.
-\nPraesent tristique magna sit amet purus gravida quis blandit turpis. Magnis dis parturient montes nascetur ridiculus. Quis commodo odio aenean sed adipiscing. Nulla facilisi morbi tempus iaculis urna id volutpat lacus. Turpis egestas integer eget aliquet nibh praesent tristique. Nisl rhoncus mattis rhoncus urna neque. Proin fermentum leo vel orci porta non pulvinar neque laoreet. Ut enim blandit volutpat maecenas. In ornare quam viverra orci sagittis eu. Maecenas ultricies mi eget mauris pharetra et ultrices neque ornare. Ut diam quam nulla porttitor massa id neque. Enim neque volutpat ac tincidunt. Arcu cursus euismod quis viverra nibh cras pulvinar mattis. Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
+            <notes>
+                <![CDATA[Tortor id aliquet lectus proin nibh nisl condimentum. Euismod elementum nisi quis eleifend quam. Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Turpis tincidunt id aliquet risus. Placerat duis ultricies lacus sed turpis. Fermentum posuere urna nec tincidunt. Montes nascetur ridiculus mus mauris vitae ultricies. Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat.]]></notes>
             <courses>
                 <item
                     number="ORA"
@@ -232,10 +230,15 @@
                     expectedEnd="2015-04-21"
                     actualEnd="2015-04-30"
                     competencyUnits="0">
+                    <notes>
+                        <![CDATA[Turpis egestas integer eget aliquet nibh praesent tristique. Nisl rhoncus mattis rhoncus urna neque. Proin fermentum leo vel orci porta non pulvinar neque laoreet. Ut enim blandit volutpat maecenas. In ornare quam viverra orci sagittis eu. Maecenas ultricies mi eget mauris pharetra et ultrices neque ornare. Ut diam quam nulla porttitor massa id neque.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            leadTime="4" />
+                        <item
+                            subsequent="false"
+                            leadTime="2" />
                         <item
                             subsequent="true"
                             leadTime="0" />
@@ -244,10 +247,9 @@
                         <item
                             code="ORA1"
                             status="PASSED"
-                            goalDate="2015-04-25"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2015-04-21">
+                            completionDate="2015-04-21">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -266,27 +268,26 @@
                     actualEnd="2015-06-09"
                     competencyUnits="4"
                     mentorId="1">
+                    <notes><![CDATA[Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus.
+\nVenenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget. Quis hendrerit dolor magna eget est lorem ipsum. Donec et odio pellentesque diam. Amet aliquam id diam maecenas ultricies mi eget mauris.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="3" />
-                        <item
                             subsequent="true"
-                            leadTime="4" />
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PAG5"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2015-05-04" />
+                            completionDate="2015-05-04" />
                         <item
                             code="GSC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
+                            completionDate="actualEnd">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -305,21 +306,26 @@
                     actualEnd="2015-08-28"
                     competencyUnits="4"
                     mentorId="2">
+                    <notes>
+                        <![CDATA[Aenean euismod elementum nisi quis eleifend quam. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Diam in arcu cursus euismod quis. Odio euismod lacinia at quis risus sed. Malesuada fames ac turpis egestas maecenas. Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nunc mi ipsum faucibus vitae aliquet. Eget egestas purus viverra accumsan in. Suscipit tellus mauris a diam maecenas sed enim ut. Aliquet risus feugiat in ante metus dictum at tempor commodo. Id semper risus in hendrerit. Tristique senectus et netus et malesuada fames ac turpis. Sit amet justo donec enim diam vulputate ut pharetra. Gravida cum sociis natoque penatibus et. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Aliquet sagittis id consectetur purus ut. Dui id ornare arcu odio.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="0" />
+                            subsequent="true"
+                            leadTime="9" />
                         <item
                             subsequent="true"
-                            leadTime="7" />
+                            leadTime="2" />
+                        <item
+                            subsequent="true"
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PIAC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2015-08-23">
+                            completionDate="2015-08-23">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -329,9 +335,9 @@
                         <item
                             code="IAC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
+                            completionDate="actualEnd">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -350,18 +356,23 @@
                     actualEnd="2015-10-23"
                     competencyUnits="4"
                     mentorId="3">
+                    <notes>
+                        <![CDATA[Maecenas ultricies mi eget mauris pharetra et ultrices neque ornare. Ut diam quam nulla porttitor massa id neque. Enim neque volutpat ac tincidunt. Arcu cursus euismod quis viverra nibh cras pulvinar mattis.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="true"
-                            leadTime="7" />
+                            subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="false"
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="EKV1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd"
+                            completionDate="actualEnd"
                             name="CompTIA - Project+">
                             <assessmentAlerts>
                                 <item
@@ -377,6 +388,7 @@
             name="Term 2"
             start="2016-01-01"
             end="2016-06-30">
+            <notes><![CDATA[Eget mauris pharetra et ultrices neque ornare aenean.]]></notes>
             <courses>
                 <item
                     number="C168"
@@ -388,11 +400,18 @@
                     actualEnd="2016-02-22"
                     competencyUnits="3"
                     mentorId="4">
-                    <notes>was \"Reasoning and Problem Solving\"</notes>
+                    <notes>
+                        <![CDATA[Egestas purus viverra accumsan in. Nisi vitae suscipit tellus mauris a diam maecenas sed.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="3" />
+                        <item
+                            subsequent="false"
+                            leadTime="1" />
+                        <item
+                            subsequent="true"
+                            leadTime="5" />
                         <item
                             subsequent="true"
                             leadTime="0" />
@@ -401,15 +420,15 @@
                         <item
                             code="PLMC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2016-01-17" />
+                            completionDate="2016-01-17" />
                         <item
                             code="LMC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
+                            completionDate="actualEnd">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -428,24 +447,42 @@
                     actualEnd="2016-05-07"
                     competencyUnits="3"
                     mentorId="5">
+                    <notes><![CDATA[Dui id ornare arcu odio.
+\nNam libero justo laoreet sit amet cursus sit. Risus feugiat in ante metus dictum at.
+\nRidiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum sit amet justo donec.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
                             leadTime="7" />
+                        <item
+                            subsequent="false"
+                            leadTime="5" />
+                        <item
+                            subsequent="false"
+                            leadTime="2" />
+                        <item
+                            subsequent="true"
+                            leadTime="8" />
+                        <item
+                            subsequent="true"
+                            leadTime="5" />
+                        <item
+                            subsequent="true"
+                            leadTime="2" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PYJC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2016-05-05" />
+                            completionDate="2016-05-05" />
                         <item
                             code="YJC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-07">
+                            completionDate="2016-05-07">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -455,9 +492,9 @@
                         <item
                             code="YJT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
+                            completionDate="actualEnd">
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
@@ -479,15 +516,24 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="11" />
+                        <item
+                            subsequent="true"
+                            leadTime="5" />
+                        <item
+                            subsequent="true"
+                            leadTime="2" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="DIT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-15"
+                            completionDate="2016-05-15"
                             name="Task 1">
                             <assessmentAlerts>
                                 <item
@@ -498,9 +544,9 @@
                         <item
                             code="DIT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-22"
+                            completionDate="2016-05-22"
                             name="Task 2">
                             <assessmentAlerts>
                                 <item
@@ -511,9 +557,9 @@
                         <item
                             code="DIT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-28"
+                            completionDate="2016-05-28"
                             name="Task 3">
                             <assessmentAlerts>
                                 <item
@@ -524,9 +570,9 @@
                         <item
                             code="DIT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd"
+                            completionDate="actualEnd"
                             name="Task 4">
                             <assessmentAlerts>
                                 <item
@@ -546,25 +592,39 @@
                     actualEnd="2016-07-05"
                     competencyUnits="3"
                     mentorId="6">
+                    <notes>
+                        <![CDATA[Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat. Lectus urna duis convallis convallis.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
                             leadTime="7" />
+                        <item
+                            subsequent="false"
+                            leadTime="6" />
+                        <item
+                            subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="4" />
+                        <item
+                            subsequent="true"
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="DJT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd"
+                            completionDate="actualEnd"
                             name="Task 1" />
                         <item
                             code="DJT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd"
+                            completionDate="actualEnd"
                             name="Task 2" />
                     </assessments>
                 </item>
@@ -574,6 +634,11 @@
             name="Term 3"
             start="2016-07-01"
             end="2016-12-31">
+            <notes><![CDATA[Egestas purus viverra accumsan in.
+\nFelis bibendum ut tristique et egestas.
+\nRisus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ultrices sagittis.
+\nEnim neque volutpat ac tincidunt.
+\nEget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ultrices sagittis.]]></notes>
             <courses>
                 <item
                     number="C393"
@@ -585,18 +650,13 @@
                     actualEnd="2016-10-22"
                     competencyUnits="4"
                     mentorId="7">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            leadTime="7" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="KEV1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd"
+                            completionDate="actualEnd"
                             name="CompTIA A+ Part 1/2" />
                     </assessments>
                 </item>
@@ -610,24 +670,35 @@
                     actualEnd="2016-12-28"
                     competencyUnits="4"
                     mentorId="8">
+                    <notes>
+                        <![CDATA[Praesent tristique magna sit amet purus gravida quis blandit turpis. Magnis dis parturient montes nascetur ridiculus.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="1" />
+                        <item
+                            subsequent="false"
+                            leadTime="0" />
+                        <item
+                            subsequent="true"
+                            leadTime="4" />
+                        <item
+                            subsequent="true"
+                            leadTime="3" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PCEC"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2016-12-13" />
+                            completionDate="2016-12-13" />
                         <item
                             code="CEC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -640,18 +711,25 @@
                     actualEnd="2016-12-28"
                     competencyUnits="4"
                     mentorId="7">
+                    <notes><![CDATA[Fermentum posuere urna nec tincidunt.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
                             leadTime="7" />
+                        <item
+                            subsequent="false"
+                            leadTime="4" />
+                        <item
+                            subsequent="false"
+                            leadTime="2" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="KFV1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd"
+                            completionDate="actualEnd"
                             name="CompTIA - A+" />
                     </assessments>
                 </item>
@@ -661,6 +739,8 @@
             name="Term 4"
             start="2017-02-01"
             end="2017-07-31">
+            <notes>
+                <![CDATA[Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ultrices sagittis. Amet tellus cras adipiscing enim eu. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor. Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet.]]></notes>
             <courses>
                 <item
                     number="C173"
@@ -672,24 +752,32 @@
                     actualEnd="2017-02-22"
                     competencyUnits="3"
                     mentorId="9">
+                    <notes><![CDATA[Euismod elementum nisi quis eleifend quam.
+\nPurus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nunc mi ipsum faucibus vitae aliquet. Eget egestas purus viverra accumsan in. Suscipit tellus mauris a diam maecenas sed enim ut.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="0" />
+                        <item
+                            subsequent="true"
+                            leadTime="8" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PCGO"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-01-05" />
+                            completionDate="2017-01-05" />
                         <item
                             code="CGO1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -702,36 +790,38 @@
                     actualEnd="2017-05-08"
                     competencyUnits="3"
                     mentorId="10">
+                    <notes>
+                        <![CDATA[Leo a diam sollicitudin tempor id. Arcu risus quis varius quam quisque. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="7" />
+                            subsequent="true"
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PCKC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-02-22" />
+                            completionDate="2017-02-22" />
                         <item
                             code="PCKC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-05-03" />
+                            completionDate="2017-05-03" />
                         <item
                             code="CKC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="2017-05-08" />
+                            completionDate="2017-05-08" />
                         <item
                             code="UXT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -747,27 +837,36 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="9" />
+                        <item
+                            subsequent="true"
                             leadTime="7" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PDQC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-05-09" />
+                            completionDate="2017-05-09" />
                         <item
                             code="VGT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2017-05-21" />
+                            completionDate="2017-05-21" />
                         <item
                             code="DQC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -780,24 +879,35 @@
                     actualEnd="2017-07-22"
                     competencyUnits="3"
                     mentorId="12">
+                    <notes>
+                        <![CDATA[Amet aliquam id diam maecenas ultricies mi eget mauris.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="2" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PJQC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-07-19" />
+                            completionDate="2017-07-19" />
                         <item
                             code="JQC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
             </courses>
@@ -806,6 +916,7 @@
             name="Term 5"
             start="2017-08-01"
             end="2018-01-31">
+            <notes><![CDATA[Risus feugiat in ante metus dictum at.]]></notes>
             <courses>
                 <item
                     number="C165"
@@ -820,21 +931,24 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="2" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PHTC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-08-02" />
+                            completionDate="2017-08-02" />
                         <item
                             code="HTC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -847,18 +961,26 @@
                     actualEnd="2017-10-30"
                     competencyUnits="2"
                     mentorId="9">
+                    <notes>
+                        <![CDATA[Proin fermentum leo vel orci porta non pulvinar neque laoreet. Ut enim blandit volutpat maecenas.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
+                            leadTime="13" />
+                        <item
+                            subsequent="false"
                             leadTime="7" />
+                        <item
+                            subsequent="false"
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="BRP1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -871,18 +993,19 @@
                     actualEnd="2017-11-29"
                     competencyUnits="3"
                     mentorId="9">
+                    <notes><![CDATA[Odio euismod lacinia at quis risus sed.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="5" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="HCV1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -895,24 +1018,28 @@
                     actualEnd="2018-01-03"
                     competencyUnits="3"
                     mentorId="14">
+                    <notes><![CDATA[Volutpat commodo sed egestas egestas fringilla.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="0" />
+                        <item
+                            subsequent="true"
+                            leadTime="2" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PIBC"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2017-12-26" />
+                            completionDate="2017-12-26" />
                         <item
                             code="IBC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -925,18 +1052,26 @@
                     actualEnd="2018-01-31"
                     competencyUnits="3"
                     mentorId="15">
+                    <notes>
+                        <![CDATA[Nisl rhoncus mattis rhoncus urna neque. Proin fermentum leo vel orci porta non pulvinar neque laoreet.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="12" />
+                        <item
+                            subsequent="false"
+                            leadTime="4" />
+                        <item
+                            subsequent="false"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="GVC1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
             </courses>
@@ -956,24 +1091,21 @@
                     actualEnd="2018-05-15"
                     competencyUnits="3"
                     mentorId="16">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            leadTime="7" />
-                    </courseAlerts>
+                    <notes><![CDATA[Montes nascetur ridiculus mus mauris vitae ultricies. Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat.
+\nIn nulla posuere sollicitudin aliquam ultrices sagittis. Amet tellus cras adipiscing enim eu. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor. Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis.]]></notes>
                     <assessments>
                         <item
                             code="PFKO"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2018-04-13" />
+                            completionDate="2018-04-13" />
                         <item
                             code="FKO1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -986,30 +1118,32 @@
                     actualEnd="2018-07-28"
                     competencyUnits="4"
                     mentorId="17">
+                    <notes>
+                        <![CDATA[Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="4" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PFJO"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2018-05-15" />
+                            completionDate="2018-05-15" />
                         <item
                             code="FJO1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="2018-06-02" />
+                            completionDate="2018-06-02" />
                         <item
                             code="VHT1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1022,18 +1156,16 @@
                     actualEnd="2018-07-27"
                     competencyUnits="4"
                     mentorId="9">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            leadTime="7" />
-                    </courseAlerts>
+                    <notes><![CDATA[Nisi vitae suscipit tellus mauris a diam maecenas sed.
+\nDonec et odio pellentesque diam. Amet aliquam id diam maecenas ultricies mi eget mauris.
+\nFelis bibendum ut tristique et egestas. Eget mauris pharetra et ultrices neque ornare aenean.]]></notes>
                     <assessments>
                         <item
                             code="FPV1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1046,18 +1178,23 @@
                     actualEnd="2018-08-09"
                     competencyUnits="3"
                     mentorId="18">
+                    <notes><![CDATA[Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.
+\nEu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget. Quis hendrerit dolor magna eget est lorem ipsum.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="7" />
+                            subsequent="true"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="EWP1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
             </courses>
@@ -1066,6 +1203,8 @@
             name="Term 7"
             start="2018-08-01"
             end="2019-01-31">
+            <notes>
+                <![CDATA[Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum.]]></notes>
             <courses>
                 <item
                     number="C188"
@@ -1077,18 +1216,25 @@
                     actualEnd="2018-11-20"
                     competencyUnits="4"
                     mentorId="19">
+                    <notes><![CDATA[Volutpat commodo sed egestas egestas fringilla.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="3" />
+                        <item
+                            subsequent="false"
+                            leadTime="1" />
+                        <item
+                            subsequent="false"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="FRV1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1101,24 +1247,32 @@
                     actualEnd="2019-01-30"
                     competencyUnits="3"
                     mentorId="19">
+                    <notes><![CDATA[Nunc mi ipsum faucibus vitae aliquet.
+\nSit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus sit. Risus feugiat in ante metus dictum at.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
                             leadTime="7" />
+                        <item
+                            subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="false"
+                            leadTime="2" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PAG7"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2018-10-31" />
+                            completionDate="2018-10-31" />
                         <item
                             code="ACO1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1131,18 +1285,32 @@
                     actualEnd="2019-02-01"
                     competencyUnits="6"
                     mentorId="9">
+                    <notes>
+                        <![CDATA[Enim neque volutpat ac tincidunt. Arcu cursus euismod quis viverra nibh cras pulvinar mattis. Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="8" />
+                        <item
+                            subsequent="false"
+                            leadTime="6" />
+                        <item
+                            subsequent="true"
+                            leadTime="12" />
+                        <item
+                            subsequent="true"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="2" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="AAO1"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="2019-01-31" />
+                            completionDate="2019-01-31" />
                     </assessments>
                 </item>
             </courses>
@@ -1151,6 +1319,7 @@
             name="Term 8"
             start="2019-02-01"
             end="2019-07-31">
+            <notes><![CDATA[Risus feugiat in ante metus dictum at.]]></notes>
             <courses>
                 <item
                     number="C482"
@@ -1162,18 +1331,20 @@
                     actualEnd="2019-05-28"
                     competencyUnits="6"
                     mentorId="19">
+                    <notes>
+                        <![CDATA[Praesent tristique magna sit amet purus gravida quis blandit turpis.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="7" />
+                            subsequent="true"
+                            leadTime="4" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="GYP1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1186,18 +1357,15 @@
                     actualEnd="2019-07-04"
                     competencyUnits="4"
                     mentorId="19">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            leadTime="7" />
-                    </courseAlerts>
+                    <notes>
+                        <![CDATA[Amet tellus cras adipiscing enim eu. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor. Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget.]]></notes>
                     <assessments>
                         <item
                             code="DIP1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1210,24 +1378,26 @@
                     actualEnd="2019-07-31"
                     competencyUnits="4"
                     mentorId="19">
+                    <notes>
+                        <![CDATA[Tortor id aliquet lectus proin nibh nisl condimentum. Euismod elementum nisi quis eleifend quam. Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Turpis tincidunt id aliquet risus. Placerat duis ultricies lacus sed turpis. Fermentum posuere urna nec tincidunt. Montes nascetur ridiculus mus mauris vitae ultricies. Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat. Lectus urna duis convallis convallis.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
+                            subsequent="true"
                             leadTime="7" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PAG8"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2019-01-30" />
+                            completionDate="2019-01-30" />
                         <item
                             code="AAO1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
             </courses>
@@ -1236,6 +1406,8 @@
             name="Term 9"
             start="2019-10-01"
             end="2020-03-31">
+            <notes>
+                <![CDATA[Nisi vitae suscipit tellus mauris a diam maecenas sed. Aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Arcu risus quis varius quam quisque.]]></notes>
             <courses>
                 <item
                     number="C193"
@@ -1247,24 +1419,32 @@
                     actualEnd="2019-10-10"
                     competencyUnits="3"
                     mentorId="20">
+                    <notes>
+                        <![CDATA[Quis commodo odio aenean sed adipiscing. Nulla facilisi morbi tempus iaculis urna id volutpat lacus. Turpis egestas integer eget aliquet nibh praesent tristique.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="1" />
+                        <item
+                            subsequent="true"
+                            leadTime="12" />
+                        <item
+                            subsequent="true"
+                            leadTime="3" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PAG9"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2019-10-02" />
+                            completionDate="2019-10-02" />
                         <item
                             code="AEO1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1280,15 +1460,15 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            leadTime="5" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="GZP1"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1301,24 +1481,26 @@
                     actualEnd="2020-05-08"
                     competencyUnits="3"
                     mentorId="21">
+                    <notes>
+                        <![CDATA[Mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Libero justo laoreet sit amet cursus.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="7" />
+                            subsequent="true"
+                            leadTime="9" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="PADO"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2019-10-02" />
+                            completionDate="2019-10-02" />
                         <item
                             code="ADO1"
                             status="NOT_PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
             </courses>
@@ -1327,6 +1509,10 @@
             name="Term 10"
             start="2020-04-01"
             end="2020-09-30">
+            <notes><![CDATA[Leo a diam sollicitudin tempor id.
+\nFelis bibendum ut tristique et egestas.
+\nMattis aliquam faucibus purus in massa tempor nec.
+\nRisus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ultrices sagittis.]]></notes>
             <courses>
                 <item
                     number="C195"
@@ -1338,18 +1524,23 @@
                     actualEnd="2020-08-05"
                     competencyUnits="6"
                     mentorId="22">
+                    <notes>
+                        <![CDATA[Felis bibendum ut tristique et egestas. Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam quisque id diam.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="7" />
+                            subsequent="true"
+                            leadTime="5" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
                     </courseAlerts>
                     <assessments>
                         <item
                             code="GZP1"
                             status="PASSED"
-                            completionDate="expectedEnd"
+                            goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd" />
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -1360,10 +1551,15 @@
                     expectedEnd="2020-09-30"
                     competencyUnits="3"
                     mentorId="23">
+                    <notes><![CDATA[Arcu risus quis varius quam quisque.
+\nVenenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget.]]></notes>
                     <courseAlerts>
                         <item
-                            subsequent="false"
-                            leadTime="3" />
+                            subsequent="true"
+                            leadTime="9" />
+                        <item
+                            subsequent="true"
+                            leadTime="1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1379,7 +1575,7 @@
             name="Term 11"
             start="2020-10-01"
             end="2020-03-31">
-            <notes>Part-time status</notes>
+            <notes><![CDATA[Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
             <courses>
                 <item
                     number="C769"
@@ -1388,10 +1584,18 @@
                     expectedStart="2020-10-01"
                     expectedEnd="2020-12-31"
                     competencyUnits="4">
+                    <notes>
+                        <![CDATA[Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis.]]></notes>
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="4" />
+                            leadTime="11" />
+                        <item
+                            subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="false"
+                            leadTime="2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1425,6 +1629,11 @@
                     title="Data Management for Programmers"
                     status="UNPLANNED"
                     competencyUnits="3">
+                    <notes><![CDATA[In eu mi bibendum neque egestas.
+\nFringilla urna porttitor rhoncus dolor purus non enim praesent elementum.
+\nOdio euismod lacinia at quis risus sed.
+\nOdio euismod lacinia at quis risus sed.
+\nSuscipit tellus mauris a diam maecenas sed enim ut. Aliquet risus feugiat in ante metus dictum at tempor commodo. Id semper risus in hendrerit. Tristique senectus et netus et malesuada fames ac turpis.]]></notes>
                     <assessments>
                         <item
                             code="ADO1"

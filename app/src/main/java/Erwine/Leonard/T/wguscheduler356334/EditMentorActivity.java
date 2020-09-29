@@ -6,14 +6,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
@@ -30,8 +27,7 @@ public class EditMentorActivity extends AppCompatActivity {
     private EditText mentorNameEditText;
     private EditText phoneNumberEditText;
     private EditText emailAddressEditText;
-    private TextView mentorNotesTextView;
-    private FloatingActionButton editMentorNotesFloatingActionButton;
+    private EditText notesEditText;
     private ImageButton saveMentorImageButton;
     private ImageButton deleteMentorImageButton;
 
@@ -57,8 +53,7 @@ public class EditMentorActivity extends AppCompatActivity {
         mentorNameEditText = findViewById(R.id.mentorNameEditText);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         emailAddressEditText = findViewById(R.id.emailAddressEditText);
-        mentorNotesTextView = findViewById(R.id.mentorNotesTextView);
-        editMentorNotesFloatingActionButton = findViewById(R.id.editMentorNotesFloatingActionButton);
+        notesEditText = findViewById(R.id.notesEditText);
         saveMentorImageButton = findViewById(R.id.saveMentorImageButton);
         deleteMentorImageButton = findViewById(R.id.deleteMentorImageButton);
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
@@ -101,18 +96,18 @@ public class EditMentorActivity extends AppCompatActivity {
             mentorNameEditText.setText(viewModel.getName());
             phoneNumberEditText.setText(viewModel.getPhoneNumber());
             emailAddressEditText.setText(viewModel.getEmailAddress());
-            mentorNotesTextView.setText(viewModel.getNotes());
+            notesEditText.setText(viewModel.getNotes());
         } else {
             mentorNameEditText.setText(entity.getName());
             phoneNumberEditText.setText(entity.getPhoneNumber());
             emailAddressEditText.setText(entity.getEmailAddress());
-            mentorNotesTextView.setText(entity.getNotes());
+            notesEditText.setText(entity.getNotes());
         }
 
         mentorNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
+        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
         phoneNumberEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setPhoneNumber));
         emailAddressEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setEmailAddress));
-        editMentorNotesFloatingActionButton.setOnClickListener(this::onEditMentorNotesFloatingActionButtonClick);
         saveMentorImageButton.setOnClickListener(this::onSaveMentorImageButtonClick);
         if (null == entity.getId()) {
             deleteMentorImageButton.setVisibility(View.GONE);
@@ -136,13 +131,6 @@ public class EditMentorActivity extends AppCompatActivity {
     private void onLoadFailed(Throwable throwable) {
         Log.e(LOG_TAG, "Error loading mentor", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
-    }
-
-    private void onEditMentorNotesFloatingActionButtonClick(View view) {
-        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), this, s -> {
-            viewModel.setNotes(s);
-            mentorNotesTextView.setText(s);
-        });
     }
 
     private void onNameValidChanged(Boolean isValid) {

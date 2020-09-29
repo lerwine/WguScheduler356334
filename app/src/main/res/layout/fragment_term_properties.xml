@@ -1,121 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.term.TermPropertiesFragment">
 
-    <TextView
-        android:id="@+id/termNameLabelTextView"
-        style="@style/WGU.Scheduler.FieldLabel"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:labelFor="@id/termNameEditText"
-        android:text="@string/label_name_of_term"
-        app:layout_constraintBottom_toTopOf="@+id/termNameEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/termNameEditText"
-        style="@style/WGU.Scheduler.TextInputEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="29dp"
-        android:ems="10"
-        android:inputType="textCapWords"
-        app:layout_constraintBottom_toTopOf="@+id/termStartTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termNameLabelTextView" />
+        <TextView
+            android:id="@+id/termNameLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/termNameEditText"
+            android:text="@string/label_name_of_term" />
 
-    <TextView
-        android:id="@+id/termStartLabelTextView"
-        style="@style/WGU.Scheduler.FieldLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:labelFor="@id/termStartTextView"
-        android:text="@string/label_start_of_term"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termNameEditText" />
+        <EditText
+            android:id="@+id/termNameEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="29dp"
+            android:ems="10"
+            android:inputType="textCapWords" />
 
-    <TextView
-        android:id="@+id/termStartTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/edit_text"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/termEndLabelTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termNameEditText" />
+        <TextView
+            android:id="@+id/termStartLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/termStartTextView"
+            android:text="@string/label_start_of_term" />
 
-    <TextView
-        android:id="@+id/termEndLabelTextView"
-        style="@style/WGU.Scheduler.FieldLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:labelFor="@id/termEndValueTextView"
-        android:text="@string/label_end_of_term"
-        app:layout_constraintBottom_toTopOf="@+id/termEndValueTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termStartTextView" />
+        <TextView
+            android:id="@+id/termStartTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/termEndValueTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/edit_text"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/termNotesLabelTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termEndLabelTextView" />
+        <TextView
+            android:id="@+id/termEndLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/termEndValueTextView"
+            android:text="@string/label_end_of_term" />
 
-    <TextView
-        android:id="@+id/termNotesLabelTextView"
-        style="@style/WGU.Scheduler.FieldLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:labelFor="@id/termNotesTextView"
-        android:text="@string/label_notes"
-        app:layout_constraintBottom_toTopOf="@+id/termNotesTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termEndValueTextView" />
+        <TextView
+            android:id="@+id/termEndValueTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/termNotesTextView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@android:drawable/edit_text"
-        android:ems="10"
-        android:gravity="top"
-        android:isScrollContainer="true"
-        android:scrollIndicators="right"
-        android:scrollbarStyle="outsideInset"
-        android:scrollbars="vertical"
-        android:verticalScrollbarPosition="right"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termNotesLabelTextView" />
+        <TextView
+            android:id="@+id/termNotesLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/notesEditText"
+            android:text="@string/label_notes" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/editNotesFloatingActionButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/control_margin"
-        android:clickable="true"
-        android:src="@drawable/edit_icon"
-        app:backgroundTint="@color/color_secondary_variant"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <EditText
+            android:id="@+id/notesEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</ScrollView>

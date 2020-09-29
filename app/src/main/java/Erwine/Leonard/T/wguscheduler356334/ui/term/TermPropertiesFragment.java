@@ -16,14 +16,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.time.LocalDate;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
 import static Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel.FORMATTER;
@@ -40,8 +37,7 @@ public class TermPropertiesFragment extends Fragment {
     private EditText termNameEditText;
     private TextView termStartTextView;
     private TextView termEndValueTextView;
-    private TextView termNotesTextView;
-    private FloatingActionButton editNotesFloatingActionButton;
+    private EditText notesEditText;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -59,8 +55,7 @@ public class TermPropertiesFragment extends Fragment {
         termNameEditText = view.findViewById(R.id.termNameEditText);
         termStartTextView = view.findViewById(R.id.termStartTextView);
         termEndValueTextView = view.findViewById(R.id.termEndValueTextView);
-        termNotesTextView = view.findViewById(R.id.termNotesTextView);
-        editNotesFloatingActionButton = view.findViewById(R.id.editNotesFloatingActionButton);
+        notesEditText = view.findViewById(R.id.notesEditText);
 
         return view;
     }
@@ -93,7 +88,7 @@ public class TermPropertiesFragment extends Fragment {
             } else {
                 termEndValueTextView.setText("");
             }
-            termNotesTextView.setText(viewModel.getNotes());
+            notesEditText.setText(viewModel.getNotes());
         } else {
             termNameEditText.setText(entity.getName());
             LocalDate date = entity.getStart();
@@ -108,24 +103,17 @@ public class TermPropertiesFragment extends Fragment {
             } else {
                 termEndValueTextView.setText("");
             }
-            termNotesTextView.setText(entity.getNotes());
+            notesEditText.setText(entity.getNotes());
         }
 
         termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
+        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
         termStartTextView.setOnClickListener(this::onStartClick);
         termEndValueTextView.setOnClickListener(this::onEndClick);
 
-        editNotesFloatingActionButton.setOnClickListener(this::onEditNotesFloatingActionButtonClick);
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getNameValidLiveData().observe(viewLifecycleOwner, this::onNameValidChanged);
         viewModel.getStartMessageLiveData().observe(viewLifecycleOwner, this::onStartValidationMessageChanged);
-    }
-
-    private void onEditNotesFloatingActionButtonClick(View view) {
-        AlertHelper.showEditMultiLineTextDialog(R.string.title_edit_notes, viewModel.getNotes(), requireContext(), s -> {
-            viewModel.setNotes(s);
-            termNotesTextView.setText(s);
-        });
     }
 
     private void onNameValidChanged(Boolean isValid) {

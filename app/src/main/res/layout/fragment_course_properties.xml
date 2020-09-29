@@ -1,44 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.course.CoursePropertiesFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/termTextView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@id/termButton"
             android:text="@string/label_term"
-            android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
         <Button
             android:id="@+id/termButton"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/btn_dropdown"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/termTextView" />
+            android:background="@android:drawable/btn_dropdown" />
 
         <TableLayout
-            android:id="@+id/tableLayout1"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:stretchColumns="1"
-            android:weightSum="100"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/termButton">
+            android:weightSum="100">
 
             <TableRow
                 android:layout_width="match_parent"
@@ -46,7 +35,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/courseCodeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="0"
@@ -56,7 +44,6 @@
                     android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
                 <TextView
-                    android:id="@+id/competencyUnitsTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
@@ -97,76 +84,61 @@
 
         <TextView
             android:id="@+id/titleTextView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@id/titleEditText"
             android:text="@string/label_title"
-            android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tableLayout1" />
+            android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
         <EditText
             android:id="@+id/titleEditText"
             style="@style/WGU.Scheduler.TextInputEditText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textShortMessage|text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
+            android:inputType="textShortMessage|text" />
 
         <TextView
             android:id="@+id/mentorTextView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@id/mentorChip"
             android:text="@string/label_mentor"
-            android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleEditText" />
+            android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/mentorChip"
             style="@style/WGU.Scheduler.Chip.Entry"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/edit_text"
-            android:checkable="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mentorTextView" />
+            android:checkable="false" />
 
-        <TextView
-            android:id="@+id/typeTextView"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/typeButton"
-            android:text="@string/label_status"
-            android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mentorChip" />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/typeButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/btn_dropdown"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/typeTextView"
-            app:layout_constraintTop_toBottomOf="@+id/mentorChip" />
+            <TextView
+                android:id="@+id/typeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/typeButton"
+                android:text="@string/label_status"
+                android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+            <Button
+                android:id="@+id/typeButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/btn_dropdown" />
+        </LinearLayout>
 
         <TableLayout
-            android:id="@+id/datesTableLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:shrinkColumns="0,2"
-            android:stretchColumns="1,3"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/typeButton">
+            android:stretchColumns="1,3">
 
             <TableRow
                 android:layout_width="match_parent"
@@ -264,30 +236,22 @@
         </TableLayout>
 
         <TextView
-            android:id="@+id/notesLabelTextView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@id/notesEditText"
             android:text="@string/label_notes"
-            android:textAppearance="@style/WGU.Scheduler.FieldLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/datesTableLayout" />
+            android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
         <EditText
             android:id="@+id/notesEditText"
             style="@style/WGU.Scheduler.TextInputEditText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:gravity="start|top"
-            android:inputType="textMultiLine"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/notesLabelTextView" />
+            android:inputType="textMultiLine" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 
 </ScrollView>

@@ -19,28 +19,19 @@
 
     <ImageButton
         android:id="@+id/saveImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/save_icon"
-        android:contentDescription="@string/command_save_changes"
+        style="@style/WGU.Scheduler.SaveImageButtonStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteImageButton" />
 
     <ImageButton
         android:id="@+id/deleteImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/delete_icon"
-        android:contentDescription="@string/command_delete"
+        style="@style/WGU.Scheduler.DeleteImageButtonStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
 
     <ImageButton
         android:id="@+id/cancelImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/undo_icon"
-        android:contentDescription="@android:string/cancel"
+        style="@style/WGU.Scheduler.CancelImageButtonStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
