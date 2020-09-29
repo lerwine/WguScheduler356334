@@ -18,13 +18,13 @@ public class AssessmentAlertEntity extends AbstractAssessmentAlertEntity<Assessm
      */
     public static final String INDEX_ASSESSMENT = "IDX_GOAL_ALERT_ASSESSMENT";
 
-    public AssessmentAlertEntity(long assessmentId, boolean goalAlert, int leadTime, long id) {
-        super(id, assessmentId, goalAlert, leadTime);
+    public AssessmentAlertEntity(long assessmentId, boolean subsequent, int leadTime, long id) {
+        super(id, assessmentId, subsequent, leadTime);
     }
 
     @Ignore
-    public AssessmentAlertEntity(long assessmentId, boolean goalAlert, int leadTime) {
-        super(null, assessmentId, goalAlert, leadTime);
+    public AssessmentAlertEntity(long assessmentId, boolean subsequent, int leadTime) {
+        super(null, assessmentId, subsequent, leadTime);
     }
 
     @Ignore

@@ -386,7 +386,7 @@ public class SampleDataLoader implements Action {
 
     private void loadSampleCourseAlert(long courseId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        CourseAlertEntity courseAlertEntity = new CourseAlertEntity(courseId, xmlParser.getAttributeBooleanValue(null, CourseAlert.COLNAME_END_ALERT, false),
+        CourseAlertEntity courseAlertEntity = new CourseAlertEntity(courseId, xmlParser.getAttributeBooleanValue(null, CourseAlert.COLNAME_SUBSEQUENT, false),
                 xmlParser.getAttributeIntValue(null, CourseAlert.COLNAME_LEAD_TIME, 0));
         Log.d(LOG_TAG, String.format("Loaded %s", courseAlertEntity));
         dbLoader.getAppDb().courseAlertDAO().insertSynchronous(courseAlertEntity);
@@ -396,6 +396,7 @@ public class SampleDataLoader implements Action {
     private void loadSampleAssessment(@NonNull CourseEntity courseEntity) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         AssessmentEntity assessmentEntity = new AssessmentEntity(Objects.requireNonNull(xmlParser.getAttributeValue(null, Assessment.COLNAME_CODE)),
+                xmlParser.getAttributeValue(null, Assessment.COLNAME_NAME),
                 AssessmentStatus.valueOf(Objects.requireNonNull(xmlParser.getAttributeValue(null, Assessment.COLNAME_STATUS))),
                 getAttributeLocalDate(Assessment.COLNAME_GOAL_DATE, courseEntity), AssessmentType.valueOf(Objects.requireNonNull(xmlParser.getAttributeValue(null, Assessment.COLNAME_TYPE))),
                 "", getAttributeLocalDate(Assessment.COLNAME_COMPLETION_DATE, courseEntity), Objects.requireNonNull(courseEntity.getId()));
@@ -412,16 +413,18 @@ public class SampleDataLoader implements Action {
         }
         Log.d(LOG_TAG, String.format("Loaded %s", assessmentEntity));
         long assessmentId = dbLoader.getAppDb().assessmentDAO().insertSynchronous(assessmentEntity);
-        xmlParser.require(XmlPullParser.END_TAG, NAMESPACE_SAMPLE_DATA, AppDb.TABLE_NAME_ASSESSMENT_ALERTS);
+        xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, AppDb.TABLE_NAME_ASSESSMENT_ALERTS);
         while (xmlParser.nextTag() == XmlPullParser.START_TAG) {
             loadSampleAssessmentAlert(assessmentId);
             xmlParser.require(XmlPullParser.END_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         }
+        xmlParser.require(XmlPullParser.END_TAG, NAMESPACE_SAMPLE_DATA, AppDb.TABLE_NAME_ASSESSMENT_ALERTS);
+        xmlParser.nextTag();
     }
 
     private void loadSampleAssessmentAlert(long assessmentId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        AssessmentAlertEntity assessmentAlertEntity = new AssessmentAlertEntity(assessmentId, xmlParser.getAttributeBooleanValue(null, AssessmentAlert.COLNAME_GOAL_ALERT, false),
+        AssessmentAlertEntity assessmentAlertEntity = new AssessmentAlertEntity(assessmentId, xmlParser.getAttributeBooleanValue(null, AssessmentAlert.COLNAME_SUBSEQUENT, false),
                 xmlParser.getAttributeIntValue(null, AssessmentAlert.COLNAME_LEAD_TIME, 0));
         Log.d(LOG_TAG, String.format("Loaded %s", assessmentAlertEntity));
         dbLoader.getAppDb().assessmentAlertDAO().insertSynchronous(assessmentAlertEntity);

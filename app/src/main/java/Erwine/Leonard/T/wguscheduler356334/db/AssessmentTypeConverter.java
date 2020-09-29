@@ -1,25 +1,34 @@
 package Erwine.Leonard.T.wguscheduler356334.db;
 
+import androidx.annotation.Nullable;
 import androidx.room.TypeConverter;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 
-public class AssessmentTypeConverter {
+public final class AssessmentTypeConverter {
     private static final AssessmentType[] VALUES = AssessmentType.values();
+    public static AssessmentType DEFAULT = VALUES[0];
 
     @TypeConverter
     public static AssessmentType toAssessmentType(Integer value) {
-        if (null != value && value >= 0) {
-            if (value < VALUES.length) {
-                return VALUES[value];
-            }
-        }
-        return AssessmentType.OBJECTIVE_ASSESSMENT;
+        return (null != value && value >= 0 && value < VALUES.length) ? VALUES[value] : DEFAULT;
     }
 
     @TypeConverter
     public static Integer fromAssessmentType(AssessmentType value) {
-        return ((null == value) ? AssessmentType.OBJECTIVE_ASSESSMENT : value).ordinal();
+        return (null == value) ? 0 : value.ordinal();
+    }
+
+    public static int compare(@Nullable AssessmentType o1, @Nullable AssessmentType o2) {
+        return (null == o1) ? ((null == o2) ? 0 : o2.ordinal()) : ((null == o2) ? -o1.ordinal() : o1.ordinal() - o2.ordinal());
+    }
+
+    public static boolean areEqual(@Nullable AssessmentType o1, @Nullable AssessmentType o2) {
+        return (null == o1 || o1 == DEFAULT) ? (null == o2 || o2 == DEFAULT) : o1 == o2;
+    }
+
+    public static AssessmentType asNonNull(@Nullable AssessmentType status) {
+        return (null == status) ? DEFAULT : status;
     }
 
 }

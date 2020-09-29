@@ -102,10 +102,10 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     @ColumnInfo(name = COLNAME_COURSE_NOTES)
     private String courseNotes;
 
-    public AssessmentDetails(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId,
+    public AssessmentDetails(String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId,
                              String courseNumber, String courseTitle, CourseStatus courseStatus, LocalDate expectedCourseStart, LocalDate actualCourseStart,
                              LocalDate expectedCourseEnd, LocalDate actualCourseEnd, int competencyUnits, String courseNotes, long termId, Long mentorId, long id) {
-        super(id, courseId, code, status, goalDate, type, notes, completionDate);
+        super(id, courseId, code, name, status, goalDate, type, notes, completionDate);
         setCourse(new CourseEntity(courseNumber, courseTitle, courseStatus, expectedCourseStart, actualCourseStart, expectedCourseEnd, actualCourseEnd,
                 competencyUnits, courseNotes, termId, mentorId, courseId));
     }
@@ -127,6 +127,105 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
         } else {
             setCourse(course);
         }
+    }
+
+    public Long getTermId() {
+        return course.getTermId();
+    }
+
+    public void setTermId(Long termId) {
+        course.setTermId(termId);
+        this.termId = course.getTermId();
+    }
+
+    public Long getMentorId() {
+        return course.getMentorId();
+    }
+
+    public void setMentorId(Long mentorId) {
+        course.setMentorId(termId);
+        this.termId = course.getMentorId();
+    }
+
+    public String getCourseNumber() {
+        return course.getNumber();
+    }
+
+    public void setCourseNumber(String courseNumber) {
+        course.setNumber(courseNumber);
+        this.courseNumber = course.getNumber();
+    }
+
+    public String getCourseTitle() {
+        return course.getTitle();
+    }
+
+    public void setCourseTitle(String courseTitle) {
+        course.setTitle(courseTitle);
+        this.courseTitle = course.getTitle();
+    }
+
+    public LocalDate getExpectedCourseStart() {
+        return course.getExpectedStart();
+    }
+
+    public void setExpectedCourseStart(LocalDate expectedCourseStart) {
+        course.setExpectedStart(expectedCourseStart);
+        this.expectedCourseStart = course.getExpectedStart();
+    }
+
+    public LocalDate getActualCourseStart() {
+        return course.getActualStart();
+    }
+
+    public void setActualCourseStart(LocalDate actualCourseStart) {
+        course.setActualStart(actualCourseStart);
+        this.actualCourseStart = course.getActualStart();
+    }
+
+    public LocalDate getExpectedCourseEnd() {
+        return course.getExpectedEnd();
+    }
+
+    public void setExpectedCourseEnd(LocalDate expectedCourseEnd) {
+        course.setExpectedEnd(expectedCourseEnd);
+        this.expectedCourseEnd = course.getExpectedEnd();
+    }
+
+    public LocalDate getActualCourseEnd() {
+        return course.getActualEnd();
+    }
+
+    public void setActualCourseEnd(LocalDate actualCourseEnd) {
+        course.setActualEnd(actualCourseEnd);
+        this.actualCourseEnd = course.getActualEnd();
+    }
+
+    public CourseStatus getCourseStatus() {
+        return course.getStatus();
+    }
+
+    public void setCourseStatus(CourseStatus courseStatus) {
+        course.setStatus(courseStatus);
+        this.courseStatus = course.getStatus();
+    }
+
+    public Integer getCompetencyUnits() {
+        return course.getCompetencyUnits();
+    }
+
+    public void setCompetencyUnits(Integer competencyUnits) {
+        course.setCompetencyUnits(competencyUnits);
+        this.competencyUnits = course.getCompetencyUnits();
+    }
+
+    public String getCourseNotes() {
+        return course.getNotes();
+    }
+
+    public void setCourseNotes(String courseNotes) {
+        course.setNotes(courseNotes);
+        this.courseNotes = course.getNotes();
     }
 
     @Override

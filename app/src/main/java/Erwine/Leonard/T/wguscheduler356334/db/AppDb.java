@@ -7,6 +7,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentAlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
@@ -22,7 +23,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 
 @Database(
         entities = {TermEntity.class, MentorEntity.class, CourseEntity.class, CourseAlertEntity.class, AssessmentEntity.class, AssessmentAlertEntity.class},
-        views = {TermListItem.class, MentorListItem.class, TermCourseListItem.class, MentorCourseListItem.class, CourseDetails.class, AssessmentDetails.class},
+        views = {TermListItem.class, MentorListItem.class, TermCourseListItem.class, MentorCourseListItem.class, CourseDetails.class, AssessmentDetails.class, AlertListItem.class},
         version = 1, exportSchema = false
 )
 @TypeConverters({LocalDateConverter.class, CourseStatusConverter.class, StringModelListConverter.class, AssessmentStatusConverter.class, AssessmentTypeConverter.class})

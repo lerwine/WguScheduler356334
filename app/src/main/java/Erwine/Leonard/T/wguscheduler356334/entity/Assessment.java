@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public interface Assessment extends NoteColumnIncludedEntity {
@@ -20,6 +21,10 @@ public interface Assessment extends NoteColumnIncludedEntity {
      * The name of the {@code "code"} database column, which contains the WGU-proprietary code that is used to refer to the assessment.
      */
     String COLNAME_CODE = "code";
+    /**
+     * The name of the {@code "name"} database column, which contains the descriptive assessment name.
+     */
+    String COLNAME_NAME = "name";
     /**
      * The name of the {@code "status"} database column, which the current or final status value for the assessment.
      */
@@ -66,6 +71,21 @@ public interface Assessment extends NoteColumnIncludedEntity {
      * @param code The new WGU-proprietary code that will to refer to the assessment.
      */
     void setCode(String code);
+
+    /**
+     * Gets the name for the assessment.
+     *
+     * @return The assessment name.
+     */
+    @Nullable
+    String getName();
+
+    /**
+     * Sets the assessment name.
+     *
+     * @param name The new name for the assessment.
+     */
+    void setName(String name);
 
     /**
      * Gets the current or final status value for the assessment.
@@ -140,8 +160,9 @@ public interface Assessment extends NoteColumnIncludedEntity {
             setCourseId(bundle.getLong(key));
         }
         setCode(bundle.getString(stateKey(COLNAME_CODE, isOriginal), ""));
+        setName(bundle.getString(stateKey(COLNAME_NAME, isOriginal), ""));
         key = stateKey(COLNAME_STATUS, isOriginal);
-        setStatus((bundle.containsKey(key)) ? AssessmentStatus.valueOf(bundle.getString(key)) : AssessmentStatus.NOT_STARTED);
+        setStatus((bundle.containsKey(key)) ? AssessmentStatus.valueOf(bundle.getString(key)) : AssessmentStatusConverter.DEFAULT);
         key = stateKey(COLNAME_GOAL_DATE, isOriginal);
         if (bundle.containsKey(key)) {
             setGoalDate(LocalDate.ofEpochDay(bundle.getLong(key)));
@@ -170,6 +191,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
             bundle.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, isOriginal), id);
         }
         bundle.putString(stateKey(COLNAME_CODE, isOriginal), getCode());
+        bundle.putString(stateKey(COLNAME_NAME, isOriginal), getName());
         bundle.putString(stateKey(COLNAME_STATUS, isOriginal), getStatus().name());
         LocalDate d = getGoalDate();
         if (null != d) {
@@ -187,6 +209,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
         NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_COURSE_ID, getCourseId())
                 .append(COLNAME_CODE, getCode())
+                .append(COLNAME_NAME, getName())
                 .append(COLNAME_STATUS, getStatus())
                 .append(COLNAME_GOAL_DATE, getGoalDate())
                 .append(COLNAME_TYPE, getType())

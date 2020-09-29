@@ -19,7 +19,9 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractAssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.Assessment;
@@ -29,10 +31,8 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 
@@ -153,6 +153,16 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     @NonNull
+    public String getName() {
+        String name = currentValues.getName();
+        return (null == name) ? "" : name;
+    }
+
+    public void setName(String name) {
+        currentValues.setName(name);
+    }
+
+    @NonNull
     public AssessmentStatus getStatus() {
         return currentValues.status;
     }
@@ -199,7 +209,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public String getNormalizedNotes() {
         if (null == normalizedNotes) {
-            normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
+            normalizedNotes = AbstractAssessmentEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
             if (normalizedNotes.equals(currentValues.notes)) {
                 currentValues.notes = null;
             }
@@ -250,7 +260,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         private Long id;
         private Long courseId;
         private String code = "";
-        private AssessmentStatus status = AssessmentStatus.NOT_STARTED;
+        private String name = "";
+        private AssessmentStatus status = AssessmentStatusConverter.DEFAULT;
         private LocalDate goalDate;
         private LocalDate completionDate;
         private AssessmentType type = AssessmentType.OBJECTIVE_ASSESSMENT;
@@ -290,7 +301,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         public void setCode(String code) {
             this.code = (null == code) ? "" : code;
             String oldValue = normalizedCode;
-            normalizedCode = TermEntity.SINGLE_LINE_NORMALIZER.apply(code);
+            normalizedCode = AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER.apply(code);
             if (normalizedCode.isEmpty()) {
                 if (!oldValue.isEmpty()) {
                     codeValidLiveData.postValue(false);
@@ -298,6 +309,18 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 codeValidLiveData.postValue(true);
             }
+        }
+
+        @Override
+        @Nullable
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public void setName(String name) {
+            String s = AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER.apply(name);
+            this.name = (s.isEmpty()) ? null : name;
         }
 
         @NonNull

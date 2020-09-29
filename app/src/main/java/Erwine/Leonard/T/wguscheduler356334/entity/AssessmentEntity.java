@@ -8,6 +8,7 @@ import androidx.room.Index;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
@@ -32,6 +33,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      * Initializes a new {@code AssessmentEntity} object to represent an existing row of data in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} database table.
      *
      * @param code           the WGU-proprietary code that is used to refer to the assessment.
+     * @param name           the descriptive name for the assessment, which can be null or empty.
      * @param status         the current or final status value for the assessment.
      * @param goalDate       the pre-determined goal date for completing the assessment or {@code null} if no goal date has been established.
      * @param type           the assessment type.
@@ -40,15 +42,16 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      * @param courseId       the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      * @param id             The value of the {@link #COLNAME_ID primary key column}.
      */
-    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId,
+    public AssessmentEntity(String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId,
                             long id) {
-        super(id, courseId, code, status, goalDate, type, notes, completionDate);
+        super(id, courseId, code, name, status, goalDate, type, notes, completionDate);
     }
 
     /**
      * Initializes a new {@code AssessmentEntity} object to represent a new row of data for the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} database table.
      *
      * @param code           the WGU-proprietary code that is used to refer to the assessment.
+     * @param name           the descriptive name for the assessment, which can be null or empty.
      * @param status         the current or final status value for the assessment.
      * @param goalDate       the pre-determined goal date for completing the assessment or {@code null} if no goal date has been established.
      * @param type           the assessment type.
@@ -57,8 +60,8 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      * @param courseId       the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      */
     @Ignore
-    public AssessmentEntity(String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId) {
-        super(null, courseId, code, status, goalDate, type, notes, completionDate);
+    public AssessmentEntity(String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId) {
+        super(null, courseId, code, name, status, goalDate, type, notes, completionDate);
     }
 
     /**
@@ -68,7 +71,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      */
     @Ignore
     public AssessmentEntity(AssessmentType type, long courseId) {
-        super(null, courseId, null, AssessmentStatus.NOT_STARTED, null, type, null, null);
+        super(null, courseId, null, null, AssessmentStatusConverter.DEFAULT, null, type, null, null);
     }
 
     /**
@@ -76,7 +79,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      */
     @Ignore
     public AssessmentEntity() {
-        super(null, null, null, null, null, null, null, null);
+        super(null, null, null, null, null, null, null, null, null);
     }
 
     @Override

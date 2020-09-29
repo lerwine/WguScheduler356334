@@ -9,6 +9,8 @@ import androidx.room.Ignore;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
+
 public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntity<T>> extends AbstractNotedEntity<T> implements Assessment {
 
     @ForeignKey(entity = CourseEntity.class, parentColumns = {CourseEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
@@ -16,6 +18,8 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
     private long courseId;
     @ColumnInfo(name = COLNAME_CODE, collate = ColumnInfo.NOCASE)
     private String code;
+    @ColumnInfo(name = COLNAME_NAME)
+    private String name;
     @ColumnInfo(name = COLNAME_STATUS)
     private AssessmentStatus status;
     @ColumnInfo(name = COLNAME_GOAL_DATE)
@@ -26,11 +30,13 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
     private AssessmentType type;
 
     @Ignore
-    protected AbstractAssessmentEntity(Long id, Long courseId, String code, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate) {
+    protected AbstractAssessmentEntity(Long id, Long courseId, String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate) {
         super(id, notes);
         this.courseId = courseId;
         this.completionDate = completionDate;
         this.code = SINGLE_LINE_NORMALIZER.apply(code);
+        String s = SINGLE_LINE_NORMALIZER.apply(name);
+        this.name = (s.isEmpty()) ? null : name;
         this.status = (null == status) ? AssessmentStatus.NOT_STARTED : status;
         this.goalDate = goalDate;
         this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
@@ -42,6 +48,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
         this.courseId = source.courseId;
         this.completionDate = source.completionDate;
         this.code = source.code;
+        this.name = source.name;
         this.status = source.status;
         this.goalDate = source.goalDate;
         this.type = source.type;
@@ -85,6 +92,23 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
     }
 
     /**
+     * Gets the title for the assessment.
+     *
+     * @return The course title, which is always single-line, whitespace-normalized and trimmed if it is not null.
+     */
+    @Override
+    @Nullable
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        String s = SINGLE_LINE_NORMALIZER.apply(name);
+        this.name = (s.isEmpty()) ? null : name;
+    }
+
+    /**
      * Gets the current or final status value for the assessment.
      *
      * @return The current or final status value for the assessment.
@@ -100,7 +124,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
      * @param status The new status value for the assessment.
      */
     public void setStatus(AssessmentStatus status) {
-        this.status = (null == status) ? AssessmentStatus.NOT_STARTED : status;
+        this.status = (null == status) ? AssessmentStatusConverter.DEFAULT : status;
     }
 
     /**
@@ -166,14 +190,16 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
                 type == other.getType() &&
                 code.equals(other.getCode()) &&
                 status == other.getStatus() &&
+                Objects.equals(name, other.getName()) &&
                 Objects.equals(goalDate, other.getGoalDate()) &&
+                Objects.equals(name, other.getName()) &&
                 Objects.equals(completionDate, other.getCompletionDate()) &&
                 getNotes().equals(other.getNotes());
     }
 
     @Override
     protected int hashCodeFromProperties() {
-        return Objects.hash(courseId, code, status, goalDate, completionDate, type, getNotes());
+        return Objects.hash(courseId, code, name, status, goalDate, completionDate, type, getNotes());
     }
 
 }

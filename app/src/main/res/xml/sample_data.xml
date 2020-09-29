@@ -232,14 +232,28 @@
                     expectedEnd="2015-04-21"
                     actualEnd="2015-04-30"
                     competencyUnits="0">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
+                    </courseAlerts>
                     <assessments>
-                        <!-- courseId, code, status, goalDate, type, notes, evaluationDate : date = yyyy-mm-dd|expectedEnd|actualEnd -->
                         <item
                             code="ORA1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            goalDate="2015-04-25"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2015-04-21" />
+                            evaluationDate="2015-04-21">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                     </assessments>
                 </item>
                 <item
@@ -252,19 +266,33 @@
                     actualEnd="2015-06-09"
                     competencyUnits="4"
                     mentorId="1">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="3" />
+                        <item
+                            subsequent="true"
+                            leadTime="4" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG5"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2015-05-04" />
                         <item
                             code="GSC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            evaluationDate="actualEnd">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                     </assessments>
                 </item>
                 <item
@@ -277,19 +305,39 @@
                     actualEnd="2015-08-28"
                     competencyUnits="4"
                     mentorId="2">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="0" />
+                        <item
+                            subsequent="true"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PIAC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            evaluationDate="2015-08-23" />
+                            evaluationDate="2015-08-23">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                         <item
                             code="IAC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            evaluationDate="actualEnd">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                     </assessments>
                 </item>
                 <item
@@ -302,14 +350,24 @@
                     actualEnd="2015-10-23"
                     competencyUnits="4"
                     mentorId="3">
+                    <courseAlerts>
+                        <item
+                            subsequent="true"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="EKV1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
-                            <notes>CompTIA - Project+</notes>
+                            evaluationDate="actualEnd"
+                            name="CompTIA - Project+">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
                         </item>
                     </assessments>
                 </item>
@@ -331,19 +389,33 @@
                     competencyUnits="3"
                     mentorId="4">
                     <notes>was \"Reasoning and Problem Solving\"</notes>
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                        <item
+                            subsequent="true"
+                            leadTime="0" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PLMC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2016-01-17" />
                         <item
                             code="LMC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            evaluationDate="actualEnd">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                     </assessments>
                 </item>
                 <item
@@ -356,25 +428,42 @@
                     actualEnd="2016-05-07"
                     competencyUnits="3"
                     mentorId="5">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PYJC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2016-05-05" />
                         <item
                             code="YJC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-07" />
+                            evaluationDate="2016-05-07">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                         <item
                             code="YJT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd" />
+                            evaluationDate="actualEnd">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
+                        </item>
                     </assessments>
                 </item>
                 <item
@@ -387,38 +476,63 @@
                     actualEnd="2016-06-05"
                     competencyUnits="3"
                     mentorId="6">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="DIT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-15">
-                            <notes>Task 1</notes>
+                            evaluationDate="2016-05-15"
+                            name="Task 1">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
                         </item>
                         <item
                             code="DIT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-22">
-                            <notes>Task 2</notes>
+                            evaluationDate="2016-05-22"
+                            name="Task 2">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
                         </item>
                         <item
                             code="DIT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="2016-05-28">
-                            <notes>Task 3</notes>
+                            evaluationDate="2016-05-28"
+                            name="Task 3">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
                         </item>
                         <item
                             code="DIT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd">
-                            <notes>Task 4</notes>
+                            evaluationDate="actualEnd"
+                            name="Task 4">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    leadTime="4" />
+                            </assessmentAlerts>
                         </item>
                     </assessments>
                 </item>
@@ -432,23 +546,26 @@
                     actualEnd="2016-07-05"
                     competencyUnits="3"
                     mentorId="6">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="DJT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd">
-                            <notes>Task 1</notes>
-                        </item>
+                            evaluationDate="actualEnd"
+                            name="Task 1" />
                         <item
                             code="DJT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            evaluationDate="actualEnd">
-                            <notes>Task 2</notes>
-                        </item>
+                            evaluationDate="actualEnd"
+                            name="Task 2" />
                     </assessments>
                 </item>
             </courses>
@@ -468,15 +585,19 @@
                     actualEnd="2016-10-22"
                     competencyUnits="4"
                     mentorId="7">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="KEV1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
-                            <notes>CompTIA A+ Part 1/2</notes>
-                        </item>
+                            evaluationDate="actualEnd"
+                            name="CompTIA A+ Part 1/2" />
                     </assessments>
                 </item>
                 <item
@@ -489,17 +610,22 @@
                     actualEnd="2016-12-28"
                     competencyUnits="4"
                     mentorId="8">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PCEC"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2016-12-13" />
                         <item
                             code="CEC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -514,15 +640,19 @@
                     actualEnd="2016-12-28"
                     competencyUnits="4"
                     mentorId="7">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="KFV1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            evaluationDate="actualEnd">
-                            <notes>CompTIA - A+</notes>
-                        </item>
+                            evaluationDate="actualEnd"
+                            name="CompTIA - A+" />
                     </assessments>
                 </item>
             </courses>
@@ -542,17 +672,22 @@
                     actualEnd="2017-02-22"
                     competencyUnits="3"
                     mentorId="9">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PCGO"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-01-05" />
                         <item
                             code="CGO1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -567,29 +702,34 @@
                     actualEnd="2017-05-08"
                     competencyUnits="3"
                     mentorId="10">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PCKC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-02-22" />
                         <item
                             code="PCKC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-05-03" />
                         <item
                             code="CKC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="2017-05-08" />
                         <item
                             code="UXT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -604,23 +744,28 @@
                     actualEnd="2017-05-23"
                     competencyUnits="4"
                     mentorId="11">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PDQC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-05-09" />
                         <item
                             code="VGT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="2017-05-21" />
                         <item
                             code="DQC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -635,17 +780,22 @@
                     actualEnd="2017-07-22"
                     competencyUnits="3"
                     mentorId="12">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PJQC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-07-19" />
                         <item
                             code="JQC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -667,17 +817,22 @@
                     actualEnd="2017-08-11"
                     competencyUnits="3"
                     mentorId="13">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PHTC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-08-02" />
                         <item
                             code="HTC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -692,11 +847,16 @@
                     actualEnd="2017-10-30"
                     competencyUnits="2"
                     mentorId="9">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="BRP1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -711,11 +871,16 @@
                     actualEnd="2017-11-29"
                     competencyUnits="3"
                     mentorId="9">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="HCV1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -730,17 +895,22 @@
                     actualEnd="2018-01-03"
                     competencyUnits="3"
                     mentorId="14">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PIBC"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2017-12-26" />
                         <item
                             code="IBC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -755,11 +925,16 @@
                     actualEnd="2018-01-31"
                     competencyUnits="3"
                     mentorId="15">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="GVC1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -781,17 +956,22 @@
                     actualEnd="2018-05-15"
                     competencyUnits="3"
                     mentorId="16">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PFKO"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2018-04-13" />
                         <item
                             code="FKO1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -806,23 +986,28 @@
                     actualEnd="2018-07-28"
                     competencyUnits="4"
                     mentorId="17">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PFJO"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2018-05-15" />
                         <item
                             code="FJO1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="2018-06-02" />
                         <item
                             code="VHT1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -837,11 +1022,16 @@
                     actualEnd="2018-07-27"
                     competencyUnits="4"
                     mentorId="9">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="FPV1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -856,11 +1046,16 @@
                     actualEnd="2018-08-09"
                     competencyUnits="3"
                     mentorId="18">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="EWP1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -882,11 +1077,16 @@
                     actualEnd="2018-11-20"
                     competencyUnits="4"
                     mentorId="19">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="FRV1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -901,17 +1101,22 @@
                     actualEnd="2019-01-30"
                     competencyUnits="3"
                     mentorId="19">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG7"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2018-10-31" />
                         <item
                             code="ACO1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -926,11 +1131,16 @@
                     actualEnd="2019-02-01"
                     competencyUnits="6"
                     mentorId="9">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="AAO1"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="2019-01-31" />
                     </assessments>
@@ -952,11 +1162,16 @@
                     actualEnd="2019-05-28"
                     competencyUnits="6"
                     mentorId="19">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="GYP1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -971,11 +1186,16 @@
                     actualEnd="2019-07-04"
                     competencyUnits="4"
                     mentorId="19">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="DIP1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -990,17 +1210,22 @@
                     actualEnd="2019-07-31"
                     competencyUnits="4"
                     mentorId="19">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG8"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2019-01-30" />
                         <item
                             code="AAO1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -1022,17 +1247,22 @@
                     actualEnd="2019-10-10"
                     competencyUnits="3"
                     mentorId="20">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG9"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2019-10-02" />
                         <item
                             code="AEO1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -1047,11 +1277,16 @@
                     actualEnd="2020-05-08"
                     competencyUnits="6"
                     mentorId="21">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="GZP1"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -1066,17 +1301,22 @@
                     actualEnd="2020-05-08"
                     competencyUnits="3"
                     mentorId="21">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="PADO"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PRE_ASSESSMENT"
                             evaluationDate="2019-10-02" />
                         <item
                             code="ADO1"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -1098,11 +1338,16 @@
                     actualEnd="2020-08-05"
                     competencyUnits="6"
                     mentorId="22">
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="7" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="GZP1"
                             status="PASSED"
-                            goalDate="expectedEnd"
+                            completionDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             evaluationDate="actualEnd" />
                     </assessments>
@@ -1115,9 +1360,11 @@
                     expectedEnd="2020-09-30"
                     competencyUnits="3"
                     mentorId="23">
-                    <courseAlert
-                        endAlert="true"
-                        leadTime="3" />
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="3" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="ABM1"
@@ -1141,34 +1388,36 @@
                     expectedStart="2020-10-01"
                     expectedEnd="2020-12-31"
                     competencyUnits="4">
-                    <courseAlert
-                        endAlert="false"
-                        leadTime="4" />
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            leadTime="4" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
                             goalDate="2020-10-15"
-                            type="PERFORMANCE_EVALUATION">
-                            <notes>Task 1</notes>
-                            <assessmentAlert
-                                goalAlert="true"
-                                leadTime="4" />
+                            type="PERFORMANCE_EVALUATION"
+                            name="Task 1">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="true"
+                                    leadTime="4" />
+                            </assessmentAlerts>
                         </item>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
                             goalDate="2020-09-20"
-                            type="PERFORMANCE_EVALUATION">
-                            <notes>Task 2</notes>
-                        </item>
+                            type="PERFORMANCE_EVALUATION"
+                            name="Task 2" />
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
                             goalDate="expectedEnd"
-                            type="PERFORMANCE_EVALUATION">
-                            <notes>Task 3</notes>
-                        </item>
+                            type="PERFORMANCE_EVALUATION"
+                            name="Task 3" />
                     </assessments>
                 </item>
                 <item

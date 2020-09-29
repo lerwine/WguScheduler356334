@@ -18,13 +18,13 @@ public class CourseAlertEntity extends AbstractCourseAlertEntity<CourseAlertEnti
      */
     public static final String INDEX_COURSE = "IDX_GOAL_ALERT_COURSE";
 
-    public CourseAlertEntity(long courseId, boolean endAlert, int leadTime, long id) {
-        super(id, courseId, endAlert, leadTime);
+    public CourseAlertEntity(long courseId, boolean subsequent, int leadTime, long id) {
+        super(id, courseId, subsequent, leadTime);
     }
 
     @Ignore
-    public CourseAlertEntity(long courseId, boolean endAlert, int leadTime) {
-        super(null, courseId, endAlert, leadTime);
+    public CourseAlertEntity(long courseId, boolean subsequent, int leadTime) {
+        super(null, courseId, subsequent, leadTime);
     }
 
     @Ignore
