@@ -58,6 +58,11 @@ public class AlertListAdapter extends RecyclerView.Adapter<AlertListAdapter.View
             typeTextView = view.findViewById(R.id.typeTextView);
             codeTextView = view.findViewById(R.id.codeTextView);
             titleTextView = view.findViewById(R.id.titleTextView);
+            view.setOnClickListener(this::onViewClick);
+        }
+
+        private void onViewClick(View view) {
+            // TODO: Display popup to view/manage alert
         }
 
         public void setItem(AlertListItem alertListItem) {

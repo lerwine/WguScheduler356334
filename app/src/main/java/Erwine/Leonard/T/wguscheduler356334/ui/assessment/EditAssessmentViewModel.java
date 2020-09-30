@@ -35,7 +35,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
@@ -81,7 +80,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public static void startViewAssessmentActivity(@NonNull Context context, long assessmentId) {
         Intent intent = new Intent(context, ViewAssessmentActivity.class);
-        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Course.COLNAME_ID, false), assessmentId);
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_ID, false), assessmentId);
         context.startActivity(intent);
     }
 
@@ -309,8 +308,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         String s = assessmentEntity.getName();
         titleLiveData.postValue((null == s) ? assessmentEntity.getCode() : assessmentEntity.getCode() + " - " + s);
         entityLiveData.postValue(assessmentEntity);
-        termsLiveData.observeForever(termsLoadedObserver);
-        coursesLiveData.observeForever(coursesLoadedObserver);
     }
 
     private void onEntityLoadedFromDb(AssessmentDetails entity) {

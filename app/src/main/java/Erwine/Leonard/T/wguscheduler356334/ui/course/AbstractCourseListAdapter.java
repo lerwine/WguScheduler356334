@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.course;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
 public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T>, U extends AbstractCourseListAdapter<T, U>.AbstractViewHolder> extends RecyclerView.Adapter<U> {
 
+    private static final String LOG_TAG = AbstractCourseListAdapter.class.getName();
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     private final List<T> items;
 
@@ -65,6 +67,7 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
 
         @SuppressWarnings("ConstantConditions")
         private void onViewClick(View view) {
+            Log.d(LOG_TAG, "Viewing assessment " + item);
             EditCourseViewModel.startViewCourseActivity(view.getContext(), item.getId());
         }
 

@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 
 public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAdapter.ViewHolder> {
 
+    private static final String LOG_TAG = AssessmentListAdapter.class.getName();
     private final List<AssessmentEntity> items;
     private final Context context;
 
@@ -69,6 +71,7 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
 
         @SuppressWarnings("ConstantConditions")
         private void onViewClick(View view) {
+            Log.d(LOG_TAG, "Viewing assessment " + item);
             EditAssessmentViewModel.startViewAssessmentActivity(view.getContext(), item.getId());
         }
 

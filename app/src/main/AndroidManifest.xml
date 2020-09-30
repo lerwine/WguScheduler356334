@@ -11,7 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".AddAssessmentActivity"></activity>
+        <activity
+            android:name=".AddAssessmentActivity"
+            android:label="@string/title_activity_add_assessment" />
         <activity
             android:name=".ViewAssessmentActivity"
             android:label="@string/title_activity_view_assessment"

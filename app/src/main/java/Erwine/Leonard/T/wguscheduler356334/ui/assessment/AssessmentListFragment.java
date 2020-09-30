@@ -80,6 +80,7 @@ public class AssessmentListFragment extends Fragment {
     }
 
     private void onEntityLoaded(CourseDetails entity) {
+        Log.d(LOG_TAG, "Loaded course details " + entity);
         Long courseId = entity.getId();
         if (null != courseId) {
             assessmentListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentListViewModel.class);

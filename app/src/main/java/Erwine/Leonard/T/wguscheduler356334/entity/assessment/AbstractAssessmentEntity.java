@@ -34,7 +34,9 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
     @Ignore
     protected AbstractAssessmentEntity(Long id, Long courseId, String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate) {
         super(id, notes);
-        this.courseId = courseId;
+        if (null != courseId) {
+            this.courseId = courseId;
+        }
         this.completionDate = completionDate;
         this.code = SINGLE_LINE_NORMALIZER.apply(code);
         String s = SINGLE_LINE_NORMALIZER.apply(name);
