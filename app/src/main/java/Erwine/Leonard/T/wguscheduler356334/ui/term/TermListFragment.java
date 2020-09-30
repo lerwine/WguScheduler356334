@@ -21,8 +21,8 @@ import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
 public class TermListFragment extends Fragment {
 
@@ -42,7 +42,7 @@ public class TermListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView mTermsRecyclerView = view.findViewById(R.id.termsRecyclerView);
-        mAdapter = new TermListAdapter(mItems, getContext());
+        mAdapter = new TermListAdapter(mItems, requireContext());
         mTermsRecyclerView.setAdapter(mAdapter);
 
         mTermsRecyclerView.setHasFixedSize(true);

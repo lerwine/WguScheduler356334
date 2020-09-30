@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
 import static Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel.FORMATTER;

@@ -8,18 +8,18 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentAlertEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseAlertEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
 @Database(
         entities = {TermEntity.class, MentorEntity.class, CourseEntity.class, CourseAlertEntity.class, AssessmentEntity.class, AssessmentAlertEntity.class},
@@ -36,6 +36,13 @@ public abstract class AppDb extends RoomDatabase {
     public static final String TABLE_NAME_ASSESSMENTS = "assessments";
     public static final String TABLE_NAME_COURSE_ALERTS = "courseAlerts";
     public static final String TABLE_NAME_ASSESSMENT_ALERTS = "assessmentAlerts";
+    public static final String VIEW_NAME_ALERT_LIST_ITEM = "alertListItemView";
+    public static final String VIEW_NAME_MENTOR_COURSE_LIST = "mentorCourseListView";
+    public static final String VIEW_NAME_ASSESSMENT_DETAIL = "assessmentDetailView";
+    public static final String VIEW_NAME_COURSE_DETAIL = "courseDetailView";
+    public static final String VIEW_NAME_TERM_COURSE_LIST = "termCourseListView";
+    public static final String VIEW_NAME_MENTOR_LIST = "mentorListView";
+    public static final String VIEW_NAME_TERM_LIST = "termListView";
     private static volatile AppDb instance;
     private static final Object SYNC_ROOT = new Object();
 
@@ -50,6 +57,8 @@ public abstract class AppDb extends RoomDatabase {
     public abstract AssessmentDAO assessmentDAO();
 
     public abstract AssessmentAlertDAO assessmentAlertDAO();
+
+    public abstract AlertDAO alertDAO();
 
     static AppDb getInstance(Context context) {
         if (null == instance) {

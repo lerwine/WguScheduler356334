@@ -12,30 +12,27 @@ import androidx.preference.PreferenceManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -575,6 +572,21 @@ public class DbLoader {
     }
 
     @NonNull
+    public LiveData<List<AlertListItem>> getActiveAlertsOnDate(LocalDate date) {
+        return appDb.alertDAO().getActiveOnDate(date);
+    }
+
+    @NonNull
+    public LiveData<List<AlertListItem>> getActiveAlertsAfterDate(LocalDate date) {
+        return appDb.alertDAO().getActiveAfterDate(date);
+    }
+
+    @NonNull
+    public LiveData<List<AlertListItem>> getActiveAlertsBeforeDate(LocalDate date) {
+        return appDb.alertDAO().getActiveBeforeDate(date);
+    }
+
+    @NonNull
     public Single<String> checkDbIntegrity() {
         return Single.fromCallable(() -> {
             List<Long> termIds;
@@ -645,123 +657,8 @@ public class DbLoader {
     }
 
     @NonNull
-    private HashMap<Integer, Long> createSampleTerms(Resources resources) {
-        List<TermEntity> entities = new ArrayList<>();
-        for (String csv : resources.getStringArray(R.array.sample_terms)) {
-            List<String> cells = parseSampleDataCells(csv, 4);
-            TermEntity term = new TermEntity(cells.get(0), LocalDate.parse(cells.get(1)), LocalDate.parse(cells.get(2)), cells.get(3));
-            Log.d(LOG_TAG, String.format("Creating: %s", term));
-            entities.add(term);
-        }
-        List<Long> ids = appDb.termDAO().insertAllSynchronous(entities);
-        HashMap<Integer, Long> result = new HashMap<>();
-        int index = 0;
-        while (index < ids.size()) {
-            long id = ids.get(index);
-            TermEntity term = entities.get(index);
-            term.setId(id);
-            Log.d(LOG_TAG, String.format("ID %d applied to %s", id, term));
-            result.put(++index, id);
-        }
-        return result;
-    }
-
-    @NonNull
-    private HashMap<Integer, Long> createSampleMentors(Resources resources) {
-        List<MentorEntity> entities = new ArrayList<>();
-        for (String csv : resources.getStringArray(R.array.sample_mentors)) {
-            List<String> cells = parseSampleDataCells(csv, 4);
-            MentorEntity mentor = new MentorEntity(cells.get(0), cells.get(1), cells.get(2), cells.get(3));
-            Log.d(LOG_TAG, String.format("Creating: %s", mentor));
-            entities.add(mentor);
-        }
-        List<Long> ids = appDb.mentorDAO().insertAllSynchronous(entities);
-        HashMap<Integer, Long> result = new HashMap<>();
-        int index = 0;
-        while (index < ids.size()) {
-            long id = ids.get(index);
-            MentorEntity mentor = entities.get(index);
-            mentor.setId(id);
-            Log.d(LOG_TAG, String.format("ID %d applied to %s", id, mentor));
-            result.put(++index, id);
-        }
-        return result;
-    }
-
-    @NonNull
-    private HashMap<Integer, CourseEntity> createSampleCourses(Resources resources, @NonNull HashMap<Integer, Long> sampleTerms, @NonNull HashMap<Integer, Long> sampleMentors) {
-        List<CourseEntity> entities = new ArrayList<>();
-        HashMap<String, CourseStatus> statusMap = new HashMap<>();
-        for (CourseStatus cs : CourseStatus.values()) {
-            statusMap.put(cs.name(), cs);
-        }
-        Function<String, LocalDate> parseDateCell = t -> (t.isEmpty()) ? null : LocalDate.parse(t);
-        for (String csv : resources.getStringArray(R.array.sample_courses)) {
-            List<String> cells = parseSampleDataCells(csv, 11);
-            String c = cells.get(8);
-            String m = cells.get(10);
-            CourseEntity course = new CourseEntity(cells.get(1), cells.get(2), statusMap.get(cells.get(3)), parseDateCell.apply(cells.get(4)), parseDateCell.apply(cells.get(5)),
-                    parseDateCell.apply(cells.get(6)), parseDateCell.apply(cells.get(7)), (c.isEmpty()) ? 0 : Integer.parseInt(c), cells.get(9),
-                    Objects.requireNonNull(sampleTerms.get(Integer.parseInt(cells.get(0)))), (m.isEmpty()) ? null : sampleMentors.get(Integer.parseInt(m)));
-            Log.d(LOG_TAG, String.format("Creating: %s", course));
-            entities.add(course);
-        }
-        List<Long> ids = appDb.courseDAO().insertAllSynchronous(entities);
-        HashMap<Integer, CourseEntity> result = new HashMap<>();
-        int index = 0;
-        while (index < ids.size()) {
-            CourseEntity e = entities.get(index);
-            Long id = ids.get(index);
-            e.setId(id);
-            Log.d(LOG_TAG, String.format("ID %d applied to %s", id, e));
-            result.put(++index, e);
-        }
-        return result;
-    }
-
-    @NonNull
     public Completable populateSampleData(Resources resources) {
         return Completable.fromAction(new SampleDataLoader(this, resources)).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
-//        return Completable.fromAction(() -> {
-//            resetDb();
-//            XmlResourceParser sampleDataParser = resources.getXml(R.xml.sample_data);
-//            int eventType = sampleDataParser.nextTag();
-//            if (eventType != XmlPullParser.START_TAG || (eventType = sampleDataParser.nextTag()) != XmlPullParser.START_TAG) {
-//                throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d", eventType));
-//            }
-//            HashMap<String, MentorEntity> mentorMap = populateSampleMentors(sampleDataParser);
-//            if ((eventType = sampleDataParser.nextTag()) != XmlPullParser.START_TAG) {
-//                throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d", eventType));
-//            }
-//            if (!sampleDataParser.getName().equals(AppDb.TABLE_NAME_TERMS)) {
-//                throw new UnsupportedOperationException(String.format("Unsupported element name: %s", sampleDataParser.getName()));
-//            }
-//            while ((eventType = sampleDataParser.nextTag()) == XmlPullParser.START_TAG) {
-//                populateSampleTerm(mentorMap, sampleDataParser);
-//            }
-//            HashMap<Integer, Long> sampleTerms = createSampleTerms(resources);
-//            HashMap<Integer, Long> sampleMentors = createSampleMentors(resources);
-//            HashMap<Integer, CourseEntity> sampleCourses = createSampleCourses(resources, sampleTerms, sampleMentors);
-//
-//            AssessmentDAO assessmentDAO = appDb.assessmentDAO();
-//            HashMap<String, AssessmentStatus> am = new HashMap<>();
-//            for (AssessmentStatus a : AssessmentStatus.values()) {
-//                am.put(a.name(), a);
-//            }
-//            HashMap<String, AssessmentType> at = new HashMap<>();
-//            for (AssessmentType a : AssessmentType.values()) {
-//                at.put(a.name(), a);
-//            }
-//            assessmentDAO.insertAllSynchronous(Arrays.stream(resources.getStringArray(R.array.sample_assessments)).map(t -> {
-//                // 0=courseId, 1=code, 2=status, 3=goalDate, 4=type, 5=notes, 6=evaluationDate
-//                List<String> cells = parseSampleDataCells(t, 7);
-//                CourseEntity course = Objects.requireNonNull(sampleCourses.get(Integer.parseInt(cells.get(0))));
-//                @SuppressWarnings("ConstantConditions") AssessmentEntity assessment = new AssessmentEntity(cells.get(1), am.get(cells.get(2)), sampleCellToLocalDate(cells.get(3), course), at.get(cells.get(4)), cells.get(5),
-//                        sampleCellToLocalDate(cells.get(6), course), course.getId());
-//                Log.d(LOG_TAG, String.format("Creating: %s", assessment));
-//                return assessment;
-//            }).collect(Collectors.toList()));
-//        }).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
 }

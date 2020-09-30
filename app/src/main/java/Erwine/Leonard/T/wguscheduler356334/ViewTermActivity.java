@@ -17,7 +17,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.ViewTermPagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;

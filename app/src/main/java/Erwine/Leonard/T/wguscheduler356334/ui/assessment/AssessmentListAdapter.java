@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 
 public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAdapter.ViewHolder> {
 
@@ -54,8 +54,8 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-            codeTextView = view.findViewById(R.id.codeTextView);
-            statusTextView = view.findViewById(R.id.typeTextView);
+            codeTextView = view.findViewById(R.id.typeTextView);
+            statusTextView = view.findViewById(R.id.statusTextView);
             adjTextView = view.findViewById(R.id.adjTextView);
             dateTextView = view.findViewById(R.id.dateTextView);
             view.setOnClickListener(this::onViewClick);

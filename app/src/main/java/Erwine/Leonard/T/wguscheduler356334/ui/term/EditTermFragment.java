@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 

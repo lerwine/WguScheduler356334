@@ -18,13 +18,8 @@
         tools:layout="@layout/fragment_mentor_list" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.notification.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
-
-    <!--    <fragment-->
-    <!--        android:id="@+id/settingsFragment"-->
-    <!--        android:name="Erwine.Leonard.T.wguscheduler356334.SettingsFragment"-->
-    <!--        android:label="SettingsFragment" />-->
+        android:id="@+id/navigation_alerts"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.alert.AlertListFragment"
+        android:label="@string/title_alerts"
+        tools:layout="@layout/fragment_alert_list" />
 </navigation>

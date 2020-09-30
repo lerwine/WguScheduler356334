@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 
 public class MentorListViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;

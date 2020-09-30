@@ -3,8 +3,8 @@ package Erwine.Leonard.T.wguscheduler356334.db;
 import androidx.annotation.Nullable;
 import androidx.room.TypeConverter;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 
 public class AssessmentStatusConverter {
     private static final AssessmentStatus[] VALUES = AssessmentStatus.values();

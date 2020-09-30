@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
 public class TermListViewModel extends AndroidViewModel {
 

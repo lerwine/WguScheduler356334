@@ -67,8 +67,9 @@
     <style name="WGU.Scheduler.ImageButtonStyle" parent="@style/TextAppearance.AppCompat.Widget.Button.Colored">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/color_on_secondary</item>
+        <item name="android:textColor">@color/color_on_primary</item>
         <item name="android:layout_gravity">end</item>
+        <item name="android:tint">@color/color_on_primary</item>
         <item name="android:backgroundTint">@color/color_accent</item>
         <item name="maxImageSize">42dp</item>
         <item name="android:padding">8dp</item>
@@ -77,10 +78,14 @@
         <item name="android:layout_marginHorizontal">8dp</item>
     </style>
 
+    <style name="WGU.Scheduler.AlertImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
+        <item name="android:src">@drawable/alerts_icon</item>
+        <item name="srcCompat">@drawable/alerts_icon</item>
+    </style>
+
     <style name="WGU.Scheduler.SaveImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
         <item name="android:src">@drawable/save_icon</item>
         <item name="srcCompat">@drawable/save_icon</item>
-        <item name="android:contentDescription">@string/command_save_changes</item>
     </style>
 
     <style name="WGU.Scheduler.DeleteImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
@@ -91,7 +96,6 @@
     <style name="WGU.Scheduler.CancelImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
         <item name="android:src">@drawable/undo_icon</item>
         <item name="srcCompat">@drawable/undo_icon</item>
-        <item name="android:contentDescription">@android:string/cancel</item>
     </style>
 
     <style name="WGU.Scheduler.FieldLabel" parent="TextAppearance.AppCompat.Medium">
@@ -204,11 +208,11 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">end</item>
-        <item name="android:background">@android:drawable/btn_default</item>
-        <item name="android:backgroundTint">@color/color_accent</item>
+        <item name="android:background">@drawable/command_button_selector</item>
         <item name="maxImageSize">42dp</item>
         <item name="android:paddingHorizontal">8dp</item>
         <item name="android:textColor">@color/color_on_primary</item>
     </style>
+    =
 
 </resources>

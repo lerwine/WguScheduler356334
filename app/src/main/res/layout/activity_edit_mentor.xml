@@ -24,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:autofillHints="name"
             android:inputType="textPersonName" />
 
         <TextView
@@ -40,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:autofillHints="phone"
             android:inputType="phone" />
 
         <TextView
@@ -56,6 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:autofillHints="emailAddress"
             android:inputType="textEmailAddress" />
 
         <TextView
@@ -73,6 +76,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:gravity="start|top"
+            android:importantForAutofill="no"
             android:inputType="textMultiLine" />
 
         <LinearLayout
@@ -83,15 +87,18 @@
 
             <ImageButton
                 android:id="@+id/saveMentorImageButton"
-                style="@style/WGU.Scheduler.SaveImageButtonStyle" />
+                style="@style/WGU.Scheduler.SaveImageButtonStyle"
+                android:contentDescription="@string/command_save_changes" />
 
             <ImageButton
                 android:id="@+id/deleteMentorImageButton"
-                style="@style/WGU.Scheduler.DeleteImageButtonStyle" />
+                style="@style/WGU.Scheduler.DeleteImageButtonStyle"
+                android:contentDescription="@string/command_delete" />
 
             <ImageButton
                 android:id="@+id/cancelImageButton"
-                style="@style/WGU.Scheduler.CancelImageButtonStyle" />
+                style="@style/WGU.Scheduler.CancelImageButtonStyle"
+                android:contentDescription="@android:string/cancel" />
         </LinearLayout>
     </LinearLayout>
 

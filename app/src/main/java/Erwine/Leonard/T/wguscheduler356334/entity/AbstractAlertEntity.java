@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 
+import java.util.Objects;
+
 public abstract class AbstractAlertEntity<T extends AbstractAlertEntity<T>> extends AbstractEntity<T> implements Alert {
 
     @ColumnInfo(name = COLNAME_SUBSEQUENT)
@@ -60,6 +62,11 @@ public abstract class AbstractAlertEntity<T extends AbstractAlertEntity<T>> exte
     @Override
     protected boolean equalsEntity(@NonNull T other) {
         return subsequent == other.isSubsequent() && leadTime == other.getLeadTime();
+    }
+
+    @Override
+    protected int hashCodeFromProperties() {
+        return Objects.hash(subsequent, leadTime);
     }
 
 }

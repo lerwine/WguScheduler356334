@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 
 public final class AssessmentListViewModel extends AndroidViewModel {
 

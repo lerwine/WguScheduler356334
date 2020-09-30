@@ -11,10 +11,10 @@ import androidx.room.Update;
 import java.time.LocalDate;
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 

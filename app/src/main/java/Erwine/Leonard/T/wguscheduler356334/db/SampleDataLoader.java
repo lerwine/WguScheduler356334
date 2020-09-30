@@ -18,21 +18,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.Assessment;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentAlert;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentAlertEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
-import Erwine.Leonard.T.wguscheduler356334.entity.Course;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseAlert;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseAlertEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.Mentor;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.Term;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import io.reactivex.functions.Action;
 
 public class SampleDataLoader implements Action {
@@ -231,7 +231,6 @@ public class SampleDataLoader implements Action {
             return "";
         }
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        // FIXME: org.xmlpull.v1.XmlPullParserException: Binary XML file line #6: expected start or end tag (position:Binary XML file line #6)
         String text = getText().orElse("");
         xmlParser.require(XmlPullParser.END_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         if (xmlParser.nextTag() != XmlPullParser.START_TAG) {

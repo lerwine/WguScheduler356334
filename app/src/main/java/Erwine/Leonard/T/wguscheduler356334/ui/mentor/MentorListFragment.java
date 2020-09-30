@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 
 /**
  * A fragment representing a list of Items.

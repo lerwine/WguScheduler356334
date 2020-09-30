@@ -7,7 +7,7 @@
     <string name="command_reset_database">Reset Database</string>
     <string name="command_reset_with_sample_data">Reset with Sample Data</string>
     <string name="command_save_changes">Save Changes</string>
-    <string name="command_save_notes">Save Notes</string>
+    <string name="command_manage_alerts">Manage Alerts</string>
     <string name="format_message_add_sample_data_error">An unexpected error has occurred while populating sample data: %s</string>
     <string name="format_message_delete_error">An unexpected error has occurred while removing the record from the database: %s</string>
     <string name="format_message_read_error">An unexpected error has occurred while retrieving the record to the database: %s</string>
@@ -55,9 +55,11 @@
     <string name="message_course_id_not_specified">Course ID not specified</string>
     <string name="message_course_no_assessments">Course has no assessments.</string>
     <string name="message_course_number_required">Course number cannot be empty</string>
+    <string name="message_assessment_code_required">Assessment Code cannot be empty</string>
     <string name="message_delete_mentor_confirm">This action cannot be undone!\n\nAre you sure you want to delete this mentor?</string>
     <string name="message_delete_term_confirm">This action cannot be undone!\n\nAre you sure you want to delete this term?</string>
     <string name="message_delete_course_confirm">This action cannot be undone!\n\nAre you sure you want to delete this course?</string>
+    <string name="message_delete_assessment_confirm">This action cannot be undone!\n\nAre you sure you want to delete this assessment?</string>
     <string name="message_discard_changes">There are changes which have not been saved.\n\nDiscard unsaved changes?</string>
     <string name="message_edit_email_addresses">Edit email addresses</string>
     <string name="message_edit_phone_numbers">Edit phone numbers</string>
@@ -78,6 +80,7 @@
     <string name="message_term_id_not_specified">Term ID not specified</string>
     <string name="message_term_no_courses">Term has no courses.</string>
     <string name="message_term_not_selected">Term not selected</string>
+    <string name="message_course_not_selected">Course not selected</string>
     <string name="message_title_required">Title cannot be empty</string>
     <string name="preference_prefer_email">prefer_email</string>
     <string name="response_no">No</string>
@@ -109,13 +112,14 @@
     <string name="title_delete_phone">Delete Phone Number</string>
     <string name="title_delete_term">Delete Term</string>
     <string name="title_delete_course">Delete Course</string>
+    <string name="title_delete_assessment">Delete Assessment</string>
     <string name="title_discard_changes">Discard Changes</string>
     <string name="title_edit_notes">Edit Notes</string>
     <string name="title_expected">Expected:</string>
     <string name="title_mentor_listing">Mentor Listing</string>
     <string name="title_mentors">Mentors</string>
     <string name="title_not_found">Not Found</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_alerts">Alerts</string>
     <string name="title_properties">Properties</string>
     <string name="title_read_error">Read Error</string>
     <string name="title_reset_database">Reset Database</string>
@@ -135,4 +139,20 @@
     <string name="label_type">Type</string>
     <string name="label_goal_date">Goal Date</string>
     <string name="label_completion_date">Completion Date</string>
+    <string name="label_active">Active</string>
+    <string name="label_past">Past</string>
+    <string name="label_upcoming">Upcoming</string>
+    <string name="message_no_alerts">No alerts to show.</string>
+    <string name="title_activity_add_assessment">Add Assessment</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="label_unknown_range">\? to ?</string>
+    <string name="format_range_end_only">\? to %s</string>
+    <string name="format_range_start_only">%s to ?</string>
+    <string name="format_range">%s to %s</string>
+    <string name="label_em_dash">–</string>
+    <string name="label_colon">:</string>
 </resources>

@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 
 public class TermCourseListAdapter extends AbstractCourseListAdapter<TermCourseListItem, TermCourseListAdapter.ViewHolder> {
 

@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;

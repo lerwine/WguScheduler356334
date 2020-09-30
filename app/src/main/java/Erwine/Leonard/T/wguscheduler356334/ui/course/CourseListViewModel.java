@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractCourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
 public abstract class CourseListViewModel<T extends AbstractCourseEntity<T>> extends AndroidViewModel {
 
@@ -31,6 +31,7 @@ public abstract class CourseListViewModel<T extends AbstractCourseEntity<T>> ext
     }
 
     public void setId(long id) {
+        // TODO: Do we need to remove listeners?
         courses = getLiveData(dbLoader, id);
     }
 

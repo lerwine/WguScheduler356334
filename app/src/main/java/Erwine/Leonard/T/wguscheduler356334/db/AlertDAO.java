@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.db;
 
 import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
 import androidx.room.Query;
 
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
 import io.reactivex.Single;
 
+@Dao
 public interface AlertDAO {
 
     @Query("SELECT * FROM alertListItemView ORDER BY alertDate DESC, eventDate DESC, code, title")
@@ -24,34 +26,34 @@ public interface AlertDAO {
     LiveData<List<AlertListItem>> getByAssessment(long assessmentId);
 
     @Query("SELECT * FROM alertListItemView WHERE NOT(eventDate IS NULL) AND alertDate < :date AND eventDate < :date ORDER BY alertDate DESC, eventDate DESC, code, title")
-    List<AlertListItem> getActiveBeforeDate(LocalDate date);
+    LiveData<List<AlertListItem>> getActiveBeforeDate(LocalDate date);
 
     @Query("SELECT * FROM alertListItemView WHERE NOT(eventDate IS NULL OR alertDate > :date OR eventDate < :date) ORDER BY alertDate, eventDate, code, title")
-    List<AlertListItem> getActiveOnDate(LocalDate date);
+    LiveData<List<AlertListItem>> getActiveOnDate(LocalDate date);
 
     @Query("SELECT * FROM alertListItemView WHERE NOT(eventDate IS NULL OR alertDate > :end OR eventDate < :start) ORDER BY alertDate, eventDate, code, title")
-    List<AlertListItem> getActiveInRange(LocalDate start, LocalDate end);
+    LiveData<List<AlertListItem>> getActiveInRange(LocalDate start, LocalDate end);
 
     @Query("SELECT * FROM alertListItemView WHERE NOT(eventDate IS NULL) AND alertDate > :date AND eventDate > :date ORDER BY alertDate, eventDate, code, title")
-    List<AlertListItem> getActiveAfterDate(LocalDate date);
+    LiveData<List<AlertListItem>> getActiveAfterDate(LocalDate date);
 
     @Query("SELECT * FROM alertListItemView WHERE eventDate IS NULL ORDER BY code, title")
-    List<AlertListItem> getDatePendingAlerts();
+    LiveData<List<AlertListItem>> getDatePendingAlerts();
 
     @Query("SELECT * FROM alertListItemView WHERE courseId=:courseId AND NOT(eventDate IS NULL) AND alertDate < :date AND eventDate < :date ORDER BY alertDate DESC, eventDate DESC, code, title")
-    List<AlertListItem> getActiveBeforeDateByCourse(LocalDate date, long courseId);
+    LiveData<List<AlertListItem>> getActiveBeforeDateByCourse(LocalDate date, long courseId);
 
     @Query("SELECT * FROM alertListItemView WHERE courseId=:courseId AND NOT(eventDate IS NULL OR alertDate > :date OR eventDate < :date) ORDER BY alertDate, eventDate, code, title")
-    List<AlertListItem> getActiveOnDateByCourse(LocalDate date, long courseId);
+    LiveData<List<AlertListItem>> getActiveOnDateByCourse(LocalDate date, long courseId);
 
     @Query("SELECT * FROM alertListItemView WHERE courseId=:courseId AND NOT(eventDate IS NULL OR alertDate > :end OR eventDate < :start) ORDER BY alertDate, eventDate, code, title")
-    List<AlertListItem> getActiveInRangeByCourse(LocalDate start, LocalDate end, long courseId);
+    LiveData<List<AlertListItem>> getActiveInRangeByCourse(LocalDate start, LocalDate end, long courseId);
 
     @Query("SELECT * FROM alertListItemView WHERE courseId=:courseId AND NOT(eventDate IS NULL) AND alertDate > :date AND eventDate > :date ORDER BY alertDate, eventDate, code, title")
-    List<AlertListItem> getActiveAfterDateByCourse(LocalDate date, long courseId);
+    LiveData<List<AlertListItem>> getActiveAfterDateByCourse(LocalDate date, long courseId);
 
     @Query("SELECT * FROM alertListItemView WHERE courseId=:courseId AND eventDate IS NULL ORDER BY code, title")
-    List<AlertListItem> getDatePendingAlertsByCourse(long courseId);
+    LiveData<List<AlertListItem>> getDatePendingAlertsByCourse(long courseId);
 
     @Query("SELECT COUNT(*) FROM alertListItemView")
     Single<Integer> getCount();

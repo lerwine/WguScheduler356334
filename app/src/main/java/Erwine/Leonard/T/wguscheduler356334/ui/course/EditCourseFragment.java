@@ -19,11 +19,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
- * Fragment for editing the properties of a {@link Erwine.Leonard.T.wguscheduler356334.entity.CourseEntity}.
+ * Fragment for editing the properties of a {@link CourseEntity}.
  * This assumes that the parent activity ({@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity} or {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity})
  * calls {@link EditCourseViewModel#initializeViewModelState(Bundle, Supplier)}.
  */
@@ -53,6 +54,7 @@ public class EditCourseFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter onViewCreated");
+        view.findViewById(R.id.alertImageButton).setOnClickListener(this::onAlertImageButtonClick);
         view.findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
         view.findViewById(R.id.deleteImageButton).setOnClickListener(this::onDeleteImageButtonClick);
         view.findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
@@ -64,6 +66,10 @@ public class EditCourseFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
+    }
+
+    private void onAlertImageButtonClick(View view) {
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.onAlertImageButtonClick
     }
 
     private void onSaveImageButtonClick(View view) {

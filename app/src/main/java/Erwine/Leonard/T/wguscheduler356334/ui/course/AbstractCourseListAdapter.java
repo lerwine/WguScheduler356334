@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractCourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
 public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T>, U extends AbstractCourseListAdapter<T, U>.AbstractViewHolder> extends RecyclerView.Adapter<U> {
 
@@ -48,9 +48,9 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
         protected AbstractViewHolder(View view) {
             super(view);
             this.view = view;
-            courseNumberTextView = (TextView) view.findViewById(R.id.codeTextView);
+            courseNumberTextView = (TextView) view.findViewById(R.id.typeTextView);
             titleTextView = (TextView) view.findViewById(R.id.titleTextView);
-            statusTextView = (TextView) view.findViewById(R.id.typeTextView);
+            statusTextView = (TextView) view.findViewById(R.id.statusTextView);
             rangeTextView = (TextView) view.findViewById(R.id.rangeTextView);
             view.setOnClickListener(this::onViewClick);
         }

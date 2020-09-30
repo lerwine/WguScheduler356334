@@ -9,8 +9,8 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.MentorListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 

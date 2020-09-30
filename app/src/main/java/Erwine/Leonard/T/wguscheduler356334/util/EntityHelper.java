@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
 public class EntityHelper {
     @NonNull

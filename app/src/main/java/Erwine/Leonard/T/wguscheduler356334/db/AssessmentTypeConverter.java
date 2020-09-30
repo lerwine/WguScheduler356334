@@ -3,7 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.db;
 import androidx.annotation.Nullable;
 import androidx.room.TypeConverter;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 
 public final class AssessmentTypeConverter {
     private static final AssessmentType[] VALUES = AssessmentType.values();

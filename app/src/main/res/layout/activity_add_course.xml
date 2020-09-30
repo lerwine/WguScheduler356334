@@ -23,12 +23,14 @@
     <ImageButton
         android:id="@+id/saveImageButton"
         style="@style/WGU.Scheduler.SaveImageButtonStyle"
+        android:contentDescription="@string/command_save_changes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
 
     <ImageButton
         android:id="@+id/cancelImageButton"
         style="@style/WGU.Scheduler.CancelImageButtonStyle"
+        android:contentDescription="@android:string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

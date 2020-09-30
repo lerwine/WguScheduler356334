@@ -21,8 +21,8 @@ import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 

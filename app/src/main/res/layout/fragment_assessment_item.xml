@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/codeTextView"
+        android:id="@+id/typeTextView"
         style="@style/list_item_text_primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,13 +14,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/typeTextView"
+        android:id="@+id/statusTextView"
         style="@style/list_item_text_primary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/control_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/codeTextView"
+        app:layout_constraintStart_toEndOf="@+id/typeTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -31,7 +31,7 @@
         android:layout_marginEnd="@dimen/control_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typeTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/statusTextView" />
 
     <TextView
         android:id="@+id/dateTextView"
@@ -42,6 +42,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/adjTextView"
-        app:layout_constraintTop_toBottomOf="@+id/typeTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/statusTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

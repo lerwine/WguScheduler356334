@@ -12,8 +12,8 @@
         android:title="@string/title_mentors" />
 
     <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/notifications_icon"
-        android:title="@string/title_notifications" />
+        android:id="@+id/navigation_alerts"
+        android:icon="@drawable/alerts_icon"
+        android:title="@string/title_alerts" />
 
 </menu>

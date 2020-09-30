@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,28 +14,32 @@ import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractAssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractCourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AbstractTermEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.Assessment;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentStatus;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentType;
-import Erwine.Leonard.T.wguscheduler356334.entity.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.Term;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AbstractAssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
+import io.reactivex.Completable;
+import io.reactivex.Single;
 
 public class EditAssessmentViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditAssessmentViewModel.class.getName();
@@ -254,6 +259,47 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             termsLoadedObserver = this::onTermsLoaded;
             termsLiveData.observeForever(termsLoadedObserver);
         }
+    }
+
+    public synchronized Single<List<Integer>> save() {
+        ArrayList<Integer> errors = new ArrayList<>();
+        if (null == selectedCourse) {
+            errors.add(R.string.message_course_not_selected);
+        }
+        if (normalizedCode.isEmpty()) {
+            errors.add(R.string.message_assessment_code_required);
+        }
+        if (!errors.isEmpty()) {
+            Log.d(LOG_TAG, String.format("Returning %d errors", errors.size()));
+            return Single.just(errors);
+        }
+        AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
+        entity.setCode(currentValues.getCode());
+        entity.setCompletionDate(currentValues.getCompletionDate());
+        //noinspection ConstantConditions
+        entity.setCourseId(selectedCourse.getId());
+        entity.setGoalDate(currentValues.getGoalDate());
+        entity.setName(currentValues.getName());
+        entity.setStatus(currentValues.getStatus());
+        entity.setType(currentValues.getType());
+        entity.setNotes(currentValues.getNotes());
+        return dbLoader.saveAssessment(entity).toSingleDefault(Collections.emptyList());
+    }
+
+    public Completable delete() {
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
+        AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
+        return dbLoader.deleteAssessment(entity).doOnError(throwable -> Log.e(getClass().getName(),
+                "Error deleting course", throwable));
+    }
+
+    public boolean isChanged() {
+        if (currentValues.getCode().equals(assessmentEntity.getCode()) && Objects.equals(currentValues.getName(), assessmentEntity.getName()) && currentValues.getStatus() == assessmentEntity.getStatus() &&
+                Objects.equals(currentValues.getGoalDate(), assessmentEntity.getGoalDate()) && Objects.equals(currentValues.getCompletionDate(), assessmentEntity.getCompletionDate()) &&
+                currentValues.getType() == assessmentEntity.getType() && Objects.equals(currentValues.getCourseId(), assessmentEntity.getCourseId())) {
+            return !getNormalizedNotes().equals(assessmentEntity.getNotes());
+        }
+        return true;
     }
 
     private class CurrentValues implements Assessment {

@@ -10,7 +10,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertEntity;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 

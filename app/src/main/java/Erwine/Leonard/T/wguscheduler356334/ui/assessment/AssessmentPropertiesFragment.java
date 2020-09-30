@@ -19,7 +19,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
 

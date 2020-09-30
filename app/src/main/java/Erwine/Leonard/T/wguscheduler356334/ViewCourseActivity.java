@@ -16,7 +16,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.ViewCoursePagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
@@ -87,7 +87,7 @@ public class ViewCourseActivity extends AppCompatActivity {
             adapter = new ViewCoursePagerAdapter(this, getSupportFragmentManager());
             ViewPager viewPager = findViewById(R.id.view_pager);
             viewPager.setAdapter(adapter);
-            TabLayout tabs = findViewById(R.id.viewCourseTabLayout);
+            TabLayout tabs = findViewById(R.id.courseListTabLayout);
             tabs.setupWithViewPager(viewPager);
             viewModel.getTitleLiveData().observe(this, this::onTitleChanged);
         }

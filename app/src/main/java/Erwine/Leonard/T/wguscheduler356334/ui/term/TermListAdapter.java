@@ -1,6 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
 public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHolder> {
 
@@ -24,8 +23,8 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     private final List<TermListItem> entityList;
     private final Context context;
 
-    public TermListAdapter(List<TermListItem> items, Context context) {
-        this.entityList = items;
+    public TermListAdapter(List<TermListItem> entityList, Context context) {
+        this.entityList = entityList;
         this.context = context;
     }
 
@@ -37,10 +36,9 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.setItem(entityList.get(position));
+        holder.accept(entityList.get(position));
     }
 
     @Override
@@ -49,40 +47,40 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private final View mView;
+        private final View fragment_term_item;
         private final TextView termNameTextView;
         private final TextView termRangeTextView;
-        private TermListItem mItem;
+        private TermListItem listItem;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            mView = itemView;
+            fragment_term_item = itemView;
             termNameTextView = itemView.findViewById(R.id.termNameTextView);
             termRangeTextView = itemView.findViewById(R.id.termRangeTextView);
-            mView.setOnClickListener(this::onViewClick);
+            fragment_term_item.setOnClickListener(this::onViewClick);
         }
 
-        public void setItem(TermListItem item) {
-            mItem = item;
-            termNameTextView.setText(item.getName());
-            LocalDate start = item.getStart();
-            LocalDate end = item.getEnd();
+        private void accept(TermListItem listItem) {
+            this.listItem = listItem;
+            termNameTextView.setText(listItem.getName());
+            LocalDate start = listItem.getStart();
+            LocalDate end = listItem.getEnd();
             if (null == start) {
                 if (null == end) {
-                    termRangeTextView.setText("? to ?");
+                    termRangeTextView.setText(R.string.label_unknown_range);
                 } else {
-                    termRangeTextView.setText(String.format("? to %s", FORMATTER.format(end)));
+                    termRangeTextView.setText(context.getResources().getString(R.string.format_range_end_only, FORMATTER.format(end)));
                 }
             } else if (null == end) {
-                termRangeTextView.setText(String.format("%s to ?", FORMATTER.format(start)));
+                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_only, FORMATTER.format(start)));
             } else {
-                termRangeTextView.setText(String.format("%s to %s", FORMATTER.format(start), FORMATTER.format(end)));
+                termRangeTextView.setText(context.getResources().getString(R.string.format_range, FORMATTER.format(start), FORMATTER.format(end)));
             }
         }
 
         @SuppressWarnings("ConstantConditions")
         private void onViewClick(View v) {
-            EditTermViewModel.startViewTermActivity(v.getContext(), mItem.getId());
+            EditTermViewModel.startViewTermActivity(v.getContext(), listItem.getId());
         }
 
     }

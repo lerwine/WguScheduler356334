@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 
 public class TermCourseListViewModel extends CourseListViewModel<TermCourseListItem> {
     public TermCourseListViewModel(@NonNull Application application) {

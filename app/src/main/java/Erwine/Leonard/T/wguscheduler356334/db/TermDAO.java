@@ -10,8 +10,8 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.TermListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 

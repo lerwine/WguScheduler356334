@@ -12,15 +12,20 @@ import androidx.room.Ignore;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentTypeConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.CourseStatusConverter;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
-        viewName = "alertListItemView",
-        // FIXME: Use "CASE courses.actualEnd WHEN NULL courses.expectedEnd ELSE courses.actualEnd" There is a problem with the query: [SQLITE_ERROR] SQL error or missing database (no such function: IIF)
+        viewName = AppDb.VIEW_NAME_ALERT_LIST_ITEM,
         value = "SELECT courseAlerts.id, courseAlerts.leadTime, courseAlerts.subsequent, 0 AS assessment, CASE courseAlerts.subsequent\n" +
                 "\tWHEN 1 THEN\n" +
                 "\t\tCASE WHEN courses.actualEnd IS NULL THEN courses.expectedEnd ELSE courses.actualEnd END\n" +
@@ -75,7 +80,7 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
     @ColumnInfo(name = COLNAME_TYPE)
     private AssessmentType type;
     @ColumnInfo(name = COLNAME_STATUS)
-    private String status;
+    private int status;
     @ColumnInfo(name = COLNAME_COURSE_ID)
     private long courseId;
     @Ignore
@@ -90,29 +95,31 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
     private int typeDisplayResourceId;
 
     @Ignore
-    protected AlertListItem(Long id, boolean subsequent, int leadTime, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type, String status, Long courseId) {
+    protected AlertListItem(Long id, boolean subsequent, int leadTime, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, int status, AssessmentType type, Long courseId) {
         super(id, subsequent, leadTime);
         this.assessment = assessment;
         this.eventDate = eventDate;
         this.alertDate = alertDate;
         this.code = SINGLE_LINE_NORMALIZER.apply(code);
         this.title = SINGLE_LINE_NORMALIZER.apply(title);
-        this.status = SINGLE_LINE_NORMALIZER.apply(status);
+        this.status = status;
         this.courseId = courseId;
         if (assessment) {
-            assessmentStatus = AssessmentStatus.valueOf(status);
+            assessmentStatus = AssessmentStatusConverter.toAssessmentStatus(status);
             courseStatus = CourseStatusConverter.fromAssessmentStatus(assessmentStatus);
             statusDisplayResourceId = assessmentStatus.displayResourceId();
             this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
+            typeDisplayResourceId = this.type.displayResourceId();
         } else {
-            courseStatus = CourseStatus.valueOf(status);
+            courseStatus = CourseStatusConverter.toCourseStatus(status);
             assessmentStatus = AssessmentStatusConverter.fromCourseStatus(courseStatus);
             statusDisplayResourceId = courseStatus.displayResourceId();
+            typeDisplayResourceId = R.string.label_course;
         }
     }
 
-    public AlertListItem(boolean subsequent, int leadTime, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type, String status, Long courseId, long id) {
-        this(id, subsequent, leadTime, assessment, eventDate, alertDate, code, title, type, status, courseId);
+    public AlertListItem(boolean subsequent, int leadTime, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type, int status, Long courseId, long id) {
+        this(id, subsequent, leadTime, assessment, eventDate, alertDate, code, title, status, type, courseId);
     }
 
     @Ignore
@@ -131,8 +138,13 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
         return assessment;
     }
 
-    public void setAssessment(boolean assessment) {
+    public synchronized void setAssessment(boolean assessment) {
         this.assessment = assessment;
+        if (assessment) {
+            typeDisplayResourceId = R.string.label_course;
+        } else {
+            typeDisplayResourceId = this.type.displayResourceId();
+        }
     }
 
     public LocalDate getEventDate() {
@@ -196,34 +208,26 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
 
     @Nullable
     public AssessmentType getType() {
-        return type;
+        return (assessment) ? null : type;
     }
 
     public void setType(AssessmentType type) {
-        if (null == type) {
-            if (assessment) {
-
-            }
+        this.type = (null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type;
+        if (!assessment) {
+            typeDisplayResourceId = this.type.displayResourceId();
         }
-        this.type = type;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public synchronized void setStatus(String status) {
-        if ((status = SINGLE_LINE_NORMALIZER.apply(status)).isEmpty()) {
+    public synchronized void setStatus(int status) {
+        if (this.status != status) {
             if (assessment) {
-                setAssessmentStatus(AssessmentStatusConverter.DEFAULT);
+                setAssessmentStatus(AssessmentStatusConverter.toAssessmentStatus(status));
             } else {
-                setCourseStatus(CourseStatus.UNPLANNED);
-            }
-        } else if (!this.status.equals(status)) {
-            if (assessment) {
-                setAssessmentStatus(AssessmentStatus.valueOf(status));
-            } else {
-                setCourseStatus(CourseStatus.valueOf(status));
+                setCourseStatus(CourseStatusConverter.toCourseStatus(status));
             }
         }
     }
@@ -253,9 +257,10 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
                 }
                 courseStatus = e;
                 assessment = true;
+                typeDisplayResourceId = R.string.label_course;
             }
         }
-        status = this.assessmentStatus.name();
+        status = this.assessmentStatus.ordinal();
         statusDisplayResourceId = this.assessmentStatus.displayResourceId();
     }
 
@@ -282,17 +287,22 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
                 }
                 assessmentStatus = e;
                 assessment = false;
+                typeDisplayResourceId = this.type.displayResourceId();
             } else {
                 assessmentStatus = AssessmentStatusConverter.fromCourseStatus(courseStatus);
             }
         }
-        status = this.courseStatus.name();
+        status = this.courseStatus.ordinal();
         statusDisplayResourceId = this.courseStatus.displayResourceId();
     }
 
     @StringRes
     public int getStatusDisplayResourceId() {
         return statusDisplayResourceId;
+    }
+
+    public int getTypeDisplayResourceId() {
+        return typeDisplayResourceId;
     }
 
     public long getCourseId() {
@@ -315,23 +325,49 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
 
     @Override
     public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
-
+        super.restoreState(bundle, isOriginal);
+        String key = stateKey(COLNAME_COURSE_ID, isOriginal);
+        if (bundle.containsKey(key)) {
+            courseId = bundle.getLong(key);
+        }
+        setAssessment(bundle.getBoolean(stateKey(COLNAME_ASSESSMENT, isOriginal), false));
+        key = stateKey(COLNAME_EVENT_DATE, isOriginal);
+        if (bundle.containsKey(key)) {
+            setEventDate(LocalDate.ofEpochDay(bundle.getLong(key)));
+        } else {
+            setEventDate(null);
+        }
+        setCode(bundle.getString(stateKey(COLNAME_CODE, isOriginal), ""));
+        setTitle(bundle.getString(stateKey(COLNAME_TITLE, isOriginal), ""));
+        setType(AssessmentTypeConverter.toAssessmentType(bundle.getInt(stateKey(COLNAME_TYPE, isOriginal), 0)));
+        if (assessment) {
+            setCourseStatus(CourseStatusConverter.toCourseStatus(bundle.getInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, isOriginal), 0)));
+            setAssessmentStatus(AssessmentStatusConverter.toAssessmentStatus(bundle.getInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_STATUS, isOriginal), 0)));
+            setAssessment(true);
+        } else {
+            setAssessmentStatus(AssessmentStatusConverter.toAssessmentStatus(bundle.getInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_STATUS, isOriginal), 0)));
+            setCourseStatus(CourseStatusConverter.toCourseStatus(bundle.getInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, isOriginal), 0)));
+            setAssessment(false);
+        }
     }
 
     @Override
     public void saveState(@NonNull Bundle bundle, boolean isOriginal) {
         super.saveState(bundle, isOriginal);
-        bundle.putLong(COLNAME_COURSE_ID, courseId);
-        bundle.putBoolean(COLNAME_ASSESSMENT, assessment);
+        bundle.putLong(stateKey(COLNAME_COURSE_ID, isOriginal), courseId);
+        bundle.putBoolean(stateKey(COLNAME_ASSESSMENT, isOriginal), assessment);
         LocalDate d = eventDate;
         if (null != d) {
-            bundle.putLong(COLNAME_EVENT_DATE, d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_EVENT_DATE, isOriginal), d.toEpochDay());
         }
-        bundle.putString(COLNAME_CODE, code);
+        bundle.putString(stateKey(COLNAME_CODE, isOriginal), code);
         String s = title;
         if (!s.isEmpty()) {
-            bundle.putString(COLNAME_TITLE, s);
+            bundle.putString(stateKey(COLNAME_TITLE, isOriginal), s);
         }
+        bundle.putInt(stateKey(COLNAME_TYPE, isOriginal), AssessmentTypeConverter.fromAssessmentType(type));
+        bundle.putInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_STATUS, isOriginal), AssessmentStatusConverter.fromAssessmentStatus(assessmentStatus));
+        bundle.putInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, isOriginal), CourseStatusConverter.fromCourseStatus(courseStatus));
     }
 
     @Override
