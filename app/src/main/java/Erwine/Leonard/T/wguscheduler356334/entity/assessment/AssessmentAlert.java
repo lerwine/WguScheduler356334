@@ -1,70 +1,59 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.assessment;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
-import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.entity.Alert;
-import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
-import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import java.util.Objects;
 
-public interface AssessmentAlert extends Alert {
-    /**
-     * The name of the {@code "assessmentId"} database column, which is the value of the {@link AssessmentEntity#COLNAME_ID primary key} for the {@link AssessmentEntity assessment}
-     * associated with the alert.
-     */
-    String COLNAME_ASSESSMENT_ID = "assessmentId";
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 
-    /**
-     * Gets the value of the {@link AssessmentEntity#COLNAME_ID primary key} for the {@link AssessmentEntity assessment} associated with the assessment.
-     *
-     * @return The value of the {@link AssessmentEntity#COLNAME_ID primary key} for the {@link AssessmentEntity assessment} associated with the assessment.
-     */
-    @Nullable
-    Long getAssessmentId();
+public class AssessmentAlert {
+    @Embedded
+    @NonNull
+    AssessmentAlertLink link;
 
-    /**
-     * Sets the {@link AssessmentEntity#COLNAME_ID primary key} value for the {@link AssessmentEntity assessment} to be associated with the assessment.
-     *
-     * @param assessmentId The {@link AssessmentEntity#COLNAME_ID primary key} value of the {@link AssessmentEntity assessment} to be associated with the assessment.
-     */
-    void setAssessmentId(long assessmentId);
+    @Relation(
+            parentColumn = AlertLink.COLNAME_ALERT_ID,
+            entityColumn = Alert.COLNAME_ID
+    )
+    @NonNull
+    private AlertEntity alert;
 
-    @Override
-    default String dbTableName() {
-        return AppDb.TABLE_NAME_ASSESSMENT_ALERTS;
-    }
-
-    @Override
-    default void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
-        Alert.super.restoreState(bundle, isOriginal);
-        String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Course.COLNAME_ID, isOriginal);
-        if (bundle.containsKey(key)) {
-            setAssessmentId(bundle.getLong(key));
+    public AssessmentAlert(@NonNull AssessmentAlertLink link, @NonNull AlertEntity alert) {
+        this.link = link;
+        this.alert = alert;
+        if (null == alert.getId() || alert.getId() != link.getAlertId()) {
+            throw new IllegalArgumentException();
         }
     }
 
-    @Override
-    default void saveState(@NonNull Bundle bundle, boolean isOriginal) {
-        Alert.super.saveState(bundle, isOriginal);
-        Long id;
-        try {
-            id = getAssessmentId();
-        } catch (NullPointerException ex) {
-            id = null;
-        }
-        if (null != id) {
-            bundle.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Course.COLNAME_ID, isOriginal), id);
-        }
+    @NonNull
+    public AssessmentAlertLink getLink() {
+        return link;
     }
 
-    @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
-        Alert.super.appendPropertiesAsStrings(sb);
-        sb.append(COLNAME_ASSESSMENT_ID, getAssessmentId());
+    public synchronized void setLink(@NonNull AssessmentAlertLink link) {
+        if (!Objects.equals(link.getAlertId(), alert.getId())) {
+            throw new IllegalArgumentException();
+        }
+        this.link = link;
+    }
+
+    @NonNull
+    public AlertEntity getAlert() {
+        return alert;
+    }
+
+    public synchronized void setAlert(@NonNull AlertEntity alert) {
+        Long id = alert.getId();
+        if (null == id) {
+            throw new IllegalArgumentException();
+        }
+        link.setAlertId(id);
+        this.alert = alert;
     }
 
 }

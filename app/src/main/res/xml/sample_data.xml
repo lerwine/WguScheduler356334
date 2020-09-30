@@ -235,13 +235,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="4" />
+                            timeSpec="-4" />
                         <item
                             subsequent="false"
-                            leadTime="2" />
+                            timeSpec="-2" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -253,7 +253,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -273,7 +273,7 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -291,7 +291,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -311,13 +311,13 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="9" />
+                            timeSpec="-9" />
                         <item
                             subsequent="true"
-                            leadTime="2" />
+                            timeSpec="-2" />
                         <item
                             subsequent="true"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -329,7 +329,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                         <item
@@ -341,7 +341,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -361,10 +361,10 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="false"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -377,7 +377,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -405,16 +405,16 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="false"
-                            leadTime="1" />
+                            timeSpec="-1" />
                         <item
                             subsequent="true"
-                            leadTime="5" />
+                            timeSpec="-5" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -432,7 +432,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -453,22 +453,22 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            timeSpec="-7" />
                         <item
                             subsequent="false"
-                            leadTime="5" />
+                            timeSpec="-5" />
                         <item
                             subsequent="false"
-                            leadTime="2" />
+                            timeSpec="-2" />
                         <item
                             subsequent="true"
-                            leadTime="8" />
+                            timeSpec="-8" />
                         <item
                             subsequent="true"
-                            leadTime="5" />
+                            timeSpec="-5" />
                         <item
                             subsequent="true"
-                            leadTime="2" />
+                            timeSpec="-2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -486,7 +486,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                         <item
@@ -498,7 +498,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -516,16 +516,16 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="11" />
+                            timeSpec="-11" />
                         <item
                             subsequent="true"
-                            leadTime="5" />
+                            timeSpec="-5" />
                         <item
                             subsequent="true"
-                            leadTime="2" />
+                            timeSpec="-2" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -538,7 +538,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                         <item
@@ -551,7 +551,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                         <item
@@ -564,7 +564,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                         <item
@@ -577,7 +577,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="false"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                     </assessments>
@@ -597,19 +597,19 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            timeSpec="-7" />
                         <item
                             subsequent="false"
-                            leadTime="6" />
+                            timeSpec="-6" />
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="true"
-                            leadTime="4" />
+                            timeSpec="-4" />
                         <item
                             subsequent="true"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -675,16 +675,16 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="1" />
+                            timeSpec="-1" />
                         <item
                             subsequent="false"
-                            leadTime="0" />
+                            timeSpec="0" />
                         <item
                             subsequent="true"
-                            leadTime="4" />
+                            timeSpec="-4" />
                         <item
                             subsequent="true"
-                            leadTime="3" />
+                            timeSpec="-3" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -715,13 +715,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            timeSpec="-7" />
                         <item
                             subsequent="false"
-                            leadTime="4" />
+                            timeSpec="-4" />
                         <item
                             subsequent="false"
-                            leadTime="2" />
+                            timeSpec="-2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -757,13 +757,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="0" />
+                            timeSpec="0" />
                         <item
                             subsequent="true"
-                            leadTime="8" />
+                            timeSpec="-8" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -795,7 +795,7 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -837,16 +837,16 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="true"
-                            leadTime="9" />
+                            timeSpec="-9" />
                         <item
                             subsequent="true"
-                            leadTime="7" />
+                            timeSpec="-7" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -884,16 +884,16 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="true"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="true"
-                            leadTime="2" />
+                            timeSpec="-2" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -931,10 +931,10 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="2" />
+                            timeSpec="-2" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -966,13 +966,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="13" />
+                            timeSpec="-13" />
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            timeSpec="-7" />
                         <item
                             subsequent="false"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -997,7 +997,7 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="5" />
+                            timeSpec="-5" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1022,10 +1022,10 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="0" />
+                            timeSpec="0" />
                         <item
                             subsequent="true"
-                            leadTime="2" />
+                            timeSpec="-2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1057,13 +1057,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="12" />
+                            timeSpec="-12" />
                         <item
                             subsequent="false"
-                            leadTime="4" />
+                            timeSpec="-4" />
                         <item
                             subsequent="false"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1123,7 +1123,7 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="4" />
+                            timeSpec="-4" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1183,10 +1183,10 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1220,13 +1220,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="false"
-                            leadTime="1" />
+                            timeSpec="-1" />
                         <item
                             subsequent="false"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1252,13 +1252,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="7" />
+                            timeSpec="-7" />
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="false"
-                            leadTime="2" />
+                            timeSpec="-2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1290,19 +1290,19 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="8" />
+                            timeSpec="-8" />
                         <item
                             subsequent="false"
-                            leadTime="6" />
+                            timeSpec="-6" />
                         <item
                             subsequent="true"
-                            leadTime="12" />
+                            timeSpec="-12" />
                         <item
                             subsequent="true"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="true"
-                            leadTime="2" />
+                            timeSpec="-2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1336,7 +1336,7 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="4" />
+                            timeSpec="-4" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1383,7 +1383,7 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="7" />
+                            timeSpec="-7" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1424,13 +1424,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="1" />
+                            timeSpec="-1" />
                         <item
                             subsequent="true"
-                            leadTime="12" />
+                            timeSpec="-12" />
                         <item
                             subsequent="true"
-                            leadTime="3" />
+                            timeSpec="-3" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1460,7 +1460,7 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="5" />
+                            timeSpec="-5" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1486,7 +1486,7 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="9" />
+                            timeSpec="-9" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1529,10 +1529,10 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="5" />
+                            timeSpec="-5" />
                         <item
                             subsequent="true"
-                            leadTime="0" />
+                            timeSpec="0" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1556,10 +1556,10 @@
                     <courseAlerts>
                         <item
                             subsequent="true"
-                            leadTime="9" />
+                            timeSpec="-9" />
                         <item
                             subsequent="true"
-                            leadTime="1" />
+                            timeSpec="-1" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1589,13 +1589,13 @@
                     <courseAlerts>
                         <item
                             subsequent="false"
-                            leadTime="11" />
+                            timeSpec="-11" />
                         <item
                             subsequent="false"
-                            leadTime="3" />
+                            timeSpec="-3" />
                         <item
                             subsequent="false"
-                            leadTime="2" />
+                            timeSpec="-2" />
                     </courseAlerts>
                     <assessments>
                         <item
@@ -1607,7 +1607,7 @@
                             <assessmentAlerts>
                                 <item
                                     subsequent="true"
-                                    leadTime="4" />
+                                    timeSpec="-4" />
                             </assessmentAlerts>
                         </item>
                         <item

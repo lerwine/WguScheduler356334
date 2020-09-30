@@ -10,7 +10,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -18,40 +18,40 @@ import io.reactivex.Single;
 public interface AssessmentAlertDAO {
 
     @Insert
-    Single<Long> insert(AssessmentAlertEntity alert);
+    Single<Long> insert(AssessmentAlertLink alert);
 
     @Insert
-    Long insertSynchronous(AssessmentAlertEntity alert);
+    Long insertSynchronous(AssessmentAlertLink alert);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable update(AssessmentAlertEntity course);
+    Completable update(AssessmentAlertLink course);
 
     @Insert
-    Single<List<Long>> insertAll(List<AssessmentAlertEntity> list);
+    Single<List<Long>> insertAll(List<AssessmentAlertLink> list);
 
     @Insert
-    List<Long> insertAllSynchronous(List<AssessmentAlertEntity> list);
+    List<Long> insertAllSynchronous(List<AssessmentAlertLink> list);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable updateAll(List<AssessmentAlertEntity> list);
+    Completable updateAll(List<AssessmentAlertLink> list);
 
     @Delete
-    Completable delete(AssessmentAlertEntity course);
+    Completable delete(AssessmentAlertLink course);
 
     @Query("SELECT * FROM assessmentAlerts WHERE ROWID = :rowId")
-    Single<AssessmentAlertEntity> getByRowId(int rowId);
+    Single<AssessmentAlertLink> getByRowId(int rowId);
 
-    @Query("SELECT * FROM assessmentAlerts WHERE id = :id")
-    Single<AssessmentAlertEntity> getById(long id);
-
-    @Query("SELECT * FROM assessmentAlerts" +
-            " WHERE assessmentId = :assessmentId ORDER BY [leadTime]")
-    LiveData<List<AssessmentAlertEntity>> getByAssessmentId(long assessmentId);
+    @Query("SELECT * FROM assessmentAlerts WHERE alertId = :alertId")
+    Single<AssessmentAlertLink> getByAlertId(long alertId);
 
     @Query("SELECT * FROM assessmentAlerts" +
-            " WHERE assessmentId = :assessmentId ORDER BY [leadTime]")
-    List<AssessmentAlertEntity> getByAssessmentIdSynchronous(long assessmentId);
+            " WHERE targetId = :assessmentId")
+    LiveData<List<AssessmentAlertLink>> getByAssessmentId(long assessmentId);
 
-    @Query("DELETE FROM assessmentAlerts WHERE assessmentId=:assessmentId")
+    @Query("SELECT * FROM assessmentAlerts" +
+            " WHERE targetId = :assessmentId")
+    List<AssessmentAlertLink> getByAssessmentIdSynchronous(long assessmentId);
+
+    @Query("DELETE FROM assessmentAlerts WHERE targetId=:assessmentId")
     Single<Integer> deleteByAssessmentId(long assessmentId);
 }

@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 
 public class AlertListViewModel extends AndroidViewModel {
 

@@ -18,15 +18,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
@@ -385,10 +385,13 @@ public class SampleDataLoader implements Action {
 
     private void loadSampleCourseAlert(long courseId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        CourseAlertEntity courseAlertEntity = new CourseAlertEntity(courseId, xmlParser.getAttributeBooleanValue(null, CourseAlert.COLNAME_SUBSEQUENT, false),
-                xmlParser.getAttributeIntValue(null, CourseAlert.COLNAME_LEAD_TIME, 0));
-        Log.d(LOG_TAG, String.format("Loaded %s", courseAlertEntity));
-        dbLoader.getAppDb().courseAlertDAO().insertSynchronous(courseAlertEntity);
+        // TODO: Support messages in XML if time permits
+        AlertEntity alert = new AlertEntity(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0),
+                xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), null);
+        long id = dbLoader.getAppDb().alertDAO().insertSynchronous(alert);
+        CourseAlertLink courseAlertLink = new CourseAlertLink(id, courseId);
+        Log.d(LOG_TAG, String.format("Loaded %s", courseAlertLink));
+        dbLoader.getAppDb().courseAlertDAO().insertSynchronous(courseAlertLink);
         xmlParser.nextTag();
     }
 
@@ -423,10 +426,13 @@ public class SampleDataLoader implements Action {
 
     private void loadSampleAssessmentAlert(long assessmentId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        AssessmentAlertEntity assessmentAlertEntity = new AssessmentAlertEntity(assessmentId, xmlParser.getAttributeBooleanValue(null, AssessmentAlert.COLNAME_SUBSEQUENT, false),
-                xmlParser.getAttributeIntValue(null, AssessmentAlert.COLNAME_LEAD_TIME, 0));
-        Log.d(LOG_TAG, String.format("Loaded %s", assessmentAlertEntity));
-        dbLoader.getAppDb().assessmentAlertDAO().insertSynchronous(assessmentAlertEntity);
+        // TODO: Support messages in XML if time permits
+        AlertEntity alert = new AlertEntity(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0),
+                xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), null);
+        long id = dbLoader.getAppDb().alertDAO().insertSynchronous(alert);
+        AssessmentAlertLink assessmentAlertLink = new AssessmentAlertLink(id, assessmentId);
+        Log.d(LOG_TAG, String.format("Loaded %s", assessmentAlertLink));
+        dbLoader.getAppDb().assessmentAlertDAO().insertSynchronous(assessmentAlertLink);
         xmlParser.nextTag();
     }
 

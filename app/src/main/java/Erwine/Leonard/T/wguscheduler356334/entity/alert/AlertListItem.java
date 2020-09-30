@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wguscheduler356334.entity;
+package Erwine.Leonard.T.wguscheduler356334.entity.alert;
 
 import android.os.Bundle;
 
@@ -17,6 +17,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentTypeConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.CourseStatusConverter;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
@@ -26,47 +27,59 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_ALERT_LIST_ITEM,
-        value = "SELECT courseAlerts.id, courseAlerts.leadTime, courseAlerts.subsequent, 0 AS assessment, CASE courseAlerts.subsequent\n" +
-                "\tWHEN 1 THEN\n" +
-                "\t\tCASE WHEN courses.actualEnd IS NULL THEN courses.expectedEnd ELSE courses.actualEnd END\n" +
-                "\tELSE\n" +
-                "\t\tCASE WHEN courses.actualStart IS NULL THEN courses.expectedStart ELSE courses.actualStart END\n" +
-                "\tEND AS eventDate, CASE courseAlerts.subsequent\n" +
-                "\tWHEN 1 THEN\n" +
-                "\t\tCASE\n" +
-                "\t\t\tWHEN courses.actualEnd IS NULL THEN\n" +
-                "\t\t\t\tCASE WHEN courses.expectedEnd IS NULL THEN NULL ELSE courses.expectedEnd - courseAlerts.leadTime END\n" +
-                "\t\t\tELSE\n" +
-                "\t\t\t\tcourses.actualEnd - courseAlerts.leadTime\n" +
+        value = "SELECT assessmentAlerts.alertId AS id, assessmentAlerts.targetId, assessments.type, assessments.code, assessments.name AS title, assessments.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
+                "\tCASE\n" +
+                "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
+                "\t\tWHEN alerts.subsequent=1 THEN assessments.completionDate\n" +
+                "\t\tELSE assessments.goalDate\n" +
+                "\tEND as eventDate,\n" +
+                "\tCASE\n" +
+                "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
+                "\t\tWHEN alerts.subsequent=1 THEN\n" +
+                "\t\t\tCASE WHEN assessments.completionDate IS NULL THEN NULL ELSE assessments.completionDate + alerts.timeSpec END\n" +
+                "\t\tELSE\n" +
+                "\t\t\tCASE WHEN assessments.goalDate IS NULL THEN NULL ELSE assessments.goalDate + alerts.timeSpec END\n" +
+                "\tEND as alertDate, 1 as assessment, assessments.courseId\n" +
+                "\tFROM assessmentAlerts LEFT JOIN alerts on assessmentAlerts.alertId=alerts.id LEFT JOIN assessments on assessmentAlerts.targetId=assessments.id\n" +
+                "UNION SELECT courseAlerts.alertId AS id, courseAlerts.targetId, NULL as type, courses.number as code, courses.title, courses.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
+                "\tCASE\n" +
+                "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
+                "\t\tWHEN alerts.subsequent=1 THEN\n" +
+                "\t\t\tCASE WHEN courses.actualEnd IS NULL THEN courses.expectedEnd ELSE courses.actualEnd END\n" +
+                "\t\tELSE\n" +
+                "\t\t\tCASE WHEN courses.actualStart IS NULL THEN courses.expectedStart ELSE courses.actualStart END\n" +
+                "\tEND as eventDate,\n" +
+                "\tCASE\n" +
+                "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
+                "\t\tWHEN alerts.subsequent=1 THEN\n" +
+                "\t\t\tCASE\n" +
+                "\t\t\t\tWHEN courses.actualEnd IS NULL THEN\n" +
+                "\t\t\t\t\tCASE WHEN courses.expectedEnd IS NULL THEN NULL ELSE courses.expectedEnd + alerts.timeSpec END\n" +
+                "\t\t\t\tELSE courses.actualEnd + alerts.timeSpec\n" +
                 "\t\t\tEND\n" +
-                "\tELSE CASE\n" +
-                "\t\tWHEN courses.actualStart IS NULL THEN\n" +
-                "\t\t\tCASE WHEN courses.expectedStart IS NULL THEN NULL ELSE courses.expectedStart - courseAlerts.leadTime END\n" +
                 "\t\tELSE\n" +
-                "\t\t\tcourses.actualStart - courseAlerts.leadTime\n" +
-                "\t\tEND\n" +
-                "\tEND AS alertDate, courses.number AS code, courses.title, NULL as type, courses.status, courseAlerts.courseId\n" +
-                "\tFROM courseAlerts LEFT JOIN courses ON courseAlerts.courseId=courses.id\n" +
-                "UNION SELECT assessmentAlerts.id, assessmentAlerts.leadTime, assessmentAlerts.subsequent, 1 AS assessment,\n" +
-                "\tCASE assessmentAlerts.subsequent WHEN 1 THEN assessments.completionDate ELSE assessments.goalDate END AS eventDate, CASE assessmentAlerts.subsequent\n" +
-                "\t\tWHEN 1 THEN\n" +
-                "\t\t\tCASE WHEN assessments.completionDate IS NULL THEN NULL ELSE assessments.completionDate - assessmentAlerts.leadTime END\n" +
-                "\t\tELSE\n" +
-                "\t\t\tCASE WHEN assessments.goalDate IS NULL THEN NULL ELSE assessments.goalDate - assessmentAlerts.leadTime END\n" +
-                "\t\tEND AS alertDate, assessments.code, CASE WHEN assessments.name IS NULL THEN '' ELSE assessments.name END as title, assessments.type, assessments.status, assessments.courseId\n" +
-                "\tFROM assessmentAlerts LEFT JOIN assessments ON assessmentAlerts.assessmentId=assessments.id"
+                "\t\t\tCASE\n" +
+                "\t\t\t\tWHEN courses.actualStart IS NULL THEN\n" +
+                "\t\t\t\t\tCASE WHEN courses.expectedStart IS NULL THEN NULL ELSE courses.expectedStart + alerts.timeSpec END\n" +
+                "\t\t\t\tELSE courses.actualStart + alerts.timeSpec\n" +
+                "\t\t\tEND\n" +
+                "\tEND as alertDate, 0 as assessment, courseAlerts.targetId as courseId\n" +
+                "\tFROM courseAlerts LEFT JOIN alerts ON courseAlerts.alertId=alerts.id LEFT JOIN courses ON courseAlerts.targetId=courses.id"
 )
-public final class AlertListItem extends AbstractAlertEntity<AlertListItem> implements Comparable<AlertListItem> {
+public final class AlertListItem extends AlertEntity implements Comparable<AlertListItem> {
 
+    static final String COLNAME_TARGET_ID = "targetId";
+    static final String COLNAME_TYPE = "type";
+    static final String COLNAME_CODE = "code";
+    static final String COLNAME_TITLE = "title";
+    static final String COLNAME_STATUS = "status";
     static final String COLNAME_EVENT_DATE = "eventDate";
     static final String COLNAME_ALERT_DATE = "alertDate";
     static final String COLNAME_ASSESSMENT = "assessment";
-    static final String COLNAME_CODE = "code";
-    static final String COLNAME_TITLE = "title";
-    static final String COLNAME_TYPE = "type";
-    static final String COLNAME_STATUS = "status";
     static final String COLNAME_COURSE_ID = "courseId";
 
+    @ColumnInfo(name = COLNAME_TARGET_ID)
+    private long targetId;
     @ColumnInfo(name = COLNAME_ASSESSMENT)
     private boolean assessment;
     @ColumnInfo(name = COLNAME_EVENT_DATE)
@@ -95,8 +108,8 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
     private int typeDisplayResourceId;
 
     @Ignore
-    protected AlertListItem(Long id, boolean subsequent, int leadTime, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, int status, AssessmentType type, Long courseId) {
-        super(id, subsequent, leadTime);
+    protected AlertListItem(Long id, Boolean subsequent, long timeSpec, String customMessage, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, int status, AssessmentType type, long courseId, long targetId) {
+        super(id, timeSpec, subsequent, customMessage);
         this.assessment = assessment;
         this.eventDate = eventDate;
         this.alertDate = alertDate;
@@ -118,21 +131,21 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
         }
     }
 
-    public AlertListItem(boolean subsequent, int leadTime, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type, int status, Long courseId, long id) {
-        this(id, subsequent, leadTime, assessment, eventDate, alertDate, code, title, status, type, courseId);
+    public AlertListItem(Boolean subsequent, long timeSpec, String customMessage, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type, int status, long courseId, long targetId, long id) {
+        this(id, subsequent, timeSpec, customMessage, assessment, eventDate, alertDate, code, title, status, type, courseId, targetId);
     }
 
-    @Ignore
-    public AlertListItem(AlertListItem source) {
-        super(source);
-        this.assessment = source.assessment;
-        this.eventDate = source.eventDate;
-        this.code = source.code;
-        this.title = source.title;
-        this.type = source.type;
-        this.status = source.status;
-        this.courseId = source.courseId;
-    }
+//    @Ignore
+//    public AlertListItem(AlertListItem source) {
+//        super(source);
+//        this.assessment = source.assessment;
+//        this.eventDate = source.eventDate;
+//        this.code = source.code;
+//        this.title = source.title;
+//        this.type = source.type;
+//        this.status = source.status;
+//        this.courseId = source.courseId;
+//    }
 
     public boolean isAssessment() {
         return assessment;
@@ -147,19 +160,45 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
         }
     }
 
+    @Override
+    public synchronized void setSubsequent(Boolean subsequent) {
+        if (null == isSubsequent()) {
+            if (null != subsequent) {
+                super.setTimeSpec((null != alertDate && null != eventDate) ? alertDate.toEpochDay() - eventDate.toEpochDay() : 0L);
+            }
+        } else if (null == subsequent) {
+            if (null == eventDate) {
+                if (null == alertDate) {
+                    super.setTimeSpec(0L);
+                } else {
+                    super.setTimeSpec((eventDate = alertDate).toEpochDay());
+                }
+            } else {
+                super.setTimeSpec((alertDate = eventDate).toEpochDay());
+            }
+        }
+        super.setSubsequent(subsequent);
+    }
+
+    public long getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(long targetId) {
+        this.targetId = targetId;
+    }
+
     public LocalDate getEventDate() {
         return eventDate;
     }
 
     public synchronized void setEventDate(LocalDate eventDate) {
-        if (!Objects.equals(this.eventDate, eventDate)) {
-            this.eventDate = eventDate;
-            if (null == eventDate) {
-                alertDate = null;
-            } else {
-                int leadTime = getLeadTime();
-                alertDate = (leadTime < 1) ? eventDate : eventDate.minusDays(leadTime);
-            }
+        this.eventDate = eventDate;
+        if (null == isSubsequent()) {
+            this.alertDate = eventDate;
+            super.setTimeSpec(((null != eventDate) ? eventDate : LocalDate.now()).toEpochDay());
+        } else if (null != eventDate) {
+            super.setTimeSpec(eventDate.toEpochDay() - alertDate.toEpochDay());
         }
     }
 
@@ -168,23 +207,24 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
     }
 
     public synchronized void setAlertDate(LocalDate alertDate) {
-        if (!Objects.equals(this.alertDate, alertDate)) {
-            this.alertDate = alertDate;
-            if (null == alertDate) {
-                eventDate = null;
-            } else {
-                int leadTime = getLeadTime();
-                eventDate = (leadTime < 1) ? alertDate : alertDate.plusDays(leadTime);
-            }
+        this.alertDate = alertDate;
+        if (null == isSubsequent()) {
+            this.eventDate = alertDate;
+            super.setTimeSpec(((null != alertDate) ? alertDate : LocalDate.now()).toEpochDay());
+        } else if (null != alertDate) {
+            super.setTimeSpec(eventDate.toEpochDay() - alertDate.toEpochDay());
         }
     }
 
     @Override
-    public synchronized void setLeadTime(int days) {
-        int oldValue = getLeadTime();
-        super.setLeadTime(days);
-        if ((days = getLeadTime()) != oldValue) {
-            alertDate = (days < 1) ? eventDate : eventDate.minusDays(days);
+    public synchronized void setTimeSpec(long days) {
+        super.setTimeSpec(days);
+        if (null == isSubsequent()) {
+            alertDate = eventDate = LocalDate.ofEpochDay(days);
+        } else if (null != eventDate) {
+            alertDate = eventDate.plusDays(days);
+        } else if (null != alertDate) {
+            eventDate = alertDate.minusDays(days);
         }
     }
 
@@ -315,7 +355,7 @@ public final class AlertListItem extends AbstractAlertEntity<AlertListItem> impl
 
     @Override
     protected int hashCodeFromProperties() {
-        return Objects.hash(courseId, isSubsequent(), getLeadTime(), assessment, eventDate, code, title, type, status);
+        return Objects.hash(courseId, isSubsequent(), getTimeSpec(), assessment, eventDate, code, title, type, status);
     }
 
     @Override

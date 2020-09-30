@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;

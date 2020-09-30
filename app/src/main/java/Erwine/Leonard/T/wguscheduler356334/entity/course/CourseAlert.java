@@ -1,69 +1,58 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.course;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
-import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
-import Erwine.Leonard.T.wguscheduler356334.entity.Alert;
-import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import java.util.Objects;
 
-public interface CourseAlert extends Alert {
-    /**
-     * The name of the {@code "courseId"} database column, which is the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course}
-     * associated with the alert.
-     */
-    String COLNAME_COURSE_ID = "courseId";
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 
-    /**
-     * Gets the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
-     *
-     * @return The value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
-     */
-    @Nullable
-    Long getCourseId();
+public class CourseAlert {
+    @Embedded
+    @NonNull
+    private CourseAlertLink link;
 
-    /**
-     * Sets the {@link CourseEntity#COLNAME_ID primary key} value for the {@link CourseEntity course} to be associated with the assessment.
-     *
-     * @param courseId The {@link CourseEntity#COLNAME_ID primary key} value of the {@link CourseEntity course} to be associated with the assessment.
-     */
-    void setCourseId(long courseId);
+    @Relation(
+            parentColumn = AlertLink.COLNAME_ALERT_ID,
+            entityColumn = Alert.COLNAME_ID
+    )
+    @NonNull
+    private AlertEntity alert;
 
-    @Override
-    default String dbTableName() {
-        return AppDb.TABLE_NAME_COURSE_ALERTS;
-    }
-
-    @Override
-    default void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
-        Alert.super.restoreState(bundle, isOriginal);
-        String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, isOriginal);
-        if (bundle.containsKey(key)) {
-            setCourseId(bundle.getLong(key));
+    public CourseAlert(@NonNull CourseAlertLink link, @NonNull AlertEntity alert) {
+        this.link = link;
+        this.alert = alert;
+        if (null == alert.getId() || alert.getId() != link.getAlertId()) {
+            throw new IllegalArgumentException();
         }
     }
 
-    @Override
-    default void saveState(@NonNull Bundle bundle, boolean isOriginal) {
-        Alert.super.saveState(bundle, isOriginal);
-        Long id;
-        try {
-            id = getCourseId();
-        } catch (NullPointerException ex) {
-            id = null;
-        }
-        if (null != id) {
-            bundle.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, isOriginal), id);
-        }
+    @NonNull
+    public CourseAlertLink getLink() {
+        return link;
     }
 
-    @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
-        Alert.super.appendPropertiesAsStrings(sb);
-        sb.append(COLNAME_COURSE_ID, getCourseId());
+    public synchronized void setLink(@NonNull CourseAlertLink link) {
+        if (!Objects.equals(link.getAlertId(), alert.getId())) {
+            throw new IllegalArgumentException();
+        }
+        this.link = link;
     }
 
+    @NonNull
+    public AlertEntity getAlert() {
+        return alert;
+    }
+
+    public synchronized void setAlert(@NonNull AlertEntity alert) {
+        Long id = alert.getId();
+        if (null == id) {
+            throw new IllegalArgumentException();
+        }
+        link.setAlertId(id);
+        this.alert = alert;
+    }
 }

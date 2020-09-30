@@ -10,7 +10,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -18,41 +18,41 @@ import io.reactivex.Single;
 public interface CourseAlertDAO {
 
     @Insert
-    Single<Long> insert(CourseAlertEntity alert);
+    Single<Long> insert(CourseAlertLink alert);
 
     @Insert
-    Long insertSynchronous(CourseAlertEntity alert);
+    Long insertSynchronous(CourseAlertLink alert);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable update(CourseAlertEntity course);
+    Completable update(CourseAlertLink course);
 
     @Insert
-    Single<List<Long>> insertAll(List<CourseAlertEntity> list);
+    Single<List<Long>> insertAll(List<CourseAlertLink> list);
 
     @Insert
-    List<Long> insertAllSynchronous(List<CourseAlertEntity> list);
+    List<Long> insertAllSynchronous(List<CourseAlertLink> list);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable updateAll(List<CourseAlertEntity> list);
+    Completable updateAll(List<CourseAlertLink> list);
 
     @Delete
-    Completable delete(CourseAlertEntity course);
+    Completable delete(CourseAlertLink course);
 
     @Query("SELECT * FROM courseAlerts WHERE ROWID = :rowId")
-    Single<CourseAlertEntity> getByRowId(int rowId);
+    Single<CourseAlertLink> getByRowId(int rowId);
 
-    @Query("SELECT * FROM courseAlerts WHERE id = :id")
-    Single<CourseAlertEntity> getById(long id);
-
-    @Query("SELECT * FROM courseAlerts" +
-            " WHERE courseId = :courseId ORDER BY [leadTime]")
-    LiveData<List<CourseAlertEntity>> getByCourseId(long courseId);
+    @Query("SELECT * FROM courseAlerts WHERE alertId = :alertId")
+    Single<CourseAlertLink> getByAlertId(long alertId);
 
     @Query("SELECT * FROM courseAlerts" +
-            " WHERE courseId = :courseId ORDER BY [leadTime]")
-    List<CourseAlertEntity> getByCourseIdSynchronous(long courseId);
+            " WHERE targetId = :courseId")
+    LiveData<List<CourseAlertLink>> getByCourseId(long courseId);
 
-    @Query("DELETE FROM courseAlerts WHERE courseId=:courseId")
+    @Query("SELECT * FROM courseAlerts" +
+            " WHERE targetId = :courseId")
+    List<CourseAlertLink> getByCourseIdSynchronous(long courseId);
+
+    @Query("DELETE FROM courseAlerts WHERE targetId=:courseId")
     Single<Integer> deleteByCourseId(long courseId);
 
 }

@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 
 public class AlertListAdapter extends RecyclerView.Adapter<AlertListAdapter.ViewHolder> {
 

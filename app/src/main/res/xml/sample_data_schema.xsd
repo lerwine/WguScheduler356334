@@ -12,6 +12,15 @@
     <xs:simpleType name="relativeOrDate">
         <xs:union memberTypes="xs:date relativeDate" />
     </xs:simpleType>
+    <xs:simpleType name="booleanOrNull">
+        <xs:union memberTypes="xs:boolean">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="null" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
     <xs:element
         name="SampleData"
         type="SampleDataType" />
@@ -63,24 +72,24 @@
         name="courseAlertItemType"
         mixed="true">
         <xs:attribute
-            type="xs:boolean"
+            type="booleanOrNull"
             name="subsequent"
             use="required" />
         <xs:attribute
-            type="xs:nonNegativeInteger"
-            name="leadTime"
+            type="xs:long"
+            name="timeSpec"
             use="required" />
     </xs:complexType>
     <xs:complexType
         name="assessmentAlertItemType"
         mixed="true">
         <xs:attribute
-            type="xs:boolean"
+            type="booleanOrNull"
             name="subsequent"
             use="required" />
         <xs:attribute
-            type="xs:nonNegativeInteger"
-            name="leadTime"
+            type="xs:long"
+            name="timeSpec"
             use="required" />
     </xs:complexType>
     <xs:complexType
