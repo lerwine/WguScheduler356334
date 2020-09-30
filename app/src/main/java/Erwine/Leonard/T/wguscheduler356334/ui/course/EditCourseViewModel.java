@@ -355,9 +355,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 Log.d(LOG_TAG, "Loading courseEntity from database");
                 competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
                 return dbLoader.getCourseById(id)
-                        .doOnSuccess(this::onEntityLoadedFromDb)
-                        // TODO: Make sure callers of initializeViewModelState display error alert and log the error; then delete the following invocation
-                        .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
+                        .doOnSuccess(this::onEntityLoadedFromDb);
             }
             if (fromInitializedState) {
                 Log.d(LOG_TAG, "Restoring competencyUnitsText from saved state");

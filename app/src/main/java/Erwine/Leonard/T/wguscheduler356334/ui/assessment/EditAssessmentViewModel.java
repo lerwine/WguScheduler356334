@@ -70,7 +70,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private Observer<List<TermCourseListItem>> coursesLoadedObserver;
     private Observer<List<AssessmentEntity>> assessmentsLoadedObserver;
 
-    // TODO: Call this to add a new assessment
     public static void startAddAssessmentActivity(@NonNull Context context, long courseId, @Nullable LocalDate goalDate) {
         Intent intent = new Intent(context, AddAssessmentActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Term.COLNAME_ID, false), courseId);
@@ -80,7 +79,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         context.startActivity(intent);
     }
 
-    // TODO: Call this to view an assessment
     public static void startViewAssessmentActivity(@NonNull Context context, long assessmentId) {
         Intent intent = new Intent(context, ViewAssessmentActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Course.COLNAME_ID, false), assessmentId);
@@ -282,7 +280,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return fromInitializedState;
     }
 
-    // TODO: Ensure AddAssessmentActivity and ViewAssessmentActivity call this
     public synchronized Single<AssessmentDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
@@ -295,11 +292,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
                 Log.d(LOG_TAG, "Restoring courseEntity from saved state");
                 assessmentEntity.restoreState(state, fromInitializedState);
             } else {
-                // TODO: Make sure callers of initializeViewModelState display error alert and log it upon error
                 return dbLoader.getAssessmentById(id).doOnSuccess(this::onEntityLoadedFromDb);
             }
-        } else {
-            // TODO: Anything need special handling?
         }
         onEntityLoaded();
         return Single.just(assessmentEntity).observeOn(AndroidSchedulers.mainThread());
@@ -312,10 +306,11 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     private void onEntityLoaded() {
-        // TODO: Listen for title and update
-        titleLiveData.postValue(assessmentEntity.getName());
+        String s = assessmentEntity.getName();
+        titleLiveData.postValue((null == s) ? assessmentEntity.getCode() : assessmentEntity.getCode() + " - " + s);
         entityLiveData.postValue(assessmentEntity);
-        // TODO: Set up option listing listeners here
+        termsLiveData.observeForever(termsLoadedObserver);
+        coursesLiveData.observeForever(coursesLoadedObserver);
     }
 
     private void onEntityLoadedFromDb(AssessmentDetails entity) {

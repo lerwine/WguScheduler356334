@@ -67,8 +67,9 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             return super.toString() + " '" + statusTextView.getText() + "'";
         }
 
+        @SuppressWarnings("ConstantConditions")
         private void onViewClick(View view) {
-            // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListAdapter.ViewHolder.onViewClick
+            EditAssessmentViewModel.startViewAssessmentActivity(view.getContext(), item.getId());
         }
 
         public void setItem(AssessmentEntity item) {
