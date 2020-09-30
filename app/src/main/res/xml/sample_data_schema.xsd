@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="relativeDate">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="expectedStart" />
+            <xs:enumeration value="actualStart" />
+            <xs:enumeration value="expectedEnd" />
+            <xs:enumeration value="actualEnd" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="relativeOrDate">
+        <xs:union memberTypes="xs:date relativeDate" />
+    </xs:simpleType>
+    <xs:element
+        name="SampleData"
+        type="SampleDataType" />
+    <xs:complexType name="phoneNumberType">
+        <xs:sequence>
+            <xs:element
+                type="xs:string"
+                name="item"
+                maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="emailAddressType">
+        <xs:sequence>
+            <xs:element
+                type="xs:string"
+                name="item"
+                maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType
+        name="mentorItemType"
+        mixed="true">
+        <xs:sequence
+            maxOccurs="unbounded"
+            minOccurs="0">
+            <xs:element
+                type="xs:string"
+                name="notes"
+                minOccurs="0" />
+            <xs:element
+                type="phoneNumberType"
+                name="phoneNumber"
+                minOccurs="0" />
+            <xs:element
+                type="emailAddressType"
+                name="emailAddress"
+                minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute
+            type="xs:nonNegativeInteger"
+            name="id"
+            use="required" />
+        <xs:attribute
+            type="xs:string"
+            name="name"
+            use="required" />
+    </xs:complexType>
+    <xs:complexType
+        name="courseAlertItemType"
+        mixed="true">
+        <xs:attribute
+            type="xs:boolean"
+            name="subsequent"
+            use="required" />
+        <xs:attribute
+            type="xs:nonNegativeInteger"
+            name="leadTime"
+            use="required" />
+    </xs:complexType>
+    <xs:complexType
+        name="assessmentAlertItemType"
+        mixed="true">
+        <xs:attribute
+            type="xs:boolean"
+            name="subsequent"
+            use="required" />
+        <xs:attribute
+            type="xs:nonNegativeInteger"
+            name="leadTime"
+            use="required" />
+    </xs:complexType>
+    <xs:complexType
+        name="assessmentsItemType"
+        mixed="true">
+        <xs:sequence
+            maxOccurs="unbounded"
+            minOccurs="0">
+            <xs:element
+                type="xs:string"
+                name="notes"
+                minOccurs="0" />
+            <xs:element
+                type="assessmentAlertsType"
+                name="assessmentAlerts"
+                minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute
+            type="xs:string"
+            name="code"
+            use="required" />
+        <xs:attribute
+            type="xs:string"
+            name="status"
+            use="required" />
+        <xs:attribute
+            type="relativeOrDate"
+            name="goalDate" />
+        <xs:attribute
+            type="xs:string"
+            name="type"
+            use="required" />
+        <xs:attribute
+            type="relativeOrDate"
+            name="completionDate" />
+        <xs:attribute
+            type="xs:string"
+            name="name" />
+    </xs:complexType>
+    <xs:complexType
+        name="courseItemType"
+        mixed="true">
+        <xs:sequence
+            maxOccurs="unbounded"
+            minOccurs="0">
+            <xs:element
+                type="xs:string"
+                name="notes"
+                minOccurs="0" />
+            <xs:element
+                type="courseAlertsType"
+                name="courseAlerts"
+                minOccurs="0" />
+            <xs:element
+                type="assessmentsType"
+                name="assessments"
+                minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute
+            type="xs:string"
+            name="number"
+            use="required" />
+        <xs:attribute
+            type="xs:string"
+            name="title"
+            use="required" />
+        <xs:attribute
+            type="xs:string"
+            name="status"
+            use="required" />
+        <xs:attribute
+            type="xs:date"
+            name="expectedStart" />
+        <xs:attribute
+            type="xs:date"
+            name="actualStart" />
+        <xs:attribute
+            type="xs:date"
+            name="expectedEnd" />
+        <xs:attribute
+            type="xs:date"
+            name="actualEnd" />
+        <xs:attribute
+            type="xs:nonNegativeInteger"
+            name="competencyUnits" />
+        <xs:attribute
+            type="xs:nonNegativeInteger"
+            name="mentorId" />
+    </xs:complexType>
+    <xs:complexType name="termItemType">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element
+                type="xs:string"
+                name="notes"
+                minOccurs="0"
+                maxOccurs="1" />
+            <xs:element
+                type="coursesType"
+                name="courses"
+                minOccurs="0"
+                maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute
+            type="xs:string"
+            name="name"
+            use="required" />
+        <xs:attribute
+            type="xs:date"
+            name="start" />
+        <xs:attribute
+            type="xs:date"
+            name="end" />
+    </xs:complexType>
+    <xs:complexType name="mentorsType">
+        <xs:sequence>
+            <xs:element
+                type="mentorItemType"
+                name="item"
+                maxOccurs="unbounded"
+                minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="courseAlertsType">
+        <xs:sequence>
+            <xs:element
+                type="courseAlertItemType"
+                name="item"
+                maxOccurs="unbounded"
+                minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="assessmentAlertsType">
+        <xs:sequence>
+            <xs:element
+                type="assessmentAlertItemType"
+                name="item" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="assessmentsType">
+        <xs:sequence>
+            <xs:element
+                type="assessmentsItemType"
+                name="item"
+                maxOccurs="unbounded"
+                minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="coursesType">
+        <xs:sequence>
+            <xs:element
+                type="courseItemType"
+                name="item"
+                maxOccurs="unbounded"
+                minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="termsType">
+        <xs:sequence>
+            <xs:element
+                type="termItemType"
+                name="item"
+                maxOccurs="unbounded"
+                minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SampleDataType">
+        <xs:sequence>
+            <xs:element
+                type="mentorsType"
+                name="mentors" />
+            <xs:element
+                type="termsType"
+                name="terms" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
