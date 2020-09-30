@@ -1,6 +1,9 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
+import android.app.DatePickerDialog;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +18,19 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.chip.Chip;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -63,7 +74,7 @@ public class AssessmentPropertiesFragment extends Fragment {
         statusButton.setOnClickListener(this::onStatusButtonClick);
         goalDateChip.setOnClickListener(this::onGoalDateChipClick);
         goalDateChip.setOnCloseIconClickListener(this::onGoalDateChipCloseIconClick);
-        completionDateChip.setOnClickListener(this::onCmpletionDateChipClick);
+        completionDateChip.setOnClickListener(this::onCompletionDateChipClick);
         completionDateChip.setOnCloseIconClickListener(this::onCompletionDateChipCloseIconClick);
     }
 
@@ -73,42 +84,170 @@ public class AssessmentPropertiesFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onEntityLoaded);
+        viewModel.getCoursesLiveData().observe(viewLifecycleOwner, this::onCoursesLoaded);
+    }
+
+    private void onCoursesLoaded(List<TermCourseListItem> courseListItems) {
+        Log.d(LOG_TAG, String.format("Loaded %d courses", courseListItems.size()));
+        AbstractCourseEntity<?> course = viewModel.initializeCourseProperty(courseListItems);
+        if (null != course) {
+            onCourseChanged(course);
+        }
     }
 
     private void onEntityLoaded(AssessmentDetails assessmentDetails) {
-
-        codeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCode));
-        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
+        if (null == assessmentDetails) {
+            return;
+        }
+        Log.d(LOG_TAG, String.format("Enter onEntityLoaded(%s)", assessmentDetails));
         codeEditText.setText(viewModel.getCode());
         notesEditText.setText(viewModel.getNotes());
+        viewModel.initializeCourseProperty(viewModel.getCoursesLiveData().getValue());
+        onCourseChanged(viewModel.getSelectedCourse());
+        onTypeChanged();
+        onStatusChanged();
+        onGoalDateChanged();
+        onCompletionDateChanged();
+        codeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCode));
+        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
     }
 
     private void onCourseButtonClick(View view) {
-
+        Log.d(LOG_TAG, "Enter onCourseButtonClick");
+        List<TermCourseListItem> courseListItems = viewModel.getCoursesLiveData().getValue();
+        if (null != courseListItems) {
+            AlertHelper.showSingleSelectDialog(R.string.title_select_course, viewModel.getSelectedCourse(), courseListItems, requireContext(), AbstractCourseEntity::getTitle, t -> {
+                viewModel.setSelectedCourse(t);
+                onCourseChanged(t);
+            });
+        } else {
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_db_read_operation_in_progress, requireContext()).showDialog();
+        }
     }
 
     private void onTypeButtonClick(View view) {
-
+        Log.d(LOG_TAG, "Enter onStatusButtonClick");
+        Resources resources = getResources();
+        AlertHelper.showSingleSelectDialog(R.string.title_select_type, viewModel.getType(), Arrays.asList(AssessmentType.values()), requireContext(), t -> resources.getString(t.displayResourceId()), t -> {
+            if (viewModel.getType() != t) {
+                viewModel.setType(t);
+                onTypeChanged();
+            }
+        });
     }
 
     private void onStatusButtonClick(View view) {
-
+        Log.d(LOG_TAG, "Enter onStatusButtonClick");
+        Resources resources = getResources();
+        AlertHelper.showSingleSelectDialog(R.string.title_select_status, viewModel.getStatus(), Arrays.asList(AssessmentStatus.values()), requireContext(), t -> resources.getString(t.displayResourceId()), t -> {
+            if (viewModel.getStatus() != t) {
+                viewModel.setStatus(t);
+                onStatusChanged();
+            }
+        });
     }
 
     private void onGoalDateChipClick(View view) {
-
+        LocalDate date = viewModel.getGoalDate();
+        if (null == date) {
+            AbstractCourseEntity<?> course = viewModel.getSelectedCourse();
+            if (null != course) {
+                if (null == (date = course.getActualEnd()) && null == (date = course.getExpectedEnd())) {
+                    date = LocalDate.now();
+                }
+            } else {
+                date = LocalDate.now();
+            }
+        }
+        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> {
+            LocalDate v = LocalDate.of(y, m + 1, d);
+            if (!v.equals(viewModel.getGoalDate())) {
+                viewModel.setGoalDate(v);
+                onGoalDateChanged();
+            }
+        }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     private void onGoalDateChipCloseIconClick(View view) {
-
+        if (null != viewModel.getGoalDate()) {
+            viewModel.setGoalDate(null);
+            onGoalDateChanged();
+        }
     }
 
-    private void onCmpletionDateChipClick(View view) {
-
+    private void onCompletionDateChipClick(View view) {
+        LocalDate date = viewModel.getCompletionDate();
+        if (null == date && null == (date = viewModel.getGoalDate())) {
+            AbstractCourseEntity<?> course = viewModel.getSelectedCourse();
+            if (null != course) {
+                if (null == (date = course.getActualEnd()) && null == (date = course.getExpectedEnd())) {
+                    date = LocalDate.now();
+                }
+            } else {
+                date = LocalDate.now();
+            }
+        }
+        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> {
+            LocalDate v = LocalDate.of(y, m + 1, d);
+            if (!v.equals(viewModel.getCompletionDate())) {
+                viewModel.setCompletionDate(v);
+                onCompletionDateChanged();
+            }
+        }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     private void onCompletionDateChipCloseIconClick(View view) {
+        if (null != viewModel.getCompletionDate()) {
+            viewModel.setCompletionDate(null);
+            onCompletionDateChanged();
+        }
+    }
 
+    private void onCourseChanged(AbstractCourseEntity<?> course) {
+        if (null == course) {
+            Log.d(LOG_TAG, "Enter onCourseChanged(null)");
+            courseButton.setText(R.string.label_none);
+        } else {
+            Log.d(LOG_TAG, String.format("Enter onCourseChanged(%s)", course));
+            courseButton.setText(course.getTitle());
+        }
+    }
+
+    private void onTypeChanged() {
+        typeButton.setText(viewModel.getType().displayResourceId());
+    }
+
+    private void onStatusChanged() {
+        Log.d(LOG_TAG, "Enter onStatusChanged");
+        statusButton.setText(viewModel.getStatus().displayResourceId());
+        onGoalDateChanged();
+        onCompletionDateChanged();
+    }
+
+    private void onCompletionDateChanged() {
+        LocalDate d = viewModel.getCompletionDate();
+        if (null == d) {
+            Log.d(LOG_TAG, "Enter onCompletionDateChanged(null)");
+            completionDateChip.setText("");
+            completionDateChip.setCloseIconVisible(false);
+        } else {
+            Log.d(LOG_TAG, String.format("Enter onCompletionDateChanged(%s)", d));
+            completionDateChip.setText(FORMATTER.format(d));
+            completionDateChip.setCloseIconVisible(true);
+        }
+    }
+
+    private void onGoalDateChanged() {
+        LocalDate d = viewModel.getGoalDate();
+        if (null == d) {
+            Log.d(LOG_TAG, "Enter onGoalDateChanged(null)");
+            goalDateChip.setText("");
+            goalDateChip.setCloseIconVisible(false);
+        } else {
+            Log.d(LOG_TAG, String.format("Enter onGoalDateChanged(%s)", d));
+            goalDateChip.setText(FORMATTER.format(d));
+            goalDateChip.setCloseIconVisible(true);
+        }
     }
 
 }

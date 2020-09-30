@@ -93,7 +93,6 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private void onCourseLoadSuccess(CourseDetails entity) {
         Log.d(LOG_TAG, "Enter onCourseLoadSuccess");
-
     }
 
     private void onCourseLoadFailed(Throwable throwable) {
@@ -109,7 +108,7 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private void onCancelImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onCancelImageButtonClick");
-        verifySaveChanges();
+        confirmSave();
     }
 
     private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
@@ -127,16 +126,6 @@ public class AddCourseActivity extends AppCompatActivity {
         Log.e(LOG_TAG, "Error saving course", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
                 .showDialog();
-    }
-
-    private void verifySaveChanges() {
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                this::finish,
-                () -> {
-                    compositeDisposable.clear();
-                    compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-                    finish();
-                }, null);
     }
 
 }

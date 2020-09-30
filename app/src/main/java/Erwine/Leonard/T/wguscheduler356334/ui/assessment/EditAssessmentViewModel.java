@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.AddAssessmentActivity;
@@ -105,6 +106,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public LiveData<String> getTitleLiveData() {
         return titleLiveData;
+    }
+
+    public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
+        return coursesLiveData;
     }
 
     public Long getId() {
@@ -300,7 +305,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return Single.just(assessmentEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
+    public void saveViewModelState(Bundle outState) {
+        outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        currentValues.saveState(outState, false);
+        assessmentEntity.saveState(outState, true);
+    }
+
     private void onEntityLoaded() {
+        // TODO: Listen for title and update
         titleLiveData.postValue(assessmentEntity.getName());
         entityLiveData.postValue(assessmentEntity);
         // TODO: Set up option listing listeners here
@@ -310,7 +322,13 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
         assessmentEntity = entity;
         setCode(entity.getCode());
-        // TODO: Initialize remainder of properties
+        setCompletionDate(entity.getCompletionDate());
+        setGoalDate(entity.getGoalDate());
+        setName(entity.getName());
+        setNotes(entity.getNotes());
+        setSelectedCourse(entity.getCourse());
+        setStatus(entity.getStatus());
+        setType(entity.getType());
         onEntityLoaded();
     }
 
@@ -353,6 +371,16 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             return !getNormalizedNotes().equals(assessmentEntity.getNotes());
         }
         return true;
+    }
+
+    public AbstractCourseEntity<?> initializeCourseProperty(List<TermCourseListItem> courseListItems) {
+        if (null == courseListItems || null == assessmentEntity) {
+            return null;
+        }
+        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeTermProperty");
+        Optional<TermCourseListItem> result = EntityHelper.findById(assessmentEntity.getCourseId(), courseListItems);
+        result.ifPresent(t -> assessmentEntity.setCourse(t));
+        return result.orElse(null);
     }
 
     private class CurrentValues implements Assessment {

@@ -53,6 +53,7 @@
     <string name="message_all_data_delete_warning">Warning! These next two options will delete all data stored by this app!</string>
     <string name="message_competency_units_required">Competency units not specified</string>
     <string name="message_course_id_not_specified">Course ID not specified</string>
+    <string name="message_assessment_id_not_specified">Assessment ID not specified</string>
     <string name="message_course_no_assessments">Course has no assessments.</string>
     <string name="message_course_number_required">Course number cannot be empty</string>
     <string name="message_assessment_code_required">Assessment Code cannot be empty</string>
@@ -98,6 +99,7 @@
     <string name="title_activity_new_term">Add New Term</string>
     <string name="title_activity_settings">Settings</string>
     <string name="format_course">Course: %s</string>
+    <string name="format_assessment">Assessment: %s</string>
     <string name="format_term">Term: %s</string>
     <string name="title_actual">Actual:</string>
     <string name="title_add_sample_data_error">Add Sample Data Error</string>
@@ -130,8 +132,10 @@
     <string name="tooltip_reset_with_sample_data">Deletes all existing data and populates database with sample data</string>
     <string name="validation_succeeded">Validation succeeded.</string>
     <string name="title_select_term">Select Term</string>
+    <string name="title_select_course">Select Course</string>
     <string name="title_select_mentor">Select Mentor</string>
     <string name="title_select_status">Select Status</string>
+    <string name="title_select_type">Select Type</string>
     <string name="title_not_ready">Not Ready</string>
     <string name="message_db_read_operation_in_progress">Data still being read from database… Please try again in a couple seconds.</string>
     <string name="label_course">Course</string>

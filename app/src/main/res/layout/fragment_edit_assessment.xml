@@ -7,17 +7,43 @@
     android:layout_height="match_parent"
     tools:context=".ui.assessment.EditAssessmentFragment">
 
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/constraintLayout"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1" />
+    <fragment
+        android:id="@+id/assessmentPropertiesFragment"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentPropertiesFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/saveImageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout="@layout/fragment_assessment_properties" />
+
+    <ImageButton
+        android:id="@+id/alertImageButton"
+        style="@style/WGU.Scheduler.AlertImageButtonStyle"
+        android:contentDescription="@string/command_manage_alerts"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/saveImageButton" />
+
+    <ImageButton
+        android:id="@+id/saveImageButton"
+        style="@style/WGU.Scheduler.SaveImageButtonStyle"
+        android:contentDescription="@string/command_save_changes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deleteImageButton" />
+
+    <ImageButton
+        android:id="@+id/deleteImageButton"
+        style="@style/WGU.Scheduler.DeleteImageButtonStyle"
+        android:contentDescription="@string/command_delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
+
+    <ImageButton
+        android:id="@+id/cancelImageButton"
+        style="@style/WGU.Scheduler.CancelImageButtonStyle"
+        android:contentDescription="@android:string/cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

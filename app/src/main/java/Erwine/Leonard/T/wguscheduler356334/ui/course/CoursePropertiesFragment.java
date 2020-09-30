@@ -255,15 +255,15 @@ public class CoursePropertiesFragment extends Fragment {
         competencyUnitsEditText.setText(viewModel.getCompetencyUnitsText());
         titleEditText.setText(viewModel.getTitle());
         onStatusChanged();
-        courseCodeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNumber));
-        competencyUnitsEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCompetencyUnitsText));
-        titleEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setTitle));
-        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
         onExpectedStartChanged();
         onActualStartChanged();
         onExpectedEndChanged();
         onActualEndChanged();
         notesEditText.setText(viewModel.getNotes());
+        courseCodeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNumber));
+        competencyUnitsEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCompetencyUnitsText));
+        titleEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setTitle));
+        notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
     }
 
     private void onTermsLoaded(List<TermListItem> termListItems) {
