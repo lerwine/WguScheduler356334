@@ -155,4 +155,5 @@
     <string name="format_range">%s to %s</string>
     <string name="label_em_dash">–</string>
     <string name="label_colon">:</string>
+    <string name="title_activity_view_assessment">View Assessment</string>
 </resources>

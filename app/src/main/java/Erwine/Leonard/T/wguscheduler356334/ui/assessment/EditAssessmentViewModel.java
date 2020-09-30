@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -17,10 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
-import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
+import Erwine.Leonard.T.wguscheduler356334.AddAssessmentActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
+import Erwine.Leonard.T.wguscheduler356334.ViewAssessmentActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
@@ -40,6 +42,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class EditAssessmentViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditAssessmentViewModel.class.getName();
@@ -48,6 +51,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
     private AssessmentDetails assessmentEntity;
     private final MutableLiveData<AssessmentDetails> entityLiveData;
+    private final MutableLiveData<String> titleLiveData;
     private final LiveData<List<TermListItem>> termsLiveData;
     private final MutableLiveData<Boolean> courseValidLiveData;
     private final MutableLiveData<Boolean> codeValidLiveData;
@@ -58,14 +62,16 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private LiveData<List<AssessmentEntity>> assessmentsLiveData;
     private AbstractCourseEntity<?> selectedCourse;
     private AbstractTermEntity<?> selectedTerm;
+    private boolean fromInitializedState;
     private String normalizedCode = "";
     private String normalizedNotes = "";
     private Observer<List<TermListItem>> termsLoadedObserver;
     private Observer<List<TermCourseListItem>> coursesLoadedObserver;
     private Observer<List<AssessmentEntity>> assessmentsLoadedObserver;
 
+    // TODO: Call this to add a new assessment
     public static void startAddAssessmentActivity(@NonNull Context context, long courseId, @Nullable LocalDate goalDate) {
-        Intent intent = new Intent(context, AddCourseActivity.class);
+        Intent intent = new Intent(context, AddAssessmentActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Term.COLNAME_ID, false), courseId);
         if (null != goalDate) {
             intent.putExtra(AssessmentDetails.COLNAME_GOAL_DATE, goalDate.toEpochDay());
@@ -73,8 +79,9 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         context.startActivity(intent);
     }
 
+    // TODO: Call this to view an assessment
     public static void startViewAssessmentActivity(@NonNull Context context, long assessmentId) {
-        Intent intent = new Intent(context, ViewCourseActivity.class);
+        Intent intent = new Intent(context, ViewAssessmentActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Course.COLNAME_ID, false), assessmentId);
         context.startActivity(intent);
     }
@@ -82,6 +89,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     public EditAssessmentViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
+        titleLiveData = new MutableLiveData<>("");
         termsLiveData = dbLoader.getAllTerms();
         currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
@@ -93,6 +101,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public LiveData<AssessmentDetails> getEntityLiveData() {
         return entityLiveData;
+    }
+
+    public LiveData<String> getTitleLiveData() {
+        return titleLiveData;
     }
 
     public Long getId() {
@@ -259,6 +271,47 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             termsLoadedObserver = this::onTermsLoaded;
             termsLiveData.observeForever(termsLoadedObserver);
         }
+    }
+
+    public boolean isFromInitializedState() {
+        return fromInitializedState;
+    }
+
+    // TODO: Ensure AddAssessmentActivity and ViewAssessmentActivity call this
+    public synchronized Single<AssessmentDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
+        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
+        Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
+        assessmentEntity = new AssessmentDetails((AbstractCourseEntity<?>) null);
+        if (null != state) {
+            Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
+            currentValues.restoreState(state, false);
+            Long id = currentValues.getId();
+            if (null == id || fromInitializedState) {
+                Log.d(LOG_TAG, "Restoring courseEntity from saved state");
+                assessmentEntity.restoreState(state, fromInitializedState);
+            } else {
+                // TODO: Make sure callers of initializeViewModelState display error alert and log it upon error
+                return dbLoader.getAssessmentById(id).doOnSuccess(this::onEntityLoadedFromDb);
+            }
+        } else {
+            // TODO: Anything need special handling?
+        }
+        onEntityLoaded();
+        return Single.just(assessmentEntity).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private void onEntityLoaded() {
+        titleLiveData.postValue(assessmentEntity.getName());
+        entityLiveData.postValue(assessmentEntity);
+        // TODO: Set up option listing listeners here
+    }
+
+    private void onEntityLoadedFromDb(AssessmentDetails entity) {
+        Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
+        assessmentEntity = entity;
+        setCode(entity.getCode());
+        // TODO: Initialize remainder of properties
+        onEntityLoaded();
     }
 
     public synchronized Single<List<Integer>> save() {

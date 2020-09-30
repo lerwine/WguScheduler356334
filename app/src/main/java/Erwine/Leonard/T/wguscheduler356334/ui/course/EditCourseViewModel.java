@@ -280,7 +280,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         return coursesForTerm;
     }
 
-    public MutableLiveData<CourseDetails> getEntityLiveData() {
+    public LiveData<CourseDetails> getEntityLiveData() {
         return entityLiveData;
     }
 
@@ -292,47 +292,47 @@ public class EditCourseViewModel extends AndroidViewModel {
         return termsLiveData;
     }
 
-    public MutableLiveData<Boolean> getTermValidLiveData() {
+    public LiveData<Boolean> getTermValidLiveData() {
         return termValidLiveData;
     }
 
-    public MutableLiveData<Boolean> getNumberValidLiveData() {
+    public LiveData<Boolean> getNumberValidLiveData() {
         return numberValidLiveData;
     }
 
-    public MutableLiveData<Boolean> getTitleValidLiveData() {
+    public LiveData<Boolean> getTitleValidLiveData() {
         return titleValidLiveData;
     }
 
-    public MutableLiveData<Integer> getExpectedStartErrorMessageLiveData() {
+    public LiveData<Integer> getExpectedStartErrorMessageLiveData() {
         return expectedStartErrorMessageLiveData;
     }
 
-    public MutableLiveData<Integer> getExpectedStartWarningMessageLiveData() {
+    public LiveData<Integer> getExpectedStartWarningMessageLiveData() {
         return expectedStartWarningMessageLiveData;
     }
 
-    public MutableLiveData<Integer> getExpectedEndMessageLiveData() {
+    public LiveData<Integer> getExpectedEndMessageLiveData() {
         return expectedEndMessageLiveData;
     }
 
-    public MutableLiveData<Integer> getActualStartErrorMessageLiveData() {
+    public LiveData<Integer> getActualStartErrorMessageLiveData() {
         return actualStartErrorMessageLiveData;
     }
 
-    public MutableLiveData<Integer> getActualStartWarningMessageLiveData() {
+    public LiveData<Integer> getActualStartWarningMessageLiveData() {
         return actualStartWarningMessageLiveData;
     }
 
-    public MutableLiveData<Integer> getActualEndMessageLiveData() {
+    public LiveData<Integer> getActualEndMessageLiveData() {
         return actualEndMessageLiveData;
     }
 
-    public MutableLiveData<Integer> getCompetencyUnitsMessageLiveData() {
+    public LiveData<Integer> getCompetencyUnitsMessageLiveData() {
         return competencyUnitsMessageLiveData;
     }
 
-    public MutableLiveData<String> getTitleLiveData() {
+    public LiveData<String> getTitleLiveData() {
         return titleLiveData;
     }
 
@@ -356,6 +356,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
                 return dbLoader.getCourseById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
+                        // TODO: Make sure callers of initializeViewModelState display error alert and log the error; then delete the following invocation
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
             if (fromInitializedState) {

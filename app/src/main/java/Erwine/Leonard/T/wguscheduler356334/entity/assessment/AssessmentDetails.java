@@ -121,8 +121,8 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     }
 
     @Ignore
-    public AssessmentDetails(AssessmentEntity source, AbstractCourseEntity<?> course) {
-        super(source);
+    public AssessmentDetails(AbstractCourseEntity<?> course) {
+        super(null, null, null, null, null, null, null, null, null);
         if (null == course) {
             courseNumber = courseTitle = courseNotes = "";
             courseStatus = CourseStatus.UNPLANNED;

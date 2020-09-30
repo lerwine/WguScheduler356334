@@ -11,6 +11,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+        <activity android:name=".AddAssessmentActivity"></activity>
+        <activity
+            android:name=".ViewAssessmentActivity"
+            android:label="@string/title_activity_view_assessment"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".EditAssessmentActivity" />
         <activity android:name=".AddCourseActivity" />
         <activity android:name=".ViewCourseActivity" />
