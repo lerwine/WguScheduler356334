@@ -27,6 +27,9 @@ public interface TermDAO {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(TermEntity term);
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void updateSynchronous(TermEntity term);
+
     @Insert
     Single<List<Long>> insertAll(List<TermEntity> terms);
 
@@ -44,6 +47,9 @@ public interface TermDAO {
 
     @Query("SELECT * FROM terms WHERE id = :id")
     Single<TermEntity> getById(long id);
+
+    @Query("SELECT * FROM terms WHERE id = :id")
+    TermEntity getByIdSynchronous(long id);
 
     @Query("SELECT * FROM termListView")
     LiveData<List<TermListItem>> getAll();

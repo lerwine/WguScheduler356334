@@ -8,15 +8,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -84,7 +83,7 @@ public class AddCourseActivity extends AppCompatActivity {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
                 compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
             }, null);
         } else {
             finish();
@@ -103,7 +102,7 @@ public class AddCourseActivity extends AppCompatActivity {
     private void onSaveImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onCancelImageButtonClick(View view) {
@@ -111,14 +110,25 @@ public class AddCourseActivity extends AppCompatActivity {
         confirmSave();
     }
 
-    private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
-        Log.d(LOG_TAG, String.format("Enter onSaveOperationFinished with %d messages", messageIds.size()));
-        if (messageIds.isEmpty()) {
+    private void onSaveOperationFinished(@NonNull ValidationMessage.ResourceMessageResult messages) {
+        if (messages.isSucceeded()) {
             finish();
         } else {
             Resources resources = getResources();
-            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, messageIds.stream().map(resources::getString).collect(Collectors.joining("; ")), this)
-                    .showDialog();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
         }
     }
 

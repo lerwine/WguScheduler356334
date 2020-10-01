@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
@@ -14,6 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 public interface Assessment extends NoteColumnIncludedEntity {
     /**
@@ -45,6 +47,20 @@ public interface Assessment extends NoteColumnIncludedEntity {
      * The name of the {@code "completionDate"} database column, which contains the actual completion date for the assessment.
      */
     String COLNAME_COMPLETION_DATE = "completionDate";
+
+    static void validate(ValidationMessage.ResourceMessageBuilder builder, AssessmentEntity entity) {
+        if (entity.getCode().isEmpty()) {
+            builder.acceptError(R.string.message_assessment_code_required);
+        }
+        switch (entity.getStatus()) {
+            case NOT_PASSED:
+            case PASSED:
+                if (null == entity.getCompletionDate()) {
+                    builder.acceptError(R.string.message_assessment_code_required);
+                }
+                break;
+        }
+    }
 
     /**
      * Gets the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.

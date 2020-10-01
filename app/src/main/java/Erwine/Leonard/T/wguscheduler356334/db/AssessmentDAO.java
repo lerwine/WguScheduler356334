@@ -27,6 +27,9 @@ public interface AssessmentDAO {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(AssessmentEntity assessment);
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void updateSynchronous(AssessmentEntity assessment);
+
     @Insert
     Single<List<Long>> insertAll(List<AssessmentEntity> list);
 
@@ -38,6 +41,9 @@ public interface AssessmentDAO {
 
     @Delete
     Completable delete(AssessmentEntity assessment);
+
+    @Delete
+    void deleteSynchronous(AssessmentEntity assessment);
 
     @Query("SELECT * FROM assessments WHERE ROWID = :rowId")
     Single<AssessmentEntity> getByRowId(int rowId);
@@ -56,6 +62,9 @@ public interface AssessmentDAO {
 
     @Query("SELECT * FROM assessments ORDER BY [goalDate], completionDate")
     List<AssessmentEntity> getAllSynchronous();
+
+    @Query("SELECT COUNT(*) FROM assessments WHERE courseId = :courseId")
+    int getCountByCourseIdSynchronous(long courseId);
 
     @Query("SELECT COUNT(*) FROM assessments")
     Single<Integer> getCount();

@@ -30,6 +30,9 @@ public interface CourseDAO {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(CourseEntity course);
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    Completable updateSynchronous(CourseEntity course);
+
     @Insert
     Single<List<Long>> insertAll(List<CourseEntity> list);
 
@@ -42,11 +45,17 @@ public interface CourseDAO {
     @Delete
     Completable delete(CourseEntity course);
 
+    @Delete
+    void deleteSynchronous(CourseEntity course);
+
     @Query("SELECT * FROM courses WHERE ROWID = :rowId")
     Single<CourseEntity> getByRowId(int rowId);
 
     @Query("SELECT * FROM courseDetailView WHERE id = :id")
     Single<CourseDetails> getById(long id);
+
+    @Query("SELECT * FROM courses WHERE id = :id")
+    CourseEntity getByIdSynchronous(long id);
 
     @Query("SELECT * FROM courses ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getAll();
@@ -68,6 +77,12 @@ public interface CourseDAO {
 
     @Query("SELECT COUNT(*) FROM courses")
     Single<Integer> getCount();
+
+    @Query("SELECT COUNT(*) FROM courses WHERE mentorId=:mentorId")
+    int getCountByMentorIdSynchronous(long mentorId);
+
+    @Query("SELECT COUNT(*) FROM courses WHERE termId=:termId")
+    int getCountByTermIdSynchronous(long termId);
 
     @Query("DELETE FROM courses WHERE termId=:termId")
     Single<Integer> deleteByTermId(long termId);

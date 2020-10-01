@@ -11,6 +11,16 @@ import java.util.stream.Stream;
 public class ComparisonHelper {
 
     @SafeVarargs
+    public static <T> Optional<T> firstNonNull(T... values) {
+        for (T t : values) {
+            if (null != t) {
+                return Optional.of(t);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @SafeVarargs
     public static <T extends Comparable<T>> Optional<T> maxValue(T... values) {
         return maxValue(Comparable::compareTo, values);
     }

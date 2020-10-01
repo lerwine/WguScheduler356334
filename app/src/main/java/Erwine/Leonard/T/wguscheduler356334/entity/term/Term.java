@@ -7,9 +7,11 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 public interface Term extends NoteColumnIncludedEntity {
 
@@ -25,6 +27,21 @@ public interface Term extends NoteColumnIncludedEntity {
      * The name of the {@code "end"} database column, which contains the inclusive end date for the term.
      */
     String COLNAME_END = "end";
+
+    static void validate(ValidationMessage.ResourceMessageBuilder builder, TermEntity entity) {
+        if (entity.getName().isEmpty()) {
+            builder.acceptError(R.string.message_name_required);
+        }
+        LocalDate end = entity.getEnd();
+        if (null != end) {
+            LocalDate start = entity.getStart();
+            if (null == start) {
+                builder.acceptError(R.string.message_start_required_with_end);
+            } else if (start.compareTo(end) > 0) {
+                builder.acceptError(R.string.message_start_after_end);
+            }
+        }
+    }
 
     /**
      * Gets the name of the term.

@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,10 +16,10 @@ import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.AddAssessmentActivity;
@@ -26,6 +27,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewAssessmentActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
+import Erwine.Leonard.T.wguscheduler356334.db.AssessmentTypeConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AbstractAssessmentEntity;
@@ -40,6 +42,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -51,7 +54,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
     private AssessmentDetails assessmentEntity;
     private final MutableLiveData<AssessmentDetails> entityLiveData;
-    private final MutableLiveData<String> titleLiveData;
+    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
     private final LiveData<List<TermListItem>> termsLiveData;
     private final MutableLiveData<Boolean> courseValidLiveData;
     private final MutableLiveData<Boolean> codeValidLiveData;
@@ -63,6 +66,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private AbstractCourseEntity<?> selectedCourse;
     private AbstractTermEntity<?> selectedTerm;
     private boolean fromInitializedState;
+    private String normalizedName;
     private String normalizedCode = "";
     private String normalizedNotes = "";
     private Observer<List<TermListItem>> termsLoadedObserver;
@@ -87,7 +91,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     public EditAssessmentViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        titleLiveData = new MutableLiveData<>("");
+        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
         termsLiveData = dbLoader.getAllTerms();
         currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
@@ -101,8 +105,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return entityLiveData;
     }
 
-    public LiveData<String> getTitleLiveData() {
-        return titleLiveData;
+    public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
+        return titleFactoryLiveData;
     }
 
     public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
@@ -305,8 +309,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     private void onEntityLoaded() {
-        String s = assessmentEntity.getName();
-        titleLiveData.postValue((null == s) ? assessmentEntity.getCode() : assessmentEntity.getCode() + " - " + s);
+        String n = assessmentEntity.getName();
+        if (null == n) {
+            titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(assessmentEntity.getType().displayResourceId()), assessmentEntity.getCode()));
+        } else {
+            titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(assessmentEntity.getType().displayResourceId()), assessmentEntity.getCode(), n));
+        }
         entityLiveData.postValue(assessmentEntity);
     }
 
@@ -324,17 +332,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         onEntityLoaded();
     }
 
-    public synchronized Single<List<Integer>> save() {
+    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
         ArrayList<Integer> errors = new ArrayList<>();
         if (null == selectedCourse) {
-            errors.add(R.string.message_course_not_selected);
-        }
-        if (normalizedCode.isEmpty()) {
-            errors.add(R.string.message_assessment_code_required);
-        }
-        if (!errors.isEmpty()) {
-            Log.d(LOG_TAG, String.format("Returning %d errors", errors.size()));
-            return Single.just(errors);
+            return Single.just(ValidationMessage.ofSingleError(R.string.message_course_not_selected));
         }
         AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
         entity.setCode(currentValues.getCode());
@@ -346,7 +347,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         entity.setStatus(currentValues.getStatus());
         entity.setType(currentValues.getType());
         entity.setNotes(currentValues.getNotes());
-        return dbLoader.saveAssessment(entity).toSingleDefault(Collections.emptyList());
+        return dbLoader.saveAssessment(entity, ignoreWarnings);
     }
 
     public Completable delete() {
@@ -428,6 +429,11 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 codeValidLiveData.postValue(true);
             }
+            if (normalizedName.isEmpty()) {
+                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(type.displayResourceId()), normalizedCode));
+            } else {
+                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(type.displayResourceId()), normalizedCode, normalizedName));
+            }
         }
 
         @Override
@@ -438,8 +444,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
-            String s = AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER.apply(name);
-            this.name = (s.isEmpty()) ? null : name;
+            normalizedName = AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER.apply(name);
+            if (normalizedName.isEmpty()) {
+                this.name = null;
+                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(type.displayResourceId()), normalizedCode));
+            } else {
+                this.name = name;
+                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(type.displayResourceId()), normalizedCode, normalizedName));
+            }
         }
 
         @NonNull
@@ -483,7 +495,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
         @Override
         public void setType(AssessmentType type) {
-            this.type = type;
+            this.type = AssessmentTypeConverter.asNonNull(type);
+            if (normalizedName.isEmpty()) {
+                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(this.type.displayResourceId()), normalizedCode));
+            } else {
+                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(this.type.displayResourceId()), normalizedCode, normalizedName));
+            }
         }
 
         @NonNull

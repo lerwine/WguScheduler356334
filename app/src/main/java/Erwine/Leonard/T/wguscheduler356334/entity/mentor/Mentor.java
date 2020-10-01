@@ -4,9 +4,11 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 public interface Mentor extends NoteColumnIncludedEntity {
 
@@ -22,6 +24,15 @@ public interface Mentor extends NoteColumnIncludedEntity {
      * The name of the {@code "emailAddress"} database column, which contains the course mentor's email address.
      */
     String COLNAME_EMAIL_ADDRESS = "emailAddress";
+
+    static void validate(ValidationMessage.ResourceMessageBuilder builder, MentorEntity entity) {
+        if (entity.getName().isEmpty()) {
+            builder.acceptError(R.string.message_name_required);
+        }
+        if (entity.getPhoneNumber().isEmpty() && entity.getEmailAddress().isEmpty()) {
+            builder.acceptError(R.string.message_phone_or_email_required);
+        }
+    }
 
     /**
      * Gets the name of the course mentor.

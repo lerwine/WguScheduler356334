@@ -67,14 +67,14 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
             LocalDate end = listItem.getEnd();
             if (null == start) {
                 if (null == end) {
-                    termRangeTextView.setText(R.string.label_unknown_range);
+                    termRangeTextView.setText(R.string.label_unknown_to_unknown_range);
                 } else {
-                    termRangeTextView.setText(context.getResources().getString(R.string.format_range_end_only, FORMATTER.format(end)));
+                    termRangeTextView.setText(context.getResources().getString(R.string.format_range_unknown_to_end, FORMATTER.format(end)));
                 }
             } else if (null == end) {
-                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_only, FORMATTER.format(start)));
+                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_to_unknown, FORMATTER.format(start)));
             } else {
-                termRangeTextView.setText(context.getResources().getString(R.string.format_range, FORMATTER.format(start), FORMATTER.format(end)));
+                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_to_end, FORMATTER.format(start), FORMATTER.format(end)));
             }
         }
 

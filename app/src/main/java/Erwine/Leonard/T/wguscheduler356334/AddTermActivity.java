@@ -8,15 +8,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class AddTermActivity extends AppCompatActivity {
@@ -90,17 +89,30 @@ public class AddTermActivity extends AppCompatActivity {
     private void onSaveTermImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveTermImageButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
-    private void onSaveOperationFinished(@NonNull List<Integer> messageIds) {
+    private void onSaveOperationFinished(@NonNull ValidationMessage.ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
-        if (messageIds.isEmpty()) {
+        if (messages.isSucceeded()) {
             finish();
         } else {
             Resources resources = getResources();
-            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, messageIds.stream().map(resources::getString).collect(Collectors.joining("; ")), this)
-                    .showDialog();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources)))
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            dialog.dismiss();
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                        })
+                        .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources));
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
         }
     }
 
@@ -118,7 +130,7 @@ public class AddTermActivity extends AppCompatActivity {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
                 compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
             }, null);
         } else {
             finish();

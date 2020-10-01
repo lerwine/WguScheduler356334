@@ -9,18 +9,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -74,14 +74,14 @@ public class EditCourseFragment extends Fragment {
     private void onSaveImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onDeleteImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, requireContext()).showYesNoDialog(() -> {
             compositeDisposable.clear();
-            compositeDisposable.add(viewModel.delete().subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
+            compositeDisposable.add(viewModel.delete(false).subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
         }, null);
     }
 
@@ -90,14 +90,25 @@ public class EditCourseFragment extends Fragment {
         verifySaveChanges();
     }
 
-    private void onSaveOperationFinished(List<Integer> messageIds) {
+    private void onSaveOperationFinished(ValidationMessage.ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationFinished");
-        if (messageIds.isEmpty()) {
+        if (messages.isSucceeded()) {
             requireActivity().finish();
         } else {
             Resources resources = getResources();
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(requireContext()).setTitle(R.string.title_save_error)
-                    .setMessage(messageIds.stream().map(resources::getString).collect(Collectors.joining("; "))).setCancelable(true).create();
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
             dlg.show();
         }
     }
@@ -108,9 +119,27 @@ public class EditCourseFragment extends Fragment {
                 .showDialog(() -> requireActivity().finish());
     }
 
-    private void onDeleteSucceeded() {
+    private void onDeleteSucceeded(ValidationMessage.ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onDeleteSucceeded");
-        requireActivity().finish();
+        if (messages.isSucceeded()) {
+            requireActivity().finish();
+        } else {
+            Resources resources = getResources();
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
+                        .setMessage(messages.join("\n", resources))
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.delete(true).subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_delete_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
+        }
     }
 
     private void onDeleteFailed(Throwable throwable) {
@@ -124,7 +153,7 @@ public class EditCourseFragment extends Fragment {
                     () -> requireActivity().finish(),
                     () -> {
                         compositeDisposable.clear();
-                        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
                         requireActivity().finish();
                     }, null);
         } else {

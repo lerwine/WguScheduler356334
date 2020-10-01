@@ -9,17 +9,17 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -67,7 +67,7 @@ public class EditAssessmentFragment extends Fragment {
     private void onSaveImageButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onDeleteImageButtonClick(View view) {
@@ -83,14 +83,25 @@ public class EditAssessmentFragment extends Fragment {
         verifySaveChanges();
     }
 
-    private void onSaveOperationFinished(List<Integer> messageIds) {
+    private void onSaveOperationFinished(ValidationMessage.ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationFinished");
-        if (messageIds.isEmpty()) {
+        if (messages.isSucceeded()) {
             requireActivity().finish();
         } else {
             Resources resources = getResources();
-            android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(requireContext()).setTitle(R.string.title_save_error)
-                    .setMessage(messageIds.stream().map(resources::getString).collect(Collectors.joining("; "))).setCancelable(true).create();
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            dialog.dismiss();
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
             dlg.show();
         }
     }
@@ -117,7 +128,7 @@ public class EditAssessmentFragment extends Fragment {
                     () -> requireActivity().finish(),
                     () -> {
                         compositeDisposable.clear();
-                        compositeDisposable.add(viewModel.save().subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
                         requireActivity().finish();
                     }, null);
         } else {

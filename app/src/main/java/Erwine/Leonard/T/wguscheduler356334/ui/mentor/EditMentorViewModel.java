@@ -22,7 +22,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import io.reactivex.Completable;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -149,18 +149,10 @@ public class EditMentorViewModel extends AndroidViewModel {
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<String> save() {
+    public Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
         String newName = currentValues.name;
         String newPhone = currentValues.phoneNumber;
         String newEmail = currentValues.emailAddress;
-        if (newPhone.isEmpty() && newEmail.isEmpty()) {
-            if (newName.isEmpty()) {
-                return Single.just("Name cannot be empty; Phone number or email address required.");
-            }
-            return Single.just("Phone number or email address required.");
-        } else if (newName.isEmpty()) {
-            return Single.just("Name cannot be empty.");
-        }
         String originalName = mentorEntity.getName();
         String originalPhoneNumber = mentorEntity.getPhoneNumber();
         String originalEmailAddress = mentorEntity.getEmailAddress();
@@ -169,18 +161,18 @@ public class EditMentorViewModel extends AndroidViewModel {
         mentorEntity.setPhoneNumber(newEmail);
         mentorEntity.setEmailAddress(newPhone);
         mentorEntity.setNotes(currentValues.notes);
-        return dbLoader.saveMentor(mentorEntity).doOnError(throwable -> {
+        return dbLoader.saveMentor(mentorEntity, ignoreWarnings).doOnError(throwable -> {
             mentorEntity.setName(originalName);
             mentorEntity.setPhoneNumber(originalPhoneNumber);
             mentorEntity.setEmailAddress(originalEmailAddress);
             mentorEntity.setNotes(originalNotes);
             Log.e(getClass().getName(), "Error saving mentor", throwable);
-        }).toSingleDefault("");
+        });
     }
 
-    public Completable delete() {
+    public Single<ValidationMessage.ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete");
-        return dbLoader.deleteMentor(mentorEntity).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting mentor", throwable));
+        return dbLoader.deleteMentor(mentorEntity, ignoreWarnings).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting mentor", throwable));
     }
 
     private void onEntityLoaded(MentorEntity entity) {

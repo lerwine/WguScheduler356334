@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.term;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,11 +16,9 @@ import androidx.lifecycle.MutableLiveData;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.AddTermActivity;
@@ -32,7 +31,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import io.reactivex.Completable;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -56,10 +55,10 @@ public class EditTermViewModel extends AndroidViewModel {
 
     private TermEntity termEntity;
     private final MutableLiveData<TermEntity> entityLiveData;
+    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
-    private final MutableLiveData<String> nameLiveData;
     private final CurrentValues currentValues;
     private boolean fromSavedState;
     private String normalizedName;
@@ -69,11 +68,11 @@ public class EditTermViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
+        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_term));
         normalizedName = normalizedNotes = "";
         entityLiveData = new MutableLiveData<>();
         startMessageLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
-        nameLiveData = new MutableLiveData<>("");
         currentValues = new CurrentValues();
     }
 
@@ -135,8 +134,8 @@ public class EditTermViewModel extends AndroidViewModel {
         return entityLiveData;
     }
 
-    public MutableLiveData<String> getNameLiveData() {
-        return nameLiveData;
+    public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
+        return titleFactoryLiveData;
     }
 
     public boolean isFromSavedState() {
@@ -160,6 +159,12 @@ public class EditTermViewModel extends AndroidViewModel {
             }
         }
         entityLiveData.postValue(termEntity);
+        normalizedName = termEntity.getName();
+        titleFactoryLiveData.postValue(r -> {
+            String t = r.getString(R.string.format_term, normalizedName);
+            int i = t.indexOf(':');
+            return (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
+        });
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -170,17 +175,9 @@ public class EditTermViewModel extends AndroidViewModel {
         termEntity.saveState(outState, true);
     }
 
-    public synchronized Single<List<Integer>> save() {
+    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
         LocalDate newStart = currentValues.start;
         LocalDate newEnd = currentValues.end;
-        ArrayList<Integer> messages = new ArrayList<>();
-        if (normalizedName.isEmpty()) {
-            messages.add(R.string.message_name_required);
-        }
-        validateDateRange(true).ifPresent(messages::add);
-        if (!messages.isEmpty()) {
-            return Single.just(messages);
-        }
         String originalName = termEntity.getName();
         LocalDate originalStart = termEntity.getStart();
         LocalDate originalEnd = termEntity.getEnd();
@@ -189,18 +186,25 @@ public class EditTermViewModel extends AndroidViewModel {
         termEntity.setStart(newStart);
         termEntity.setEnd(newEnd);
         termEntity.setNotes(currentValues.notes);
-        return dbLoader.saveTerm(termEntity).doOnError(throwable -> {
+        return dbLoader.saveTerm(termEntity, ignoreWarnings).doOnError(throwable -> {
             termEntity.setName(originalName);
             termEntity.setStart(originalStart);
             termEntity.setEnd(originalEnd);
             termEntity.setNotes(originalNotes);
             Log.e(getClass().getName(), "Error saving term", throwable);
-        }).toSingleDefault(Collections.emptyList());
+        }).doOnSuccess(t -> {
+            if (t.isError() || !(ignoreWarnings || t.isSucceeded())) {
+                termEntity.setName(originalName);
+                termEntity.setStart(originalStart);
+                termEntity.setEnd(originalEnd);
+                termEntity.setNotes(originalNotes);
+            }
+        });
     }
 
-    public Completable delete() {
+    public Single<ValidationMessage.ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.delete");
-        return dbLoader.deleteTerm(entityLiveData.getValue()).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting term", throwable));
+        return dbLoader.deleteTerm(entityLiveData.getValue(), ignoreWarnings);
     }
 
     private void onEntityLoadedFromDb(TermEntity entity) {
@@ -213,10 +217,10 @@ public class EditTermViewModel extends AndroidViewModel {
         entityLiveData.postValue(termEntity);
     }
 
-    private synchronized Optional<Integer> validateDateRange(boolean saveMode) {
+    private synchronized Optional<Integer> validateDateRange() {
         if (null != currentValues.end) {
             if (null == currentValues.start) {
-                return Optional.of((saveMode) ? R.string.message_start_required_with_end : R.string.message_required);
+                return Optional.of(R.string.message_required);
             }
             if (currentValues.start.compareTo(currentValues.end) > 0) {
                 return Optional.of(R.string.message_start_after_end);
@@ -272,7 +276,12 @@ public class EditTermViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 nameValidLiveData.postValue(true);
             }
-            nameLiveData.postValue(normalizedName);
+
+            titleFactoryLiveData.postValue(r -> {
+                String t = r.getString(R.string.format_term, normalizedName);
+                int i = t.indexOf(':');
+                return (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
+            });
         }
 
         @Nullable
@@ -285,7 +294,7 @@ public class EditTermViewModel extends AndroidViewModel {
         public void setStart(LocalDate start) {
             if (!Objects.equals(this.start, start)) {
                 this.start = start;
-                startMessageLiveData.postValue(validateDateRange(false).orElse(null));
+                startMessageLiveData.postValue(validateDateRange().orElse(null));
             }
         }
 
@@ -299,7 +308,7 @@ public class EditTermViewModel extends AndroidViewModel {
         public void setEnd(LocalDate end) {
             if (!Objects.equals(this.end, end)) {
                 this.end = end;
-                startMessageLiveData.postValue(validateDateRange(false).orElse(null));
+                startMessageLiveData.postValue(validateDateRange().orElse(null));
             }
         }
 

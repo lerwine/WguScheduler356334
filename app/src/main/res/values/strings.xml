@@ -13,6 +13,8 @@
     <string name="format_message_read_error">An unexpected error has occurred while retrieving the record to the database: %s</string>
     <string name="format_message_reset_db_error">An unexpected error has occurred while resetting the database: %s</string>
     <string name="format_message_save_error">An unexpected error has occurred while saving the record to the database: %s</string>
+    <string name="format_message_save_warning">%s\n\nSave, anyway?</string>
+    <string name="format_message_delete_warning">%s\n\nDelete, anyway?</string>
     <string name="label_competency_units">Competency Units</string>
     <string name="label_completed">Completed:</string>
     <string name="label_course_number">Course Number</string>
@@ -45,7 +47,7 @@
     <string name="label_to_lc">to</string>
     <string name="label_unplanned">Unplanned</string>
     <string name="message_actual_end_required">Actual end date is required</string>
-    <string name="message_actual_start_after_end">Actual start cannot occur after actual end</string>
+    <string name="message_actual_start_after_end">Actual start cannot occur after the end date</string>
     <string name="message_after_term_end">Date occurs after term end date</string>
     <string name="message_before_term_start">Date occurs before term start date</string>
     <string name="message_actual_start_required">Actual start date is required</string>
@@ -57,6 +59,7 @@
     <string name="message_course_no_assessments">Course has no assessments.</string>
     <string name="message_course_number_required">Course number cannot be empty</string>
     <string name="message_assessment_code_required">Assessment Code cannot be empty</string>
+    <string name="message_comletion_date_required">Completion date is required</string>
     <string name="message_delete_mentor_confirm">This action cannot be undone!\n\nAre you sure you want to delete this mentor?</string>
     <string name="message_delete_term_confirm">This action cannot be undone!\n\nAre you sure you want to delete this term?</string>
     <string name="message_delete_course_confirm">This action cannot be undone!\n\nAre you sure you want to delete this course?</string>
@@ -98,8 +101,9 @@
     <string name="title_activity_new_mentor">Add New Mentor</string>
     <string name="title_activity_new_term">Add New Term</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="format_course">Course: %s</string>
-    <string name="format_assessment">Assessment: %s</string>
+    <string name="format_course">Course: %s – %s</string>
+    <string name="format_assessment">%s: %s</string>
+    <string name="format_assessment_name">%s: %s– %s</string>
     <string name="format_term">Term: %s</string>
     <string name="title_actual">Actual:</string>
     <string name="title_add_sample_data_error">Add Sample Data Error</string>
@@ -110,6 +114,7 @@
     <string name="title_dates">Dates</string>
     <string name="title_delete_email">Delete Email Address</string>
     <string name="title_delete_error">Delete Error</string>
+    <string name="title_delete_warning">Delete Warning</string>
     <string name="title_delete_mentor">Delete Mentor</string>
     <string name="title_delete_phone">Delete Phone Number</string>
     <string name="title_delete_term">Delete Term</string>
@@ -127,6 +132,7 @@
     <string name="title_reset_database">Reset Database</string>
     <string name="title_reset_db_error">Reset Database Error</string>
     <string name="title_save_error">Save Error</string>
+    <string name="title_save_warning">Save Warning</string>
     <string name="title_terms">Terms</string>
     <string name="tooltip_clear_database">Removes all data from the database</string>
     <string name="tooltip_reset_with_sample_data">Deletes all existing data and populates database with sample data</string>
@@ -148,16 +154,35 @@
     <string name="label_upcoming">Upcoming</string>
     <string name="message_no_alerts">No alerts to show.</string>
     <string name="title_activity_add_assessment">Add Assessment</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="title_activity_add_course">Add Course</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="label_unknown_range">\? to ?</string>
-    <string name="format_range_end_only">\? to %s</string>
-    <string name="format_range_start_only">%s to ?</string>
-    <string name="format_range">%s to %s</string>
+    <string name="label_unknown_to_unknown_range">\? to ?</string>
+    <string name="format_range_unknown_to_end">\? to %s</string>
+    <string name="format_range_start_to_unknown">%s to ?</string>
+    <string name="format_range_start_to_end">%s to %s</string>
+    <string name="format_range_start_dash_end">%s – %s</string>
     <string name="label_em_dash">–</string>
     <string name="label_colon">:</string>
     <string name="title_activity_view_assessment">View Assessment</string>
+    <string name="title_activity_view_course">View Course</string>
+    <string name="title_activity_view_term">View Term</string>
+    <string name="message_term_start_past_course_start">Start of term is later the start date of one or more of its courses.</string>
+    <string name="message_term_end_before_course_end">Start of term is later the start date of one or more of its courses.</string>
+    <string name="message_term_duplicate_name">That term name is already being used.</string>
+    <string name="message_mentor_duplicate_name">That mentor name is already being used.</string>
+    <string name="message_course_duplicate_number">That course number is already being used.</string>
+    <string name="message_assessment_duplicate_code">That assessment code is already being used.</string>
+    <string name="message_item_never_saved">Item was never saved. Nothing to delete.</string>
+    <string name="message_term_has_courses">Term still has one or more courses. This will delete all courses, assessments and alerts for this term as well!</string>
+    <string name="format_error">Error: %s</string>
+    <string name="format_warning">Warning: %s</string>
+    <string name="message_mentor_has_courses">Mentor is still associated one or more courses. This will delete all courses, assessments and alerts associated with this mentor as well!</string>
+    <string name="message_assessment_date_before_course_start">Assessment date is earlier the start date its course.</string>
+    <string name="message_assessment_date_after_course_end">Assessment date is after the end date its course.</string>
+    <string name="message_course_start_date_before_term_start">Course start date is before the start date of its term.</string>
+    <string name="message_course_end_date_after_term_end">Course end date is after the end date of its term.</string>
+    <string name="message_course_start_date_after_assessment">Course start date is after one or more of its assessment dates.</string>
+    <string name="message_course_end_date_before_assessment">Course end date is before one or more of its assessment dates.</string>
+    <string name="message_course_has_assessments">Course has one or more assessments. This will delete all assessments and alerts associated with this course as well!</string>
 </resources>

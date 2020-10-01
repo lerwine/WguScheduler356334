@@ -82,39 +82,28 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
             courseNumberTextView.setText(courseEntity.getNumber());
             titleTextView.setText(courseEntity.getTitle());
             statusTextView.setText(courseEntity.getStatus().displayResourceId());
-            LocalDate date = courseEntity.getActualStart();
-            StringBuilder sb = new StringBuilder();
-            boolean expected = null == date;
-            if (expected) {
-                date = courseEntity.getExpectedStart();
-                if (null == date) {
-                    sb.append("?");
-                } else {
-                    sb.append(FORMATTER.format(date));
+            LocalDate start = courseEntity.getActualStart();
+            LocalDate end;
+            if (null == start) {
+                start = courseEntity.getExpectedStart();
+                if (null == (end = courseEntity.getExpectedEnd())) {
+                    end = courseEntity.getActualEnd();
                 }
-            } else {
-                sb.append(FORMATTER.format(date));
+            } else if (null == (end = courseEntity.getActualEnd())) {
+                end = courseEntity.getExpectedEnd();
             }
-            sb.append(" - ");
-            date = courseEntity.getActualEnd();
-            if (null == date) {
-                date = courseEntity.getExpectedEnd();
-                if (null == date) {
-                    if (expected) {
-                        sb.append(" (expected) - ?");
-                    } else {
-                        sb.append(" - ?");
-                    }
+
+            if (null == start) {
+                if (null == end) {
+                    rangeTextView.setText(R.string.label_unknown_to_unknown_range);
                 } else {
-                    sb.append(" - ").append(FORMATTER.format(date)).append(" (expected)");
+                    rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_unknown_to_end, FORMATTER.format(end)));
                 }
+            } else if (null == end) {
+                rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_start_to_unknown, FORMATTER.format(start)));
             } else {
-                if (expected) {
-                    sb.append(" (expected) - ");
-                }
-                sb.append(FORMATTER.format(date));
+                rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_start_to_end, FORMATTER.format(start), FORMATTER.format(end)));
             }
-            rangeTextView.setText(sb.toString());
         }
     }
 }

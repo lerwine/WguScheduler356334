@@ -27,8 +27,8 @@ public final class AssessmentTypeConverter {
         return (null == o1 || o1 == DEFAULT) ? (null == o2 || o2 == DEFAULT) : o1 == o2;
     }
 
-    public static AssessmentType asNonNull(@Nullable AssessmentType status) {
-        return (null == status) ? DEFAULT : status;
+    public static AssessmentType asNonNull(@Nullable AssessmentType value) {
+        return (null == value) ? DEFAULT : value;
     }
 
 }

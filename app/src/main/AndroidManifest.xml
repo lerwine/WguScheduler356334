@@ -16,19 +16,25 @@
             android:label="@string/title_activity_add_assessment" />
         <activity
             android:name=".ViewAssessmentActivity"
-            android:label="@string/title_activity_view_assessment"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".EditAssessmentActivity" />
-        <activity android:name=".AddCourseActivity" />
-        <activity android:name=".ViewCourseActivity" />
+            android:label="@string/title_activity_view_assessment" />
+        <activity
+            android:name=".AddCourseActivity"
+            android:label="@string/title_activity_add_assessment" />
+        <activity
+            android:name=".ViewCourseActivity"
+            android:label="@string/title_activity_view_course" />
         <activity
             android:name=".AddTermActivity"
             android:label="@string/title_activity_new_term" />
-        <activity android:name=".EditMentorActivity" />
+        <activity
+            android:name=".EditMentorActivity"
+            android:label="@string/title_activity_mentor_detail" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".ViewTermActivity" />
+        <activity
+            android:name=".ViewTermActivity"
+            android:label="@string/title_activity_view_term" />
         <activity
             android:name=".ManageDataActivity"
             android:label="@string/title_activity_manage_data" />

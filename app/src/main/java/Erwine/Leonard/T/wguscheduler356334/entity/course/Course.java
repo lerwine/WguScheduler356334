@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
@@ -15,6 +16,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 public interface Course extends NoteColumnIncludedEntity {
     /**
@@ -57,6 +59,54 @@ public interface Course extends NoteColumnIncludedEntity {
      * The name of the {@code "competencyUnits"} database column, which contains the competencyUnits attributed to the course.
      */
     String COLNAME_COMPETENCY_UNITS = "competencyUnits";
+
+    static void validate(ValidationMessage.ResourceMessageBuilder builder, CourseEntity entity) {
+        if (entity.getNumber().isEmpty()) {
+            builder.acceptError(R.string.message_course_number_required);
+        }
+        if (entity.getTitle().isEmpty()) {
+            builder.acceptError(R.string.message_title_required);
+        }
+        LocalDate es = entity.getExpectedStart();
+        CourseStatus s = entity.getStatus();
+        LocalDate actualStart = entity.getActualStart();
+        switch (s) {
+            case PLANNED:
+                if (null == entity.getExpectedStart()) {
+                    builder.acceptError(R.string.message_expected_start_required);
+                }
+                break;
+            case IN_PROGRESS:
+                if (null == actualStart) {
+                    builder.acceptError(R.string.message_actual_start_required);
+                } else {
+                    LocalDate expectedEnd = entity.getExpectedEnd();
+                    if (null != expectedEnd && expectedEnd.compareTo(actualStart) < 0) {
+                        builder.acceptError(R.string.message_actual_start_after_end);
+                    }
+                }
+                break;
+            case PASSED:
+            case NOT_PASSED:
+                LocalDate actualEnd = entity.getActualEnd();
+                if (null == actualStart) {
+                    builder.acceptError(R.string.message_actual_start_required);
+                    if (null == actualEnd) {
+                        builder.acceptError(R.string.message_actual_end_required);
+                    }
+                } else if (null == actualEnd) {
+                    builder.acceptError(R.string.message_actual_end_required);
+                } else if (actualStart.compareTo(actualEnd) > 0) {
+                    builder.acceptError(R.string.message_expected_start_after_end);
+                }
+                break;
+            default:
+                break;
+        }
+        if (entity.getCompetencyUnits() < 0) {
+            builder.acceptError(R.string.message_invalid_competency_units_value);
+        }
+    }
 
     /**
      * Gets the value of the {@link TermEntity#COLNAME_ID primary key} for the {@link TermEntity term} associated with the course.
