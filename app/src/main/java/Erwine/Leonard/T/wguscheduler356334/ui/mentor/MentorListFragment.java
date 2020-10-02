@@ -27,6 +27,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 public class MentorListFragment extends Fragment {
 
     private final List<MentorListItem> mItems;
+    @SuppressWarnings("FieldCanBeLocal")
     private MentorListViewModel mentorListViewModel;
     private MentorListAdapter mAdapter;
 

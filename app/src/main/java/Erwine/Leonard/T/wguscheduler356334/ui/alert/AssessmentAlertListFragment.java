@@ -25,22 +25,22 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 /**
  * A fragment representing a list of Items.
  */
-public class AlertListFragment extends Fragment {
+public class AssessmentAlertListFragment extends Fragment {
 
-    private static final String LOG_TAG = AlertListFragment.class.getName();
+    private static final String LOG_TAG = AssessmentAlertListFragment.class.getName();
     private final List<AlertListItem> items;
     private final TabSelectedListener tabSelectedListener;
-    private AlertListAdapter adapter;
+    private AssessmentAlertListAdapter adapter;
     private TabLayout listingSelectionTabLayout;
     private TextView noAlertsTextView;
     private RecyclerView alertsRecyclerView;
-    private AlertListViewModel viewModel;
+    private AssessmentAlertListViewModel viewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public AlertListFragment() {
+    public AssessmentAlertListFragment() {
         items = new ArrayList<>();
         tabSelectedListener = new TabSelectedListener();
     }
@@ -53,7 +53,7 @@ public class AlertListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_alert_list, container, false);
+        return inflater.inflate(R.layout.fragment_assessment_alert_list, container, false);
     }
 
     @Override
@@ -62,14 +62,14 @@ public class AlertListFragment extends Fragment {
         listingSelectionTabLayout = view.findViewById(R.id.listingSelectionTabLayout);
         noAlertsTextView = view.findViewById(R.id.noAlertsTextView);
         alertsRecyclerView = view.findViewById(R.id.alertsRecyclerView);
-        adapter = new AlertListAdapter(items);
+        adapter = new AssessmentAlertListAdapter(items);
         alertsRecyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AlertListViewModel.class);
+        viewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentAlertListViewModel.class);
         viewModel.setPosition(0, tabSelectedListener, getViewLifecycleOwner());
         listingSelectionTabLayout.addOnTabSelectedListener(tabSelectedListener);
     }

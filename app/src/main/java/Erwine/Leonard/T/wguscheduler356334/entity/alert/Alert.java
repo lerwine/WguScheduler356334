@@ -7,8 +7,10 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 public interface Alert extends IdIndexedEntity {
 
@@ -26,6 +28,15 @@ public interface Alert extends IdIndexedEntity {
      * The name of the {@code "customMessage"} database column.
      */
     String COLNAME_CUSTOM_MESSAGE = "customMessage";
+
+    static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull AlertEntity entity) {
+        if (null != entity.isSubsequent()) {
+            long timeSpec = entity.getTimeSpec();
+            if (timeSpec < AlertEntity.MIN_VALUE_RELATIVE_DAYS || timeSpec > AlertEntity.MAX_VALUE_RELATIVE_DAYS) {
+                builder.acceptError(R.string.message_relative_days_out_of_range);
+            }
+        }
+    }
 
     /**
      * Gets alert time value.
@@ -79,7 +90,7 @@ public interface Alert extends IdIndexedEntity {
     default void saveState(@NonNull Bundle bundle, boolean isOriginal) {
         IdIndexedEntity.super.saveState(bundle, isOriginal);
         Boolean subsequent = isSubsequent();
-        if (null != isSubsequent()) {
+        if (null != subsequent) {
             bundle.putBoolean(COLNAME_SUBSEQUENT, subsequent);
         }
         bundle.putLong(COLNAME_TIME_SPEC, getTimeSpec());
@@ -90,7 +101,7 @@ public interface Alert extends IdIndexedEntity {
     }
 
     @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+    default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         IdIndexedEntity.super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_SUBSEQUENT, isSubsequent()).append(COLNAME_TIME_SPEC, getTimeSpec()).append(COLNAME_CUSTOM_MESSAGE, getCustomMessage());
     }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class EditTextValueFragment extends Fragment {
         if (null == valueEditText) {
             mErrorText = errorText;
         } else {
-            valueEditText.setError(errorText);
+            valueEditText.setError(errorText, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
@@ -68,7 +69,7 @@ public class EditTextValueFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_text_value, container, false);
         (labelTextView = view.findViewById(R.id.labelTextView)).setText(mLabelText);
         (valueEditText = view.findViewById(R.id.valueEditText)).setText(mCurrentValue);
-        valueEditText.setError(mErrorText);
+        valueEditText.setError(mErrorText, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         textWatchers.forEach(t -> valueEditText.addTextChangedListener(t));
         textWatchers = null;
         mLabelText = mErrorText = mCurrentValue = null;

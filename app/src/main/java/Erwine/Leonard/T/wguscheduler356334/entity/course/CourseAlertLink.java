@@ -9,9 +9,12 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 @Entity(tableName = AppDb.TABLE_NAME_COURSE_ALERTS,
 //        primaryKeys = {AlertLink.COLNAME_ALERT_ID, AlertLink.COLNAME_TARGET_ID},
@@ -33,12 +36,14 @@ public class CourseAlertLink implements AlertLink {
     private long targetId;
 
     public CourseAlertLink(long alertId, long targetId) {
-        this.alertId = alertId;
-        this.targetId = targetId;
+        this.alertId = IdIndexedEntity.assertNotNewId(alertId);
+        this.targetId = IdIndexedEntity.assertNotNewId(targetId);
     }
 
     @Ignore
     public CourseAlertLink() {
+        this.alertId = ID_NEW;
+        this.targetId = ID_NEW;
     }
 
     @Override
@@ -61,6 +66,7 @@ public class CourseAlertLink implements AlertLink {
         this.targetId = targetId;
     }
 
+    @NonNull
     @Override
     public String dbTableName() {
         return AppDb.TABLE_NAME_COURSE_ALERTS;

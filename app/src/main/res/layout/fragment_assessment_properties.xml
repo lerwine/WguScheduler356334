@@ -65,7 +65,8 @@
                     android:layout_weight="65"
                     android:ems="10"
                     style="@style/WGU.Scheduler.TextInputEditText"
-                    android:inputType="textShortMessage|text|textCapCharacters" />
+                    android:inputType="textShortMessage|text|textCapCharacters"
+                    android:importantForAutofill="no" />
 
                 <Button
                     android:id="@+id/typeButton"
@@ -159,6 +160,7 @@
             android:layout_height="match_parent"
             android:ems="10"
             android:gravity="start|top"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:importantForAutofill="no" />
     </LinearLayout>
 </ScrollView>

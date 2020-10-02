@@ -54,7 +54,7 @@ public class CollectionHelper {
             if (source.hasNext()) {
                 Stream.Builder<T> builder = Stream.builder();
                 builder.accept(value);
-                source.forEachRemaining(builder::accept);
+                source.forEachRemaining(builder);
                 return builder.build();
             }
             return Stream.of(value);
@@ -326,7 +326,7 @@ public class CollectionHelper {
             U value = b.next();
             if (!a.hasNext() && predicate.test(a.next(), value)) {
                 builder.accept(value);
-                b.forEachRemaining(builder::accept);
+                b.forEachRemaining(builder);
                 return Optional.of(builder.build());
             }
             builder.accept(value);

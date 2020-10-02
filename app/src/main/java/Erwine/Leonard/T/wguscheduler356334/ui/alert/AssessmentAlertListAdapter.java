@@ -16,12 +16,12 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 
-public class AlertListAdapter extends RecyclerView.Adapter<AlertListAdapter.ViewHolder> {
+public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentAlertListAdapter.ViewHolder> {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<AlertListItem> mValues;
 
-    public AlertListAdapter(List<AlertListItem> items) {
+    public AssessmentAlertListAdapter(List<AlertListItem> items) {
         mValues = items;
     }
 
@@ -29,7 +29,7 @@ public class AlertListAdapter extends RecyclerView.Adapter<AlertListAdapter.View
     @NonNull
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_alert_item, parent, false);
+                .inflate(R.layout.fragment_assessment_alert_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -43,12 +43,14 @@ public class AlertListAdapter extends RecyclerView.Adapter<AlertListAdapter.View
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        @SuppressWarnings("FieldCanBeLocal")
         private final View mView;
         private final TextView dateTextView;
         private final TextView typeTextView;
         private final TextView codeTextView;
         private final TextView titleTextView;
+        @SuppressWarnings("FieldCanBeLocal")
         private AlertListItem alertListItem;
 
         public ViewHolder(View view) {
@@ -62,7 +64,7 @@ public class AlertListAdapter extends RecyclerView.Adapter<AlertListAdapter.View
         }
 
         private void onViewClick(View view) {
-            // TODO: Display popup to view/manage alert
+            // TODO: Display EditAlertViewModel popup to view/manage alert
         }
 
         public void setItem(AlertListItem alertListItem) {

@@ -39,8 +39,8 @@ public abstract class AppDb extends RoomDatabase {
     public static final String TABLE_NAME_ALERTS = "alerts";
     public static final String TABLE_NAME_COURSE_ALERTS = "courseAlerts";
     public static final String TABLE_NAME_ASSESSMENT_ALERTS = "assessmentAlerts";
-    public static final String VIEW_NAME_ALERT_LIST_ITEM = "alertListItemView";
-    public static final String VIEW_NAME_MENTOR_COURSE_LIST = "mentorCourseListView";
+    public static final String VIEW_NAME_ALERT_LIST = "alertListView";
+    public static final String VIEW_NAME_MENTOR_COURSE = "mentorCourseView";
     public static final String VIEW_NAME_ASSESSMENT_DETAIL = "assessmentDetailView";
     public static final String VIEW_NAME_COURSE_DETAIL = "courseDetailView";
     public static final String VIEW_NAME_TERM_COURSE_LIST = "termCourseListView";

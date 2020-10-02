@@ -65,7 +65,6 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
             return view;
         }
 
-        @SuppressWarnings("ConstantConditions")
         private void onViewClick(View view) {
             Log.d(LOG_TAG, "Viewing assessment " + item);
             EditCourseViewModel.startViewCourseActivity(view.getContext(), item.getId());

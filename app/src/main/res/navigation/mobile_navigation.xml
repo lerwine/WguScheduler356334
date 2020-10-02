@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_alerts"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.alert.AlertListFragment"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertListFragment"
         android:label="@string/title_alerts"
-        tools:layout="@layout/fragment_alert_list" />
+        tools:layout="@layout/fragment_assessment_alert_list" />
 </navigation>

@@ -45,7 +45,7 @@ public class SampleDataLoader implements Action {
 
     private final DbLoader dbLoader;
     private final XmlResourceParser xmlParser;
-    private int eventType = XmlPullParser.END_TAG;
+//    private int eventType = XmlPullParser.END_TAG;
 
     SampleDataLoader(DbLoader dbLoader, Resources resources) {
         this.dbLoader = dbLoader;
@@ -185,16 +185,16 @@ public class SampleDataLoader implements Action {
         }
     }
 
-    private boolean isTextEvent(int eventType) {
-        switch (eventType) {
-            case XmlPullParser.ENTITY_REF:
-            case XmlPullParser.CDSECT:
-            case XmlPullParser.TEXT:
-                return true;
-            default:
-                return false;
-        }
-    }
+//    private boolean isTextEvent(int eventType) {
+//        switch (eventType) {
+//            case XmlPullParser.ENTITY_REF:
+//            case XmlPullParser.CDSECT:
+//            case XmlPullParser.TEXT:
+//                return true;
+//            default:
+//                return false;
+//        }
+//    }
 
     private Optional<String> getText() throws XmlPullParserException, IOException {
         switch (xmlParser.getEventType()) {
@@ -401,7 +401,7 @@ public class SampleDataLoader implements Action {
                 xmlParser.getAttributeValue(null, Assessment.COLNAME_NAME),
                 AssessmentStatus.valueOf(Objects.requireNonNull(xmlParser.getAttributeValue(null, Assessment.COLNAME_STATUS))),
                 getAttributeLocalDate(Assessment.COLNAME_GOAL_DATE, courseEntity), AssessmentType.valueOf(Objects.requireNonNull(xmlParser.getAttributeValue(null, Assessment.COLNAME_TYPE))),
-                "", getAttributeLocalDate(Assessment.COLNAME_COMPLETION_DATE, courseEntity), Objects.requireNonNull(courseEntity.getId()));
+                "", getAttributeLocalDate(Assessment.COLNAME_COMPLETION_DATE, courseEntity), courseEntity.getId());
         if (xmlParser.nextTag() != XmlPullParser.START_TAG) {
             dbLoader.getAppDb().assessmentDAO().insertSynchronous(assessmentEntity);
             return;

@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
@@ -24,7 +23,7 @@ public abstract class AbstractEntity<T extends AbstractEntity<T>> implements IdI
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLNAME_ID)
-    private Long id;
+    private long id;
 
     /**
      * Initializes a new {@code AbstractEntity} object to represent a row of data in an {@link AppDb} database table.
@@ -32,20 +31,20 @@ public abstract class AbstractEntity<T extends AbstractEntity<T>> implements IdI
      * @param id The value of the database row primary key, which can be {@code null} if this represents a new row that has not yet been saved.
      */
     @Ignore
-    protected AbstractEntity(Long id) {
+    protected AbstractEntity(long id) {
         this.id = id;
     }
 
     @Override
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
     @Override
-    public synchronized void setId(Long id) {
-        if (null == this.id) {
+    public synchronized void setId(long id) {
+        if (ID_NEW == this.id) {
             this.id = id;
-        } else if (!Objects.equals(id, this.id)) {
+        } else if (id != this.id) {
             throw new IllegalStateException();
         }
     }
@@ -63,21 +62,17 @@ public abstract class AbstractEntity<T extends AbstractEntity<T>> implements IdI
     public synchronized boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Long thatId = ((AbstractEntity<?>) o).id;
-        if (null != id) {
-            return id.equals(thatId);
-        }
-        if (null != thatId) {
+        if (id != ((AbstractEntity<?>) o).id) {
             return false;
         }
         //noinspection unchecked
-        return equalsEntity((T) o);
+        return id == ID_NEW && equalsEntity((T) o);
     }
 
     @Override
     public synchronized int hashCode() {
-        if (null != id) {
-            return id.hashCode();
+        if (id != ID_NEW) {
+            return Long.hashCode(id);
         }
         return hashCodeFromProperties();
     }

@@ -25,7 +25,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="29dp"
             android:ems="10"
-            android:inputType="textCapWords" />
+            android:inputType="textCapWords"
+            android:importantForAutofill="no" />
 
         <TextView
             android:id="@+id/termStartLabelTextView"
@@ -72,7 +73,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:gravity="start|top"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:importantForAutofill="no" />
 
     </LinearLayout>
 

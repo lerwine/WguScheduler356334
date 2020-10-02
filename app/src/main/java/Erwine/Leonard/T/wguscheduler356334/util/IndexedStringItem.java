@@ -432,7 +432,7 @@ public class IndexedStringItem {
         }
 
         @Override
-        public boolean addAll(int index, Collection<? extends IndexedStringItem> c) {
+        public boolean addAll(int index, @NonNull Collection<? extends IndexedStringItem> c) {
             throw new UnsupportedOperationException();
         }
 

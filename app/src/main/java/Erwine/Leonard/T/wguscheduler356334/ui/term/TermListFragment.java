@@ -28,6 +28,7 @@ public class TermListFragment extends Fragment {
 
     private final List<TermListItem> mItems;
     private TermListAdapter mAdapter;
+    @SuppressWarnings("FieldCanBeLocal")
     private TermListViewModel viewModel;
 
     public TermListFragment() {

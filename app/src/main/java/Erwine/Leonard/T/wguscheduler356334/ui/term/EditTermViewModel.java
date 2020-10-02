@@ -35,6 +35,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 public class EditTermViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditTermViewModel.class.getName();
@@ -149,8 +151,8 @@ public class EditTermViewModel extends AndroidViewModel {
         termEntity = new TermEntity();
         if (null != state) {
             currentValues.restoreState(state, false);
-            Long id = currentValues.getId();
-            if (null == id || fromSavedState) {
+            long id = currentValues.getId();
+            if (ID_NEW == id || fromSavedState) {
                 termEntity.restoreState(state, fromSavedState);
             } else {
                 return dbLoader.getTermById(id)
@@ -230,7 +232,7 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public boolean isChanged() {
-        if (null != termEntity.getId() && normalizedName.equals(termEntity.getName()) && Objects.equals(currentValues.start, termEntity.getStart()) && Objects.equals(currentValues.end, termEntity.getEnd())) {
+        if (ID_NEW != termEntity.getId() && normalizedName.equals(termEntity.getName()) && Objects.equals(currentValues.start, termEntity.getStart()) && Objects.equals(currentValues.end, termEntity.getEnd())) {
             return !getNormalizedNotes().equals(termEntity.getNotes());
         }
         return true;
@@ -244,14 +246,13 @@ public class EditTermViewModel extends AndroidViewModel {
         private LocalDate end;
         private String notes = "";
 
-        @Nullable
         @Override
-        public Long getId() {
+        public long getId() {
             return (null == termEntity) ? id : termEntity.getId();
         }
 
         @Override
-        public void setId(Long id) {
+        public void setId(long id) {
             if (null != termEntity) {
                 termEntity.setId(id);
             }

@@ -1040,6 +1040,7 @@ public class ToStringBuilder implements Appendable, CharSequence {
         return this;
     }
 
+    // TODO: Omit unnecessary second argument
     @NonNull
     private ToStringBuilder appendImpl(@NonNull char[] array, boolean omitTypeName) {
         int len = array.length;
@@ -1048,19 +1049,16 @@ public class ToStringBuilder implements Appendable, CharSequence {
                 backingBuilder.append("[]");
                 return this;
             }
-            backingBuilder.append("[");
-            append(array[0]);
+            backingBuilder.append("[").append(array[0]);
         } else {
             if (len == 0) {
                 backingBuilder.append("char[]");
                 return this;
             }
-            backingBuilder.append("char[");
-            append(array[0]);
+            backingBuilder.append("char[").append(array[0]);
         }
         for (int i = 1; i < len; i++) {
-            backingBuilder.append(", ");
-            append(array[i]);
+            backingBuilder.append(", ").append(array[i]);
         }
         return this;
     }

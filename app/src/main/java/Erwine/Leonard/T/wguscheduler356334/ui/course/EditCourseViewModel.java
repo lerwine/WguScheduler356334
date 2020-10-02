@@ -47,6 +47,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 /**
  * View model shared by {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity}, {@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity},
  * {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link EditCourseFragment}
@@ -90,8 +92,8 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final CurrentValues currentValues;
     private final ArrayList<TermCourseListItem> coursesForTerm;
     private LiveData<List<TermCourseListItem>> coursesLiveData;
-    private Observer<List<TermListItem>> termsLoadedObserver;
-    private Observer<List<MentorListItem>> mentorsLoadedObserver;
+    private final Observer<List<TermListItem>> termsLoadedObserver;
+    private final Observer<List<MentorListItem>> mentorsLoadedObserver;
     private Observer<List<TermCourseListItem>> coursesLoadedObserver;
     private boolean fromInitializedState;
     private AbstractTermEntity<?> selectedTerm;
@@ -125,7 +127,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         mentorsLoadedObserver = this::onMentorsLoaded;
     }
 
-    public Long getId() {
+    public long getId() {
         return currentValues.getId();
     }
 
@@ -143,12 +145,12 @@ public class EditCourseViewModel extends AndroidViewModel {
                 coursesLiveData = null;
             }
             if (null == selectedTerm) {
-                currentValues.termId = null;
+                currentValues.termId = ID_NEW;
                 termValidLiveData.postValue(false);
             } else {
-                Long id = selectedTerm.getId();
+                long id = selectedTerm.getId();
                 currentValues.termId = id;
-                if (null != id) {
+                if (ID_NEW != id) {
                     coursesLiveData = dbLoader.getCoursesByTermId(id);
                     coursesLoadedObserver = this::onAllCoursesLoaded;
                     coursesLiveData.observeForever(coursesLoadedObserver);
@@ -158,7 +160,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 }
             }
             expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
-            actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
+            actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
             expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
             actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
         }
@@ -348,8 +350,8 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (null != state) {
             Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
             currentValues.restoreState(state, false);
-            Long id = currentValues.getId();
-            if (null == id || fromInitializedState) {
+            long id = currentValues.getId();
+            if (ID_NEW == id || fromInitializedState) {
                 Log.d(LOG_TAG, "Restoring courseEntity from saved state");
                 courseEntity.restoreState(state, fromInitializedState);
             } else {
@@ -492,15 +494,15 @@ public class EditCourseViewModel extends AndroidViewModel {
         return Optional.empty();
     }
 
-    private synchronized Optional<Integer> validateActualStart(boolean saveMode) {
+    private synchronized Optional<Integer> validateActualStart() {
         if (null == currentValues.actualStart) {
             Log.d(LOG_TAG, String.format("Validating actualStart(null); status=%s", currentValues.status.name()));
             switch (currentValues.status) {
                 case IN_PROGRESS:
                 case PASSED:
                 case NOT_PASSED:
-                    Log.d(LOG_TAG, (saveMode) ? "validateActualStart: Returning R.string.message_actual_start_required" : "Returning R.string.message_required");
-                    return Optional.of((saveMode) ? R.string.message_actual_start_required : R.string.message_required);
+                    Log.d(LOG_TAG, "Returning R.string.message_required");
+                    return Optional.of(R.string.message_required);
                 default:
                     break;
             }
@@ -510,8 +512,8 @@ public class EditCourseViewModel extends AndroidViewModel {
                 case PASSED:
                 case NOT_PASSED:
                     if (null != currentValues.actualEnd && currentValues.actualStart.compareTo(currentValues.actualEnd) > 0) {
-                        Log.d(LOG_TAG, (saveMode) ? "validateActualStart: Returning R.string.message_actual_start_after_end" : "Returning R.string.message_start_after_end");
-                        return Optional.of((saveMode) ? R.string.message_actual_start_after_end : R.string.message_start_after_end);
+                        Log.d(LOG_TAG, "Returning R.string.message_start_after_end");
+                        return Optional.of(R.string.message_start_after_end);
                     }
                     break;
                 default:
@@ -576,7 +578,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             return Single.just(ValidationMessage.ofSingleError(id));
         }
         CourseEntity entity = courseEntity.toEntity();
-        entity.setTermId(Objects.requireNonNull(Objects.requireNonNull(selectedTerm).getId()));
+        entity.setTermId(Objects.requireNonNull(selectedTerm).getId());
         entity.setMentorId((null == selectedMentor) ? null : selectedMentor.getId());
         Log.d(LOG_TAG, String.format("Setting number from %s to %s", ToStringBuilder.toEscapedString(entity.getNumber()), ToStringBuilder.toEscapedString(normalizedNumber)));
         entity.setNumber(normalizedNumber);
@@ -598,7 +600,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public boolean isChanged() {
-        if (null != courseEntity.getId() && normalizedNumber.equals(courseEntity.getNumber()) && normalizedTitle.equals(courseEntity.getTitle()) && Objects.equals(getExpectedStart(), courseEntity.getExpectedStart()) &&
+        if (ID_NEW != courseEntity.getId() && normalizedNumber.equals(courseEntity.getNumber()) && normalizedTitle.equals(courseEntity.getTitle()) && Objects.equals(getExpectedStart(), courseEntity.getExpectedStart()) &&
                 Objects.equals(getExpectedEnd(), courseEntity.getExpectedEnd()) && Objects.equals(getActualStart(), courseEntity.getActualStart()) && Objects.equals(getActualEnd(), courseEntity.getActualEnd()) &&
                 currentValues.status == courseEntity.getStatus() && null != currentValues.competencyUnits && currentValues.competencyUnits == courseEntity.getCompetencyUnits()) {
             return !getNormalizedNotes().equals(courseEntity.getNotes());
@@ -628,9 +630,9 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     private class CurrentValues implements Course {
 
-        private Long id;
+        private long id;
         private String number = "";
-        private Long termId;
+        private long termId;
         private Long mentorId;
         private String title = "";
         private LocalDate expectedStart;
@@ -641,15 +643,14 @@ public class EditCourseViewModel extends AndroidViewModel {
         private Integer competencyUnits;
         private String notes = "";
 
-        @Nullable
         @Override
-        public Long getId() {
+        public long getId() {
             return (null == courseEntity) ? id : courseEntity.getId();
         }
 
         @Override
-        public void setId(Long id) {
-            Log.d(LOG_TAG, (null == id) ? "Setting id to null" : String.format("Setting id to %d", id));
+        public void setId(long id) {
+            Log.d(LOG_TAG, String.format("Setting id to %d", id));
             if (null != courseEntity) {
                 courseEntity.setId(id);
             }
@@ -681,9 +682,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             Log.d(LOG_TAG, "Number change complete");
         }
 
-        @Nullable
         @Override
-        public Long getTermId() {
+        public long getTermId() {
             return termId;
         }
 
@@ -764,7 +764,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         public void setActualStart(LocalDate actualStart) {
             if (!Objects.equals(this.actualStart, actualStart)) {
                 this.actualStart = actualStart;
-                actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
+                actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
             }
         }
@@ -804,7 +804,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             if (!Objects.equals(this.actualEnd, actualEnd)) {
                 this.actualEnd = actualEnd;
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
-                actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
+                actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
             }
         }
 
@@ -823,7 +823,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 Log.d(LOG_TAG, String.format("Status changing from %s to %s", this.status.name(), status.name()));
                 this.status = status;
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
-                actualStartErrorMessageLiveData.postValue(validateActualStart(false).orElse(null));
+                actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
                 expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
             }

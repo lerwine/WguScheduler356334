@@ -25,7 +25,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
@@ -41,11 +40,14 @@ import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 public class CoursePropertiesFragment extends Fragment {
 
     private static final String LOG_TAG = CoursePropertiesFragment.class.getName();
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
     private Button termButton;
@@ -126,7 +128,7 @@ public class CoursePropertiesFragment extends Fragment {
         if (null == isValid || isValid) {
             termButton.setError(null);
         } else {
-            termButton.setError(getResources().getString(R.string.message_required));
+            termButton.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
@@ -135,7 +137,7 @@ public class CoursePropertiesFragment extends Fragment {
         if (null == isValid || isValid) {
             courseCodeEditText.setError(null);
         } else {
-            courseCodeEditText.setError(getResources().getString(R.string.message_required));
+            courseCodeEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
@@ -144,14 +146,14 @@ public class CoursePropertiesFragment extends Fragment {
         if (null == isValid || isValid) {
             titleEditText.setError(null);
         } else {
-            titleEditText.setError(getResources().getString(R.string.message_required));
+            titleEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
     private void onExpectedStartErrorMessageChanged(@StringRes Integer id) {
         if (null != id) {
             Log.d(LOG_TAG, String.format("Enter onExpectedStartErrorMessageChanged(%d)", id));
-            expectedStartChip.setError(getResources().getString(id));
+            expectedStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         } else if (null == (id = viewModel.getExpectedStartWarningMessageLiveData().getValue())) {
             Log.d(LOG_TAG, "Enter onExpectedStartErrorMessageChanged(null); warning=null");
             expectedStartChip.setError(null);
@@ -183,7 +185,7 @@ public class CoursePropertiesFragment extends Fragment {
             Log.d(LOG_TAG, String.format("Enter onExpectedEndMessageChanged(%d)", id));
             String message = getResources().getString(id);
             if (id == R.string.message_required) {
-                expectedEndChip.setError(message);
+                expectedEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
             } else {
                 expectedEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
             }
@@ -193,7 +195,7 @@ public class CoursePropertiesFragment extends Fragment {
     private void onActualStartErrorMessageChanged(@StringRes Integer id) {
         if (null != id) {
             Log.d(LOG_TAG, String.format("Enter onActualStartErrorMessageChanged(%d)", id));
-            actualStartChip.setError(getResources().getString(id));
+            actualStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         } else if (null == (id = viewModel.getActualStartWarningMessageLiveData().getValue())) {
             Log.d(LOG_TAG, "Enter onActualStartErrorMessageChanged(null); warning=null");
             actualStartChip.setError(null);
@@ -225,7 +227,7 @@ public class CoursePropertiesFragment extends Fragment {
             Log.d(LOG_TAG, String.format("Enter onActualEndMessageChanged(%d)", id));
             String message = getResources().getString(id);
             if (id == R.string.message_required) {
-                actualEndChip.setError(message);
+                actualEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
             } else {
                 actualEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
             }
@@ -238,7 +240,7 @@ public class CoursePropertiesFragment extends Fragment {
             competencyUnitsEditText.setError(null);
         } else {
             Log.d(LOG_TAG, String.format("Enter onCompetencyUnitsMessageChanged(%d)", id));
-            competencyUnitsEditText.setError(getResources().getString(id));
+            competencyUnitsEditText.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
@@ -330,9 +332,9 @@ public class CoursePropertiesFragment extends Fragment {
             AbstractTermEntity<?> term = viewModel.getSelectedTerm();
             if (null != term) {
                 Stream<TermCourseListItem> filtered = viewModel.getCoursesForTerm().stream();
-                Long id = viewModel.getId();
-                if (null != id) {
-                    filtered = filtered.filter(t -> !Objects.equals(id, t.getId()));
+                long id = viewModel.getId();
+                if (ID_NEW != id) {
+                    filtered = filtered.filter(t -> id != t.getId());
                 }
                 date = EntityHelper.getLatestDate(term.getStart(), term.getEnd(), filtered).map(t -> t.plusDays(1L)).orElseGet(() -> {
                     LocalDate d = term.getEnd();
@@ -378,9 +380,9 @@ public class CoursePropertiesFragment extends Fragment {
             AbstractTermEntity<?> term = viewModel.getSelectedTerm();
             if (null != term) {
                 Stream<TermCourseListItem> filtered = viewModel.getCoursesForTerm().stream();
-                Long id = viewModel.getId();
-                if (null != id) {
-                    filtered = filtered.filter(t -> !Objects.equals(id, t.getId()));
+                long id = viewModel.getId();
+                if (ID_NEW != id) {
+                    filtered = filtered.filter(t -> id != t.getId());
                 }
                 date = EntityHelper.getLatestDate(term.getStart(), term.getEnd(), filtered).map(t -> t.plusDays(1L)).orElseGet(() -> {
                     LocalDate d = term.getEnd();
@@ -430,9 +432,9 @@ public class CoursePropertiesFragment extends Fragment {
                 LocalDate s = term.getStart();
                 if ((null != s && date.compareTo(s) < 0) || (null != (s = term.getEnd()) && date.compareTo(s) > 0)) {
                     Stream<TermCourseListItem> filtered = viewModel.getCoursesForTerm().stream();
-                    Long id = viewModel.getId();
-                    if (null != id) {
-                        filtered = filtered.filter(t -> !Objects.equals(id, t.getId()));
+                    long id = viewModel.getId();
+                    if (ID_NEW != id) {
+                        filtered = filtered.filter(t -> id != t.getId());
                     }
                     date = EntityHelper.getLatestDate(term.getStart(), term.getEnd(), filtered).map(t -> t.plusDays(1L)).orElseGet(() -> {
                         LocalDate d = term.getStart();
@@ -486,9 +488,9 @@ public class CoursePropertiesFragment extends Fragment {
                 LocalDate s = term.getStart();
                 if ((null != s && date.compareTo(s) < 0) || (null != (s = term.getEnd()) && date.compareTo(s) > 0)) {
                     Stream<TermCourseListItem> filtered = viewModel.getCoursesForTerm().stream();
-                    Long id = viewModel.getId();
-                    if (null != id) {
-                        filtered = filtered.filter(t -> !Objects.equals(id, t.getId()));
+                    long id = viewModel.getId();
+                    if (ID_NEW != id) {
+                        filtered = filtered.filter(t -> id != t.getId());
                     }
                     date = EntityHelper.getLatestDate(term.getStart(), term.getEnd(), filtered).map(t -> t.plusDays(1L)).orElseGet(() -> {
                         LocalDate d = term.getEnd();

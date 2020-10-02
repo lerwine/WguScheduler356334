@@ -9,6 +9,7 @@ import androidx.room.DatabaseView;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
@@ -49,7 +50,7 @@ public final class TermListItem extends AbstractTermEntity<TermListItem> impleme
      * @param id                   The value of the {@link #COLNAME_ID primary key column}.
      */
     public TermListItem(String name, LocalDate start, LocalDate end, String notes, int courseCount, Integer totalCompetencyUnits, long id) {
-        super(id, name, start, end, notes);
+        super(IdIndexedEntity.assertNotNewId(id), name, start, end, notes);
         this.courseCount = Math.max(courseCount, 0);
         this.totalCompetencyUnits = (null == totalCompetencyUnits) ? 0 : totalCompetencyUnits;
     }
@@ -93,11 +94,7 @@ public final class TermListItem extends AbstractTermEntity<TermListItem> impleme
         if (result != 0) {
             return result;
         }
-        Long i = o.getId();
-        if (null == i) {
-            return (null == getId()) ? getName().compareTo(o.getName()) : -1;
-        }
-        return (null == getId()) ? 1 : Long.compare(getId(), i);
+        return Long.compare(getId(), o.getId());
     }
 
     @NonNull
@@ -107,7 +104,7 @@ public final class TermListItem extends AbstractTermEntity<TermListItem> impleme
     }
 
     @Override
-    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append("courseCount", courseCount).append("totalCompetencyUnits", totalCompetencyUnits);
     }

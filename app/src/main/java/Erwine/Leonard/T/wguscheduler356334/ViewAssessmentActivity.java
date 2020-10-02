@@ -20,12 +20,15 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 public class ViewAssessmentActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewAssessmentActivity.class.getName();
 
     private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
+    @SuppressWarnings("FieldCanBeLocal")
     private ViewAssessmentPagerAdapter adapter;
 
     public ViewAssessmentActivity() {
@@ -74,8 +77,8 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadSucceeded(AssessmentDetails entity) {
-        Long assessmentId = entity.getId();
-        if (null == assessmentId) {
+        long assessmentId = entity.getId();
+        if (ID_NEW == assessmentId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_assessment_id_not_specified, this).showDialog(this::finish);
         } else {
             adapter = new ViewAssessmentPagerAdapter(this, getSupportFragmentManager());

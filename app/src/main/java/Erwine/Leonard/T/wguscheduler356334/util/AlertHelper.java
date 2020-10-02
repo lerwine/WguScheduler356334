@@ -76,7 +76,7 @@ public class AlertHelper {
             allOptions.addFirst(defaultOption);
             displayText.add(0, toDisplayText.apply(defaultOption));
         }
-        showSingleSelectDialog(titleId, optionIndex, displayText.toArray(new String[displayText.size()]), context, i -> onSelected.accept((i < 0) ? null : allOptions.get(i)), onCancel);
+        showSingleSelectDialog(titleId, optionIndex, displayText.toArray(new String[0]), context, i -> onSelected.accept((i < 0) ? null : allOptions.get(i)), onCancel);
     }
 
     public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull String[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected) {

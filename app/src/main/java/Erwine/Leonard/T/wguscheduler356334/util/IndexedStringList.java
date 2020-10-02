@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveIntegerData;
+import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveData;
 
 public final class IndexedStringList extends AbstractList<IndexedStringList.Item> {
 
@@ -25,7 +25,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
     private final ArrayList<Item> backingList;
     private final Observer<Item> emptyStateChangeObserver;
     private final LiveBoolean anyElementNonEmpty;
-    private ArrayList<WeakReference<Observer<IndexedStringList>>> changeObservers = new ArrayList<>();
+    private final ArrayList<WeakReference<Observer<IndexedStringList>>> changeObservers = new ArrayList<>();
 
     public IndexedStringList(Collection<String> content) {
         this();
@@ -274,7 +274,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return backingList.hashCode();
     }
 
     @Override
@@ -352,8 +352,8 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
     public synchronized boolean remove(@Nullable Object o) {
         if (o instanceof Item) {
             Item item = (Item) o;
-            if (null != item.lineNumber.getValue()) {
-                int index = item.lineNumber.getValueLiveData().getValue() - 1;
+            if (item.lineNumber.getValue().isPresent()) {
+                @SuppressWarnings("ConstantConditions") int index = item.lineNumber.getValueLiveData().getValue() - 1;
                 if (index < backingList.size() && backingList.get(index) == item && null != (item = backingList.remove(index))) {
                     item.lineNumber.set(null);
                     item.removeContentChangeObserver(contentChangeObserver);
@@ -413,7 +413,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         }
     }
 
-    private static class NumberData extends OptionalLiveIntegerData {
+    private static class NumberData extends OptionalLiveData<Integer> {
         private Integer currentValue;
 
         NumberData() {

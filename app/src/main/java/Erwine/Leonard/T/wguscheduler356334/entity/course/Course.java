@@ -60,14 +60,16 @@ public interface Course extends NoteColumnIncludedEntity {
      */
     String COLNAME_COMPETENCY_UNITS = "competencyUnits";
 
-    static void validate(ValidationMessage.ResourceMessageBuilder builder, CourseEntity entity) {
+    static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull CourseEntity entity) {
+        if (entity.getTermId() == ID_NEW) {
+            builder.acceptError(R.string.message_term_not_selected);
+        }
         if (entity.getNumber().isEmpty()) {
             builder.acceptError(R.string.message_course_number_required);
         }
         if (entity.getTitle().isEmpty()) {
             builder.acceptError(R.string.message_title_required);
         }
-        LocalDate es = entity.getExpectedStart();
         CourseStatus s = entity.getStatus();
         LocalDate actualStart = entity.getActualStart();
         switch (s) {
@@ -113,8 +115,7 @@ public interface Course extends NoteColumnIncludedEntity {
      *
      * @return The value of the {@link TermEntity#COLNAME_ID primary key} for the {@link TermEntity term} associated with the course.
      */
-    @Nullable
-    Long getTermId();
+    long getTermId();
 
     /**
      * Sets the {@link TermEntity#COLNAME_ID primary key} value for the {@link TermEntity term} to be associated with the course.
@@ -258,6 +259,7 @@ public interface Course extends NoteColumnIncludedEntity {
      */
     void setCompetencyUnits(int competencyUnits);
 
+    @NonNull
     @Override
     default String dbTableName() {
         return AppDb.TABLE_NAME_COURSES;
@@ -309,7 +311,7 @@ public interface Course extends NoteColumnIncludedEntity {
     default void saveState(@NonNull Bundle bundle, boolean isOriginal) {
         NoteColumnIncludedEntity.super.saveState(bundle, isOriginal);
         Long id = getTermId();
-        if (null != id) {
+        if (ID_NEW != id) {
             bundle.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, isOriginal), id);
         }
         id = getMentorId();
@@ -339,7 +341,7 @@ public interface Course extends NoteColumnIncludedEntity {
     }
 
     @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+    default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_TERM_ID, getTermId())
                 .append(COLNAME_MENTOR_ID, getMentorId())

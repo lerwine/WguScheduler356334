@@ -19,24 +19,29 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
     @ColumnInfo(name = COLNAME_COURSE_ID)
     private long courseId;
     @ColumnInfo(name = COLNAME_CODE, collate = ColumnInfo.NOCASE)
+    @NonNull
     private String code;
     @ColumnInfo(name = COLNAME_NAME)
+    @Nullable
     private String name;
     @ColumnInfo(name = COLNAME_STATUS)
+    @NonNull
     private AssessmentStatus status;
     @ColumnInfo(name = COLNAME_GOAL_DATE)
+    @Nullable
     private LocalDate goalDate;
     @ColumnInfo(name = COLNAME_COMPLETION_DATE)
+    @Nullable
     private LocalDate completionDate;
     @ColumnInfo(name = COLNAME_TYPE)
+    @NonNull
     private AssessmentType type;
 
     @Ignore
-    protected AbstractAssessmentEntity(Long id, Long courseId, String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate) {
+    protected AbstractAssessmentEntity(long id, long courseId, String code, @Nullable String name, AssessmentStatus status, @Nullable LocalDate goalDate, AssessmentType type, String notes,
+                                       @Nullable LocalDate completionDate) {
         super(id, notes);
-        if (null != courseId) {
-            this.courseId = courseId;
-        }
+        this.courseId = courseId;
         this.completionDate = completionDate;
         this.code = SINGLE_LINE_NORMALIZER.apply(code);
         String s = SINGLE_LINE_NORMALIZER.apply(name);
@@ -63,7 +68,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
      *
      * @return The value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      */
-    public Long getCourseId() {
+    public long getCourseId() {
         return courseId;
     }
 
@@ -107,7 +112,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         String s = SINGLE_LINE_NORMALIZER.apply(name);
         this.name = (s.isEmpty()) ? null : name;
     }
@@ -146,7 +151,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
      *
      * @param goalDate The new pre-determined goal date for completing the assessment or {@code null} if no goal date has been established.
      */
-    public void setGoalDate(LocalDate goalDate) {
+    public void setGoalDate(@Nullable LocalDate goalDate) {
         this.goalDate = goalDate;
     }
 
@@ -184,7 +189,7 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
      *
      * @param completionDate The actual completion date for the assessment or {@code null} if the course has not yet been concluded.
      */
-    public void setCompletionDate(LocalDate completionDate) {
+    public void setCompletionDate(@Nullable LocalDate completionDate) {
         this.completionDate = completionDate;
     }
 

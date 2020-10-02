@@ -42,12 +42,6 @@ public class SettingsActivity extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    public void finish() {
-
-        super.finish();
-    }
-
     public static class SettingsFragment extends PreferenceFragmentCompat {
         private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
 
@@ -64,6 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
+        @SuppressWarnings("SameReturnValue")
         private boolean onPreferenceChange(Preference preference, Object newValue) {
             DbLoader.getPreferEmailLiveData().postValue(null != newValue && (Boolean) newValue);
             return true;

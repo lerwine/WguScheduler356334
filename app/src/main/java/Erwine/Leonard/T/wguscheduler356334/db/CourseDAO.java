@@ -69,7 +69,7 @@ public interface CourseDAO {
     @Query("SELECT * FROM termCourseListView WHERE termId = :termId")
     List<TermCourseListItem> getByTermIdSynchronous(long termId);
 
-    @Query("SELECT * FROM mentorCourseListView WHERE mentorId = :mentorId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    @Query("SELECT * FROM mentorCourseView WHERE mentorId = :mentorId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<MentorCourseListItem>> getByMentorId(long mentorId);
 
     @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")

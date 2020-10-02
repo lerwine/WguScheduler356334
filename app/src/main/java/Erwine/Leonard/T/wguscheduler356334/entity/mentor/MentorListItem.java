@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
@@ -37,7 +38,7 @@ public class MentorListItem extends AbstractMentorEntity<MentorListItem> impleme
      * @param id           The value of the {@link #COLNAME_ID primary key column}.
      */
     public MentorListItem(String name, String notes, String phoneNumber, String emailAddress, int courseCount, long id) {
-        super(id, name, notes, phoneNumber, emailAddress);
+        super(IdIndexedEntity.assertNotNewId(id), name, notes, phoneNumber, emailAddress);
         this.courseCount = Math.max(courseCount, 0);
     }
 
@@ -69,10 +70,7 @@ public class MentorListItem extends AbstractMentorEntity<MentorListItem> impleme
         if (result != 0 || (result = getPhoneNumber().compareTo(o.getPhoneNumber())) != 0 || (result = getEmailAddress().compareTo(o.getEmailAddress())) != 0) {
             return result;
         }
-        if (null == getId()) {
-            return (null == o.getId()) ? 0 : -1;
-        }
-        return (null == o.getId()) ? 1 : getId().compareTo(o.getId());
+        return Long.compare(getId(), o.getId());
     }
 
     @NonNull
@@ -82,7 +80,7 @@ public class MentorListItem extends AbstractMentorEntity<MentorListItem> impleme
     }
 
     @Override
-    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append("courseCount", courseCount);
     }

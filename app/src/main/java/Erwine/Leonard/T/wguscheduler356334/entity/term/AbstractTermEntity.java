@@ -13,14 +13,17 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 public abstract class AbstractTermEntity<T extends AbstractTermEntity<T>> extends AbstractNotedEntity<T> implements Term {
 
     @ColumnInfo(name = COLNAME_NAME, collate = ColumnInfo.NOCASE)
+    @NonNull
     private String name;
     @ColumnInfo(name = COLNAME_START)
+    @Nullable
     private LocalDate start;
     @ColumnInfo(name = COLNAME_END)
+    @Nullable
     private LocalDate end;
 
     @Ignore
-    protected AbstractTermEntity(Long id, String name, LocalDate start, LocalDate end, String notes) {
+    protected AbstractTermEntity(long id, String name, @Nullable LocalDate start, @Nullable LocalDate end, String notes) {
         super(id, notes);
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
         this.start = start;

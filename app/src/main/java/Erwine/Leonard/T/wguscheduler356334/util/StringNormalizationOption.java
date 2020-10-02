@@ -9,7 +9,7 @@ import static Erwine.Leonard.T.wguscheduler356334.util.StringHelper.NORMALIZE_FL
 
 /**
  * Specifies options for {@link StringHelper#normalizeString(String, StringNormalizationOption...)} and {@link StringHelper#getNormalizer(StringNormalizationOption...)}
- * that deviate from the default behavior. The defalt behavior is as follows:
+ * that deviate from the default behavior. The default behavior is as follows:
  * <ul>
  *     <li>{@code null} string values are converted to an empty string.</li>
  *     <li>Control characters, other than line separators, are normalized as space characters.</li>

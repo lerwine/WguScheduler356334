@@ -74,7 +74,7 @@ public final class TermCourseListItem extends AbstractCourseEntity<TermCourseLis
     public TermCourseListItem(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart, LocalDate expectedEnd, LocalDate actualEnd,
                               int competencyUnits, String notes, long termId, Long mentorId, Integer assessmentCount, String mentorName, String phoneNumber,
                               String emailAddress, long id) {
-        super(id, termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+        super(IdIndexedEntity.assertNotNewId(id), termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
         this.assessmentCount = (null == assessmentCount || assessmentCount < 0) ? 0 : assessmentCount;
         this.mentorName = SINGLE_LINE_NORMALIZER.apply(mentorName);
         this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);
@@ -178,20 +178,10 @@ public final class TermCourseListItem extends AbstractCourseEntity<TermCourseLis
                 return result;
             }
         }
-        if ((result = getStatus().compareTo(o.getStatus())) != 0) {
+        if ((result = getStatus().compareTo(o.getStatus())) != 0 || (result = getNumber().compareTo(o.getNumber())) != 0 || (result = getTitle().compareTo(o.getTitle())) != 0) {
             return result;
         }
-        Long i = o.getId();
-        if (null != i) {
-            return (null == getId()) ? 1 : Long.compare(getId(), i);
-        }
-        if (null != getId()) {
-            return -1;
-        }
-        if ((result = getNumber().compareTo(o.getNumber())) != 0) {
-            return result;
-        }
-        return getTitle().compareTo(o.getTitle());
+        return Long.compare(getId(), o.getId());
     }
 
     @NonNull
@@ -201,7 +191,7 @@ public final class TermCourseListItem extends AbstractCourseEntity<TermCourseLis
     }
 
     @Override
-    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append("assessmentCount", assessmentCount).append("mentorName", mentorName).append("phoneNumber", phoneNumber).append("emailAddress", emailAddress);
     }

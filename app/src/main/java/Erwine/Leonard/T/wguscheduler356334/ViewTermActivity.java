@@ -22,11 +22,14 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 public class ViewTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
 
     private final CompositeDisposable compositeDisposable;
+    @SuppressWarnings("FieldCanBeLocal")
     private ViewTermPagerAdapter adapter;
     private EditTermViewModel viewModel;
 
@@ -51,8 +54,8 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
-        Long termId = termEntity.getId();
-        if (null == termId) {
+        long termId = termEntity.getId();
+        if (ID_NEW == termId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_id_not_specified, this).showDialog(this::finish);
         } else {
             adapter = new ViewTermPagerAdapter(termId, this, getSupportFragmentManager());

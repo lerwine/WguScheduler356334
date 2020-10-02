@@ -6,8 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class OptionalLiveData<T> extends LiveData<Optional<T>> {
-    private PresentLiveData presentLiveData;
-    private ValueLiveData valueLiveData;
+    private final PresentLiveData presentLiveData;
+    private final ValueLiveData valueLiveData;
 
     public OptionalLiveData(Optional<T> initialValue) {
         super((null == initialValue) ? Optional.empty() : initialValue);
@@ -28,6 +28,7 @@ public class OptionalLiveData<T> extends LiveData<Optional<T>> {
     }
 
     protected T onOrElseGet() {
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveData.onOrElseGet
         return null;
     }
 
@@ -54,13 +55,14 @@ public class OptionalLiveData<T> extends LiveData<Optional<T>> {
     }
 
     public boolean isPresent() {
+        //noinspection ConstantConditions
         return presentLiveData.getValue();
     }
 
     private class ValueLiveData extends LiveData<T> {
 
         public ValueLiveData() {
-            super(OptionalLiveData.this.getValue().orElseGet(OptionalLiveData.this::onOrElseGet));
+            super(Objects.requireNonNull(OptionalLiveData.this.getValue()).orElseGet(OptionalLiveData.this::onOrElseGet));
         }
 
         private void set(T value) {
@@ -77,9 +79,10 @@ public class OptionalLiveData<T> extends LiveData<Optional<T>> {
     private class PresentLiveData extends LiveData<Boolean> {
 
         public PresentLiveData() {
-            super(OptionalLiveData.this.getValue().isPresent());
+            super(Objects.requireNonNull(OptionalLiveData.this.getValue()).isPresent());
         }
 
+        @SuppressWarnings("ConstantConditions")
         private void set(boolean value) {
             if (value != getValue()) {
                 super.setValue(value);

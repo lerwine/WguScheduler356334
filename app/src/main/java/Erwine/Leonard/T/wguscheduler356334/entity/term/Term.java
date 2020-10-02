@@ -88,6 +88,7 @@ public interface Term extends NoteColumnIncludedEntity {
      */
     void setEnd(@Nullable LocalDate end);
 
+    @NonNull
     @Override
     default String dbTableName() {
         return AppDb.TABLE_NAME_TERMS;
@@ -126,7 +127,7 @@ public interface Term extends NoteColumnIncludedEntity {
     }
 
     @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+    default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_NAME, getName())
                 .append(COLNAME_START, getStart())

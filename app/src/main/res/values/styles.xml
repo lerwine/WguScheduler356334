@@ -64,23 +64,42 @@
         <item name="android:textColor">@color/color_on_primary</item>
     </style>
 
+    <style name="WGU.Scheduler.FloatingActionButton" parent="@style/Widget.Design.FloatingActionButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:layout_gravity">end</item>
+        <item name="android:tint">@color/color_accent_inverse</item>
+        <item name="maxImageSize">42dp</item>
+        <item name="android:layout_margin">@dimen/fab_margin</item>
+        <item name="android:backgroundTint">@color/color_accent</item>
+    </style>
+
     <style name="WGU.Scheduler.ImageButtonStyle" parent="@style/TextAppearance.AppCompat.Widget.Button.Colored">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/color_on_primary</item>
         <item name="android:layout_gravity">end</item>
         <item name="android:tint">@color/color_on_primary</item>
-        <item name="android:backgroundTint">@color/color_accent</item>
         <item name="maxImageSize">42dp</item>
-        <item name="android:padding">8dp</item>
-        <item name="android:scaleX">1.25</item>
-        <item name="android:scaleY">1.25</item>
-        <item name="android:layout_marginHorizontal">8dp</item>
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:background">@drawable/image_button_selector</item>
+    </style>
+
+    <style name="WGU.Scheduler.RadioButtonStyle" parent="@style/Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:button">@drawable/radio_button_selector</item>
     </style>
 
     <style name="WGU.Scheduler.AlertImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
         <item name="android:src">@drawable/alerts_icon</item>
         <item name="srcCompat">@drawable/alerts_icon</item>
+    </style>
+
+    <style name="WGU.Scheduler.AddFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/add_item_icon</item>
+        <item name="srcCompat">@drawable/add_item_icon</item>
     </style>
 
     <style name="WGU.Scheduler.SaveImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
@@ -208,7 +227,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">end</item>
-        <item name="android:background">@drawable/command_button_selector</item>
+        <item name="android:background">@drawable/image_button_selector</item>
         <item name="maxImageSize">42dp</item>
         <item name="android:paddingHorizontal">8dp</item>
         <item name="android:textColor">@color/color_on_primary</item>

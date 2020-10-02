@@ -61,7 +61,7 @@ public class EditAssessmentFragment extends Fragment {
     }
 
     private void onAlertImageButtonClick(View view) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.onAlertImageButtonClick
+        // TODO: Replace alertImageButton with a FloatingActionButton on AlertListFragment
     }
 
     private void onSaveImageButtonClick(View view) {

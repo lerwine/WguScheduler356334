@@ -79,6 +79,7 @@ public interface Mentor extends NoteColumnIncludedEntity {
      */
     void setEmailAddress(String emailAddress);
 
+    @NonNull
     @Override
     default String dbTableName() {
         return AppDb.TABLE_NAME_MENTORS;
@@ -101,7 +102,7 @@ public interface Mentor extends NoteColumnIncludedEntity {
     }
 
     @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+    default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_NAME, getName())
                 .append(COLNAME_PHONE_NUMBER, getPhoneNumber())

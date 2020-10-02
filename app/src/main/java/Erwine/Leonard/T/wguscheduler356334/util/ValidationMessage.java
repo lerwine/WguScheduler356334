@@ -102,8 +102,16 @@ public class ValidationMessage {
         return new ResourceMessageResult(Stream.of(ResourceMessageFactory.ofWarning(id)), false);
     }
 
+    public static ResourceMessageResult ofSingleWarning(@StringRes int id, Object... formatArgs) {
+        return new ResourceMessageResult(Stream.of(ResourceMessageFactory.ofWarning(id, formatArgs)), false);
+    }
+
     public static ResourceMessageResult ofSingleError(@StringRes int id) {
         return new ResourceMessageResult(Stream.of(ResourceMessageFactory.ofError(id)), false);
+    }
+
+    public static ResourceMessageResult ofSingleError(@StringRes int id, Object... formatArgs) {
+        return new ResourceMessageResult(Stream.of(ResourceMessageFactory.ofError(id, formatArgs)), false);
     }
 
     public String getMessage() {
@@ -143,7 +151,7 @@ public class ValidationMessage {
             };
         }
 
-        static ResourceMessageFactory ofWarning(int id, Object... formatArgs) {
+        static ResourceMessageFactory ofWarning(@StringRes int id, Object... formatArgs) {
             return new ResourceMessageFactory() {
                 @Override
                 public boolean isWarning() {
@@ -157,7 +165,7 @@ public class ValidationMessage {
             };
         }
 
-        static ResourceMessageFactory ofError(int id) {
+        static ResourceMessageFactory ofError(@StringRes int id) {
             return r -> r.getString(id);
         }
 
@@ -165,7 +173,7 @@ public class ValidationMessage {
             return factory::apply;
         }
 
-        static ResourceMessageFactory ofError(int id, Object... formatArgs) {
+        static ResourceMessageFactory ofError(@StringRes int id, Object... formatArgs) {
             return r -> r.getString(id, formatArgs);
         }
 

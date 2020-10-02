@@ -6,6 +6,7 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
@@ -31,7 +32,7 @@ public final class MentorEntity extends AbstractMentorEntity<MentorEntity> {
      * @param id           The value of the {@link #COLNAME_ID primary key column}.
      */
     public MentorEntity(String name, String notes, String phoneNumber, String emailAddress, long id) {
-        super(id, name, notes, phoneNumber, emailAddress);
+        super(IdIndexedEntity.assertNotNewId(id), name, notes, phoneNumber, emailAddress);
     }
 
     /**
@@ -44,7 +45,7 @@ public final class MentorEntity extends AbstractMentorEntity<MentorEntity> {
      */
     @Ignore
     public MentorEntity(String name, String notes, String phoneNumber, String emailAddress) {
-        super(null, name, notes, phoneNumber, emailAddress);
+        super(ID_NEW, name, notes, phoneNumber, emailAddress);
     }
 
     @Ignore
@@ -57,7 +58,7 @@ public final class MentorEntity extends AbstractMentorEntity<MentorEntity> {
      */
     @Ignore
     public MentorEntity() {
-        super(null, null, null, null, null);
+        super(ID_NEW, null, null, null, null);
     }
 
     @NonNull

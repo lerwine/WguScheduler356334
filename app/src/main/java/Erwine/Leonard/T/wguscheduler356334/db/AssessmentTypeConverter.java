@@ -7,7 +7,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 
 public final class AssessmentTypeConverter {
     private static final AssessmentType[] VALUES = AssessmentType.values();
-    public static AssessmentType DEFAULT = VALUES[0];
+    public static final AssessmentType DEFAULT = VALUES[0];
 
     @TypeConverter
     public static AssessmentType toAssessmentType(Integer value) {

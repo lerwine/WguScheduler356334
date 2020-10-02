@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.term;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -8,6 +9,7 @@ import androidx.room.Index;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
@@ -32,8 +34,8 @@ public final class TermEntity extends AbstractTermEntity<TermEntity> {
      * @param notes User notes to be associated with the term.
      * @param id    The value of the {@link #COLNAME_ID primary key column}.
      */
-    public TermEntity(String name, LocalDate start, LocalDate end, String notes, long id) {
-        super(id, name, start, end, notes);
+    public TermEntity(String name, @Nullable LocalDate start, @Nullable LocalDate end, String notes, long id) {
+        super(IdIndexedEntity.assertNotNewId(id), name, start, end, notes);
     }
 
     /**
@@ -45,8 +47,8 @@ public final class TermEntity extends AbstractTermEntity<TermEntity> {
      * @param notes User notes to be associated with the term.
      */
     @Ignore
-    public TermEntity(String name, LocalDate start, LocalDate end, String notes) {
-        super(null, name, start, end, notes);
+    public TermEntity(String name, @Nullable LocalDate start, @Nullable LocalDate end, String notes) {
+        super(ID_NEW, name, start, end, notes);
     }
 
     @Ignore
@@ -59,7 +61,7 @@ public final class TermEntity extends AbstractTermEntity<TermEntity> {
      */
     @Ignore
     public TermEntity() {
-        super(null, null, null, null, null);
+        super(ID_NEW, null, null, null, null);
     }
 
     @NonNull

@@ -27,12 +27,15 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 /**
  * A fragment representing a list of Items.
  */
 public class AssessmentListFragment extends Fragment {
 
     private static final String LOG_TAG = AssessmentListFragment.class.getName();
+    @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
     private final ArrayList<AssessmentEntity> list;
     private AssessmentListAdapter adapter;
@@ -81,8 +84,8 @@ public class AssessmentListFragment extends Fragment {
 
     private void onEntityLoaded(CourseDetails entity) {
         Log.d(LOG_TAG, "Loaded course details " + entity);
-        Long courseId = entity.getId();
-        if (null != courseId) {
+        long courseId = entity.getId();
+        if (ID_NEW != courseId) {
             assessmentListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentListViewModel.class);
             assessmentListViewModel.setId(courseId);
             assessmentListViewModel.getAssessments().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);

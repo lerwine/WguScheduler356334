@@ -421,8 +421,8 @@ public abstract class CharSequenceMap<K extends CharSequenceMap.ValueWrapper, V>
         return entrySet;
     }
 
-    private KeySet keySet = new KeySet();
-    private Values values = new Values();
+    private final KeySet keySet = new KeySet();
+    private final Values values = new Values();
 
     private class KeySet implements Set<CharSequence> {
 
@@ -460,6 +460,7 @@ public abstract class CharSequenceMap<K extends CharSequenceMap.ValueWrapper, V>
             return backingSet.stream().map(t -> t.key).toArray();
         }
 
+        @SuppressWarnings("SuspiciousToArrayCall")
         @NonNull
         @Override
         public <T> T[] toArray(@NonNull T[] a) {
@@ -543,6 +544,7 @@ public abstract class CharSequenceMap<K extends CharSequenceMap.ValueWrapper, V>
 
         @NonNull
         @Override
+        @SuppressWarnings("SuspiciousToArrayCall")
         public <T> T[] toArray(@NonNull T[] a) {
             return backingSet.stream().map(t -> t.value).collect(Collectors.toList()).toArray(a);
         }

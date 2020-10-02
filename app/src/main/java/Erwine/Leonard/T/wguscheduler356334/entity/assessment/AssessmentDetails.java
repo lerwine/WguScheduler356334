@@ -10,6 +10,7 @@ import androidx.room.Ignore;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
@@ -25,7 +26,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
                 "FROM assessments LEFT JOIN courses ON assessments.courseId = courses.id\n" +
                 "GROUP BY assessments.id ORDER BY [completionDate], [goalDate]"
 )
-public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetails> {
+public final class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetails> {
 
     /**
      * The name of the {@link #termId "termId"} view column, which contains the name of the term.
@@ -85,7 +86,7 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     @Ignore
     private AbstractCourseEntity<?> course;
     @ColumnInfo(name = COLNAME_TERM_ID)
-    private Long termId;
+    private long termId;
     @ColumnInfo(name = COLNAME_MENTOR_ID)
     private Long mentorId;
     @ColumnInfo(name = COLNAME_COURSE_NUMBER)
@@ -110,7 +111,7 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     public AssessmentDetails(String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId,
                              String courseNumber, String courseTitle, CourseStatus courseStatus, LocalDate expectedCourseStart, LocalDate actualCourseStart,
                              LocalDate expectedCourseEnd, LocalDate actualCourseEnd, int competencyUnits, String courseNotes, long termId, Long mentorId, long id) {
-        super(id, courseId, code, name, status, goalDate, type, notes, completionDate);
+        super(IdIndexedEntity.assertNotNewId(id), IdIndexedEntity.assertNotNewId(courseId), code, name, status, goalDate, type, notes, completionDate);
         setCourse(new CourseEntity(courseNumber, courseTitle, courseStatus, expectedCourseStart, actualCourseStart, expectedCourseEnd, actualCourseEnd,
                 competencyUnits, courseNotes, termId, mentorId, courseId));
     }
@@ -122,7 +123,7 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
 
     @Ignore
     public AssessmentDetails(AbstractCourseEntity<?> course) {
-        super(null, null, null, null, null, null, null, null, null);
+        super(ID_NEW, ID_NEW, null, null, null, null, null, null, null);
         if (null == course) {
             courseNumber = courseTitle = courseNotes = "";
             courseStatus = CourseStatus.UNPLANNED;
@@ -134,11 +135,11 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
         }
     }
 
-    public Long getTermId() {
+    public long getTermId() {
         return course.getTermId();
     }
 
-    public void setTermId(Long termId) {
+    public void setTermId(long termId) {
         course.setTermId(termId);
         this.termId = course.getTermId();
     }
@@ -148,8 +149,8 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     }
 
     public void setMentorId(Long mentorId) {
-        course.setMentorId(termId);
-        this.termId = course.getMentorId();
+        course.setMentorId(mentorId);
+        this.mentorId = course.getMentorId();
     }
 
     public String getCourseNumber() {
@@ -257,11 +258,7 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
 
     public synchronized void setCourse(@NonNull AbstractCourseEntity<?> course) {
         this.course = course;
-        Long id = course.getId();
-        if (null == id) {
-            throw new IllegalArgumentException();
-        }
-        super.setCourseId(id);
+        super.setCourseId(IdIndexedEntity.assertNotNewId(course.getId()));
         courseNumber = course.getNumber();
         courseTitle = course.getTitle();
         courseNotes = course.getNotes();
@@ -287,7 +284,7 @@ public class AssessmentDetails extends AbstractAssessmentEntity<AssessmentDetail
     }
 
     @Override
-    public synchronized void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public synchronized void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append("course", course, false);
     }

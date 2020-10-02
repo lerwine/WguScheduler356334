@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.course;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -8,6 +9,7 @@ import androidx.room.Index;
 import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
@@ -51,9 +53,9 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
      * @param mentorId        The value of the {@link MentorEntity#COLNAME_ID primary key} for the student's {@link MentorEntity course mentor} for the course.
      * @param id              The value of the {@link #COLNAME_ID primary key column}.
      */
-    public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
-                        LocalDate expectedEnd, LocalDate actualEnd, int competencyUnits, String notes, long termId, Long mentorId, long id) {
-        super(id, termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+    public CourseEntity(String number, String title, CourseStatus status, @Nullable LocalDate expectedStart, @Nullable LocalDate actualStart,
+                        @Nullable LocalDate expectedEnd, @Nullable LocalDate actualEnd, int competencyUnits, String notes, long termId, @Nullable Long mentorId, long id) {
+        super(IdIndexedEntity.assertNotNewId(id), IdIndexedEntity.assertNotNewId(termId), IdIndexedEntity.nullIfNewId(mentorId), number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
     }
 
     /**
@@ -72,15 +74,15 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
      * @param mentorId        The value of the {@link MentorEntity#COLNAME_ID primary key} for the student's {@link MentorEntity course mentor} for the course.
      */
     @Ignore
-    public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
-                        LocalDate expectedEnd, LocalDate actualEnd, int competencyUnits, String notes, long termId, Long mentorId) {
-        super(null, termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+    public CourseEntity(String number, String title, CourseStatus status, @Nullable LocalDate expectedStart, @Nullable LocalDate actualStart,
+                        @Nullable LocalDate expectedEnd, @Nullable LocalDate actualEnd, int competencyUnits, String notes, long termId, @Nullable Long mentorId) {
+        super(ID_NEW, IdIndexedEntity.assertNotNewId(termId), IdIndexedEntity.nullIfNewId(mentorId), number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
     }
 
     @Ignore
-    public CourseEntity(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
-                        LocalDate expectedEnd, LocalDate actualEnd, int competencyUnits, String notes, Long mentorId) {
-        super(null, null, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+    public CourseEntity(String number, String title, CourseStatus status, @Nullable LocalDate expectedStart, @Nullable LocalDate actualStart,
+                        @Nullable LocalDate expectedEnd, LocalDate actualEnd, int competencyUnits, String notes, @Nullable Long mentorId) {
+        super(ID_NEW, ID_NEW, IdIndexedEntity.nullIfNewId(mentorId), number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
     }
 
     /**
@@ -90,7 +92,7 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
      */
     @Ignore
     public CourseEntity(long termId) {
-        super(null, termId, null, null, null, CourseStatus.UNPLANNED, null, null, null, null, 0, null);
+        super(ID_NEW, termId, null, null, null, CourseStatus.UNPLANNED, null, null, null, null, 0, null);
     }
 
     @Ignore
@@ -103,7 +105,7 @@ public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
      */
     @Ignore
     public CourseEntity() {
-        super(null, null, null, null, null, null, null, null, null, null, 0, null);
+        super(ID_NEW, ID_NEW, null, null, null, null, null, null, null, null, 0, null);
     }
 
     @Override

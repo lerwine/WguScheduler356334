@@ -23,6 +23,7 @@ public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> exte
     public static final Function<String, String> MULTI_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.NO_TRIM_START, StringNormalizationOption.LEAVE_BLANK_LINES);
 
     @ColumnInfo(name = COLNAME_NOTES)
+    @NonNull
     private String notes;
 
     /**
@@ -31,7 +32,7 @@ public abstract class AbstractNotedEntity<T extends AbstractNotedEntity<T>> exte
      * @param id    The value of the database row primary key, which can be {@code null} if this represents a new row that has not yet been saved.
      * @param notes User notes to be associated with the term.
      */
-    protected AbstractNotedEntity(Long id, String notes) {
+    protected AbstractNotedEntity(long id, String notes) {
         super(id);
         this.notes = MULTI_LINE_NORMALIZER.apply(notes);
     }

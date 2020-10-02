@@ -47,6 +47,7 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @SuppressWarnings("FieldCanBeLocal")
         private final View fragment_term_item;
         private final TextView termNameTextView;
         private final TextView termRangeTextView;
@@ -78,7 +79,6 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
             }
         }
 
-        @SuppressWarnings("ConstantConditions")
         private void onViewClick(View v) {
             EditTermViewModel.startViewTermActivity(v.getContext(), listItem.getId());
         }

@@ -21,6 +21,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 /**
  * Views course information in 2 tabs: {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment}.
  * This initializes the shared view model {@link EditCourseViewModel}.
@@ -31,6 +33,7 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
+    @SuppressWarnings("FieldCanBeLocal")
     private ViewCoursePagerAdapter adapter;
 
     public ViewCourseActivity() {
@@ -79,8 +82,8 @@ public class ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadSucceeded(CourseDetails entity) {
-        Long courseId = entity.getId();
-        if (null == courseId) {
+        long courseId = entity.getId();
+        if (ID_NEW == courseId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_course_id_not_specified, this).showDialog(this::finish);
         } else {
             adapter = new ViewCoursePagerAdapter(this, getSupportFragmentManager());

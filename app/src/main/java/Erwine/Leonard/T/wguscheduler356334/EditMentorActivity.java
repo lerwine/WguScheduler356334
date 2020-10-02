@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.ViewModelProvider;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
@@ -20,6 +21,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
+
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditMentorActivity extends AppCompatActivity {
 
@@ -112,7 +115,7 @@ public class EditMentorActivity extends AppCompatActivity {
         phoneNumberEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setPhoneNumber));
         emailAddressEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setEmailAddress));
         saveMentorImageButton.setOnClickListener(this::onSaveMentorImageButtonClick);
-        if (null == entity.getId()) {
+        if (ID_NEW == entity.getId()) {
             deleteMentorImageButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
         } else {
@@ -140,7 +143,7 @@ public class EditMentorActivity extends AppCompatActivity {
         if (null != isValid && isValid) {
             mentorNameEditText.setError(null);
         } else {
-            mentorNameEditText.setError(getResources().getString(R.string.message_required));
+            mentorNameEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
     }
 
@@ -148,7 +151,7 @@ public class EditMentorActivity extends AppCompatActivity {
         if (null != isValid && isValid) {
             mentorNameEditText.setError(null);
         } else {
-            mentorNameEditText.setError(getResources().getString(R.string.message_phone_or_email_required));
+            mentorNameEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
     }
 

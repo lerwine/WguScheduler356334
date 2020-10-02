@@ -4,9 +4,13 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuildable;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public interface AlertLink extends ToStringBuildable {
 
@@ -20,6 +24,19 @@ public interface AlertLink extends ToStringBuildable {
      */
     String COLNAME_TARGET_ID = "targetId";
 
+    static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull AlertLinkEntity<?> entity) {
+        AlertLink link = entity.getLink();
+        long id = link.getTargetId();
+        if (id == ID_NEW) {
+            builder.acceptError(R.string.message_alert_has_no_target);
+        }
+        AlertEntity alert = entity.getAlert();
+        if (alert.getId() != id) {
+            builder.acceptError(R.string.message_alert_mismatch);
+        }
+        Alert.validate(builder, alert);
+    }
+
     long getAlertId();
 
     void setAlertId(long alertId);
@@ -28,6 +45,7 @@ public interface AlertLink extends ToStringBuildable {
 
     void setTargetId(long targetId);
 
+    @NonNull
     String dbTableName();
 
     default void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
@@ -48,7 +66,7 @@ public interface AlertLink extends ToStringBuildable {
         bundle.putLong(IdIndexedEntity.stateKey(n, COLNAME_TARGET_ID, isOriginal), getTargetId());
     }
 
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+    default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         sb.append(COLNAME_ALERT_ID, getAlertId())
                 .append(COLNAME_TARGET_ID, getTargetId());
     }

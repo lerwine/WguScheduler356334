@@ -18,6 +18,10 @@ public class BooleanAndLiveData extends LiveData<Boolean> {
         mediatorLiveData = new MediatorLiveData<>();
     }
 
+    public synchronized boolean get() {
+        return null == firstFalse && null != firstTrue;
+    }
+
     private synchronized void onNodeChanged(Node node) {
         if (node.lastValue) {
             if (null == node.next) {
@@ -58,7 +62,7 @@ public class BooleanAndLiveData extends LiveData<Boolean> {
                 if (null == (node.next.previous = node.previous)) {
                     firstTrue = node.next;
                 } else {
-                    node.next.previous = node.previous;
+                    node.previous.next = node.next;
                 }
                 node.next = null;
             }
@@ -191,7 +195,7 @@ public class BooleanAndLiveData extends LiveData<Boolean> {
     }
 
     class Node {
-        private LiveData<Boolean> source;
+        private final LiveData<Boolean> source;
         private Node previous;
         private Node next;
         private boolean lastValue;

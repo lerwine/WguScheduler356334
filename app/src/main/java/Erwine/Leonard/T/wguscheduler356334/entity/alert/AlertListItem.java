@@ -26,7 +26,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
-        viewName = AppDb.VIEW_NAME_ALERT_LIST_ITEM,
+        viewName = AppDb.VIEW_NAME_ALERT_LIST,
         value = "SELECT assessmentAlerts.alertId AS id, assessmentAlerts.targetId, assessments.type, assessments.code, assessments.name AS title, assessments.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
                 "\tCASE\n" +
                 "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
@@ -107,9 +107,9 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     @StringRes
     private int typeDisplayResourceId;
 
-    @Ignore
-    protected AlertListItem(Long id, Boolean subsequent, long timeSpec, String customMessage, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, int status, AssessmentType type, long courseId, long targetId) {
-        super(id, timeSpec, subsequent, customMessage);
+    public AlertListItem(Boolean subsequent, long timeSpec, String customMessage, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type,
+                         int status, long courseId, long targetId, long id) {
+        super(IdIndexedEntity.assertNotNewId(id), timeSpec, subsequent, customMessage);
         this.assessment = assessment;
         this.eventDate = eventDate;
         this.alertDate = alertDate;
@@ -117,6 +117,7 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         this.title = SINGLE_LINE_NORMALIZER.apply(title);
         this.status = status;
         this.courseId = courseId;
+        this.targetId = targetId;
         if (assessment) {
             assessmentStatus = AssessmentStatusConverter.toAssessmentStatus(status);
             courseStatus = CourseStatusConverter.fromAssessmentStatus(assessmentStatus);
@@ -130,22 +131,6 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
             typeDisplayResourceId = R.string.label_course;
         }
     }
-
-    public AlertListItem(Boolean subsequent, long timeSpec, String customMessage, boolean assessment, LocalDate eventDate, LocalDate alertDate, String code, String title, AssessmentType type, int status, long courseId, long targetId, long id) {
-        this(id, subsequent, timeSpec, customMessage, assessment, eventDate, alertDate, code, title, status, type, courseId, targetId);
-    }
-
-//    @Ignore
-//    public AlertListItem(AlertListItem source) {
-//        super(source);
-//        this.assessment = source.assessment;
-//        this.eventDate = source.eventDate;
-//        this.code = source.code;
-//        this.title = source.title;
-//        this.type = source.type;
-//        this.status = source.status;
-//        this.courseId = source.courseId;
-//    }
 
     public boolean isAssessment() {
         return assessment;
@@ -202,11 +187,12 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         }
     }
 
+    @Nullable
     public LocalDate getAlertDate() {
         return alertDate;
     }
 
-    public synchronized void setAlertDate(LocalDate alertDate) {
+    public synchronized void setAlertDate(@Nullable LocalDate alertDate) {
         this.alertDate = alertDate;
         if (null == isSubsequent()) {
             this.eventDate = alertDate;
@@ -358,6 +344,7 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         return Objects.hash(courseId, isSubsequent(), getTimeSpec(), assessment, eventDate, code, title, type, status);
     }
 
+    @NonNull
     @Override
     public String dbTableName() {
         return (assessment) ? AppDb.TABLE_NAME_ASSESSMENT_ALERTS : AppDb.TABLE_NAME_COURSE_ALERTS;
@@ -411,7 +398,7 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     }
 
     @Override
-    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_COURSE_ID, getCourseId())
                 .append(COLNAME_ASSESSMENT, isAssessment())
@@ -468,8 +455,6 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         if ((result = code.compareTo(o.code)) != 0 || ((result = title.compareTo(o.title)) != 0) || (result = Long.compare(courseId, o.courseId)) != 0) {
             return result;
         }
-        Long x = getId();
-        Long y = o.getId();
-        return (null == x) ? ((null == y) ? 0 : -1) : ((null == y) ? 1 : Long.compare(x, y));
+        return Long.compare(getId(), o.getId());
     }
 }

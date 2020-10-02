@@ -19,6 +19,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 public class MentorListAdapter extends RecyclerView.Adapter<MentorListAdapter.ViewHolder> {
 
     private final List<MentorListItem> mValues;
+    @SuppressWarnings("FieldCanBeLocal")
     private final Context mContext;
     private final boolean mPreferEmailAddress;
 

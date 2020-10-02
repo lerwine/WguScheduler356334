@@ -27,6 +27,8 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 /**
  * A fragment representing a list of Items.
  */
@@ -83,8 +85,8 @@ public class CourseListFragment extends Fragment {
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
-        Long termId = termEntity.getId();
-        if (null != termId) {
+        long termId = termEntity.getId();
+        if (ID_NEW != termId) {
             courseListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermCourseListViewModel.class);
             courseListViewModel.setId(termId);
             courseListViewModel.getCourses().observe(getViewLifecycleOwner(), this::onCourseListChanged);

@@ -19,7 +19,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
-        viewName = AppDb.VIEW_NAME_MENTOR_COURSE_LIST,
+        viewName = AppDb.VIEW_NAME_MENTOR_COURSE,
         value = "SELECT courses.*, COUNT(assessments.id) AS [assessmentCount], terms.name as [termName]\n" +
                 "FROM courses LEFT JOIN terms ON courses.termId = terms.id\n" +
                 "LEFT JOIN assessments ON courses.id = assessments.courseId\n" +
@@ -144,20 +144,10 @@ public class MentorCourseListItem extends AbstractCourseEntity<MentorCourseListI
                 return result;
             }
         }
-        if ((result = getStatus().compareTo(o.getStatus())) != 0) {
+        if ((result = getStatus().compareTo(o.getStatus())) != 0 || (result = getNumber().compareTo(o.getNumber())) != 0 || (result = getTitle().compareTo(o.getTitle())) != 0) {
             return result;
         }
-        Long i = o.getId();
-        if (null != i) {
-            return (null == getId()) ? 1 : Long.compare(getId(), i);
-        }
-        if (null != getId()) {
-            return -1;
-        }
-        if ((result = getNumber().compareTo(o.getNumber())) != 0) {
-            return result;
-        }
-        return getTitle().compareTo(o.getTitle());
+        return Long.compare(getId(), o.getId());
     }
 
     @NonNull
@@ -167,7 +157,7 @@ public class MentorCourseListItem extends AbstractCourseEntity<MentorCourseListI
     }
 
     @Override
-    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append("assessmentCount", assessmentCount).append("termName", termName);
     }

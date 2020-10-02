@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 
@@ -17,38 +18,46 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
 
     @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_TERM_ID)
-    private Long termId;
+    private long termId;
 
     @ForeignKey(entity = MentorEntity.class, parentColumns = {MentorEntity.COLNAME_ID}, childColumns = {COLNAME_MENTOR_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_MENTOR_ID)
+    @Nullable
     private Long mentorId;
 
     @ColumnInfo(name = COLNAME_NUMBER, collate = ColumnInfo.NOCASE)
+    @NonNull
     private String number;
 
     @ColumnInfo(name = COLNAME_TITLE)
+    @NonNull
     private String title;
 
     @ColumnInfo(name = COLNAME_EXPECTED_START)
+    @Nullable
     private LocalDate expectedStart;
 
     @ColumnInfo(name = COLNAME_ACTUAL_START)
+    @Nullable
     private LocalDate actualStart;
 
     @ColumnInfo(name = COLNAME_EXPECTED_END)
+    @Nullable
     private LocalDate expectedEnd;
 
     @ColumnInfo(name = COLNAME_ACTUAL_END)
+    @Nullable
     private LocalDate actualEnd;
 
     @ColumnInfo(name = COLNAME_STATUS)
+    @NonNull
     private CourseStatus status;
 
     @ColumnInfo(name = COLNAME_COMPETENCY_UNITS)
     private int competencyUnits;
 
-    protected AbstractCourseEntity(Long id, Long termId, Long mentorId, String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart,
-                                   LocalDate expectedEnd, LocalDate actualEnd, int competencyUnits, String notes) {
+    protected AbstractCourseEntity(long id, long termId, @Nullable Long mentorId, String number, String title, CourseStatus status, @Nullable LocalDate expectedStart, @Nullable LocalDate actualStart,
+                                   @Nullable LocalDate expectedEnd, @Nullable LocalDate actualEnd, int competencyUnits, String notes) {
         super(id, notes);
         this.termId = termId;
         this.mentorId = mentorId;
@@ -78,14 +87,13 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
     }
 
     @Override
-    @Nullable
-    public Long getTermId() {
+    public long getTermId() {
         return termId;
     }
 
     @Override
     public void setTermId(long termId) {
-        this.termId = termId;
+        this.termId = IdIndexedEntity.assertNotNewId(termId);
     }
 
     @Override
@@ -96,7 +104,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
 
     @Override
     public void setMentorId(@Nullable Long mentorId) {
-        this.mentorId = mentorId;
+        this.mentorId = IdIndexedEntity.nullIfNewId(mentorId);
     }
 
     /**
@@ -198,7 +206,7 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
 
     @Override
     protected boolean equalsEntity(@NonNull T other) {
-        return Objects.equals(termId, other.getTermId()) &&
+        return termId == other.getTermId() &&
                 Objects.equals(mentorId, other.getMentorId()) &&
                 number.equals(other.getNumber()) &&
                 title.equals(other.getTitle()) &&

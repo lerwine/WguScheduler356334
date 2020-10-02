@@ -39,6 +39,7 @@ public class AssessmentPropertiesFragment extends Fragment {
     private static final String LOG_TAG = AssessmentPropertiesFragment.class.getName();
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
     private Button courseButton;

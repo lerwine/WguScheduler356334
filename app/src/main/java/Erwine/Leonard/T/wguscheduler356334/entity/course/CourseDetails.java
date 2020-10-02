@@ -10,9 +10,9 @@ import androidx.room.Ignore;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.AbstractMentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
@@ -114,7 +114,7 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
 
     @Ignore
     public CourseDetails(AbstractTermEntity<?> term) {
-        super(null, (null == term) ? null : term.getId(), null, null, null, CourseStatus.UNPLANNED, null, null, null, null, 0, null);
+        super(ID_NEW, (null == term) ? ID_NEW : term.getId(), null, null, null, CourseStatus.UNPLANNED, null, null, null, null, 0, null);
         if (null != term) {
             setTerm(term);
         } else {
@@ -130,10 +130,7 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
     }
 
     public synchronized void setTerm(@NonNull AbstractTermEntity<?> term) {
-        Long id = term.getId();
-        if (null == id) {
-            throw new IllegalArgumentException();
-        }
+        long id = IdIndexedEntity.assertNotNewId(term.getId());
         this.term = term;
         super.setTermId(id);
         this.termName = term.getName();
@@ -153,10 +150,7 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
             super.setMentorId(null);
             this.mentorName = this.phoneNumber = this.emailAddress = this.mentorNotes = "";
         } else {
-            Long id = mentor.getId();
-            if (null == id) {
-                throw new IllegalArgumentException();
-            }
+            long id = IdIndexedEntity.assertNotNewId(mentor.getId());
             super.setMentorId(id);
             this.mentorName = mentor.getName();
             this.phoneNumber = mentor.getPhoneNumber();
@@ -196,16 +190,16 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
     }
 
     public synchronized void applyEntity(@NonNull CourseEntity source, @NonNull List<? extends AbstractTermEntity<?>> terms, @NonNull List<? extends AbstractMentorEntity<?>> mentors) {
-        Long currentId = getId();
-        Long sourceId = source.getId();
+        long currentId = getId();
+        long sourceId = source.getId();
         Long termId;
-        if (null == sourceId || !(null == currentId || Objects.equals(currentId, sourceId)) || null == (termId = source.getTermId())) {
+        if (ID_NEW == sourceId || !(ID_NEW == currentId || currentId == sourceId) || ID_NEW == (termId = source.getTermId())) {
             throw new IllegalArgumentException();
         }
         AbstractTermEntity<?> newTerm = terms.stream().filter(t -> termId.equals(t.getId())).findFirst().orElseThrow(() -> new IllegalArgumentException("Matching term not found"));
         Long mentorId = source.getMentorId();
         AbstractMentorEntity<?> newMentor = (null == mentorId) ? null : mentors.stream().filter(t -> mentorId.equals(t.getId())).findFirst().orElseThrow(() -> new IllegalArgumentException("Matching mentor not found"));
-        if (null == currentId) {
+        if (ID_NEW == currentId) {
             setId(sourceId);
         }
         setTerm(newTerm);
@@ -228,7 +222,7 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
     }
 
     @Override
-    public void appendPropertiesAsStrings(ToStringBuilder sb) {
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         super.appendPropertiesAsStrings(sb);
         sb.append("term", term, false).append("mentor", mentor, false);
     }

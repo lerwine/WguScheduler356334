@@ -12,6 +12,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 
 public class MentorListViewModel extends AndroidViewModel {
+    @SuppressWarnings("FieldCanBeLocal")
     private final DbLoader dbLoader;
     private final LiveData<List<MentorListItem>> mentors;
 

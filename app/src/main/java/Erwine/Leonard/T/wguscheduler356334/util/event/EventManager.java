@@ -224,7 +224,10 @@ public abstract class EventManager<T extends EventObject, U extends EventListene
             try {
                 notifyListener(iterator.next(), event);
             } catch (@SuppressWarnings("UseSpecificCatch") Throwable ex) {
-                Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), ex);
+                Thread.UncaughtExceptionHandler eh = Thread.currentThread().getUncaughtExceptionHandler();
+                if (null != eh) {
+                    eh.uncaughtException(Thread.currentThread(), ex);
+                }
             }
         } while (iterator.hasNext());
     }

@@ -26,6 +26,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 public class EditMentorViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditMentorViewModel.class.getName();
@@ -64,8 +66,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         context.startActivity(intent);
     }
 
-    public Long getId() {
-        return (null == mentorEntity) ? null : mentorEntity.getId();
+    public long getId() {
+        return (null == mentorEntity) ? ID_NEW : mentorEntity.getId();
     }
 
     public String getName() {
@@ -136,8 +138,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         mentorEntity = new MentorEntity();
         if (null != state) {
             currentValues.restoreState(state, false);
-            Long id = currentValues.getId();
-            if (null == id || fromInitializedState) {
+            long id = currentValues.getId();
+            if (ID_NEW == id || fromInitializedState) {
                 mentorEntity.restoreState(state, fromInitializedState);
             } else {
                 return dbLoader.getMentorById(id)
@@ -193,7 +195,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     }
 
     public boolean isChanged() {
-        if (null != mentorEntity.getId() && normalizedName.equals(mentorEntity.getName()) && normalizedPhoneNumber.equals(mentorEntity.getPhoneNumber()) &&
+        if (ID_NEW != mentorEntity.getId() && normalizedName.equals(mentorEntity.getName()) && normalizedPhoneNumber.equals(mentorEntity.getPhoneNumber()) &&
                 normalizedEmailAddress.equals(mentorEntity.getEmailAddress())) {
             return !getNormalizedNotes().equals(mentorEntity.getNotes());
         }
@@ -202,20 +204,19 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     private class CurrentValues implements Mentor {
 
-        private Long id;
+        private long id;
         private String name = "";
         private String phoneNumber = "";
         private String emailAddress = "";
         private String notes = "";
 
-        @Nullable
         @Override
-        public Long getId() {
+        public long getId() {
             return id;
         }
 
         @Override
-        public void setId(Long id) {
+        public void setId(long id) {
             this.id = id;
         }
 

@@ -71,13 +71,13 @@ public class PropertyChangeSupported {
     }
 
     protected void firePropertyChange(String propertyName, String oldValue, String newValue) {
-        if ((null == oldValue) ? null != newValue : !oldValue.equals(newValue)) {
+        if (!Objects.equals(oldValue, newValue)) {
             propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
 
     protected void firePropertyChange(String propertyName, LocalDate oldValue, LocalDate newValue) {
-        if ((null == oldValue) ? null != newValue : !oldValue.equals(newValue)) {
+        if (!Objects.equals(oldValue, newValue)) {
             propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
@@ -102,7 +102,7 @@ public class PropertyChangeSupported {
      * @param event The {@code PropertyChangeEvent} that is being fired.
      * @throws Exception Allows implementing classes to throw any exception, which will be caught by the {@link Thread.UncaughtExceptionHandler}.
      */
-    @SuppressWarnings("RedundantThrows")
+    @SuppressWarnings({"RedundantThrows", "EmptyMethod"})
     protected void onPropertyChange(PropertyChangeEvent event) throws Exception {
     }
 

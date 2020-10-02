@@ -76,16 +76,19 @@ public class NormalizingCharSequence implements CharSequence {
         return toString().charAt(index);
     }
 
+    @NonNull
     @Override
     public CharSequence subSequence(int start, int end) {
         return toString().substring(start, end);
     }
 
+    @NonNull
     @Override
     public IntStream chars() {
         return toString().chars();
     }
 
+    @NonNull
     @Override
     public IntStream codePoints() {
         return toString().codePoints();

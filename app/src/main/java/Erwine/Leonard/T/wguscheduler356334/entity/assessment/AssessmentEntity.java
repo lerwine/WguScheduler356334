@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.assessment;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
@@ -43,9 +45,9 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      * @param courseId       the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      * @param id             The value of the {@link #COLNAME_ID primary key column}.
      */
-    public AssessmentEntity(String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId,
+    public AssessmentEntity(String code, @Nullable String name, AssessmentStatus status, @Nullable LocalDate goalDate, AssessmentType type, String notes, @Nullable LocalDate completionDate, long courseId,
                             long id) {
-        super(id, courseId, code, name, status, goalDate, type, notes, completionDate);
+        super(IdIndexedEntity.assertNotNewId(id), IdIndexedEntity.assertNotNewId(courseId), code, name, status, goalDate, type, notes, completionDate);
     }
 
     /**
@@ -61,8 +63,8 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      * @param courseId       the value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      */
     @Ignore
-    public AssessmentEntity(String code, String name, AssessmentStatus status, LocalDate goalDate, AssessmentType type, String notes, LocalDate completionDate, long courseId) {
-        super(null, courseId, code, name, status, goalDate, type, notes, completionDate);
+    public AssessmentEntity(String code, @Nullable String name, AssessmentStatus status, @Nullable LocalDate goalDate, AssessmentType type, String notes, @Nullable LocalDate completionDate, long courseId) {
+        super(ID_NEW, IdIndexedEntity.assertNotNewId(courseId), code, name, status, goalDate, type, notes, completionDate);
     }
 
     /**
@@ -72,7 +74,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      */
     @Ignore
     public AssessmentEntity(AssessmentType type, long courseId) {
-        super(null, courseId, null, null, AssessmentStatusConverter.DEFAULT, null, type, null, null);
+        super(ID_NEW, IdIndexedEntity.assertNotNewId(courseId), null, null, AssessmentStatusConverter.DEFAULT, null, type, null, null);
     }
 
     @Ignore
@@ -85,7 +87,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
      */
     @Ignore
     public AssessmentEntity() {
-        super(null, null, null, null, null, null, null, null, null);
+        super(ID_NEW, ID_NEW, null, null, null, null, null, null, null);
     }
 
     @Override
@@ -136,8 +138,7 @@ public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentE
         if ((result = getStatus().compareTo(o.getStatus())) != 0 || (result = getType().compareTo(o.getType())) != 0 || (result = getCode().compareTo(o.getCode())) != 0) {
             return result;
         }
-        Long i = o.getId();
-        return (null == i) ? ((null == getId()) ? 0 : -1) : ((null == getId()) ? 1 : Long.compare(getId(), i));
+        return Long.compare(getId(), o.getId());
     }
 
     @NonNull

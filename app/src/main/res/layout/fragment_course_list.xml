@@ -33,15 +33,9 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addCourseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:backgroundTint="@color/color_accent"
+        style="@style/WGU.Scheduler.AddFabButtonStyle"
         android:clickable="true"
-        android:src="@drawable/add_item_icon"
-        android:tint="@color/color_accent_inverse"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="42dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

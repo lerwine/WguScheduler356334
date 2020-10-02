@@ -46,6 +46,7 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @SuppressWarnings("FieldCanBeLocal")
         private final View view;
         private final TextView codeTextView;
         private final TextView statusTextView;
@@ -69,7 +70,6 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             return super.toString() + " '" + statusTextView.getText() + "'";
         }
 
-        @SuppressWarnings("ConstantConditions")
         private void onViewClick(View view) {
             Log.d(LOG_TAG, "Viewing assessment " + item);
             EditAssessmentViewModel.startViewAssessmentActivity(view.getContext(), item.getId());

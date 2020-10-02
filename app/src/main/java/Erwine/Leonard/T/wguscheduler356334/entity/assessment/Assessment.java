@@ -49,6 +49,9 @@ public interface Assessment extends NoteColumnIncludedEntity {
     String COLNAME_COMPLETION_DATE = "completionDate";
 
     static void validate(ValidationMessage.ResourceMessageBuilder builder, AssessmentEntity entity) {
+        if (entity.getCourseId() == ID_NEW) {
+            builder.acceptError(R.string.message_assessment_has_no_course);
+        }
         if (entity.getCode().isEmpty()) {
             builder.acceptError(R.string.message_assessment_code_required);
         }
@@ -67,8 +70,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
      *
      * @return The value of the {@link CourseEntity#COLNAME_ID primary key} for the {@link CourseEntity course} associated with the assessment.
      */
-    @Nullable
-    Long getCourseId();
+    long getCourseId();
 
     /**
      * Sets the {@link CourseEntity#COLNAME_ID primary key} value for the {@link CourseEntity course} to be associated with the assessment.
@@ -167,6 +169,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
      */
     void setCompletionDate(LocalDate completionDate);
 
+    @NonNull
     @Override
     default String dbTableName() {
         return AppDb.TABLE_NAME_ASSESSMENTS;
@@ -228,7 +231,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
     }
 
     @Override
-    default void appendPropertiesAsStrings(ToStringBuilder sb) {
+    default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         NoteColumnIncludedEntity.super.appendPropertiesAsStrings(sb);
         sb.append(COLNAME_COURSE_ID, getCourseId())
                 .append(COLNAME_CODE, getCode())

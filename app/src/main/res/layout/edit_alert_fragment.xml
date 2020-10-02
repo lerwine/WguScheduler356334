@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.alert.EditAlertFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/typeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/codeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/eventDateLabelTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_event_date"
+        android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+    <TextView
+        android:id="@+id/eventDateDescriptionTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="0">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/daysBeforeStartEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number" />
+
+            <RadioButton
+                android:id="@+id/daysBeforeStartRadioButton"
+                style="@style/WGU.Scheduler.RadioButtonStyle"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/daysBeforeStartEditText"
+                android:text="@string/label_days_before_start" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/daysBeforeEndEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number" />
+
+            <RadioButton
+                android:id="@+id/daysBeforeEndRadioButton"
+                style="@style/WGU.Scheduler.RadioButtonStyle"
+                android:labelFor="@id/daysBeforeEndEditText"
+                tools:text="@string/label_days_before_end" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/specificDateEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="date" />
+
+            <RadioButton
+                android:id="@+id/specificDateRadioButton"
+                style="@style/WGU.Scheduler.RadioButtonStyle"
+                android:labelFor="@id/specificDateEditText"
+                android:text="@string/label_specific_date" />
+        </TableRow>
+
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/messageLabelTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/messageEditText"
+        android:text="@string/label_message"
+        android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+    <EditText
+        android:id="@+id/messageEditText"
+        style="@style/WGU.Scheduler.TextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:importantForAutofill="no"
+        android:inputType="textShortMessage" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/saveImageButton"
+            style="@style/WGU.Scheduler.SaveImageButtonStyle"
+            android:contentDescription="@string/command_save_changes"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/deleteImageButton" />
+
+        <ImageButton
+            android:id="@+id/deleteImageButton"
+            style="@style/WGU.Scheduler.DeleteImageButtonStyle"
+            android:contentDescription="@string/command_delete"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
+
+        <ImageButton
+            android:id="@+id/cancelImageButton"
+            style="@style/WGU.Scheduler.CancelImageButtonStyle"
+            android:contentDescription="@android:string/cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -11,16 +11,19 @@ import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 public abstract class AbstractMentorEntity<T extends AbstractMentorEntity<T>> extends AbstractNotedEntity<T> implements Mentor {
 
     @ColumnInfo(name = COLNAME_NAME, collate = ColumnInfo.NOCASE)
+    @NonNull
     private String name;
 
     @ColumnInfo(name = COLNAME_PHONE_NUMBER)
+    @NonNull
     private String phoneNumber;
 
     @ColumnInfo(name = COLNAME_EMAIL_ADDRESS)
+    @NonNull
     private String emailAddress;
 
     @Ignore
-    protected AbstractMentorEntity(Long id, String name, String notes, String phoneNumber, String emailAddress) {
+    protected AbstractMentorEntity(long id, String name, String notes, String phoneNumber, String emailAddress) {
         super(id, notes);
         this.name = SINGLE_LINE_NORMALIZER.apply(name);
         this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -120,7 +121,7 @@ public class TermPropertiesFragment extends Fragment {
         if (null != isValid && isValid) {
             termNameEditText.setError(null);
         } else {
-            termNameEditText.setError(getResources().getString(R.string.message_required));
+            termNameEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
@@ -128,7 +129,7 @@ public class TermPropertiesFragment extends Fragment {
         if (null == id) {
             termStartTextView.setError(null);
         } else {
-            termStartTextView.setError(getResources().getString(id));
+            termStartTextView.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 

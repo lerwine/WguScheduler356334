@@ -13,6 +13,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
 public class TermListViewModel extends AndroidViewModel {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final DbLoader dbLoader;
     private final LiveData<List<TermListItem>> terms;
 

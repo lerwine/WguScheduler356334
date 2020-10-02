@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
+@SuppressWarnings("ConstantConditions")
 public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> extends ArrayList<T> {
 
     public static boolean isValid(ValidationTrackable source) {
@@ -88,8 +88,9 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         }
         return  element;
     }
+
     private synchronized boolean unlink(ValidationTrackable element, boolean isSizeChange) {
-        if (null == element.tracker || element.tracker != this) {
+        if (element.tracker != this) {
             throw new IllegalStateException();
         }
         element.tracker = null;
@@ -130,6 +131,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         }
         return false;
     }
+
     private synchronized boolean link(ValidationTrackable element, boolean isSizeChange) {
         if (null != element.tracker || element.tracker != this) {
             throw new IllegalStateException();
@@ -162,8 +164,9 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         element.previous.next = element;
         return false;
     }
+
     private synchronized void replace(ValidationTrackable target, ValidationTrackable newElement) {
-        if (null == target.tracker || target.tracker != this) {
+        if (target.tracker != this) {
             throw new IllegalStateException();
         }
         if (null != newElement.tracker) {
@@ -209,6 +212,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
             unlink(target, false);
         }
     }
+
     @Override
     public synchronized T set(int index, T element) {
         assertOrphaned(element);
@@ -255,7 +259,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         if (isEmpty()) {
             return;
         }
-        List<T> removed = stream().collect(Collectors.toList());
+        List<T> removed = new ArrayList<>(this);
         super.clear();
         removed.forEach(t -> {
             ValidationTrackable node = (ValidationTrackable) t;
@@ -271,6 +275,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
             }
         });
     }
+
     @Override
     public synchronized boolean addAll(@NonNull Collection<? extends T> c) {
         if (super.addAll(c)) {
@@ -296,10 +301,11 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
             }
         });
     }
+
     @Override
     public synchronized void removeRange(int fromIndex, int toIndex) {
         if (!isEmpty()) {
-            List<T> items = stream().collect(Collectors.toList());
+            List<T> items = new ArrayList<>(this);
             super.removeRange(fromIndex, toIndex);
             checkRemove(items);
         }
@@ -308,7 +314,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
     @Override
     public synchronized boolean removeAll(@NonNull Collection<?> c) {
         if (!isEmpty()) {
-            List<T> items = stream().collect(Collectors.toList());
+            List<T> items = new ArrayList<>(this);
             if (super.removeAll(c)) {
                 checkRemove(items);
                 return true;
@@ -320,7 +326,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
     @Override
     public synchronized boolean retainAll(@NonNull Collection<?> c) {
         if (!isEmpty()) {
-            List<T> items = stream().collect(Collectors.toList());
+            List<T> items = new ArrayList<>(this);
             if (super.retainAll(c)) {
                 checkRemove(items);
                 return true;
@@ -331,16 +337,17 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
 
     @Override
     public synchronized void replaceAll(@NonNull UnaryOperator<T> operator) {
-        List<T> items = stream().collect(Collectors.toList());
+        List<T> items = new ArrayList<>(this);
         super.replaceAll(operator);
         checkRemove(items);
         ensureLinked();
     }
 
     public void setAll(List<T> phoneNumberEntities) {
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.util.ValidationTracker.setAll
     }
 
-    private class LiveBoolean extends LiveData<Boolean> {
+    private static class LiveBoolean extends LiveData<Boolean> {
         private boolean postedValue;
 
         private LiveBoolean(boolean initialValue) {

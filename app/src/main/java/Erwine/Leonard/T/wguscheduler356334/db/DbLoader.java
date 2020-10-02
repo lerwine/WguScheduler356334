@@ -17,17 +17,25 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
@@ -39,7 +47,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -47,6 +54,8 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 /**
  * A singleton helper object for database I/O.
@@ -78,14 +87,16 @@ public class DbLoader {
 
     private static final MutableLiveData<Boolean> preferEmailLiveData = new MutableLiveData<>(false);
     private static DbLoader instance;
+    @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
     private final AppDb appDb;
     private final Scheduler scheduler;
+    @SuppressWarnings("FieldCanBeLocal")
     private final Executor dataExecutor;
     private LiveData<List<TermListItem>> allTerms;
     private LiveData<List<MentorListItem>> allMentors;
-    private LiveData<List<CourseEntity>> allCourses;
-    private LiveData<List<AssessmentEntity>> allAssessments;
+//    private LiveData<List<CourseEntity>> allCourses;
+//    private LiveData<List<AssessmentEntity>> allAssessments;
 
     /**
      * Gets the singleton {@code DbLoader} instance.
@@ -99,42 +110,6 @@ public class DbLoader {
         }
 
         return instance;
-    }
-
-    private static <T> void applyInsertedIds(List<Long> ids, List<T> entities, BiConsumer<T, Long> setId) {
-        for (int n = 0; n < ids.size() && n < entities.size(); n++) {
-            Long i = ids.get(n);
-            if (null != i) {
-                setId.accept(entities.get(n), i);
-            }
-        }
-    }
-
-    private static ArrayList<String> parseSampleDataCells(String csvText, Integer expectedCellCount) {
-        try {
-            ArrayList<ArrayList<String>> rows = StringHelper.parseCsv(csvText.trim());
-            if (rows.size() != 1)
-                throw new RuntimeException(String.format("Expected 1 parsed CSV row; Actual: %d", rows.size()));
-            ArrayList<String> r = rows.get(0);
-            if (r.size() != expectedCellCount)
-                throw new RuntimeException(String.format("Expected %d parsed CSV cells; Actual: %d", expectedCellCount, r.size()));
-            return r;
-        } catch (RuntimeException ex) {
-            throw new RuntimeException(String.format("Error parsing sample data %s", csvText), ex);
-        }
-    }
-
-    private static LocalDate sampleCellToLocalDate(String t, CourseEntity u) {
-        switch (t) {
-            case "expectedEnd":
-                return u.getExpectedEnd();
-            case "actualEnd":
-                return u.getActualEnd();
-            case "":
-                return null;
-            default:
-                return LocalDate.parse(t);
-        }
     }
 
     private DbLoader(Context context) {
@@ -158,16 +133,16 @@ public class DbLoader {
         return appDb;
     }
 
-    /**
-     * Asynchronously gets a {@link TermEntity} from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb} by its {@code ROWID}.
-     *
-     * @param rowId The {@code ROWID} of the {@link TermEntity} to retrieve.
-     * @return The {@link Single} object that can be used to observe the result {@link TermEntity} object.
-     */
-    @NonNull
-    public Single<TermEntity> getTermByRowId(int rowId) {
-        return appDb.termDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets a {@link TermEntity} from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb} by its {@code ROWID}.
+//     *
+//     * @param rowId The {@code ROWID} of the {@link TermEntity} to retrieve.
+//     * @return The {@link Single} object that can be used to observe the result {@link TermEntity} object.
+//     */
+//    @NonNull
+//    public Single<TermEntity> getTermByRowId(int rowId) {
+//        return appDb.termDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Asynchronously gets a {@link TermEntity} from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb} by its unique identifier.
@@ -215,8 +190,8 @@ public class DbLoader {
             TermDAO dao = appDb.termDAO();
             List<TermListItem> list = dao.getAllSynchronous();
             String name = entity.getName();
-            final Long id = entity.getId();
-            if (null == id) {
+            final long id = entity.getId();
+            if (id == ID_NEW) {
                 if (list.stream().anyMatch(t -> t.getName().equals(name))) {
                     builder.acceptError(R.string.message_term_duplicate_name);
                 }
@@ -226,7 +201,7 @@ public class DbLoader {
                 entity.setId(dao.insertSynchronous(entity));
                 return builder.build();
             }
-            if (list.stream().anyMatch(t -> t.getName().equals(name) && !id.equals(t.getId()))) {
+            if (list.stream().anyMatch(t -> t.getName().equals(name) && id != t.getId())) {
                 builder.acceptError(R.string.message_term_duplicate_name);
             }
             final LocalDate start = entity.getStart();
@@ -276,8 +251,8 @@ public class DbLoader {
     public Single<ValidationMessage.ResourceMessageResult> deleteTerm(TermEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called deleteTerm(%s)", entity));
         return Single.fromCallable(() -> {
-            Long id = entity.getId();
-            if (null == id) {
+            long id = entity.getId();
+            if (ID_NEW == id) {
                 return ValidationMessage.ofSingleWarning(R.string.message_item_never_saved);
             }
             if (!(ignoreWarnings || appDb.courseDAO().getCountByTermIdSynchronous(entity.getId()) == 0)) {
@@ -288,16 +263,16 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Asynchronously gets a {@link MentorEntity} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb} by its {@code ROWID}.
-     *
-     * @param rowId The {@code ROWID} of the {@link MentorEntity} to retrieve.
-     * @return The {@link Single} object that can be used to observe the result {@link MentorEntity} object.
-     */
-    @NonNull
-    public Single<MentorEntity> getMentorByRowId(int rowId) {
-        return appDb.mentorDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets a {@link MentorEntity} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb} by its {@code ROWID}.
+//     *
+//     * @param rowId The {@code ROWID} of the {@link MentorEntity} to retrieve.
+//     * @return The {@link Single} object that can be used to observe the result {@link MentorEntity} object.
+//     */
+//    @NonNull
+//    public Single<MentorEntity> getMentorByRowId(int rowId) {
+//        return appDb.mentorDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Gets all rows from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
@@ -313,16 +288,16 @@ public class DbLoader {
         return allMentors;
     }
 
-    /**
-     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
-     *
-     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
-     */
-    @NonNull
-    public Single<Integer> getMentorCount() {
-        Log.d(LOG_TAG, "Called getMentorCount()");
-        return appDb.mentorDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
+//     *
+//     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
+//     */
+//    @NonNull
+//    public Single<Integer> getMentorCount() {
+//        Log.d(LOG_TAG, "Called getMentorCount()");
+//        return appDb.mentorDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Asynchronously saves the specified {@link MentorEntity} object into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table of the underlying {@link AppDb}.
@@ -342,8 +317,8 @@ public class DbLoader {
             MentorDAO dao = appDb.mentorDAO();
             List<MentorListItem> list = dao.getAllSynchronous();
             String name = entity.getName();
-            final Long id = entity.getId();
-            if (null == id) {
+            final long id = entity.getId();
+            if (ID_NEW == id) {
                 if (list.stream().anyMatch(t -> t.getName().equals(name))) {
                     builder.acceptError(R.string.message_mentor_duplicate_name);
                 }
@@ -353,7 +328,7 @@ public class DbLoader {
                 entity.setId(dao.insertSynchronous(entity));
                 return builder.build();
             }
-            if (list.stream().anyMatch(t -> t.getName().equals(name) && !id.equals(t.getId()))) {
+            if (list.stream().anyMatch(t -> t.getName().equals(name) && id != t.getId())) {
                 builder.acceptError(R.string.message_mentor_duplicate_name);
             }
 
@@ -366,17 +341,17 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Asynchronously inserts a {@link List} of @link MentorEntity} objects into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table of the underlying {@link AppDb}.
-     *
-     * @param list The {@link List} of @link TermEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable insertAllMentors(List<MentorEntity> list) {
-        return Completable.fromSingle(appDb.mentorDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
-    }
+//    /**
+//     * Asynchronously inserts a {@link List} of @link MentorEntity} objects into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table of the underlying {@link AppDb}.
+//     *
+//     * @param list The {@link List} of @link TermEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table.
+//     * @return The {@link Completable} that can be observed for DB operation completion status.
+//     */
+//    @NonNull
+//    public Completable insertAllMentors(List<MentorEntity> list) {
+//        return Completable.fromSingle(appDb.mentorDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+//                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
+//    }
 
     /**
      * Asynchronously deletes a {@link MentorEntity} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table of the underlying {@link AppDb}.
@@ -388,8 +363,8 @@ public class DbLoader {
     public Single<ValidationMessage.ResourceMessageResult> deleteMentor(MentorEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called deleteMentor(%s)", entity));
         return Single.fromCallable(() -> {
-            Long id = entity.getId();
-            if (null == id) {
+            long id = entity.getId();
+            if (ID_NEW == id) {
                 return ValidationMessage.ofSingleWarning(R.string.message_item_never_saved);
             }
             if (!(ignoreWarnings || appDb.courseDAO().getCountByMentorIdSynchronous(id) > 0)) {
@@ -422,8 +397,8 @@ public class DbLoader {
     public Single<ValidationMessage.ResourceMessageResult> deleteCourse(CourseEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called deleteCourse(%s)", entity));
         return Single.fromCallable(() -> {
-            Long id = entity.getId();
-            if (null == id) {
+            long id = entity.getId();
+            if (ID_NEW == id) {
                 return ValidationMessage.ofSingleWarning(R.string.message_item_never_saved);
             }
             if (!(ignoreWarnings || appDb.assessmentDAO().getCountByCourseIdSynchronous(id) > 0)) {
@@ -434,16 +409,16 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Asynchronously gets a {@link CourseEntity} from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb} by its {@code ROWID}.
-     *
-     * @param rowId The {@code ROWID} of the {@link CourseEntity} to retrieve.
-     * @return The {@link Single} object that can be used to observe the result {@link CourseEntity} object.
-     */
-    @NonNull
-    public Single<CourseEntity> getCourseByRowId(int rowId) {
-        return appDb.courseDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets a {@link CourseEntity} from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb} by its {@code ROWID}.
+//     *
+//     * @param rowId The {@code ROWID} of the {@link CourseEntity} to retrieve.
+//     * @return The {@link Single} object that can be used to observe the result {@link CourseEntity} object.
+//     */
+//    @NonNull
+//    public Single<CourseEntity> getCourseByRowId(int rowId) {
+//        return appDb.courseDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Asynchronously gets a {@link CourseDetails} from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb} by its unique identifier.
@@ -457,19 +432,19 @@ public class DbLoader {
         return appDb.courseDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Gets all rows from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
-     *
-     * @return A {@link LiveData} object that will contain the list of {@link CourseEntity} objects retrieved from the underlying {@link AppDb}.
-     */
-    @NonNull
-    public LiveData<List<CourseEntity>> getAllCourses() {
-        Log.d(LOG_TAG, "Called getAllCourses()");
-        if (null == allCourses) {
-            allCourses = appDb.courseDAO().getAll();
-        }
-        return allCourses;
-    }
+//    /**
+//     * Gets all rows from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
+//     *
+//     * @return A {@link LiveData} object that will contain the list of {@link CourseEntity} objects retrieved from the underlying {@link AppDb}.
+//     */
+//    @NonNull
+//    public LiveData<List<CourseEntity>> getAllCourses() {
+//        Log.d(LOG_TAG, "Called getAllCourses()");
+//        if (null == allCourses) {
+//            allCourses = appDb.courseDAO().getAll();
+//        }
+//        return allCourses;
+//    }
 
     /**
      * Gets rows from the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb} that are associated with a specific
@@ -513,16 +488,16 @@ public class DbLoader {
         return appDb.courseDAO().getUnterminatedOnOrBefore(date);
     }
 
-    /**
-     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
-     *
-     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
-     */
-    @NonNull
-    public Single<Integer> getCourseCount() {
-        Log.d(LOG_TAG, "Called getCourseCount()");
-        return appDb.courseDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
+//     *
+//     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_COURSES "courses"} data table within the underlying {@link AppDb}.
+//     */
+//    @NonNull
+//    public Single<Integer> getCourseCount() {
+//        Log.d(LOG_TAG, "Called getCourseCount()");
+//        return appDb.courseDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Asynchronously save the specified {@link CourseEntity} object into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
@@ -540,10 +515,10 @@ public class DbLoader {
             final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
             Course.validate(builder, entity);
             CourseDAO dao = appDb.courseDAO();
-            Long termId = entity.getTermId();
+            long termId = entity.getTermId();
             Optional<LocalDate> start = ComparisonHelper.firstNonNull(entity.getActualStart(), entity.getExpectedStart());
             Optional<LocalDate> end = ComparisonHelper.firstNonNull(entity.getActualEnd(), entity.getExpectedEnd());
-            if (null != termId) {
+            if (ID_NEW != termId) {
                 TermEntity term = appDb.termDAO().getByIdSynchronous(termId);
                 start.ifPresent(s -> Optional.ofNullable(term.getStart()).ifPresent(t -> {
                     if (s.compareTo(t) < 0) {
@@ -558,8 +533,8 @@ public class DbLoader {
             }
             List<CourseEntity> list = dao.getAllSynchronous();
             String number = entity.getNumber();
-            final Long id = entity.getId();
-            if (null == id) {
+            final long id = entity.getId();
+            if (ID_NEW == id) {
                 if (list.stream().anyMatch(t -> t.getNumber().equals(number))) {
                     builder.acceptWarning(R.string.message_course_duplicate_number);
                 }
@@ -569,7 +544,7 @@ public class DbLoader {
                 entity.setId(dao.insertSynchronous(entity));
                 return builder.build();
             }
-            if (list.stream().anyMatch(t -> t.getNumber().equals(number) && !id.equals(t.getId()))) {
+            if (list.stream().anyMatch(t -> t.getNumber().equals(number) && id != t.getId())) {
                 builder.acceptWarning(R.string.message_course_duplicate_number);
             }
             List<AssessmentEntity> assessments = appDb.assessmentDAO().getByCourseIdSynchronous(id);
@@ -592,17 +567,17 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Asynchronously inserts a {@link List} of @link CourseEntity} objects into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
-     *
-     * @param list The {@link List} of @link CourseEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable insertAllCourses(List<CourseEntity> list) {
-        return Completable.fromSingle(appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
-    }
+//    /**
+//     * Asynchronously inserts a {@link List} of @link CourseEntity} objects into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
+//     *
+//     * @param list The {@link List} of @link CourseEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table.
+//     * @return The {@link Completable} that can be observed for DB operation completion status.
+//     */
+//    @NonNull
+//    public Completable insertAllCourses(List<CourseEntity> list) {
+//        return Completable.fromSingle(appDb.courseDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+//                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
+//    }
 
     /**
      * Asynchronously deletes a {@link AssessmentEntity} from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table of the underlying {@link AppDb}.
@@ -616,16 +591,16 @@ public class DbLoader {
         return appDb.assessmentDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Asynchronously gets a {@link AssessmentEntity} from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb} by its {@code ROWID}.
-     *
-     * @param rowId The {@code ROWID} of the {@link AssessmentEntity} to retrieve.
-     * @return The {@link Single} object that can be used to observe the result {@link AssessmentEntity} object.
-     */
-    @NonNull
-    public Single<AssessmentEntity> getAssessmentByRowId(int rowId) {
-        return appDb.assessmentDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets a {@link AssessmentEntity} from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb} by its {@code ROWID}.
+//     *
+//     * @param rowId The {@code ROWID} of the {@link AssessmentEntity} to retrieve.
+//     * @return The {@link Single} object that can be used to observe the result {@link AssessmentEntity} object.
+//     */
+//    @NonNull
+//    public Single<AssessmentEntity> getAssessmentByRowId(int rowId) {
+//        return appDb.assessmentDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Asynchronously gets a {@link AssessmentEntity} from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb} by its unique identifier.
@@ -653,30 +628,30 @@ public class DbLoader {
         return appDb.assessmentDAO().getByCourseId(courseId);
     }
 
-    /**
-     * Gets all rows from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
-     *
-     * @return A {@link LiveData} object that will contain the list of {@link AssessmentEntity} objects retrieved from the underlying {@link AppDb}.
-     */
-    @NonNull
-    public LiveData<List<AssessmentEntity>> getAllAssessments() {
-        Log.d(LOG_TAG, "Called getAllAssessments()");
-        if (null == allAssessments) {
-            allAssessments = appDb.assessmentDAO().getAll();
-        }
-        return allAssessments;
-    }
+//    /**
+//     * Gets all rows from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
+//     *
+//     * @return A {@link LiveData} object that will contain the list of {@link AssessmentEntity} objects retrieved from the underlying {@link AppDb}.
+//     */
+//    @NonNull
+//    public LiveData<List<AssessmentEntity>> getAllAssessments() {
+//        Log.d(LOG_TAG, "Called getAllAssessments()");
+//        if (null == allAssessments) {
+//            allAssessments = appDb.assessmentDAO().getAll();
+//        }
+//        return allAssessments;
+//    }
 
-    /**
-     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
-     *
-     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
-     */
-    @NonNull
-    public Single<Integer> getAssessmentCount() {
-        Log.d(LOG_TAG, "Called getAssessmentCount()");
-        return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    /**
+//     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
+//     *
+//     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
+//     */
+//    @NonNull
+//    public Single<Integer> getAssessmentCount() {
+//        Log.d(LOG_TAG, "Called getAssessmentCount()");
+//        return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
     /**
      * Asynchronously save the specified {@link AssessmentEntity} object into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table of the underlying {@link AppDb}.
@@ -696,21 +671,19 @@ public class DbLoader {
             AssessmentDAO dao = appDb.assessmentDAO();
             LocalDate date = entity.getCompletionDate();
             if (null != date || null != (date = entity.getGoalDate())) {
-                final Long courseId = entity.getCourseId();
-                if (null != courseId) {
-                    CourseEntity course = appDb.courseDAO().getByIdSynchronous(courseId);
-                    LocalDate d = course.getActualStart();
-                    if (null != d || null != (d = course.getExpectedStart()) && d.compareTo(date) > 0) {
-                        builder.acceptWarning(R.string.message_assessment_date_before_course_start);
-                    } else if ((null != (d = course.getActualEnd()) || null != (d = course.getExpectedEnd())) && d.compareTo(date) < 0) {
-                        builder.acceptWarning(R.string.message_assessment_date_after_course_end);
-                    }
+                final long courseId = entity.getCourseId();
+                CourseEntity course = appDb.courseDAO().getByIdSynchronous(courseId);
+                LocalDate d = course.getActualStart();
+                if (null != d || null != (d = course.getExpectedStart()) && d.compareTo(date) > 0) {
+                    builder.acceptWarning(R.string.message_assessment_date_before_course_start);
+                } else if ((null != (d = course.getActualEnd()) || null != (d = course.getExpectedEnd())) && d.compareTo(date) < 0) {
+                    builder.acceptWarning(R.string.message_assessment_date_after_course_end);
                 }
             }
             List<AssessmentEntity> list = dao.getAllSynchronous();
             String code = entity.getCode();
-            final Long id = entity.getId();
-            if (null == id) {
+            final long id = entity.getId();
+            if (ID_NEW == id) {
                 if (list.stream().anyMatch(t -> t.getCode().equals(code))) {
                     builder.acceptWarning(R.string.message_assessment_duplicate_code);
                 }
@@ -720,7 +693,7 @@ public class DbLoader {
                 entity.setId(dao.insertSynchronous(entity));
                 return builder.build();
             }
-            if (list.stream().anyMatch(t -> t.getCode().equals(code) && !id.equals(t.getId()))) {
+            if (list.stream().anyMatch(t -> t.getCode().equals(code) && id != t.getId())) {
                 builder.acceptWarning(R.string.message_assessment_duplicate_code);
             }
 
@@ -732,17 +705,82 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    /**
-     * Asynchronously inserts a {@link List} of @link AssessmentEntity} objects into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
-     *
-     * @param list The {@link List} of @link AssessmentEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table.
-     * @return The {@link Completable} that can be observed for DB operation completion status.
-     */
-    @NonNull
-    public Completable insertAllAssessments(List<AssessmentEntity> list) {
-        return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
+    public Single<ValidationMessage.ResourceMessageResult> updateAlert(AlertEntity entity, boolean ignoreWarnings) {
+        Log.d(LOG_TAG, String.format("Called saveAlert(%s)", entity));
+        return Single.fromCallable(() -> {
+            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            if (entity.getId() == ID_NEW) {
+                builder.acceptError(R.string.message_alert_not_inserted);
+                return builder.build();
+            }
+            Alert.validate(builder, entity);
+            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                return builder.build();
+            }
+            appDb.alertDAO().update(entity);
+            return builder.build();
+        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
+
+    public Single<ValidationMessage.ResourceMessageResult> insertCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
+        Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
+        return Single.fromCallable(() -> {
+            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            AlertEntity alert = entity.getAlert();
+            if (alert.getId() != ID_NEW) {
+                builder.acceptError(R.string.message_alert_already_inserted);
+                return builder.build();
+            }
+            AlertLink.validate(builder, entity);
+            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                return builder.build();
+            }
+            appDb.runInTransaction(() -> {
+                long id = appDb.alertDAO().insertSynchronous(alert);
+                CourseAlertLink link = entity.getLink();
+                link.setAlertId(id);
+                appDb.courseAlertDAO().insertSynchronous(link);
+                alert.setId(id);
+            });
+            return builder.build();
+        }).doOnError(e -> entity.getLink().setAlertId(ID_NEW)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<ValidationMessage.ResourceMessageResult> insertAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
+        Log.d(LOG_TAG, String.format("Called insertAssessmentAlert(%s)", entity));
+        return Single.fromCallable(() -> {
+            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            AlertEntity alert = entity.getAlert();
+            if (alert.getId() != ID_NEW) {
+                builder.acceptError(R.string.message_alert_already_inserted);
+                return builder.build();
+            }
+            AlertLink.validate(builder, entity);
+            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                return builder.build();
+            }
+            appDb.runInTransaction(() -> {
+                long id = appDb.alertDAO().insertSynchronous(alert);
+                AssessmentAlertLink link = entity.getLink();
+                link.setAlertId(id);
+                appDb.assessmentAlertDAO().insertSynchronous(link);
+                alert.setId(id);
+            });
+            return builder.build();
+        }).doOnError(e -> entity.getLink().setAlertId(ID_NEW)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+//    /**
+//     * Asynchronously inserts a {@link List} of @link AssessmentEntity} objects into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
+//     *
+//     * @param list The {@link List} of @link AssessmentEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table.
+//     * @return The {@link Completable} that can be observed for DB operation completion status.
+//     */
+//    @NonNull
+//    public Completable insertAllAssessments(List<AssessmentEntity> list) {
+//        return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
+//                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
+//    }
 
     @NonNull
     public LiveData<List<AlertListItem>> getActiveAlertsOnDate(LocalDate date) {
@@ -757,6 +795,16 @@ public class DbLoader {
     @NonNull
     public LiveData<List<AlertListItem>> getActiveAlertsBeforeDate(LocalDate date) {
         return appDb.alertDAO().getActiveBeforeDate(date);
+    }
+
+    @NonNull
+    public Single<CourseAlertDetails> getCourseAlertDetailsId(long alertId, long courseId) {
+        return appDb.courseAlertDAO().getDetailsAlertId(alertId, courseId);
+    }
+
+    @NonNull
+    public Single<AssessmentAlertDetails> getAssessmentAlertDetailsId(long alertId, long courseId) {
+        return appDb.assessmentAlertDAO().getByDetailByAlertId(alertId, courseId);
     }
 
     @NonNull

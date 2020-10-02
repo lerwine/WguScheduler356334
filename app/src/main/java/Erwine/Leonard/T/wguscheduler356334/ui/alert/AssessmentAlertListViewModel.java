@@ -15,13 +15,13 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 
-public class AlertListViewModel extends AndroidViewModel {
+public class AssessmentAlertListViewModel extends AndroidViewModel {
 
     private final DbLoader dbLoader;
     private LiveData<List<AlertListItem>> liveData;
     private int position = -1;
 
-    public AlertListViewModel(@NonNull Application application) {
+    public AssessmentAlertListViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
         liveData = new MutableLiveData<>();
