@@ -2,13 +2,18 @@ package Erwine.Leonard.T.wguscheduler356334.entity.assessment;
 
 import androidx.annotation.NonNull;
 import androidx.room.Embedded;
+import androidx.room.Ignore;
 import androidx.room.Relation;
+
+import java.time.LocalDate;
+import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertListViewModel;
 
 public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     @Embedded
@@ -21,6 +26,14 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     )
     @NonNull
     private AlertEntity alert;
+    @Ignore
+    private LocalDate alertDate;
+    @Ignore
+    private long relativeDays = 0L;
+    @Ignore
+    private boolean messagePresent;
+    @Ignore
+    private String message;
 
     public AssessmentAlert(@NonNull AssessmentAlertLink link, @NonNull AlertEntity alert) {
         if (IdIndexedEntity.assertNotNewId(alert.getId()) != link.getAlertId()) {
@@ -28,6 +41,22 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         }
         this.link = link;
         this.alert = alert;
+    }
+
+    public boolean isMessagePresent() {
+        return messagePresent;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public LocalDate getAlertDate() {
+        return alertDate;
+    }
+
+    public long getRelativeDays() {
+        return relativeDays;
     }
 
     @Override
@@ -54,4 +83,40 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         this.alert = alert;
     }
 
+    public void calculate(AssessmentAlertListViewModel viewModel) {
+        Boolean subsequent = alert.isSubsequent();
+        if (null == subsequent) {
+            alertDate = LocalDate.ofEpochDay(alert.getTimeSpec());
+            relativeDays = 0L;
+        } else {
+            relativeDays = alert.getTimeSpec();
+            LocalDate date = (subsequent) ?
+                    viewModel.getEffectiveStartDate() :
+                    viewModel.getEffectiveEndDate();
+            LocalDate oldValue = alertDate;
+            alertDate = (null == date) ? null : date.plusDays(relativeDays);
+        }
+        String m = alert.getCustomMessage();
+        if (null == m) {
+            messagePresent = false;
+            message = "";
+        } else {
+            messagePresent = true;
+            message = m;
+        }
+    }
+
+    public boolean reCalculate(AssessmentAlertListViewModel viewModel) {
+        Boolean subsequent = alert.isSubsequent();
+        if (null == subsequent) {
+            return false;
+        }
+        relativeDays = alert.getTimeSpec();
+        LocalDate date = (subsequent) ?
+                viewModel.getEffectiveStartDate() :
+                viewModel.getEffectiveEndDate();
+        LocalDate oldValue = alertDate;
+        alertDate = (null == date) ? null : date.plusDays(relativeDays);
+        return !Objects.equals(oldValue, alertDate);
+    }
 }

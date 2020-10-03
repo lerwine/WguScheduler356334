@@ -705,6 +705,8 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link CourseAlert} if {@link Alert#isSubsequent()} is {@code true} and {@link #getActualStart()} is not {@code null}.
+    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link AssessmentAlert} if {@link Alert#isSubsequent()} is {@code true}.
     public Single<ValidationMessage.ResourceMessageResult> updateAlert(AlertEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called saveAlert(%s)", entity));
         return Single.fromCallable(() -> {
@@ -722,6 +724,7 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link CourseAlert} if {@link Alert#isSubsequent()} is {@code true} and {@link #getActualStart()} is not {@code null}.
     public Single<ValidationMessage.ResourceMessageResult> insertCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
         return Single.fromCallable(() -> {
@@ -746,6 +749,7 @@ public class DbLoader {
         }).doOnError(e -> entity.getLink().setAlertId(ID_NEW)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link AssessmentAlert} if {@link Alert#isSubsequent()} is {@code true}.
     public Single<ValidationMessage.ResourceMessageResult> insertAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertAssessmentAlert(%s)", entity));
         return Single.fromCallable(() -> {
@@ -781,6 +785,16 @@ public class DbLoader {
 //        return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
 //                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
 //    }
+
+    @NonNull
+    public LiveData<List<CourseAlert>> getAlertsByCourseId(long id) {
+        return appDb.courseAlertDAO().getByCourseId(id);
+    }
+
+    @NonNull
+    public LiveData<List<AssessmentAlert>> getAlertsByAssessmentId(long id) {
+        return appDb.assessmentAlertDAO().getByAssessmentId(id);
+    }
 
     @NonNull
     public LiveData<List<AlertListItem>> getActiveAlertsOnDate(LocalDate date) {

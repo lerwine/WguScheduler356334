@@ -63,6 +63,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private final CurrentValues currentValues;
     private final ArrayList<AssessmentEntity> assessmentsForCourse;
     private final ArrayList<TermCourseListItem> coursesForTerm;
+    private final MutableLiveData<LocalDate> effectiveStartLiveData;
+    private final MutableLiveData<LocalDate> effectiveEndLiveData;
     private LiveData<List<TermCourseListItem>> coursesLiveData;
     private LiveData<List<AssessmentEntity>> assessmentsLiveData;
     private AbstractCourseEntity<?> selectedCourse;
@@ -99,6 +101,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         entityLiveData = new MutableLiveData<>();
         courseValidLiveData = new MutableLiveData<>(false);
         codeValidLiveData = new MutableLiveData<>(false);
+        effectiveStartLiveData = new MutableLiveData<>();
+        effectiveEndLiveData = new MutableLiveData<>();
         assessmentsForCourse = new ArrayList<>();
         coursesForTerm = new ArrayList<>();
     }
@@ -113,6 +117,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
         return coursesLiveData;
+    }
+
+    public MutableLiveData<LocalDate> getEffectiveStartLiveData() {
+        return effectiveStartLiveData;
+    }
+
+    public MutableLiveData<LocalDate> getEffectiveEndLiveData() {
+        return effectiveEndLiveData;
     }
 
     public long getId() {
@@ -471,8 +483,11 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setGoalDate(LocalDate goalDate) {
-            this.goalDate = goalDate;
+        public synchronized void setGoalDate(LocalDate goalDate) {
+            if (!Objects.equals(goalDate, this.goalDate)) {
+                this.goalDate = goalDate;
+                effectiveStartLiveData.setValue(goalDate);
+            }
         }
 
         @Nullable
@@ -482,8 +497,11 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setCompletionDate(LocalDate completionDate) {
-            this.completionDate = completionDate;
+        public synchronized void setCompletionDate(LocalDate completionDate) {
+            if (!Objects.equals(completionDate, this.completionDate)) {
+                this.completionDate = completionDate;
+                effectiveStartLiveData.setValue(completionDate);
+            }
         }
 
         @NonNull

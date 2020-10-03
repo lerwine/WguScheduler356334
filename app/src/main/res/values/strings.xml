@@ -204,4 +204,14 @@
     <string name="message_alert_mismatch">Specified alert does not match the link.</string>
     <string name="message_alert_already_inserted">Alert has already been inserted into the database.</string>
     <string name="message_alert_not_inserted">Alert has not been inserted into the database.</string>
+    <string name="format_days_before_course_start">%d days before course start date.</string>
+    <string name="format_days_after_course_start">%d days after course start date.</string>
+    <string name="format_days_before_course_end">%d days before course end date.</string>
+    <string name="format_days_after_course_end">%d days after expected course end date.</string>
+    <string name="format_days_after_goal_date">%d days after goal date.</string>
+    <string name="format_days_after_completion_date">%d days after completion date.</string>
+    <string name="message_on_course_start">On course start date.</string>
+    <string name="message_on_course_end">On course end date.</string>
+    <string name="message_on_goal_date">On goal date.</string>
+    <string name="message_on_completion_date">On completion date.</string>
 </resources>

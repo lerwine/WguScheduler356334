@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertListFragment;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment;
 
 /**
@@ -29,6 +30,8 @@ public class ViewCoursePagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return new AssessmentListFragment();
             case 1:
+                return new CourseAlertListFragment();
+            case 2:
                 return new EditCourseFragment();
             default:
                 throw new IllegalStateException(String.format("Unexpected pager position %d", position));
@@ -41,6 +44,8 @@ public class ViewCoursePagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return context.getResources().getString(R.string.title_assessments);
             case 1:
+                return context.getResources().getString(R.string.title_alerts);
+            case 2:
                 return context.getResources().getString(R.string.title_activity_edit);
             default:
                 throw new IllegalStateException(String.format("Unexpected title position %d", position));
@@ -49,6 +54,6 @@ public class ViewCoursePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 }

@@ -78,6 +78,8 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final MutableLiveData<CourseDetails> entityLiveData;
     private final LiveData<List<TermListItem>> termsLiveData;
     private final LiveData<List<MentorListItem>> mentorsLiveData;
+    private final MutableLiveData<LocalDate> effectiveStartLiveData;
+    private final MutableLiveData<LocalDate> effectiveEndLiveData;
     private final MutableLiveData<Boolean> termValidLiveData;
     private final MutableLiveData<Boolean> numberValidLiveData;
     private final MutableLiveData<Boolean> titleValidLiveData;
@@ -111,6 +113,8 @@ public class EditCourseViewModel extends AndroidViewModel {
         mentorsLiveData = dbLoader.getAllMentors();
         currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
+        effectiveStartLiveData = new MutableLiveData<>();
+        effectiveEndLiveData = new MutableLiveData<>();
         termValidLiveData = new MutableLiveData<>(false);
         numberValidLiveData = new MutableLiveData<>(false);
         titleValidLiveData = new MutableLiveData<>(false);
@@ -293,6 +297,14 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public LiveData<List<TermListItem>> getTermsLiveData() {
         return termsLiveData;
+    }
+
+    public MutableLiveData<LocalDate> getEffectiveStartLiveData() {
+        return effectiveStartLiveData;
+    }
+
+    public MutableLiveData<LocalDate> getEffectiveEndLiveData() {
+        return effectiveEndLiveData;
     }
 
     public LiveData<Boolean> getTermValidLiveData() {
@@ -649,7 +661,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setId(long id) {
+        public synchronized void setId(long id) {
             Log.d(LOG_TAG, String.format("Setting id to %d", id));
             if (null != courseEntity) {
                 courseEntity.setId(id);
@@ -664,7 +676,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setNumber(String number) {
+        public synchronized void setNumber(String number) {
             Log.d(LOG_TAG, String.format("Number changing from %s to %s", ToStringBuilder.toEscapedString(this.number), ToStringBuilder.toEscapedString(number)));
             this.number = (null == number) ? "" : number;
             String oldValue = normalizedNumber;
@@ -710,7 +722,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setTitle(String title) {
+        public synchronized void setTitle(String title) {
             Log.d(LOG_TAG, String.format("Title changing from %s to %s", ToStringBuilder.toEscapedString(this.title), ToStringBuilder.toEscapedString(title)));
             this.title = (null == title) ? "" : title;
             String oldValue = normalizedTitle;
@@ -730,9 +742,20 @@ public class EditCourseViewModel extends AndroidViewModel {
             Log.d(LOG_TAG, "Title change complete");
         }
 
+        public synchronized LocalDate getEffectiveStart() {
+            switch (status) {
+                case UNPLANNED:
+                    return null;
+                case PLANNED:
+                    return expectedStart;
+                default:
+                    return actualStart;
+            }
+        }
+
         @Nullable
         @Override
-        public LocalDate getExpectedStart() {
+        public synchronized LocalDate getExpectedStart() {
             if (status == CourseStatus.UNPLANNED) {
                 return null;
             }
@@ -740,17 +763,22 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setExpectedStart(LocalDate expectedStart) {
+        public synchronized void setExpectedStart(LocalDate expectedStart) {
             if (!Objects.equals(this.expectedStart, expectedStart)) {
+                LocalDate oldStart = getEffectiveStart();
                 this.expectedStart = expectedStart;
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
                 expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
+                LocalDate newStart = getEffectiveStart();
+                if (!Objects.equals(oldStart, newStart)) {
+                    effectiveStartLiveData.postValue(newStart);
+                }
             }
         }
 
         @Nullable
         @Override
-        public LocalDate getActualStart() {
+        public synchronized LocalDate getActualStart() {
             switch (status) {
                 case UNPLANNED:
                 case PLANNED:
@@ -761,17 +789,33 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setActualStart(LocalDate actualStart) {
+        public synchronized void setActualStart(LocalDate actualStart) {
             if (!Objects.equals(this.actualStart, actualStart)) {
+                LocalDate oldStart = getEffectiveStart();
                 this.actualStart = actualStart;
                 actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
+                LocalDate newStart = getEffectiveStart();
+                if (!Objects.equals(oldStart, newStart)) {
+                    effectiveStartLiveData.postValue(newStart);
+                }
+            }
+        }
+
+        public synchronized LocalDate getEffectiveEnd() {
+            switch (status) {
+                case UNPLANNED:
+                    return null;
+                case PLANNED:
+                    return expectedEnd;
+                default:
+                    return actualEnd;
             }
         }
 
         @Nullable
         @Override
-        public LocalDate getExpectedEnd() {
+        public synchronized LocalDate getExpectedEnd() {
             if (status == CourseStatus.UNPLANNED) {
                 return null;
             }
@@ -779,17 +823,22 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setExpectedEnd(LocalDate expectedEnd) {
+        public synchronized void setExpectedEnd(LocalDate expectedEnd) {
             if (!Objects.equals(this.expectedEnd, expectedEnd)) {
+                LocalDate oldEnd = getEffectiveEnd();
                 this.expectedEnd = expectedEnd;
                 expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
+                LocalDate newEnd = getEffectiveEnd();
+                if (!Objects.equals(oldEnd, newEnd)) {
+                    effectiveEndLiveData.postValue(newEnd);
+                }
             }
         }
 
         @Nullable
         @Override
-        public LocalDate getActualEnd() {
+        public synchronized LocalDate getActualEnd() {
             switch (status) {
                 case UNPLANNED:
                 case PLANNED:
@@ -800,11 +849,16 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setActualEnd(LocalDate actualEnd) {
+        public synchronized void setActualEnd(LocalDate actualEnd) {
             if (!Objects.equals(this.actualEnd, actualEnd)) {
+                LocalDate oldEnd = getEffectiveEnd();
                 this.actualEnd = actualEnd;
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
                 actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
+                LocalDate newEnd = getEffectiveEnd();
+                if (!Objects.equals(oldEnd, newEnd)) {
+                    effectiveEndLiveData.postValue(newEnd);
+                }
             }
         }
 
@@ -815,17 +869,27 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setStatus(CourseStatus status) {
+        public synchronized void setStatus(CourseStatus status) {
             if (null == status) {
                 status = CourseStatus.UNPLANNED;
             }
             if (status != this.status) {
                 Log.d(LOG_TAG, String.format("Status changing from %s to %s", this.status.name(), status.name()));
+                LocalDate oldStart = getEffectiveStart();
+                LocalDate oldEnd = getEffectiveEnd();
                 this.status = status;
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
                 actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
                 expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
+                LocalDate newStart = getEffectiveStart();
+                if (!Objects.equals(oldStart, newStart)) {
+                    effectiveStartLiveData.postValue(newStart);
+                }
+                LocalDate newEnd = getEffectiveEnd();
+                if (!Objects.equals(oldEnd, newEnd)) {
+                    effectiveEndLiveData.postValue(newEnd);
+                }
             }
         }
 
@@ -846,7 +910,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setNotes(String notes) {
+        public synchronized void setNotes(String notes) {
             if (null == notes || notes.isEmpty()) {
                 normalizedNotes = "";
                 this.notes = null;

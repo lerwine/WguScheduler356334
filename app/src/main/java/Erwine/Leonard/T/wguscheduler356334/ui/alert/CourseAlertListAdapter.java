@@ -6,18 +6,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 
 public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertListAdapter.ViewHolder> {
 
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<CourseAlert> mValues;
 
-    public CourseAlertListAdapter(List<CourseAlert> items) {
+    public <T extends ViewModel> CourseAlertListAdapter(@NonNull List<CourseAlert> items) {
         mValues = items;
     }
 
@@ -31,9 +38,7 @@ public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertList
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mValues.get(position).content);
+        holder.setItem(mValues.get(position));
     }
 
     @Override
@@ -42,22 +47,56 @@ public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertList
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public CourseAlert mItem;
+        @SuppressWarnings("FieldCanBeLocal")
+        private final View mView;
+        private final TextView dateTextView;
+        private final TextView messageTextView;
+        @SuppressWarnings("FieldCanBeLocal")
+        private CourseAlert alertListItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            dateTextView = view.findViewById(R.id.dateTextView);
+            messageTextView = view.findViewById(R.id.messageTextView);
+            view.setOnClickListener(this::onViewClick);
         }
 
-        @NonNull
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+        private void onViewClick(View view) {
+            // TODO: Display EditAlertViewModel popup to view/manage alert
+        }
+
+        public void setItem(CourseAlert alertListItem) {
+            this.alertListItem = alertListItem;
+            AlertEntity alert = alertListItem.getAlert();
+            LocalDate d = alertListItem.getAlertDate();
+            if (null != d) {
+                dateTextView.setText(FORMATTER.format(d));
+            } else {
+                long timeSpec = alert.getTimeSpec();
+                if (Objects.requireNonNull(alert.isSubsequent())) {
+                    if (timeSpec == 0) {
+                        dateTextView.setText(mView.getResources().getString(R.string.message_on_course_end));
+                    } else if (timeSpec > 0) {
+                        dateTextView.setText(mView.getResources().getString(R.string.format_days_after_course_end, timeSpec));
+                    } else {
+                        dateTextView.setText(mView.getResources().getString(R.string.format_days_before_course_end, Math.abs(timeSpec)));
+                    }
+                } else if (timeSpec == 0) {
+                    dateTextView.setText(mView.getResources().getString(R.string.message_on_course_start));
+                } else if (timeSpec < 0) {
+                    dateTextView.setText(mView.getResources().getString(R.string.format_days_before_course_start, Math.abs(timeSpec)));
+                } else {
+                    dateTextView.setText(mView.getResources().getString(R.string.format_days_after_course_start, timeSpec));
+                }
+            }
+            if (alertListItem.isMessagePresent()) {
+                messageTextView.setVisibility(View.VISIBLE);
+                messageTextView.setText(alertListItem.getMessage());
+            } else {
+                messageTextView.setText("");
+                messageTextView.setVisibility(View.GONE);
+            }
         }
     }
 }

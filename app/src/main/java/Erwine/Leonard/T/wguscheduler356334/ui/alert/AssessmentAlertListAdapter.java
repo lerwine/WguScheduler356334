@@ -12,16 +12,18 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 
 public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentAlertListAdapter.ViewHolder> {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
-    private final List<AlertListItem> mValues;
+    private final List<AssessmentAlert> mValues;
 
-    public AssessmentAlertListAdapter(List<AlertListItem> items) {
+    public AssessmentAlertListAdapter(List<AssessmentAlert> items) {
         mValues = items;
     }
 
@@ -47,19 +49,15 @@ public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentA
         @SuppressWarnings("FieldCanBeLocal")
         private final View mView;
         private final TextView dateTextView;
-        private final TextView typeTextView;
-        private final TextView codeTextView;
-        private final TextView titleTextView;
+        private final TextView messageTextView;
         @SuppressWarnings("FieldCanBeLocal")
-        private AlertListItem alertListItem;
+        private AssessmentAlert alertListItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             dateTextView = view.findViewById(R.id.dateTextView);
-            typeTextView = view.findViewById(R.id.typeTextView);
-            codeTextView = view.findViewById(R.id.codeTextView);
-            titleTextView = view.findViewById(R.id.titleTextView);
+            messageTextView = view.findViewById(R.id.messageTextView);
             view.setOnClickListener(this::onViewClick);
         }
 
@@ -67,17 +65,35 @@ public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentA
             // TODO: Display EditAlertViewModel popup to view/manage alert
         }
 
-        public void setItem(AlertListItem alertListItem) {
+        public void setItem(AssessmentAlert alertListItem) {
             this.alertListItem = alertListItem;
-            LocalDate d = alertListItem.getEventDate();
-            if (null == d) {
-                dateTextView.setText(R.string.label_none);
-            } else {
+            AlertEntity alert = alertListItem.getAlert();
+            LocalDate d = alertListItem.getAlertDate();
+            if (null != d) {
                 dateTextView.setText(FORMATTER.format(d));
+            } else {
+                long timeSpec = alert.getTimeSpec();
+                if (Objects.requireNonNull(alert.isSubsequent())) {
+                    if (timeSpec == 0) {
+                        dateTextView.setText(mView.getResources().getString(R.string.message_on_course_end));
+                    } else {
+                        dateTextView.setText(mView.getResources().getString(R.string.format_days_after_course_end, Math.abs(timeSpec)));
+                    }
+                } else if (timeSpec == 0) {
+                    dateTextView.setText(mView.getResources().getString(R.string.message_on_course_start));
+                } else if (timeSpec < 0) {
+                    dateTextView.setText(mView.getResources().getString(R.string.format_days_before_course_start, Math.abs(timeSpec)));
+                } else {
+                    dateTextView.setText(mView.getResources().getString(R.string.format_days_after_course_start, timeSpec));
+                }
             }
-            typeTextView.setText(alertListItem.getTypeDisplayResourceId());
-            codeTextView.setText(alertListItem.getCode());
-            titleTextView.setText(alertListItem.getTitle());
+            if (alertListItem.isMessagePresent()) {
+                messageTextView.setVisibility(View.VISIBLE);
+                messageTextView.setText(alertListItem.getMessage());
+            } else {
+                messageTextView.setText("");
+                messageTextView.setVisibility(View.GONE);
+            }
         }
     }
 }

@@ -15,41 +15,41 @@ import java.util.List;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 
-public class AssessmentAlertListViewModel extends AndroidViewModel {
+public class CourseAlertListViewModel extends AndroidViewModel {
 
     private final DbLoader dbLoader;
-    private final Observer<List<AssessmentAlert>> alertsLoadedObserver;
-    private final MutableLiveData<List<AssessmentAlert>> liveData;
-    private LiveData<List<AssessmentAlert>> observed;
-    private AssessmentDetails assessment;
+    private final Observer<List<CourseAlert>> alertsLoadedObserver;
+    private MutableLiveData<List<CourseAlert>> liveData;
+    private LiveData<List<CourseAlert>> observed;
+    private CourseDetails course;
     private LocalDate effectiveStartDate;
     private LocalDate effectiveEndDate;
-    private List<AssessmentAlert> assessmentAlerts;
+    private List<CourseAlert> courseAlerts;
 
-    public AssessmentAlertListViewModel(@NonNull Application application) {
+    public CourseAlertListViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
         liveData = new MutableLiveData<>();
         alertsLoadedObserver = this::onAlertsLoaded;
     }
 
-    public LiveData<List<AssessmentAlert>> getLiveData() {
+    public LiveData<List<CourseAlert>> getLiveData() {
         return liveData;
     }
 
-    public AssessmentDetails getAssessment() {
-        return assessment;
+    public CourseDetails getCourse() {
+        return course;
     }
 
-    public void setAssessment(@NonNull AssessmentDetails assessment, @NonNull LifecycleOwner viewLifecycleOwner) {
-        this.assessment = assessment;
+    public void setCourse(CourseDetails course, LifecycleOwner viewLifecycleOwner) {
+        this.course = course;
         if (null != observed) {
             observed.removeObserver(alertsLoadedObserver);
         }
-        observed = dbLoader.getAlertsByAssessmentId(assessment.getId());
+        observed = dbLoader.getAlertsByCourseId(course.getId());
         observed.observe(viewLifecycleOwner, alertsLoadedObserver);
     }
 
@@ -77,17 +77,17 @@ public class AssessmentAlertListViewModel extends AndroidViewModel {
         return recalculateAll();
     }
 
-    private void onAlertsLoaded(List<AssessmentAlert> assessmentAlerts) {
-        assessmentAlerts.forEach(t -> t.calculate(this));
-        this.assessmentAlerts = assessmentAlerts;
-        liveData.postValue(assessmentAlerts);
+    private synchronized void onAlertsLoaded(List<CourseAlert> courseAlerts) {
+        courseAlerts.forEach(t -> t.calculate(this));
+        this.courseAlerts = courseAlerts;
+        liveData.postValue(courseAlerts);
     }
 
     private boolean recalculateAll() {
-        if (null == assessmentAlerts || assessmentAlerts.isEmpty()) {
+        if (null == courseAlerts || courseAlerts.isEmpty()) {
             return false;
         }
-        Iterator<AssessmentAlert> iterator = assessmentAlerts.iterator();
+        Iterator<CourseAlert> iterator = courseAlerts.iterator();
         while (iterator.hasNext()) {
             if (iterator.next().reCalculate(this)) {
                 while (iterator.hasNext()) {

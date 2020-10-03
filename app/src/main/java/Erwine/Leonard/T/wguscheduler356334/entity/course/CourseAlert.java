@@ -2,13 +2,18 @@ package Erwine.Leonard.T.wguscheduler356334.entity.course;
 
 import androidx.annotation.NonNull;
 import androidx.room.Embedded;
+import androidx.room.Ignore;
 import androidx.room.Relation;
+
+import java.time.LocalDate;
+import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertListViewModel;
 
 public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
     @Embedded
@@ -21,6 +26,14 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
     )
     @NonNull
     private AlertEntity alert;
+    @Ignore
+    private LocalDate alertDate;
+    @Ignore
+    private long relativeDays = 0L;
+    @Ignore
+    private boolean messagePresent;
+    @Ignore
+    private String message;
 
     public CourseAlert(@NonNull CourseAlertLink link, @NonNull AlertEntity alert) {
         if (IdIndexedEntity.assertNotNewId(alert.getId()) != link.getAlertId()) {
@@ -28,6 +41,22 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
         }
         this.link = link;
         this.alert = alert;
+    }
+
+    public boolean isMessagePresent() {
+        return messagePresent;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public LocalDate getAlertDate() {
+        return alertDate;
+    }
+
+    public long getRelativeDays() {
+        return relativeDays;
     }
 
     @Override
@@ -52,5 +81,41 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
     public synchronized void setAlert(@NonNull AlertEntity alert) {
         link.setAlertId(IdIndexedEntity.assertNotNewId(alert.getId()));
         this.alert = alert;
+    }
+
+    public boolean reCalculate(CourseAlertListViewModel viewModel) {
+        Boolean subsequent = alert.isSubsequent();
+        if (null == subsequent) {
+            return false;
+        }
+        relativeDays = alert.getTimeSpec();
+        LocalDate date = (subsequent) ?
+                viewModel.getEffectiveStartDate() :
+                viewModel.getEffectiveEndDate();
+        LocalDate oldValue = alertDate;
+        alertDate = (null == date) ? null : date.plusDays(relativeDays);
+        return !Objects.equals(oldValue, alertDate);
+    }
+
+    public void calculate(CourseAlertListViewModel viewModel) {
+        Boolean subsequent = alert.isSubsequent();
+        if (null == subsequent) {
+            alertDate = LocalDate.ofEpochDay(alert.getTimeSpec());
+            relativeDays = 0L;
+        } else {
+            relativeDays = alert.getTimeSpec();
+            LocalDate date = (subsequent) ?
+                    viewModel.getEffectiveStartDate() :
+                    viewModel.getEffectiveEndDate();
+            alertDate = (null == date) ? null : date.plusDays(relativeDays);
+        }
+        String m = alert.getCustomMessage();
+        if (null == m) {
+            messagePresent = false;
+            message = "";
+        } else {
+            messagePresent = true;
+            message = m;
+        }
     }
 }
