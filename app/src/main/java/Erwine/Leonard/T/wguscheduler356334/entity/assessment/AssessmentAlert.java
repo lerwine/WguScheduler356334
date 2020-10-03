@@ -8,12 +8,14 @@ import androidx.room.Relation;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertListViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     @Embedded
@@ -118,5 +120,13 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         LocalDate oldValue = alertDate;
         alertDate = (null == date) ? null : date.plusDays(relativeDays);
         return !Objects.equals(oldValue, alertDate);
+    }
+
+    public synchronized void validate(ValidationMessage.ResourceMessageBuilder builder) {
+        AlertLink.validate(builder, this);
+        Boolean subsequent = alert.isSubsequent();
+        if (null != subsequent && !subsequent && alert.getTimeSpec() < 0L) {
+            builder.acceptError(R.string.message_alert_relative_before_completion);
+        }
     }
 }

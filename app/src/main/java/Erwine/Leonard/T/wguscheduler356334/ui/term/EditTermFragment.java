@@ -168,7 +168,6 @@ public class EditTermFragment extends Fragment {
                     () -> {
                         compositeDisposable.clear();
                         compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-                        requireActivity().finish();
                     }, null);
         } else {
             requireActivity().finish();

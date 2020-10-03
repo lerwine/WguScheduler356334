@@ -30,7 +30,8 @@ public interface Alert extends IdIndexedEntity {
     String COLNAME_CUSTOM_MESSAGE = "customMessage";
 
     static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull AlertEntity entity) {
-        if (null != entity.isSubsequent()) {
+        Boolean subsequent = entity.isSubsequent();
+        if (null != subsequent) {
             long timeSpec = entity.getTimeSpec();
             if (timeSpec < AlertEntity.MIN_VALUE_RELATIVE_DAYS || timeSpec > AlertEntity.MAX_VALUE_RELATIVE_DAYS) {
                 builder.acceptError(R.string.message_relative_days_out_of_range);
@@ -66,7 +67,6 @@ public interface Alert extends IdIndexedEntity {
     @Nullable
     String getCustomMessage();
 
-    // TODO: Need to support customMessage in views
     void setCustomMessage(@Nullable String customMessage);
 
     @Override

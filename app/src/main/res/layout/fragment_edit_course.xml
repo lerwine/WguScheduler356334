@@ -18,13 +18,6 @@
         tools:layout="@layout/fragment_course_properties" />
 
     <ImageButton
-        android:id="@+id/alertImageButton"
-        style="@style/WGU.Scheduler.AlertImageButtonStyle"
-        android:contentDescription="@string/command_manage_alerts"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/saveImageButton" />
-
-    <ImageButton
         android:id="@+id/saveImageButton"
         style="@style/WGU.Scheduler.SaveImageButtonStyle"
         android:contentDescription="@string/command_save_changes"

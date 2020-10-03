@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
@@ -705,73 +704,78 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link CourseAlert} if {@link Alert#isSubsequent()} is {@code true} and {@link #getActualStart()} is not {@code null}.
-    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link AssessmentAlert} if {@link Alert#isSubsequent()} is {@code true}.
-    public Single<ValidationMessage.ResourceMessageResult> updateAlert(AlertEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called saveAlert(%s)", entity));
-        return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
-            if (entity.getId() == ID_NEW) {
-                builder.acceptError(R.string.message_alert_not_inserted);
-                return builder.build();
-            }
-            Alert.validate(builder, entity);
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
-                return builder.build();
-            }
-            appDb.alertDAO().update(entity);
-            return builder.build();
-        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-    }
+//    public Single<ValidationMessage.ResourceMessageResult> updateAlert(AlertEntity entity, boolean ignoreWarnings) {
+//        Log.d(LOG_TAG, String.format("Called saveAlert(%s)", entity));
+//        return Single.fromCallable(() -> {
+//            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+//            if (entity.getId() == ID_NEW) {
+//                builder.acceptError(R.string.message_alert_not_inserted);
+//                return builder.build();
+//            }
+//
+//            Alert.validate(builder, entity);
+//            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+//                return builder.build();
+//            }
+//            appDb.alertDAO().update(entity);
+//            return builder.build();
+//        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+//    }
 
-    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link CourseAlert} if {@link Alert#isSubsequent()} is {@code true} and {@link #getActualStart()} is not {@code null}.
-    public Single<ValidationMessage.ResourceMessageResult> insertCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
+    public Single<ValidationMessage.ResourceMessageResult> saveCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
         return Single.fromCallable(() -> {
             final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
             AlertEntity alert = entity.getAlert();
-            if (alert.getId() != ID_NEW) {
-                builder.acceptError(R.string.message_alert_already_inserted);
-                return builder.build();
-            }
             AlertLink.validate(builder, entity);
             if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
                 return builder.build();
             }
             appDb.runInTransaction(() -> {
-                long id = appDb.alertDAO().insertSynchronous(alert);
                 CourseAlertLink link = entity.getLink();
-                link.setAlertId(id);
-                appDb.courseAlertDAO().insertSynchronous(link);
-                alert.setId(id);
+                if (alert.getTimeSpec() < 0L) {
+                    Boolean subsequent = alert.isSubsequent();
+                    // Need to be sure that course is saved before this is invoked or validation message may not be as expected
+                    if (null != subsequent && !subsequent && null != appDb.courseDAO().getByIdSynchronous(link.getTargetId()).getActualEnd()) {
+                        builder.acceptError(R.string.message_alert_relative_before_end);
+                        return;
+                    }
+                }
+                if (alert.getId() == ID_NEW) {
+                    long id = appDb.alertDAO().insertSynchronous(alert);
+                    link.setAlertIdAndRun(id, () -> appDb.courseAlertDAO().insertSynchronous(link));
+                    alert.setId(id);
+                } else {
+                    appDb.courseAlertDAO().updateSynchronous(entity.getLink());
+                    appDb.alertDAO().update(alert);
+                }
             });
             return builder.build();
-        }).doOnError(e -> entity.getLink().setAlertId(ID_NEW)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    // TODO: Need to validate that {@link Alert#getTimeSpec()} is never less than zero for {@link AssessmentAlert} if {@link Alert#isSubsequent()} is {@code true}.
-    public Single<ValidationMessage.ResourceMessageResult> insertAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
+    public Single<ValidationMessage.ResourceMessageResult> saveAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertAssessmentAlert(%s)", entity));
         return Single.fromCallable(() -> {
             final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
-            AlertEntity alert = entity.getAlert();
-            if (alert.getId() != ID_NEW) {
-                builder.acceptError(R.string.message_alert_already_inserted);
-                return builder.build();
-            }
-            AlertLink.validate(builder, entity);
+            entity.validate(builder);
             if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
                 return builder.build();
             }
             appDb.runInTransaction(() -> {
-                long id = appDb.alertDAO().insertSynchronous(alert);
+                AlertEntity alert = entity.getAlert();
                 AssessmentAlertLink link = entity.getLink();
-                link.setAlertId(id);
-                appDb.assessmentAlertDAO().insertSynchronous(link);
-                alert.setId(id);
+                if (alert.getId() == ID_NEW) {
+                    long id = appDb.alertDAO().insertSynchronous(alert);
+                    link.setAlertIdAndRun(id, () -> appDb.assessmentAlertDAO().insertSynchronous(link));
+                    alert.setId(id);
+                } else {
+                    appDb.assessmentAlertDAO().updateSynchronous(link);
+                    appDb.alertDAO().update(alert);
+                }
             });
             return builder.build();
-        }).doOnError(e -> entity.getLink().setAlertId(ID_NEW)).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
 //    /**

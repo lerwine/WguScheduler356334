@@ -1040,7 +1040,6 @@ public class ToStringBuilder implements Appendable, CharSequence {
         return this;
     }
 
-    // TODO: Omit unnecessary second argument
     @NonNull
     private ToStringBuilder appendImpl(@NonNull char[] array, boolean omitTypeName) {
         int len = array.length;

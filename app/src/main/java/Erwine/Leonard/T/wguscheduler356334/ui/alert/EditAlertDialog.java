@@ -30,16 +30,9 @@ import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
-public class EditAlertFragment extends DialogFragment {
+public class EditAlertDialog extends DialogFragment {
 
     private EditAlertViewModel viewModel;
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.edit_alert_fragment, container, false);
-    }
-
     private TextView typeTextView;
     private TextView codeTextView;
     private TextView titleTextView;
@@ -54,6 +47,11 @@ public class EditAlertFragment extends DialogFragment {
     private ImageButton saveImageButton;
     private ImageButton deleteImageButton;
     private ImageButton cancelImageButton;
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_edit_alert, container, false);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -182,7 +180,7 @@ public class EditAlertFragment extends DialogFragment {
     }
 
     private void onCancelButtonClick(View view) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertFragment.onCancelButtonClick
+        dismiss();
     }
 
     private void onBeforeStartValidationChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {

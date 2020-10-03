@@ -53,7 +53,6 @@ public class EditCourseFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter onViewCreated");
-        view.findViewById(R.id.alertImageButton).setOnClickListener(this::onAlertImageButtonClick);
         view.findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
         view.findViewById(R.id.deleteImageButton).setOnClickListener(this::onDeleteImageButtonClick);
         view.findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
@@ -65,10 +64,6 @@ public class EditCourseFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
-    }
-
-    private void onAlertImageButtonClick(View view) {
-        // TODO: Replace alertImageButton with another tab
     }
 
     private void onSaveImageButtonClick(View view) {
@@ -154,7 +149,6 @@ public class EditCourseFragment extends Fragment {
                     () -> {
                         compositeDisposable.clear();
                         compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-                        requireActivity().finish();
                     }, null);
         } else {
             requireActivity().finish();

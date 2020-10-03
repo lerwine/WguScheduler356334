@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -22,6 +24,9 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * A fragment representing a list of Items.
@@ -29,6 +34,7 @@ import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel
 public class AssessmentAlertListFragment extends Fragment {
 
     private static final String LOG_TAG = AssessmentAlertListFragment.class.getName();
+    private final CompositeDisposable compositeDisposable;
     private final List<AssessmentAlert> items;
     private AssessmentAlertListViewModel listViewModel;
     private AssessmentAlertListAdapter adapter;
@@ -36,12 +42,14 @@ public class AssessmentAlertListFragment extends Fragment {
     private RecyclerView alertsRecyclerView;
     private EditAssessmentViewModel assessmentViewModel;
     private AssessmentDetails currentAssessment;
+    private long editAlertId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public AssessmentAlertListFragment() {
+        compositeDisposable = new CompositeDisposable();
         items = new ArrayList<>();
     }
 
@@ -55,7 +63,7 @@ public class AssessmentAlertListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         noAlertsTextView = view.findViewById(R.id.noAlertsTextView);
         alertsRecyclerView = view.findViewById(R.id.alertsRecyclerView);
-        adapter = new AssessmentAlertListAdapter(items);
+        adapter = new AssessmentAlertListAdapter(items, this::onEditAlert);
         alertsRecyclerView.setAdapter(adapter);
         view.findViewById(R.id.addFloatingActionButton).setOnClickListener(this::onAddFloatingActionButtonClick);
     }
@@ -106,8 +114,86 @@ public class AssessmentAlertListFragment extends Fragment {
         }
     }
 
+    private void onEditAlert(AssessmentAlert assessmentAlert) {
+        if (assessmentViewModel.isChanged()) {
+            editAlertId = assessmentAlert.getAlert().getId();
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
+                    () -> requireActivity().finish(),
+                    () -> {
+                        compositeDisposable.clear();
+                        compositeDisposable.add(assessmentViewModel.save(false).subscribe(this::onSaveForEditAlertFinished, this::onSaveFailed));
+                        requireActivity().finish();
+                    }, null);
+        } else {
+            EditAlertDialog dlg = EditAlertViewModel.existingAssessmentAlertEditor(assessmentAlert.getAlert().getId(), assessmentViewModel.getId());
+            dlg.show(getParentFragmentManager(), null);
+        }
+    }
+
     private void onAddFloatingActionButtonClick(View view) {
-        // TODO: Display new alert popup
+        if (assessmentViewModel.isChanged()) {
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
+                    () -> requireActivity().finish(),
+                    () -> {
+                        compositeDisposable.clear();
+                        compositeDisposable.add(assessmentViewModel.save(false).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
+                        requireActivity().finish();
+                    }, null);
+        } else {
+            EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(assessmentViewModel.getId());
+            dlg.show(getParentFragmentManager(), null);
+        }
+    }
+
+    private void onSaveForNewAlertFinished(ValidationMessage.ResourceMessageResult messages) {
+        if (messages.isSucceeded()) {
+            EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(assessmentViewModel.getId());
+            dlg.show(getParentFragmentManager(), null);
+        } else {
+            Resources resources = getResources();
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(assessmentViewModel.save(true).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
+        }
+    }
+
+    private void onSaveForEditAlertFinished(ValidationMessage.ResourceMessageResult messages) {
+        if (messages.isSucceeded()) {
+            EditAlertDialog dlg = EditAlertViewModel.existingAssessmentAlertEditor(editAlertId, assessmentViewModel.getId());
+            dlg.show(getParentFragmentManager(), null);
+        } else {
+            Resources resources = getResources();
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(assessmentViewModel.save(true).subscribe(this::onSaveForEditAlertFinished, this::onSaveFailed));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
+        }
+    }
+
+    private void onSaveFailed(Throwable throwable) {
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
+                .showDialog(() -> requireActivity().finish());
     }
 
 }

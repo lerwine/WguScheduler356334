@@ -65,6 +65,16 @@ public class AssessmentAlertLink implements AlertLink {
         this.targetId = targetId;
     }
 
+    public void setAlertIdAndRun(long id, Runnable runnable) {
+        alertId = id;
+        try {
+            runnable.run();
+            id = alertId;
+        } finally {
+            alertId = id;
+        }
+    }
+
     @NonNull
     @Override
     public String dbTableName() {

@@ -48,7 +48,6 @@ public class EditAssessmentFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view.findViewById(R.id.alertImageButton).setOnClickListener(this::onAlertImageButtonClick);
         view.findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
         view.findViewById(R.id.deleteImageButton).setOnClickListener(this::onDeleteImageButtonClick);
         view.findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
@@ -58,10 +57,6 @@ public class EditAssessmentFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
-    }
-
-    private void onAlertImageButtonClick(View view) {
-        // TODO: Replace alertImageButton with a FloatingActionButton on AlertListFragment
     }
 
     private void onSaveImageButtonClick(View view) {
@@ -129,7 +124,6 @@ public class EditAssessmentFragment extends Fragment {
                     () -> {
                         compositeDisposable.clear();
                         compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-                        requireActivity().finish();
                     }, null);
         } else {
             requireActivity().finish();

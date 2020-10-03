@@ -21,6 +21,8 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
+import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 
 /**
  * A fragment representing a list of Items.
@@ -28,7 +30,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 public class AllAlertsListFragment extends Fragment {
 
     private static final String LOG_TAG = AllAlertsListFragment.class.getName();
-    // TODO: Change to AssessmentAlert
     private final List<AlertListItem> items;
     private final TabSelectedListener tabSelectedListener;
     private AllAlertsListViewModel viewModel;
@@ -58,8 +59,16 @@ public class AllAlertsListFragment extends Fragment {
         listingSelectionTabLayout = view.findViewById(R.id.listingSelectionTabLayout);
         noAlertsTextView = view.findViewById(R.id.noAlertsTextView);
         alertsRecyclerView = view.findViewById(R.id.alertsRecyclerView);
-        adapter = new AllAlertsListAdapter(items);
+        adapter = new AllAlertsListAdapter(items, this::onItemClicked);
         alertsRecyclerView.setAdapter(adapter);
+    }
+
+    private void onItemClicked(AlertListItem item) {
+        if (item.isAssessment()) {
+            EditAssessmentViewModel.startViewAssessmentActivity(requireContext(), item.getTargetId());
+        } else {
+            EditCourseViewModel.startViewCourseActivity(requireContext(), item.getTargetId());
+        }
     }
 
     @Override
@@ -78,12 +87,10 @@ public class AllAlertsListFragment extends Fragment {
 
         @Override
         public void onTabUnselected(TabLayout.Tab tab) {
-
         }
 
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
-
         }
 
         @Override

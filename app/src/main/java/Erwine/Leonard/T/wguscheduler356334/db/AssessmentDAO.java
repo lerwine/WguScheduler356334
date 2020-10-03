@@ -51,6 +51,9 @@ public interface AssessmentDAO {
     @Query("SELECT * FROM assessmentDetailView WHERE id = :id")
     Single<AssessmentDetails> getById(long id);
 
+    @Query("SELECT * FROM assessmentDetailView WHERE id = :id")
+    AssessmentDetails getByIdSynchronous(long id);
+
     @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
     LiveData<List<AssessmentEntity>> getByCourseId(long courseId);
 

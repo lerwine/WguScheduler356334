@@ -13,7 +13,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
 public class EntityHelper {
     @NonNull
-    // TODO: Make id parameter NonNull
     public static <T extends AbstractEntity<T>> Optional<T> findById(@Nullable Long id, @NonNull Collection<T> source) {
         if (null == id) {
             return Optional.empty();

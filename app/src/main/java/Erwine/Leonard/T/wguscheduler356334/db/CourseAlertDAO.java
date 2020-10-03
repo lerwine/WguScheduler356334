@@ -6,6 +6,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Transaction;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -23,6 +24,9 @@ public interface CourseAlertDAO {
 
     @Insert
     Long insertSynchronous(CourseAlertLink alert);
+
+    @Update
+    void updateSynchronous(CourseAlertLink alert);
 
     @Insert
     Single<List<Long>> insertAll(List<CourseAlertLink> list);
@@ -49,7 +53,10 @@ public interface CourseAlertDAO {
     @Query("SELECT * FROM courseAlerts WHERE targetId = :courseId")
     List<CourseAlert> getByCourseIdSynchronous(long courseId);
 
-    @Transaction
     @Query("DELETE FROM courseAlerts WHERE targetId=:courseId")
     Single<Integer> deleteByCourseId(long courseId);
+
+    @Query("SELECT COUNT(targetId) FROM courseAlerts WHERE alertId=:alertId")
+    int countByAlertIdSynchronous(long alertId);
+
 }

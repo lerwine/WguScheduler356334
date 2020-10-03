@@ -55,36 +55,36 @@ public class EditAlertViewModel extends AndroidViewModel {
     @StringRes
     private static final int TYPE_VALUE_COURSE = R.string.label_course;
 
-    public static EditAlertFragment existingCourseAlertEditor(long alertId, long courseId) {
+    public static EditAlertDialog existingCourseAlertEditor(long alertId, long courseId) {
         Bundle args = new Bundle();
         args.putLong(ARG_KEY_ALERT_ID, alertId);
         args.putLong(ARG_KEY_COURSE_ID, courseId);
-        EditAlertFragment dialog = new EditAlertFragment();
+        EditAlertDialog dialog = new EditAlertDialog();
         dialog.setArguments(args);
         return dialog;
     }
 
-    public static EditAlertFragment existingAssessmentAlertEditor(long alertId, long assessmentId) {
+    public static EditAlertDialog existingAssessmentAlertEditor(long alertId, long assessmentId) {
         Bundle args = new Bundle();
         args.putLong(ARG_KEY_ALERT_ID, alertId);
         args.putLong(ARG_KEY_ASSESSMENT_ID, assessmentId);
-        EditAlertFragment dialog = new EditAlertFragment();
+        EditAlertDialog dialog = new EditAlertDialog();
         dialog.setArguments(args);
         return dialog;
     }
 
-    public static EditAlertFragment newCourseAlert(long courseId) {
+    public static EditAlertDialog newCourseAlert(long courseId) {
         Bundle args = new Bundle();
         args.putLong(ARG_KEY_COURSE_ID, courseId);
-        EditAlertFragment dialog = new EditAlertFragment();
+        EditAlertDialog dialog = new EditAlertDialog();
         dialog.setArguments(args);
         return dialog;
     }
 
-    public static EditAlertFragment newAssessmentAlert(long assessmentId) {
+    public static EditAlertDialog newAssessmentAlert(long assessmentId) {
         Bundle args = new Bundle();
         args.putLong(ARG_KEY_ASSESSMENT_ID, assessmentId);
-        EditAlertFragment dialog = new EditAlertFragment();
+        EditAlertDialog dialog = new EditAlertDialog();
         dialog.setArguments(args);
         return dialog;
     }

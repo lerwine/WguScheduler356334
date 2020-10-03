@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Consumer;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
@@ -20,9 +21,11 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<AlertListItem> mValues;
+    private final Consumer<AlertListItem> onItemClicked;
 
-    public AllAlertsListAdapter(List<AlertListItem> items) {
+    public AllAlertsListAdapter(@NonNull List<AlertListItem> items, @NonNull Consumer<AlertListItem> onItemClicked) {
         mValues = items;
+        this.onItemClicked = onItemClicked;
     }
 
     @NonNull
@@ -43,7 +46,7 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
         return mValues.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         @SuppressWarnings("FieldCanBeLocal")
         private final View mView;
         private final TextView dateTextView;
@@ -64,7 +67,7 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
         }
 
         private void onViewClick(View view) {
-            // TODO: Display EditAlertViewModel popup to view/manage alert
+            onItemClicked.accept(alertListItem);
         }
 
         public void setItem(AlertListItem alertListItem) {

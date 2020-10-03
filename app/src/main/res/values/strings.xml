@@ -214,4 +214,6 @@
     <string name="message_on_course_end">On course end date.</string>
     <string name="message_on_goal_date">On goal date.</string>
     <string name="message_on_completion_date">On completion date.</string>
+    <string name="message_alert_relative_before_completion">Cannot create an alert that is relative prior to the completion date.</string>
+    <string name="message_alert_relative_before_end">Cannot create an alert that is relative prior to the actual end date.</string>
 </resources>
