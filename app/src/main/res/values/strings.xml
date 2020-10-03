@@ -72,6 +72,8 @@
     <string name="message_expected_start_required">Expected start date is required</string>
     <string name="message_in_progress">In progress…</string>
     <string name="message_invalid_competency_units_value">Invalid number value for competency units</string>
+    <string name="message_invalid_parentheses">(invalid)</string>
+    <string name="message_missing_parentheses">(missing)</string>
     <string name="message_invalid_number">Invalid number value</string>
     <string name="message_mentor_not_found">Mentor not found</string>
     <string name="message_name_required">Name cannot be empty</string>
@@ -123,6 +125,10 @@
     <string name="title_discard_changes">Discard Changes</string>
     <string name="title_edit_notes">Edit Notes</string>
     <string name="title_expected">Expected:</string>
+    <string name="label_expected_start">Expected Start</string>
+    <string name="label_actual_start">Actual Start</string>
+    <string name="label_expected_end">Expected End</string>
+    <string name="label_actual_end">Actual End</string>
     <string name="title_mentor_listing">Mentor Listing</string>
     <string name="title_mentors">Mentors</string>
     <string name="title_not_found">Not Found</string>
@@ -188,6 +194,7 @@
     <string name="title_edit_alert">Edit Alert</string>
     <string name="title_new_alert">New Alert</string>
     <string name="label_event_date">Event Date</string>
+    <string name="label_alert_date">Alert Date</string>
     <string name="title_relative_to_start">Relative to Start</string>
     <string name="title_relative_to_end">Relative to End</string>
     <string name="title_specific_date">Specific Date</string>
@@ -196,7 +203,8 @@
     <string name="label_specific_date">Specific Date</string>
     <string name="label_message">Message (optional)</string>
     <string name="message_assessment_has_no_course">Assessment has no course associated with it.</string>
-    <string name="message_assessment_has_no_date">Relative alert date cannot be calculated. Current assessment has no date defined.</string>
+    <string name="message_assessment_has_no_goal_date">Relative alert date cannot be calculated. Current assessment has no goal date defined.</string>
+    <string name="message_assessment_has_no_completion_date">Relative alert date cannot be calculated. Current assessment has no completion date defined.</string>
     <string name="message_course_has_no_start_date">Relative alert date cannot be calculated. Current course has no start date defined.</string>
     <string name="message_course_has_no_end_date">Relative alert date cannot be calculated. Current course has no start date defined.</string>
     <string name="message_relative_days_out_of_range">Relative number of days out of range.</string>
@@ -216,4 +224,7 @@
     <string name="message_on_completion_date">On completion date.</string>
     <string name="message_alert_relative_before_completion">Cannot create an alert that is relative prior to the completion date.</string>
     <string name="message_alert_relative_before_end">Cannot create an alert that is relative prior to the actual end date.</string>
+    <string name="label_before">Before</string>
+    <string name="label_after">After</string>
+    <string name="label_days_lc">days</string>
 </resources>

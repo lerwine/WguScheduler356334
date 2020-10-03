@@ -37,77 +37,126 @@
         android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
     <TextView
-        android:id="@+id/eventDateDescriptionTextView"
+        android:id="@+id/eventDateTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TableLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/specificDateTextView"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            app:layout_constraintEnd_toEndOf="@+id/daysEditText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioButton
+            android:id="@+id/specificDateRadioButton"
+            style="@style/WGU.Scheduler.RadioButtonStyle"
+            android:labelFor="@id/specificDateTextView"
+            android:text="@string/label_specific_date"
+            app:layout_constraintBottom_toBottomOf="@+id/specificDateTextView"
+            app:layout_constraintStart_toEndOf="@+id/specificDateTextView"
+            app:layout_constraintTop_toTopOf="@+id/specificDateTextView" />
+
+        <EditText
+            android:id="@+id/daysEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            app:layout_constraintEnd_toStartOf="@+id/daysTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/specificDateTextView" />
+
+        <TextView
+            android:id="@+id/daysTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/daysEditText"
+            android:text="@string/label_days_lc"
+            app:layout_constraintBottom_toBottomOf="@+id/daysEditText"
+            app:layout_constraintEnd_toStartOf="@+id/dateSpecTableLayout"
+            app:layout_constraintTop_toTopOf="@+id/daysEditText" />
+
+        <TableLayout
+            android:id="@+id/dateSpecTableLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:shrinkColumns="0"
+            app:layout_constraintBottom_toBottomOf="@+id/daysEditText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/daysEditText">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/daysBeforeRadioButton"
+                    style="@style/WGU.Scheduler.RadioButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/label_before" />
+
+                <RadioButton
+                    android:id="@+id/startDateRadioButton"
+                    style="@style/WGU.Scheduler.RadioButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/control_margin"
+                    android:text="@string/label_expected_start"
+                    app:layout_constraintBottom_toTopOf="@+id/endDateRadioButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/daysEditText" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/daysAfterRadioButton"
+                    style="@style/WGU.Scheduler.RadioButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_after" />
+
+                <RadioButton
+                    android:id="@+id/endDateRadioButton"
+                    style="@style/WGU.Scheduler.RadioButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/control_margin"
+                    android:text="@string/label_expected_end" />
+
+            </TableRow>
+        </TableLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/calculatedDateLabelTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="0">
+        android:labelFor="@id/calculatedDateValueTextView"
+        android:text="@string/label_alert_date"
+        android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/daysBeforeStartEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:importantForAutofill="no"
-                android:inputType="number" />
-
-            <RadioButton
-                android:id="@+id/daysBeforeStartRadioButton"
-                style="@style/WGU.Scheduler.RadioButtonStyle"
-                android:layout_height="wrap_content"
-                android:labelFor="@id/daysBeforeStartEditText"
-                android:text="@string/label_days_before_start" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/daysBeforeEndEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:importantForAutofill="no"
-                android:inputType="number" />
-
-            <RadioButton
-                android:id="@+id/daysBeforeEndRadioButton"
-                style="@style/WGU.Scheduler.RadioButtonStyle"
-                android:labelFor="@id/daysBeforeEndEditText"
-                tools:text="@string/label_days_before_end" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/specificDateEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:importantForAutofill="no"
-                android:inputType="date" />
-
-            <RadioButton
-                android:id="@+id/specificDateRadioButton"
-                style="@style/WGU.Scheduler.RadioButtonStyle"
-                android:labelFor="@id/specificDateEditText"
-                android:text="@string/label_specific_date" />
-        </TableRow>
-
-    </TableLayout>
+    <TextView
+        android:id="@+id/calculatedDateValueTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/messageLabelTextView"

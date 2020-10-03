@@ -36,13 +36,15 @@ public class EditAlertDialog extends DialogFragment {
     private TextView typeTextView;
     private TextView codeTextView;
     private TextView titleTextView;
-    private TextView eventDateDescriptionTextView;
-    private EditText daysBeforeStartEditText;
-    private RadioButton daysBeforeStartRadioButton;
-    private EditText daysBeforeEndEditText;
-    private RadioButton daysBeforeEndRadioButton;
-    private EditText specificDateEditText;
+    private TextView eventDateTextView;
+    private EditText daysEditText;
+    private TextView specificDateTextView;
     private RadioButton specificDateRadioButton;
+    private RadioButton daysBeforeRadioButton;
+    private RadioButton daysAfterRadioButton;
+    private RadioButton startDateRadioButton;
+    private RadioButton endDateRadioButton;
+    private TextView calculatedDateValueTextView;
     private EditText messageEditText;
     private ImageButton saveImageButton;
     private ImageButton deleteImageButton;
@@ -60,13 +62,15 @@ public class EditAlertDialog extends DialogFragment {
         typeTextView = view.findViewById(R.id.typeTextView);
         codeTextView = view.findViewById(R.id.codeTextView);
         titleTextView = view.findViewById(R.id.titleTextView);
-        eventDateDescriptionTextView = view.findViewById(R.id.eventDateDescriptionTextView);
-        daysBeforeStartEditText = view.findViewById(R.id.daysBeforeStartEditText);
-        daysBeforeStartRadioButton = view.findViewById(R.id.daysBeforeStartRadioButton);
-        daysBeforeEndEditText = view.findViewById(R.id.daysBeforeEndEditText);
-        daysBeforeEndRadioButton = view.findViewById(R.id.daysBeforeEndRadioButton);
-        specificDateEditText = view.findViewById(R.id.specificDateEditText);
+        eventDateTextView = view.findViewById(R.id.eventDateTextView);
+        specificDateTextView = view.findViewById(R.id.specificDateTextView);
         specificDateRadioButton = view.findViewById(R.id.specificDateRadioButton);
+        daysEditText = view.findViewById(R.id.daysEditText);
+        daysBeforeRadioButton = view.findViewById(R.id.daysBeforeRadioButton);
+        daysAfterRadioButton = view.findViewById(R.id.daysAfterRadioButton);
+        startDateRadioButton = view.findViewById(R.id.startDateRadioButton);
+        endDateRadioButton = view.findViewById(R.id.endDateRadioButton);
+        calculatedDateValueTextView = view.findViewById(R.id.calculatedDateValueTextView);
         messageEditText = view.findViewById(R.id.messageEditText);
         saveImageButton = view.findViewById(R.id.saveImageButton);
         deleteImageButton = view.findViewById(R.id.deleteImageButton);
@@ -74,16 +78,16 @@ public class EditAlertDialog extends DialogFragment {
         viewModel = new ViewModelProvider(requireActivity()).get(EditAlertViewModel.class);
         viewModel.initializeViewModelState(savedInstanceState, this::getArguments);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        viewModel.getAlertLiveData().observe(viewLifecycleOwner, this::onAlertLoaded);
-        viewModel.getInitializationFailureLiveData().observe(viewLifecycleOwner, this::onLoadFailed);
-        viewModel.getAlertDateLiveData().observe(viewLifecycleOwner, this::onAlertDateChanged);
-        viewModel.getBeforeStartValidationLiveData().observe(viewLifecycleOwner, this::onBeforeStartValidationChanged);
-        viewModel.getBeforeEndValidationLiveData().observe(viewLifecycleOwner, this::onBeforeEndValidationChanged);
+        viewModel.getAlertEntityLiveData().observe(viewLifecycleOwner, this::onAlertEntityLoaded);
+        viewModel.getInitializationFailureLiveData().observe(viewLifecycleOwner, this::onInitializationFailure);
+        viewModel.getDaysValidationLiveData().observe(viewLifecycleOwner, this::onDaysValidationChanged);
         viewModel.getSelectedDateValidationLiveData().observe(viewLifecycleOwner, this::onSelectedDateValidationLChanged);
+        viewModel.getCalculatedDateLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
+        viewModel.getEventDateLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
         viewModel.getValidLiveData().observe(viewLifecycleOwner, this::onValidChanged);
     }
 
-    private void onAlertLoaded(@NonNull AlertEntity alertEntity) {
+    private void onAlertEntityLoaded(@NonNull AlertEntity alertEntity) {
         long id = alertEntity.getId();
         if (ID_NEW == id) {
             deleteImageButton.setEnabled(false);
@@ -92,65 +96,71 @@ public class EditAlertDialog extends DialogFragment {
         typeTextView.setText(viewModel.getType());
         codeTextView.setText(viewModel.getCode());
         titleTextView.setText(viewModel.getTitle());
-        daysBeforeStartEditText.setText(viewModel.getBeforeStartText());
-        daysBeforeEndEditText.setText(viewModel.getBeforeEndText());
+        daysEditText.setText(viewModel.getDaysText());
+        AlertDateOption option = viewModel.getDateSpecOption();
+        specificDateRadioButton.setChecked(option.isExplicit());
+        daysBeforeRadioButton.setChecked(option.isBefore());
+        startDateRadioButton.setChecked(option.isStart());
+        daysAfterRadioButton.setChecked(option.isAfter());
+        if (option.isExplicit()) {
+            endDateRadioButton.setEnabled(true);
+            endDateRadioButton.setChecked(false);
+            specificDateTextView.setClickable(true);
+            daysEditText.setClickable(false);
+            daysEditText.setEnabled(false);
+        } else {
+            if (viewModel.isBeforeEndEnabled() || !option.isBefore()) {
+                endDateRadioButton.setEnabled(true);
+                endDateRadioButton.setChecked(option.isEnd());
+            } else {
+                endDateRadioButton.setChecked(false);
+                endDateRadioButton.setEnabled(false);
+            }
+            specificDateTextView.setClickable(false);
+            daysEditText.setClickable(true);
+            daysEditText.setEnabled(true);
+        }
         LocalDate d = viewModel.getSelectedDate();
         if (null != d) {
-            specificDateEditText.setText(EditAlertViewModel.DATE_FORMATTER.format(d));
+            specificDateTextView.setText(EditAlertViewModel.DATE_FORMATTER.format(d));
         } else {
-            specificDateEditText.setText("");
+            specificDateTextView.setText("");
         }
 
-        switch (viewModel.getDateSpecOption()) {
-            case START_DATE:
-                daysBeforeStartRadioButton.setChecked(true);
-                daysBeforeEndRadioButton.setChecked(false);
-                specificDateRadioButton.setChecked(false);
-                daysBeforeStartEditText.setEnabled(true);
-                daysBeforeEndEditText.setEnabled(false);
-                specificDateEditText.setClickable(false);
-                specificDateEditText.setEnabled(false);
-                break;
-            case END_DATE:
-                daysBeforeStartRadioButton.setChecked(false);
-                daysBeforeEndRadioButton.setChecked(true);
-                specificDateRadioButton.setChecked(false);
-                daysBeforeStartEditText.setEnabled(false);
-                daysBeforeEndEditText.setEnabled(true);
-                specificDateEditText.setClickable(false);
-                specificDateEditText.setEnabled(false);
-                break;
-            default:
-                daysBeforeStartRadioButton.setChecked(false);
-                daysBeforeEndRadioButton.setChecked(false);
-                specificDateRadioButton.setChecked(true);
-                daysBeforeStartEditText.setEnabled(false);
-                daysBeforeEndEditText.setEnabled(false);
-                specificDateEditText.setClickable(true);
-                specificDateEditText.setEnabled(true);
-                break;
-        }
-
-        daysBeforeStartEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setBeforeStartText));
-        daysBeforeEndEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setBeforeEndText));
+        daysEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setDaysText));
         messageEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setMessage));
+        specificDateTextView.setOnClickListener(this::onSpecificDateTextViewClick);
         saveImageButton.setOnClickListener(this::onSaveButtonClick);
         deleteImageButton.setOnClickListener(this::onDeleteButtonClick);
         cancelImageButton.setOnClickListener(this::onCancelButtonClick);
-        daysBeforeStartRadioButton.setOnCheckedChangeListener(this::onDaysBeforeStartRadioButtonCheckedChange);
-        daysBeforeEndRadioButton.setOnCheckedChangeListener(this::onDaysBeforeEndRadioButtonCheckedChange);
         specificDateRadioButton.setOnCheckedChangeListener(this::onSpecificDateRadioButtonCheckedChange);
+        daysBeforeRadioButton.setOnCheckedChangeListener(this::onDaysBeforeRadioButtonCheckedChange);
+        startDateRadioButton.setOnCheckedChangeListener(this::onStartDateRadioButtonCheckedChange);
+        daysAfterRadioButton.setOnCheckedChangeListener(this::onDaysAfterRadioButtonCheckedChange);
+        endDateRadioButton.setOnCheckedChangeListener(this::onEndDateDateRadioButtonCheckedChange);
     }
 
-    private void onAlertDateChanged(LocalDate d) {
-        if (null != d) {
-            eventDateDescriptionTextView.setText(EditAlertViewModel.DATE_FORMATTER.format(d));
+    private void onSpecificDateTextViewClick(View view) {
+        // TODO: Show date selection popup
+    }
+
+    private void onEventDateChanged(String text) {
+        if (null != text) {
+            eventDateTextView.setText(text);
         } else {
-            eventDateDescriptionTextView.setText("");
+            eventDateTextView.setText(getResources().getString(R.string.message_missing_parentheses));
         }
     }
 
-    private void onLoadFailed(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onCalculatedDateChanged(String text) {
+        if (null != text) {
+            calculatedDateValueTextView.setText(text);
+        } else {
+            calculatedDateValueTextView.setText(getResources().getString(R.string.message_invalid_parentheses));
+        }
+    }
+
+    private void onInitializationFailure(@NonNull ValidationMessage.ResourceMessageResult messages) {
         FragmentActivity activity = requireActivity();
         requireDialog().dismiss();
         AlertDialog dlg = new AlertDialog.Builder(activity).setTitle(R.string.title_read_error)
@@ -183,59 +193,98 @@ public class EditAlertDialog extends DialogFragment {
         dismiss();
     }
 
-    private void onBeforeStartValidationChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
+    private void onDaysValidationChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
         if (null == resourceMessageFactory) {
-            daysBeforeStartEditText.setError(null);
+            daysEditText.setError(null);
         } else {
-            daysBeforeStartEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
-                    (resourceMessageFactory.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
-        }
-    }
-
-    private void onBeforeEndValidationChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
-        if (null == resourceMessageFactory) {
-            daysBeforeEndEditText.setError(null);
-        } else {
-            daysBeforeEndEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
+            daysEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
                     (resourceMessageFactory.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
         }
     }
 
     private void onSelectedDateValidationLChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
         if (null == resourceMessageFactory) {
-            specificDateEditText.setError(null);
+            specificDateTextView.setError(null);
         } else {
-            specificDateEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
+            specificDateTextView.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
                     (resourceMessageFactory.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
         }
     }
 
-    private void onDaysBeforeStartRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
+    private void onDaysBeforeRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {
-            daysBeforeStartEditText.setEnabled(true);
-            viewModel.setDateSpecOption(AlertDateOption.START_DATE);
-        } else {
-            daysBeforeStartEditText.setEnabled(false);
+            if (specificDateRadioButton.isChecked()) {
+                specificDateRadioButton.setChecked(false);
+                startDateRadioButton.setChecked(true);
+                specificDateTextView.setClickable(false);
+                daysEditText.setClickable(true);
+                daysEditText.setEnabled(true);
+                viewModel.setDateSpecOption(AlertDateOption.BEFORE_START_DATE);
+            } else {
+                viewModel.setDateSpecOption((startDateRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.BEFORE_END_DATE);
+            }
+            endDateRadioButton.setEnabled(viewModel.isBeforeEndEnabled());
         }
     }
 
-    private void onDaysBeforeEndRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
+    private void onStartDateRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {
-            daysBeforeEndEditText.setEnabled(true);
-            viewModel.setDateSpecOption(AlertDateOption.END_DATE);
-        } else {
-            daysBeforeEndEditText.setEnabled(false);
+            if (specificDateRadioButton.isChecked()) {
+                specificDateRadioButton.setChecked(false);
+                daysBeforeRadioButton.setChecked(true);
+                specificDateTextView.setClickable(false);
+                daysEditText.setClickable(true);
+                daysEditText.setEnabled(true);
+                viewModel.setDateSpecOption(AlertDateOption.BEFORE_START_DATE);
+            } else {
+                viewModel.setDateSpecOption((daysBeforeRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.AFTER_START_DATE);
+            }
+            endDateRadioButton.setEnabled(true);
+        }
+    }
+
+    private void onDaysAfterRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
+        if (isChecked) {
+            endDateRadioButton.setEnabled(true);
+            if (specificDateRadioButton.isChecked()) {
+                specificDateRadioButton.setChecked(false);
+                endDateRadioButton.setChecked(true);
+                specificDateTextView.setClickable(false);
+                daysEditText.setClickable(true);
+                daysEditText.setEnabled(true);
+                viewModel.setDateSpecOption(AlertDateOption.AFTER_END_DATE);
+            } else {
+                viewModel.setDateSpecOption((endDateRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.AFTER_START_DATE);
+            }
+        }
+    }
+
+    private void onEndDateDateRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
+        if (isChecked) {
+            if (specificDateRadioButton.isChecked()) {
+                specificDateRadioButton.setChecked(false);
+                daysAfterRadioButton.setChecked(true);
+                specificDateTextView.setClickable(false);
+                daysEditText.setClickable(true);
+                daysEditText.setEnabled(true);
+                viewModel.setDateSpecOption(AlertDateOption.AFTER_END_DATE);
+            } else {
+                viewModel.setDateSpecOption((daysAfterRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.BEFORE_END_DATE);
+            }
         }
     }
 
     private void onSpecificDateRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {
-            specificDateEditText.setClickable(true);
-            specificDateEditText.setEnabled(true);
+            endDateRadioButton.setEnabled(true);
+            specificDateTextView.setClickable(true);
+            daysBeforeRadioButton.setChecked(false);
+            daysAfterRadioButton.setChecked(false);
+            startDateRadioButton.setChecked(false);
+            endDateRadioButton.setChecked(false);
+            daysEditText.setClickable(false);
+            daysEditText.setEnabled(false);
             viewModel.setDateSpecOption(AlertDateOption.EXPLICIT);
-        } else {
-            specificDateEditText.setClickable(false);
-            specificDateEditText.setEnabled(false);
         }
     }
 
