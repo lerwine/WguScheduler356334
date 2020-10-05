@@ -1,13 +1,19 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 
@@ -44,17 +50,26 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
         private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
+        private final Preference.OnPreferenceChangeListener prefAlertTimeChangeListener;
 
         public SettingsFragment() {
             onPreferEmailChangeListener = this::onPreferenceChange;
+            prefAlertTimeChangeListener = this::onAlertTimeChange;
         }
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
-            final SwitchPreference preference = findPreference(getResources().getString(R.string.preference_prefer_email));
+            Resources resources = getResources();
+            final SwitchPreference preference = findPreference(resources.getString(R.string.preference_prefer_email));
             if (null != preference) {
                 preference.setOnPreferenceChangeListener(onPreferEmailChangeListener);
+            }
+            final TimePreference timePreference = findPreference(resources.getString(R.string.preference_alert_time));
+            if (null != timePreference) {
+                timePreference.setOnPreferenceChangeListener(prefAlertTimeChangeListener);
+                int minutes = timePreference.getTime();
+                setSummary(timePreference, LocalTime.of(minutes / 60, minutes % 60));
             }
         }
 
@@ -64,5 +79,32 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         }
 
+        private boolean onAlertTimeChange(Preference preference, Object newValue) {
+            int value = (null == newValue) ? TimePreference.DEFAULT_VALUE : (int) newValue;
+            LocalTime time = LocalTime.of(value / 60, value % 60);
+            DbLoader.getPreferAlertTimeLiveData().postValue(time);
+            setSummary(preference, time);
+            return true;
+        }
+
+        private void setSummary(Preference preference, LocalTime time) {
+            preference.setSummary(getResources().getString(R.string.format_alarm_time_summary, DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).format(time)));
+        }
+
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+            DialogFragment dialogFragment = null;
+            if (preference instanceof TimePreference) {
+                dialogFragment = TimePreferenceDialog.newInstance(preference.getKey());
+            }
+
+            // If it was one of our cutom Preferences, show its dialog
+            if (dialogFragment != null) {
+                dialogFragment.setTargetFragment(this, 0);
+                dialogFragment.show(this.getParentFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
+        }
     }
 }

@@ -45,6 +45,7 @@ public class EditTermFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        view.findViewById(R.id.shareImageButton).setOnClickListener(this::onShareImageButtonClick);
         view.findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveTermImageButtonClick);
         view.findViewById(R.id.deleteImageButton).setOnClickListener(this::onDeleteImageButtonClick);
         view.findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
@@ -81,6 +82,10 @@ public class EditTermFragment extends Fragment {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", termEntity));
+    }
+
+    private void onShareImageButtonClick(View view) {
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment.onShareImageButtonClick
     }
 
     private void onSaveTermImageButtonClick(View view) {

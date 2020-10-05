@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.TimePreference;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
@@ -85,6 +87,7 @@ public class DbLoader {
             "\\t([^\\t]+)\\t([^\\t]+)?\\t(?:(\\d{4}-\\d\\d-\\d\\d)|(expectedEnd)|(actualEnd))?$");
 
     private static final MutableLiveData<Boolean> preferEmailLiveData = new MutableLiveData<>(false);
+    private static final MutableLiveData<LocalTime> preferAlertTimeLiveData = new MutableLiveData<>(LocalTime.of(TimePreference.DEFAULT_HOUR, TimePreference.DEFAULT_MINUTE));
     private static DbLoader instance;
     @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
@@ -126,6 +129,10 @@ public class DbLoader {
 
     public static MutableLiveData<Boolean> getPreferEmailLiveData() {
         return preferEmailLiveData;
+    }
+
+    public static MutableLiveData<LocalTime> getPreferAlertTimeLiveData() {
+        return preferAlertTimeLiveData;
     }
 
     AppDb getAppDb() {

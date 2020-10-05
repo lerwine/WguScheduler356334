@@ -583,11 +583,11 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
         if (null == selectedTerm) {
-            return Single.just(ValidationMessage.ofSingleError(R.string.message_term_not_selected));
+            return Single.just(ValidationMessage.ofSingleError(R.string.message_term_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
         Integer id = validateCompetencyUnits(true).orElse(null);
         if (null != id) {
-            return Single.just(ValidationMessage.ofSingleError(id));
+            return Single.just(ValidationMessage.ofSingleError(id)).observeOn(AndroidSchedulers.mainThread());
         }
         CourseEntity entity = courseEntity.toEntity();
         entity.setTermId(Objects.requireNonNull(selectedTerm).getId());

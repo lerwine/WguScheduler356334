@@ -97,6 +97,7 @@
     <string name="message_course_not_selected">Course not selected</string>
     <string name="message_title_required">Title cannot be empty</string>
     <string name="preference_prefer_email">prefer_email</string>
+    <string name="preference_alert_time">alert_time</string>
     <string name="response_no">No</string>
     <string name="response_yes">Yes</string>
     <string name="tab_title_email">Email</string>
@@ -240,4 +241,11 @@
     <string name="message_please_wait">Please wait…</string>
     <string name="message_alert_date_required">Alert date is required.</string>
     <string name="message_alert_days_required">Alert days value is required.</string>
+    <string name="label_share_calendar_event">Share Calendar Event</string>
+    <string name="label_share_assessment">Share Assessment Information</string>
+    <string name="label_share_course">Share Course Information</string>
+    <string name="label_share_term">Share Term Information</string>
+    <string name="label_share_contact">Share Contact Information</string>
+    <string name="title_daily_alarm_time">Daily Alarm Time</string>
+    <string name="format_alarm_time_summary">%s\n\nThis is the time of day when course and assessment alerts will be generated, even if this app is not running.</string>
 </resources>

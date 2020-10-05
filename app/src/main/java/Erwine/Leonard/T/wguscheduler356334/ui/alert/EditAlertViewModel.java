@@ -37,6 +37,7 @@ import Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class EditAlertViewModel extends AndroidViewModel {
@@ -506,13 +507,13 @@ public class EditAlertViewModel extends AndroidViewModel {
         if (dateSpecOption.isExplicit()) {
             entity.setSubsequent(null);
             if (null == selectedDate) {
-                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_date_required));
+                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_date_required)).observeOn(AndroidSchedulers.mainThread());
             }
             entity.setTimeSpec(selectedDate.toEpochDay());
         } else {
             entity.setSubsequent(dateSpecOption.isEnd());
             if (null == daysValue) {
-                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_days_required));
+                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_days_required)).observeOn(AndroidSchedulers.mainThread());
             }
             entity.setTimeSpec(daysValue);
         }

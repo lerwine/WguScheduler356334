@@ -50,6 +50,7 @@ public class EditAlertDialog extends DialogFragment {
     private RadioButton endDateRadioButton;
     private TextView calculatedDateValueTextView;
     private EditText messageEditText;
+    private ImageButton shareImageButton;
     private ImageButton saveImageButton;
     private ImageButton deleteImageButton;
     private ImageButton cancelImageButton;
@@ -78,6 +79,7 @@ public class EditAlertDialog extends DialogFragment {
         endDateRadioButton = view.findViewById(R.id.endDateRadioButton);
         calculatedDateValueTextView = view.findViewById(R.id.calculatedDateValueTextView);
         messageEditText = view.findViewById(R.id.messageEditText);
+        shareImageButton = view.findViewById(R.id.shareImageButton);
         saveImageButton = view.findViewById(R.id.saveImageButton);
         deleteImageButton = view.findViewById(R.id.deleteImageButton);
         cancelImageButton = view.findViewById(R.id.cancelImageButton);
@@ -135,6 +137,7 @@ public class EditAlertDialog extends DialogFragment {
         daysEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setDaysText));
         messageEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setMessage));
         specificDateTextView.setOnClickListener(this::onSpecificDateTextViewClick);
+        shareImageButton.setOnClickListener(this::onShareImageButtonClick);
         saveImageButton.setOnClickListener(this::onSaveButtonClick);
         deleteImageButton.setOnClickListener(this::onDeleteButtonClick);
         cancelImageButton.setOnClickListener(this::onCancelButtonClick);
@@ -188,6 +191,10 @@ public class EditAlertDialog extends DialogFragment {
     public void onStart() {
         super.onStart();
         Objects.requireNonNull(Objects.requireNonNull(getDialog()).getWindow()).setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    }
+
+    private void onShareImageButtonClick(View view) {
+        // TODO: Implement onShareImageButtonClick
     }
 
     private void onSaveButtonClick(View view) {

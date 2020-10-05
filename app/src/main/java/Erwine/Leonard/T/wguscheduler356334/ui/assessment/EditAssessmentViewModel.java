@@ -36,7 +36,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -50,6 +52,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     private final DbLoader dbLoader;
     private AssessmentDetails assessmentEntity;
+    private TermEntity termEntity;
+    private MentorEntity mentorEntity;
     private final MutableLiveData<AssessmentDetails> entityLiveData;
     private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
     private final MutableLiveData<Boolean> courseValidLiveData;
@@ -273,7 +277,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
         if (null == selectedCourse) {
-            return Single.just(ValidationMessage.ofSingleError(R.string.message_course_not_selected));
+            return Single.just(ValidationMessage.ofSingleError(R.string.message_course_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
         AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
         entity.setCode(currentValues.getCode());
@@ -301,6 +305,20 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             return !getNormalizedNotes().equals(assessmentEntity.getNotes());
         }
         return true;
+    }
+
+    public Single<TermEntity> getCurrentTerm() {
+        if (null != termEntity) {
+            return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
+        }
+        return dbLoader.getTermById(assessmentEntity.getTermId()).doOnSuccess(t -> termEntity = t);
+    }
+
+    public Single<MentorEntity> getCourseMentor() {
+        if (null != mentorEntity) {
+            return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
+        }
+        return dbLoader.getMentorById(assessmentEntity.getMentorId()).doOnSuccess(t -> mentorEntity = t);
     }
 
     private class CurrentValues implements Assessment {

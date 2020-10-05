@@ -86,6 +86,11 @@
             android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/shareImageButton"
+                style="@style/WGU.Scheduler.ShareImageButtonStyle"
+                android:contentDescription="@string/label_share_contact" />
+
+            <ImageButton
                 android:id="@+id/saveMentorImageButton"
                 style="@style/WGU.Scheduler.SaveImageButtonStyle"
                 android:contentDescription="@string/command_save_changes" />

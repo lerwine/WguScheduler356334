@@ -11,11 +11,18 @@
         android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/saveImageButton"
+        app:layout_constraintBottom_toTopOf="@+id/shareImageButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/fragment_course_properties" />
+
+    <ImageButton
+        android:id="@+id/shareImageButton"
+        style="@style/WGU.Scheduler.ShareImageButtonStyle"
+        android:contentDescription="@string/label_share_course"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/saveImageButton" />
 
     <ImageButton
         android:id="@+id/saveImageButton"

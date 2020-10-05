@@ -162,25 +162,24 @@
         android:orientation="horizontal">
 
         <ImageButton
+            android:id="@+id/shareImageButton"
+            style="@style/WGU.Scheduler.ShareImageButtonStyle"
+            android:contentDescription="@string/label_share_calendar_event" />
+
+        <ImageButton
             android:id="@+id/saveImageButton"
             style="@style/WGU.Scheduler.SaveImageButtonStyle"
-            android:contentDescription="@string/command_save_changes"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/deleteImageButton" />
+            android:contentDescription="@string/command_save_changes" />
 
         <ImageButton
             android:id="@+id/deleteImageButton"
             style="@style/WGU.Scheduler.DeleteImageButtonStyle"
-            android:contentDescription="@string/command_delete"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
+            android:contentDescription="@string/command_delete" />
 
         <ImageButton
             android:id="@+id/cancelImageButton"
             style="@style/WGU.Scheduler.CancelImageButtonStyle"
-            android:contentDescription="@android:string/cancel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:contentDescription="@android:string/cancel" />
 
     </LinearLayout>
 
