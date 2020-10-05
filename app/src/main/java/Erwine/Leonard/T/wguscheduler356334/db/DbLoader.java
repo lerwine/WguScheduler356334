@@ -456,7 +456,7 @@ public class DbLoader {
     @NonNull
     public LiveData<List<TermCourseListItem>> getCoursesByTermId(long termId) {
         Log.d(LOG_TAG, String.format("Called getCoursesByTermId(%d)", termId));
-        return appDb.courseDAO().getByTermId(termId);
+        return appDb.courseDAO().getLiveDataByTermId(termId);
     }
 
     /**
@@ -622,9 +622,21 @@ public class DbLoader {
      * specific {@link CourseEntity}.
      */
     @NonNull
-    public LiveData<List<AssessmentEntity>> getAssessmentsByCourseId(long courseId) {
-        Log.d(LOG_TAG, String.format("Called getAssessmentsByCourseId(%d)", courseId));
-        return appDb.assessmentDAO().getByCourseId(courseId);
+    public LiveData<List<AssessmentEntity>> getAssessmentsLiveDataByCourseId(long courseId) {
+        Log.d(LOG_TAG, String.format("Called getAssessmentsLiveDataByCourseId(%d)", courseId));
+        return appDb.assessmentDAO().getLiveDataByCourseId(courseId);
+    }
+
+    @NonNull
+    public Single<List<AssessmentEntity>> loadAssessmentsByCourseId(long courseId) {
+        Log.d(LOG_TAG, String.format("Called loadAssessmentsByCourseId(%d)", courseId));
+        return appDb.assessmentDAO().loadByCourseId(courseId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @NonNull
+    public Single<List<TermCourseListItem>> loadCoursesByTermId(long termId) {
+        Log.d(LOG_TAG, String.format("Called loadCoursesByTermId(%d)", termId));
+        return appDb.courseDAO().loadByTermId(termId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
 //    /**
@@ -722,6 +734,22 @@ public class DbLoader {
 //        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
 //    }
 
+    public Completable deleteCourseAlert(CourseAlert entity) {
+        Log.d(LOG_TAG, String.format("Called deleteCourseAlert(%s)", entity));
+        return Completable.fromAction(() -> appDb.runInTransaction(() -> {
+            appDb.courseAlertDAO().delete(entity.getLink());
+            appDb.alertDAO().delete(entity.getAlert());
+        })).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable deleteAssessmentAlert(AssessmentAlert entity) {
+        Log.d(LOG_TAG, String.format("Called deleteAssessmentAlert(%s)", entity));
+        return Completable.fromAction(() -> appDb.runInTransaction(() -> {
+            appDb.assessmentAlertDAO().delete(entity.getLink());
+            appDb.alertDAO().delete(entity.getAlert());
+        })).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Single<ValidationMessage.ResourceMessageResult> saveCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
         return Single.fromCallable(() -> {
@@ -817,12 +845,12 @@ public class DbLoader {
 
     @NonNull
     public Single<CourseAlertDetails> getCourseAlertDetailsId(long alertId, long courseId) {
-        return appDb.courseAlertDAO().getDetailsAlertId(alertId, courseId);
+        return appDb.courseAlertDAO().getDetailsAlertId(alertId, courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
     public Single<AssessmentAlertDetails> getAssessmentAlertDetailsId(long alertId, long courseId) {
-        return appDb.assessmentAlertDAO().getByDetailByAlertId(alertId, courseId);
+        return appDb.assessmentAlertDAO().getByDetailByAlertId(alertId, courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull

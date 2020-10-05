@@ -30,6 +30,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private EditAssessmentViewModel viewModel;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewAssessmentPagerAdapter adapter;
+    private AlertDialog waitDialog;
 
     public ViewAssessmentActivity() {
         compositeDisposable = new CompositeDisposable();
@@ -47,6 +48,8 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditAssessmentViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
         compositeDisposable.clear();
+        waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
+        waitDialog.show();
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoadSucceeded, this::onEntityLoadFailed));
     }
 
@@ -77,6 +80,11 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadSucceeded(AssessmentDetails entity) {
+        waitDialog.dismiss();
+        if (null == entity) {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_assessment_not_found : R.string.message_assessment_not_restored, this).showDialog(this::finish);
+            return;
+        }
         long assessmentId = entity.getId();
         if (ID_NEW == assessmentId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_assessment_id_not_specified, this).showDialog(this::finish);
@@ -90,6 +98,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
+        waitDialog.dismiss();
         Log.e(LOG_TAG, "Error loading course", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage())
                 .showDialog(this::finish);

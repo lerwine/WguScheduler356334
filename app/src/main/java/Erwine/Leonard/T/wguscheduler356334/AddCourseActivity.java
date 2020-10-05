@@ -28,6 +28,7 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
+    private AlertDialog waitDialog;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -52,6 +53,8 @@ public class AddCourseActivity extends AppCompatActivity {
         findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         compositeDisposable.clear();
+        waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
+        waitDialog.show();
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onCourseLoadSuccess, this::onCourseLoadFailed));
     }
 
@@ -91,11 +94,17 @@ public class AddCourseActivity extends AppCompatActivity {
     }
 
     private void onCourseLoadSuccess(CourseDetails entity) {
-        Log.d(LOG_TAG, "Enter onCourseLoadSuccess");
+        waitDialog.dismiss();
+        if (null != entity) {
+            Log.d(LOG_TAG, String.format("Loaded %s", entity));
+        } else {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_course_not_restored, this).showDialog(this::finish);
+        }
     }
 
     private void onCourseLoadFailed(Throwable throwable) {
         Log.e(LOG_TAG, "Error loading course", throwable);
+        waitDialog.dismiss();
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 

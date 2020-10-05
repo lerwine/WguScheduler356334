@@ -35,6 +35,7 @@ public class ViewCourseActivity extends AppCompatActivity {
     private EditCourseViewModel viewModel;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewCoursePagerAdapter adapter;
+    private AlertDialog waitDialog;
 
     public ViewCourseActivity() {
         compositeDisposable = new CompositeDisposable();
@@ -52,6 +53,8 @@ public class ViewCourseActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
         compositeDisposable.clear();
+        waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
+        waitDialog.show();
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoadSucceeded, this::onEntityLoadFailed));
     }
 
@@ -82,6 +85,11 @@ public class ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadSucceeded(CourseDetails entity) {
+        waitDialog.dismiss();
+        if (null == entity) {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_course_not_found : R.string.message_course_not_restored, this).showDialog(this::finish);
+            return;
+        }
         long courseId = entity.getId();
         if (ID_NEW == courseId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_course_id_not_specified, this).showDialog(this::finish);
@@ -96,6 +104,7 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private void onEntityLoadFailed(Throwable throwable) {
         Log.e(LOG_TAG, "Error loading course", throwable);
+        waitDialog.dismiss();
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage())
                 .showDialog(this::finish);
     }

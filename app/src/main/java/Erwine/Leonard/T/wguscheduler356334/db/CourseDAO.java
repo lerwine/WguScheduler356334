@@ -57,14 +57,17 @@ public interface CourseDAO {
     @Query("SELECT * FROM courses WHERE id = :id")
     CourseEntity getByIdSynchronous(long id);
 
-    @Query("SELECT * FROM courses ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
-    LiveData<List<CourseEntity>> getAll();
+//    @Query("SELECT * FROM courses ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+//    LiveData<List<CourseEntity>> getAll();
 
     @Query("SELECT * FROM courses")
     List<CourseEntity> getAllSynchronous();
 
     @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
-    LiveData<List<TermCourseListItem>> getByTermId(long termId);
+    LiveData<List<TermCourseListItem>> getLiveDataByTermId(long termId);
+
+    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    Single<List<TermCourseListItem>> loadByTermId(long termId);
 
     @Query("SELECT * FROM termCourseListView WHERE termId = :termId")
     List<TermCourseListItem> getByTermIdSynchronous(long termId);

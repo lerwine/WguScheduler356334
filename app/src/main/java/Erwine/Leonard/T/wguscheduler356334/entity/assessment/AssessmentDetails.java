@@ -129,7 +129,8 @@ public final class AssessmentDetails extends AbstractAssessmentEntity<Assessment
             courseStatus = CourseStatus.UNPLANNED;
             expectedCourseStart = actualCourseStart = expectedCourseEnd = actualCourseEnd = null;
             competencyUnits = 0;
-            termId = mentorId = null;
+            termId = ID_NEW;
+            mentorId = null;
         } else {
             setCourse(course);
         }

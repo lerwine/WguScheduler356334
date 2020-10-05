@@ -23,15 +23,20 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
-import Erwine.Leonard.T.wguscheduler356334.util.live.BooleanAndLiveData;
+import io.reactivex.Completable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class EditAlertViewModel extends AndroidViewModel {
@@ -52,6 +57,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     private static final String STATE_KEY_TYPE = "type";
     @StringRes
     private static final int TYPE_VALUE_COURSE = R.string.label_course;
+    private LocalDate calculatedDate;
 
     public static EditAlertDialog existingCourseAlertEditor(long alertId, long courseId) {
         Bundle args = new Bundle();
@@ -89,19 +95,16 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     private final MutableLiveData<AlertEntity> alertEntityLiveData;
     private final MutableLiveData<ValidationMessage.ResourceMessageResult> initializationFailureLiveData;
-    private final MutableLiveData<ValidationMessage.ResourceMessageFactory> daysValidationLiveData;
-    private final MutableLiveData<ValidationMessage.ResourceMessageFactory> selectedDateValidationLiveData;
-    //    private final MutableLiveData<LocalDate> alertDateLiveData;
     private final MutableLiveData<String> eventDateLiveData;
     private final MutableLiveData<String> calculatedDateLiveData;
-    private final BooleanAndLiveData validLiveData;
+    private final IsValid validLiveData;
     private final CompositeDisposable compositeDisposable;
     private final DbLoader dbLoader;
     private CourseEntity courseEntity;
     private AssessmentEntity assessmentEntity;
     private AlertEntity alertEntity;
     private int type;
-    private AlertDateOption dateSpecOption;
+    private AlertDateOption dateSpecOption = AlertDateOption.EXPLICIT;
     @StringRes
     private int startLabelTextResourceId;
     @StringRes
@@ -109,41 +112,32 @@ public class EditAlertViewModel extends AndroidViewModel {
     private boolean beforeEndEnabled;
     private LocalDate eventStart;
     private LocalDate eventEnd;
-    private String message;
+    @NonNull
+    private String message = "";
     private Integer daysValue;
-    private String daysText;
+    @NonNull
+    private String daysText = "";
     private LocalDate selectedDate;
+
+    @StringRes
+    public int getStartLabelTextResourceId() {
+        return startLabelTextResourceId;
+    }
+
+    @StringRes
+    public int getEndLabelTextResourceId() {
+        return endLabelTextResourceId;
+    }
 
     public EditAlertViewModel(@NonNull Application application) {
         super(application);
         compositeDisposable = new CompositeDisposable();
         dbLoader = DbLoader.getInstance(getApplication());
-        daysValidationLiveData = new MutableLiveData<>();
-        selectedDateValidationLiveData = new MutableLiveData<>();
         eventDateLiveData = new MutableLiveData<>();
         calculatedDateLiveData = new MutableLiveData<>();
-//        alertDateLiveData = new MutableLiveData<>();
-        validLiveData = new BooleanAndLiveData();
-        validLiveData.addSource(daysValidationLiveData, input -> null == input || input.isWarning());
-        validLiveData.addSource(selectedDateValidationLiveData, input -> null == input || input.isWarning());
+        validLiveData = new IsValid();
         alertEntityLiveData = new MutableLiveData<>();
         initializationFailureLiveData = new MutableLiveData<>();
-    }
-
-    public AlertEntity getAlertEntity() {
-        return alertEntity;
-    }
-
-    public CourseEntity getCourseEntity() {
-        return courseEntity;
-    }
-
-    public AssessmentEntity getAssessmentEntity() {
-        return assessmentEntity;
-    }
-
-    public int getType() {
-        return type;
     }
 
     public AlertDateOption getDateSpecOption() {
@@ -151,48 +145,64 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private synchronized void calculateAlertDate() {
+        Log.d(LOG_TAG, "Enter calculateAlertDate");
         if (dateSpecOption == AlertDateOption.EXPLICIT) {
-//            alertDateLiveData.postValue(selectedDate);
             if (null == selectedDate) {
-                selectedDateValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(R.string.message_required));
+                Log.d(LOG_TAG, "calculateAlertDate: Posting message_required to selectedDateValidationLiveData");
+                validLiveData.postSelectedDateMessage(R.string.message_required);
+                Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
                 calculatedDateLiveData.postValue(null);
             } else {
+                Log.d(LOG_TAG, "calculateAlertDate: Posting " + DATE_FORMATTER.format(selectedDate) + " to calculatedDateLiveData");
                 calculatedDateLiveData.postValue(DATE_FORMATTER.format(selectedDate));
-                selectedDateValidationLiveData.postValue(null);
+                Log.d(LOG_TAG, "calculateAlertDate: Posting null to selectedDateValidationLiveData");
+                validLiveData.clearSelectedDateMessage();
             }
-            daysValidationLiveData.postValue(null);
+            Log.d(LOG_TAG, "calculateAlertDate: Posting null to daysValidationLiveData");
+            validLiveData.clearDaysMessage();
         } else {
             if (null == daysValue) {
-//                alertDateLiveData.postValue(null);
+                Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
                 calculatedDateLiveData.postValue(null);
-                daysValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError((daysText.isEmpty()) ? R.string.message_required : R.string.message_invalid_number));
+                calculatedDate = null;
+                Log.d(LOG_TAG, "calculateAlertDate: Posting " + ((daysText.isEmpty()) ? "message_required" : "message_invalid_number") + " to daysValidationLiveData");
+                validLiveData.postSelectedDateMessage((daysText.isEmpty()) ? R.string.message_required : R.string.message_invalid_number);
             } else if (daysValue < AlertEntity.MIN_VALUE_RELATIVE_DAYS || daysValue > AlertEntity.MAX_VALUE_RELATIVE_DAYS) {
-                daysValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(R.string.message_relative_days_out_of_range));
+                Log.d(LOG_TAG, "calculateAlertDate: Posting null to message_relative_days_out_of_range");
+                validLiveData.postDaysMessage(R.string.message_relative_days_out_of_range);
+                Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
                 calculatedDateLiveData.postValue(null);
+                calculatedDate = null;
             } else {
                 LocalDate date = (dateSpecOption.isStart()) ? eventStart : eventEnd;
                 if (null != date) {
-                    date = (dateSpecOption.isBefore()) ? date.minusDays(daysValue) : date.plusDays(daysValue);
-//                    alertDateLiveData.postValue(date);
+                    calculatedDate = (dateSpecOption.isBefore()) ? date.minusDays(daysValue) : date.plusDays(daysValue);
+                    Log.d(LOG_TAG, "calculateAlertDate: Posting " + DATE_FORMATTER.format(date) + " to calculatedDateLiveData");
                     calculatedDateLiveData.postValue(DATE_FORMATTER.format(date));
-                    daysValidationLiveData.postValue(null);
+                    Log.d(LOG_TAG, "calculateAlertDate: Posting null to daysValidationLiveData");
+                    validLiveData.clearDaysMessage();
                 } else {
-//                    alertDateLiveData.postValue(null);
+                    calculatedDate = null;
+                    Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
                     calculatedDateLiveData.postValue(null);
                     if (type == TYPE_VALUE_COURSE) {
-                        daysValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofWarning((dateSpecOption.isStart()) ? R.string.message_course_has_no_start_date : R.string.message_course_has_no_end_date));
+                        Log.d(LOG_TAG, "calculateAlertDate: Posting " + ((dateSpecOption.isStart()) ? "message_course_has_no_start_date" : "message_course_has_no_end_date") + " to daysValidationLiveData");
+                        validLiveData.postDaysMessage((dateSpecOption.isStart()) ? R.string.message_course_has_no_start_date : R.string.message_course_has_no_end_date);
                     } else {
-                        daysValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofWarning((dateSpecOption.isStart()) ? R.string.message_assessment_has_no_goal_date : R.string.message_assessment_has_no_completion_date));
+                        Log.d(LOG_TAG, "calculateAlertDate: Posting " + ((dateSpecOption.isStart()) ? "message_assessment_has_no_goal_date" : "message_assessment_has_no_completion_date") + " to daysValidationLiveData");
+                        validLiveData.postDaysMessage((dateSpecOption.isStart()) ? R.string.message_assessment_has_no_goal_date : R.string.message_assessment_has_no_completion_date);
                     }
                 }
             }
-            selectedDateValidationLiveData.postValue(null);
+            Log.d(LOG_TAG, "calculateAlertDate: Posting null to selectedDateValidationLiveData");
+            validLiveData.clearSelectedDateMessage();
         }
     }
 
     public synchronized void setDateSpecOption(AlertDateOption dateSpecOption) {
         AlertDateOption newValue = (null == dateSpecOption) ? AlertDateOption.EXPLICIT : dateSpecOption;
         if (this.dateSpecOption != newValue) {
+            Log.d(LOG_TAG, "setDateSpecOption: Changing from " + this.dateSpecOption.name() + " to " + newValue.name());
             if (newValue == AlertDateOption.BEFORE_END_DATE && !beforeEndEnabled) {
                 throw new IllegalStateException();
             }
@@ -200,8 +210,9 @@ public class EditAlertViewModel extends AndroidViewModel {
             this.dateSpecOption = newValue;
             if (oldValue == AlertDateOption.EXPLICIT) {
                 parseDaysText();
+            } else {
+                calculateAlertDate();
             }
-            calculateAlertDate();
         }
     }
 
@@ -209,14 +220,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         return beforeEndEnabled;
     }
 
-    public LocalDate getEventStart() {
-        return eventStart;
-    }
-
-    public LocalDate getEventEnd() {
-        return eventEnd;
-    }
-
+    @NonNull
     public String getMessage() {
         return message;
     }
@@ -225,16 +229,16 @@ public class EditAlertViewModel extends AndroidViewModel {
         this.message = AbstractEntity.SINGLE_LINE_NORMALIZER.apply(message);
     }
 
-    public Integer getDaysValue() {
-        return daysValue;
-    }
-
+    @NonNull
     public String getDaysText() {
         return daysText;
     }
 
+    public LocalDate getCalculatedDate() {
+        return calculatedDate;
+    }
+
     private void parseDaysText() {
-        Integer oldValue = daysValue;
         if (this.daysText.isEmpty()) {
             daysValue = null;
         } else {
@@ -251,6 +255,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         String olValue = this.daysText;
         this.daysText = AbstractEntity.SINGLE_LINE_NORMALIZER.apply(daysText);
         if (dateSpecOption != AlertDateOption.EXPLICIT && !this.daysText.equals(olValue)) {
+            Log.d(LOG_TAG, "setDaysText: Changing from \"" + olValue + "\" to \"" + this.daysText + "\"");
             parseDaysText();
         }
     }
@@ -260,26 +265,28 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     public synchronized void setSelectedDate(LocalDate selectedDate) {
-        this.selectedDate = selectedDate;
-        if (dateSpecOption != AlertDateOption.EXPLICIT) {
+        if (Objects.equals(this.selectedDate, selectedDate)) {
             return;
         }
+        if (dateSpecOption == AlertDateOption.EXPLICIT) {
+            this.selectedDate = selectedDate;
+            return;
+        }
+        Log.d(LOG_TAG, "setDateSpecOption: Changing from " + this.selectedDate + " to " + selectedDate);
+        this.selectedDate = selectedDate;
         if (null == selectedDate) {
-            selectedDateValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(R.string.message_required));
+            Log.d(LOG_TAG, "setSelectedDate: Posting message_required to selectedDateValidationLiveData");
+            validLiveData.postSelectedDateMessage(R.string.message_required);
+            Log.d(LOG_TAG, "setSelectedDate: Posting null to calculatedDateLiveData");
             calculatedDateLiveData.postValue(null);
         } else {
+            Log.d(LOG_TAG, "setSelectedDate: Posting " + DATE_FORMATTER.format(selectedDate) + " to calculatedDateLiveData");
             calculatedDateLiveData.postValue(DATE_FORMATTER.format(selectedDate));
-            selectedDateValidationLiveData.postValue(null);
+            Log.d(LOG_TAG, "setSelectedDate: Posting null to selectedDateValidationLiveData");
+            validLiveData.clearSelectedDateMessage();
         }
-        daysValidationLiveData.postValue(null);
-    }
-
-    public String getCode() {
-        return (type == TYPE_VALUE_COURSE) ? courseEntity.getNumber() : assessmentEntity.getCode();
-    }
-
-    public String getTitle() {
-        return (type == TYPE_VALUE_COURSE) ? courseEntity.getTitle() : assessmentEntity.getName();
+        Log.d(LOG_TAG, "setSelectedDate: Posting null to daysValidationLiveData");
+        validLiveData.clearDaysMessage();
     }
 
     public LiveData<AlertEntity> getAlertEntityLiveData() {
@@ -295,18 +302,18 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     public LiveData<ValidationMessage.ResourceMessageFactory> getDaysValidationLiveData() {
-        return daysValidationLiveData;
+        return validLiveData.daysValidationLiveData;
     }
 
     public LiveData<ValidationMessage.ResourceMessageFactory> getSelectedDateValidationLiveData() {
-        return selectedDateValidationLiveData;
+        return validLiveData.selectedDateValidationLiveData;
     }
 
     public LiveData<String> getEventDateLiveData() {
         return eventDateLiveData;
     }
 
-    public BooleanAndLiveData getValidLiveData() {
+    public LiveData<Boolean> getValidLiveData() {
         return validLiveData;
     }
 
@@ -399,8 +406,9 @@ public class EditAlertViewModel extends AndroidViewModel {
         alertEntityLiveData.postValue(alertEntity);
     }
 
-    private void onCourseAlertLoaded(CourseAlertDetails courseAlertDetails) {
+    private synchronized void onCourseAlertLoaded(CourseAlertDetails courseAlertDetails) {
         courseEntity = courseAlertDetails.getCourse();
+        assessmentEntity = null;
         alertEntity = courseAlertDetails.getAlert();
         initializeCourseAlert();
     }
@@ -410,9 +418,10 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private void onAssessmentAlertLoaded(AssessmentAlertDetails assessmentAlertDetails) {
+    private synchronized void onAssessmentAlertLoaded(AssessmentAlertDetails assessmentAlertDetails) {
         assessmentEntity = assessmentAlertDetails.getAssessment();
         alertEntity = assessmentAlertDetails.getAlert();
+        courseEntity = null;
         initializeAssessmentAlert();
     }
 
@@ -492,4 +501,70 @@ public class EditAlertViewModel extends AndroidViewModel {
         alertEntityLiveData.postValue(alertEntity);
     }
 
+    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
+        AlertEntity entity = new AlertEntity(alertEntity);
+        if (dateSpecOption.isExplicit()) {
+            entity.setSubsequent(null);
+            if (null == selectedDate) {
+                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_date_required));
+            }
+            entity.setTimeSpec(selectedDate.toEpochDay());
+        } else {
+            entity.setSubsequent(dateSpecOption.isEnd());
+            if (null == daysValue) {
+                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_days_required));
+            }
+            entity.setTimeSpec(daysValue);
+        }
+        entity.setCustomMessage((message.isEmpty()) ? null : message);
+        if (null == assessmentEntity) {
+            CourseAlert courseAlert = new CourseAlert(new CourseAlertLink(alertEntity.getId(), courseEntity.getId()), entity);
+            return dbLoader.saveCourseAlert(courseAlert, ignoreWarnings);
+        }
+        AssessmentAlert assessmentAlert = new AssessmentAlert(new AssessmentAlertLink(alertEntity.getId(), courseEntity.getId()), entity);
+        return dbLoader.saveAssessmentAlert(assessmentAlert, ignoreWarnings);
+    }
+
+    public synchronized Completable delete() {
+        if (null == assessmentEntity) {
+            CourseAlert courseAlert = new CourseAlert(new CourseAlertLink(alertEntity.getId(), courseEntity.getId()), new AlertEntity(alertEntity));
+            return dbLoader.deleteCourseAlert(courseAlert);
+        }
+        AssessmentAlert assessmentAlert = new AssessmentAlert(new AssessmentAlertLink(alertEntity.getId(), courseEntity.getId()), new AlertEntity(alertEntity));
+        return dbLoader.deleteAssessmentAlert(assessmentAlert);
+    }
+
+    private static class IsValid extends LiveData<Boolean> {
+
+        private final MutableLiveData<ValidationMessage.ResourceMessageFactory> daysValidationLiveData;
+        private final MutableLiveData<ValidationMessage.ResourceMessageFactory> selectedDateValidationLiveData;
+
+        private IsValid() {
+            super(true);
+            daysValidationLiveData = new MutableLiveData<>();
+            selectedDateValidationLiveData = new MutableLiveData<>();
+        }
+
+        void clearSelectedDateMessage() {
+            selectedDateValidationLiveData.postValue(null);
+            ValidationMessage.ResourceMessageFactory m = daysValidationLiveData.getValue();
+            postValue(null == m || m.isWarning());
+        }
+
+        void postSelectedDateMessage(@StringRes int id) {
+            selectedDateValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(id));
+            postValue(false);
+        }
+
+        void clearDaysMessage() {
+            daysValidationLiveData.postValue(null);
+            ValidationMessage.ResourceMessageFactory m = selectedDateValidationLiveData.getValue();
+            postValue(null == m || m.isWarning());
+        }
+
+        public void postDaysMessage(@StringRes int id) {
+            daysValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(id));
+            postValue(false);
+        }
+    }
 }

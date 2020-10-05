@@ -36,6 +36,7 @@ public class EditMentorActivity extends AppCompatActivity {
     private EditText notesEditText;
     private ImageButton saveMentorImageButton;
     private ImageButton deleteMentorImageButton;
+    private AlertDialog waitDialog;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,6 +65,8 @@ public class EditMentorActivity extends AppCompatActivity {
         deleteMentorImageButton = findViewById(R.id.deleteMentorImageButton);
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
         compositeDisposable.clear();
+        waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
+        waitDialog.show();
         compositeDisposable.add(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onLoadSuccess, this::onLoadFailed));
     }
 
@@ -92,8 +95,9 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onLoadSuccess(MentorEntity entity) {
+        waitDialog.dismiss();
         if (null == entity) {
-            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_mentor_not_found, this).showDialog(this::finish);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_mentor_not_found : R.string.message_mentor_not_found, this).showDialog(this::finish);
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
@@ -136,6 +140,7 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onLoadFailed(Throwable throwable) {
         Log.e(LOG_TAG, "Error loading mentor", throwable);
+        waitDialog.dismiss();
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
 

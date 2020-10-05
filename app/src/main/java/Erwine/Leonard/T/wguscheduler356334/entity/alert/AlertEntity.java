@@ -46,6 +46,14 @@ public class AlertEntity extends AbstractEntity<AlertEntity> implements Alert {
         this(ID_NEW, 0, false, null);
     }
 
+    @Ignore
+    public AlertEntity(AlertEntity alertEntity) {
+        super(alertEntity.getId());
+        this.timeSpec = alertEntity.timeSpec;
+        this.subsequent = alertEntity.subsequent;
+        this.customMessage = alertEntity.customMessage;
+    }
+
     @Override
     public long getTimeSpec() {
         return timeSpec;

@@ -15,10 +15,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -38,10 +36,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
-import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -57,23 +52,20 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private AssessmentDetails assessmentEntity;
     private final MutableLiveData<AssessmentDetails> entityLiveData;
     private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final LiveData<List<TermListItem>> termsLiveData;
     private final MutableLiveData<Boolean> courseValidLiveData;
     private final MutableLiveData<Boolean> codeValidLiveData;
     private final CurrentValues currentValues;
-    private final ArrayList<AssessmentEntity> assessmentsForCourse;
-    private final ArrayList<TermCourseListItem> coursesForTerm;
     private final MutableLiveData<LocalDate> effectiveStartLiveData;
     private final MutableLiveData<LocalDate> effectiveEndLiveData;
-    private LiveData<List<TermCourseListItem>> coursesLiveData;
-    private LiveData<List<AssessmentEntity>> assessmentsLiveData;
+    private LiveData<List<AssessmentEntity>> assessmentsForCourse;
+    private LiveData<List<TermCourseListItem>> coursesForTerm;
     private AbstractCourseEntity<?> selectedCourse;
-    private AbstractTermEntity<?> selectedTerm;
     private boolean fromInitializedState;
-    private String normalizedName;
+    @NonNull
+    private String normalizedName = "";
+    @NonNull
     private String normalizedCode = "";
     private String normalizedNotes = "";
-    private Observer<List<TermListItem>> termsLoadedObserver;
     private Observer<List<TermCourseListItem>> coursesLoadedObserver;
     private Observer<List<AssessmentEntity>> assessmentsLoadedObserver;
 
@@ -96,34 +88,31 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
-        termsLiveData = dbLoader.getAllTerms();
         currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
         courseValidLiveData = new MutableLiveData<>(false);
         codeValidLiveData = new MutableLiveData<>(false);
         effectiveStartLiveData = new MutableLiveData<>();
         effectiveEndLiveData = new MutableLiveData<>();
-        assessmentsForCourse = new ArrayList<>();
-        coursesForTerm = new ArrayList<>();
     }
 
+    @NonNull
     public LiveData<AssessmentDetails> getEntityLiveData() {
         return entityLiveData;
     }
 
+    @NonNull
     public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
         return titleFactoryLiveData;
     }
 
-    public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
-        return coursesLiveData;
-    }
-
-    public MutableLiveData<LocalDate> getEffectiveStartLiveData() {
+    @NonNull
+    public LiveData<LocalDate> getEffectiveStartLiveData() {
         return effectiveStartLiveData;
     }
 
-    public MutableLiveData<LocalDate> getEffectiveEndLiveData() {
+    @NonNull
+    public LiveData<LocalDate> getEffectiveEndLiveData() {
         return effectiveEndLiveData;
     }
 
@@ -131,51 +120,21 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return currentValues.getId();
     }
 
-    public AbstractTermEntity<?> getSelectedTerm() {
-        return selectedTerm;
-    }
-
     public AbstractCourseEntity<?> getSelectedCourse() {
         return selectedCourse;
     }
 
     public synchronized void setSelectedCourse(AbstractCourseEntity<?> selectedCourse) {
+        Log.d(LOG_TAG, "Enter setSelectedCourse(" + selectedCourse + ")");
         AbstractCourseEntity<?> oldCourse = this.selectedCourse;
         if (!Objects.equals(oldCourse, selectedCourse)) {
             this.selectedCourse = selectedCourse;
-            assessmentsForCourse.clear();
-            if (null != assessmentsLiveData) {
-                assessmentsLiveData.removeObserver(assessmentsLoadedObserver);
-                assessmentsLiveData = null;
-            }
-            long id;
-            if (null == selectedCourse || ID_NEW == (id = selectedCourse.getTermId())) {
-                coursesForTerm.clear();
-                if (null != coursesLiveData) {
-                    coursesLiveData.removeObserver(coursesLoadedObserver);
-                    coursesLiveData = null;
-                }
+            long id = selectedCourse.getId();
+            currentValues.courseId = id;
+            if (ID_NEW != id) {
+                courseValidLiveData.postValue(true);
             } else {
-                if (null == oldCourse || oldCourse.getTermId() != id) {
-                    coursesForTerm.clear();
-                    if (null != coursesLiveData) {
-                        coursesLiveData.removeObserver(coursesLoadedObserver);
-                        coursesLiveData = null;
-                    }
-                    coursesLiveData = dbLoader.getCoursesByTermId(id);
-                    coursesLoadedObserver = this::onTermCoursesLoaded;
-                    coursesLiveData.observeForever(coursesLoadedObserver);
-                }
-                id = selectedCourse.getId();
-                currentValues.courseId = id;
-                if (ID_NEW != id) {
-                    assessmentsLiveData = dbLoader.getAssessmentsByCourseId(id);
-                    assessmentsLoadedObserver = this::onAllAssessmentsLoaded;
-                    assessmentsLiveData.observeForever(assessmentsLoadedObserver);
-                    courseValidLiveData.postValue(true);
-                } else {
-                    courseValidLiveData.postValue(false);
-                }
+                courseValidLiveData.postValue(false);
             }
         }
     }
@@ -254,47 +213,13 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return normalizedNotes;
     }
 
-    private synchronized void onTermsLoaded(List<TermListItem> termListItems) {
-        if (null == termListItems) {
-            return;
-        }
-        termsLiveData.removeObserver(termsLoadedObserver);
-        if (null != selectedCourse) {
-            long termId = selectedCourse.getTermId();
-            if (ID_NEW == termId) {
-                selectedTerm = null;
-            } else {
-                selectedTerm = EntityHelper.findById(termId, termListItems).orElse(null);
-            }
-        }
-    }
-
-    private synchronized void onAllAssessmentsLoaded(List<AssessmentEntity> assessmentEntities) {
-        if (null != assessmentEntities) {
-            assessmentsLiveData.removeObserver(assessmentsLoadedObserver);
-            assessmentsLiveData = null;
-            assessmentsForCourse.clear();
-            assessmentsForCourse.addAll(assessmentEntities);
-        }
-    }
-
-    private synchronized void onTermCoursesLoaded(List<TermCourseListItem> termCourseListItems) {
-        if (null != termCourseListItems) {
-            coursesLiveData.removeObserver(coursesLoadedObserver);
-            coursesLiveData = null;
-            coursesForTerm.clear();
-            coursesForTerm.addAll(termCourseListItems);
-            EntityHelper.findById(assessmentEntity.getCourseId(), termCourseListItems).ifPresent(t -> {
-                assessmentEntity.setCourse(t);
-                this.selectedCourse = t;
-            });
-            termsLoadedObserver = this::onTermsLoaded;
-            termsLiveData.observeForever(termsLoadedObserver);
-        }
-    }
-
     public boolean isFromInitializedState() {
         return fromInitializedState;
+    }
+
+    @NonNull
+    public Single<List<TermCourseListItem>> loadCourses() {
+        return dbLoader.loadCoursesByTermId(assessmentEntity.getCourse().getTermId());
     }
 
     public synchronized Single<AssessmentDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
@@ -376,16 +301,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             return !getNormalizedNotes().equals(assessmentEntity.getNotes());
         }
         return true;
-    }
-
-    public AbstractCourseEntity<?> initializeCourseProperty(List<TermCourseListItem> courseListItems) {
-        if (null == courseListItems || null == assessmentEntity) {
-            return null;
-        }
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeTermProperty");
-        Optional<TermCourseListItem> result = EntityHelper.findById(assessmentEntity.getCourseId(), courseListItems);
-        result.ifPresent(t -> assessmentEntity.setCourse(t));
-        return result.orElse(null);
     }
 
     private class CurrentValues implements Assessment {

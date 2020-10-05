@@ -55,7 +55,10 @@ public interface AssessmentDAO {
     AssessmentDetails getByIdSynchronous(long id);
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
-    LiveData<List<AssessmentEntity>> getByCourseId(long courseId);
+    LiveData<List<AssessmentEntity>> getLiveDataByCourseId(long courseId);
+
+    @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
+    Single<List<AssessmentEntity>> loadByCourseId(long courseId);
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId")
     List<AssessmentEntity> getByCourseIdSynchronous(long courseId);

@@ -24,6 +24,7 @@ public class AddTermActivity extends AppCompatActivity {
 
     private final CompositeDisposable compositeDisposable;
     private EditTermViewModel viewModel;
+    private AlertDialog waitDialog;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -48,18 +49,23 @@ public class AddTermActivity extends AppCompatActivity {
         findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
         compositeDisposable.clear();
+        waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
+        waitDialog.show();
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
     }
 
-    private void onTermLoadSuccess(TermEntity termEntity) {
-        if (null == termEntity) {
-            return;
+    private void onTermLoadSuccess(TermEntity entity) {
+        waitDialog.dismiss();
+        if (null != entity) {
+            Log.d(LOG_TAG, String.format("Loaded %s", entity));
+        } else {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_not_restored, this).showDialog(this::finish);
         }
-        Log.d(LOG_TAG, String.format("Loaded %s", termEntity));
     }
 
     private void onTermLoadFailed(Throwable throwable) {
         Log.e(LOG_TAG, "Error loading term", throwable);
+        waitDialog.dismiss();
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 

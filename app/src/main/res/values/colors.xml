@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="color_primary">#1B5E20</color>
+    <color name="color_primary_light">#6deb77</color>
     <color name="color_primary_variant">#1C5761</color>
-    <color name="color_primary_dark">#004D40</color>
+    <color name="color_primary_dark">#032f07</color>
     <color name="color_on_primary">#FFFFFF</color>
     <color name="color_accent">#6C2F00</color>
-    <color name="color_accent_disabled">#4E3F33</color>
+    <color name="color_accent_dark">#361700</color>
+    <color name="color_accent_light">#ed883b</color>
+    <color name="color_on_accent">#FFFFFF</color>
+    <color name="color_on_accent_light">#9dd3fc</color>
+    <color name="color_on_accent_dark">#0e4772</color>
+    <color name="color_accent_disabled">#e4d4c8</color>
+    <color name="color_on_accent_disabled">#abcbe4</color>
     <color name="color_control_normal">#FFF176</color>
     <color name="color_button_normal">#E4B48F</color>
     <color name="color_secondary">#4B9150</color>
@@ -13,9 +20,6 @@
     <color name="color_on_secondary">#FFF176</color>
     <color name="color_error">#B71C1C</color>
     <color name="color_on_error">#FFFFFF</color>
-
     <color name="color_error_light">#E10B0B</color>
-    <color name="color_accent_inverse">#FFFFFF</color>
-    <color name="color_primary_inverse">#FFF176</color>
     <color name="color_error_accent">#A63E0E</color>
 </resources>

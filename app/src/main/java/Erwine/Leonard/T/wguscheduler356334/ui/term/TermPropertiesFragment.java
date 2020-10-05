@@ -75,7 +75,7 @@ public class TermPropertiesFragment extends Fragment {
         }
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
 
-        if (viewModel.isFromSavedState()) {
+        if (viewModel.isFromInitializedState()) {
             termNameEditText.setText(viewModel.getName());
             LocalDate date = viewModel.getStart();
             if (null != date) {

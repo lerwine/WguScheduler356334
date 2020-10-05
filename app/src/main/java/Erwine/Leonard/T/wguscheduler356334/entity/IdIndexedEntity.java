@@ -15,7 +15,7 @@ public interface IdIndexedEntity extends ToStringBuildable {
      */
     String COLNAME_ID = "id";
 
-    long ID_NEW = Long.MIN_VALUE;
+    long ID_NEW = 0L;
 
     /**
      * Gets the value of the primary key for the database row represented by this {@code IdIndexedEntity}.

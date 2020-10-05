@@ -35,7 +35,7 @@ public final class AssessmentListViewModel extends AndroidViewModel {
 
     public void setId(long id) {
         courseId = id;
-        assessments = dbLoader.getAssessmentsByCourseId(courseId);
+        assessments = dbLoader.getAssessmentsLiveDataByCourseId(courseId);
     }
 
 }

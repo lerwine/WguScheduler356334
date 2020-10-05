@@ -42,9 +42,9 @@ public class ViewAssessmentPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return context.getResources().getString(R.string.title_activity_edit);
-            case 1:
                 return context.getResources().getString(R.string.title_alerts);
+            case 1:
+                return context.getResources().getString(R.string.title_activity_edit);
             default:
                 throw new IllegalStateException(String.format("Unexpected title position %d", position));
         }

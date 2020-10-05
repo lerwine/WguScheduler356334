@@ -94,7 +94,7 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             if (null == date) {
                 dateTextView.setText(R.string.label_none);
             } else {
-                dateTextView.setText(AssessmentListViewModel.FORMATTER.format(item.getCompletionDate()));
+                dateTextView.setText(AssessmentListViewModel.FORMATTER.format(date));
             }
         }
     }

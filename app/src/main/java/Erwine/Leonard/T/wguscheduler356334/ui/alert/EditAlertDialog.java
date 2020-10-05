@@ -1,7 +1,10 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +28,18 @@ import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditAlertDialog extends DialogFragment {
 
+    private static final String LOG_TAG = EditAlertDialog.class.getName();
+    private final CompositeDisposable compositeDisposable;
     private EditAlertViewModel viewModel;
-    private TextView typeTextView;
-    private TextView codeTextView;
-    private TextView titleTextView;
     private TextView eventDateTextView;
     private EditText daysEditText;
     private TextView specificDateTextView;
@@ -50,6 +54,11 @@ public class EditAlertDialog extends DialogFragment {
     private ImageButton deleteImageButton;
     private ImageButton cancelImageButton;
 
+    public EditAlertDialog() {
+        Log.d(LOG_TAG, "Constructing EditAlertDialog");
+        compositeDisposable = new CompositeDisposable();
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_edit_alert, container, false);
@@ -59,9 +68,6 @@ public class EditAlertDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        typeTextView = view.findViewById(R.id.typeTextView);
-        codeTextView = view.findViewById(R.id.codeTextView);
-        titleTextView = view.findViewById(R.id.titleTextView);
         eventDateTextView = view.findViewById(R.id.eventDateTextView);
         specificDateTextView = view.findViewById(R.id.specificDateTextView);
         specificDateRadioButton = view.findViewById(R.id.specificDateRadioButton);
@@ -93,10 +99,9 @@ public class EditAlertDialog extends DialogFragment {
             deleteImageButton.setEnabled(false);
             deleteImageButton.setVisibility(View.GONE);
         }
-        typeTextView.setText(viewModel.getType());
-        codeTextView.setText(viewModel.getCode());
-        titleTextView.setText(viewModel.getTitle());
         daysEditText.setText(viewModel.getDaysText());
+        startDateRadioButton.setText(viewModel.getStartLabelTextResourceId());
+        endDateRadioButton.setText(viewModel.getEndLabelTextResourceId());
         AlertDateOption option = viewModel.getDateSpecOption();
         specificDateRadioButton.setChecked(option.isExplicit());
         daysBeforeRadioButton.setChecked(option.isBefore());
@@ -141,7 +146,11 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSpecificDateTextViewClick(View view) {
-        // TODO: Show date selection popup
+        LocalDate date = viewModel.getSelectedDate();
+        if (null == date && (null == (date = viewModel.getCalculatedDate()))) {
+            date = LocalDate.now();
+        }
+        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> viewModel.setSelectedDate(LocalDate.of(y, m + 1, d)), date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     private void onEventDateChanged(String text) {
@@ -182,11 +191,16 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertFragment.onSaveButtonClick
+        compositeDisposable.clear();
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
 
     private void onDeleteButtonClick(View view) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertFragment.onDeleteButtonClick
+        Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(viewModel.delete().subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
+        }, null);
     }
 
     private void onCancelButtonClick(View view) {
@@ -221,7 +235,12 @@ public class EditAlertDialog extends DialogFragment {
                 daysEditText.setEnabled(true);
                 viewModel.setDateSpecOption(AlertDateOption.BEFORE_START_DATE);
             } else {
+                if (endDateRadioButton.isChecked() && !viewModel.isBeforeEndEnabled()) {
+                    endDateRadioButton.setChecked(false);
+                    startDateRadioButton.setChecked(true);
+                }
                 viewModel.setDateSpecOption((startDateRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.BEFORE_END_DATE);
+                daysAfterRadioButton.setChecked(false);
             }
             endDateRadioButton.setEnabled(viewModel.isBeforeEndEnabled());
         }
@@ -238,6 +257,7 @@ public class EditAlertDialog extends DialogFragment {
                 viewModel.setDateSpecOption(AlertDateOption.BEFORE_START_DATE);
             } else {
                 viewModel.setDateSpecOption((daysBeforeRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.AFTER_START_DATE);
+                endDateRadioButton.setChecked(false);
             }
             endDateRadioButton.setEnabled(true);
         }
@@ -255,6 +275,7 @@ public class EditAlertDialog extends DialogFragment {
                 viewModel.setDateSpecOption(AlertDateOption.AFTER_END_DATE);
             } else {
                 viewModel.setDateSpecOption((endDateRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.AFTER_START_DATE);
+                daysBeforeRadioButton.setChecked(false);
             }
         }
     }
@@ -270,6 +291,7 @@ public class EditAlertDialog extends DialogFragment {
                 viewModel.setDateSpecOption(AlertDateOption.AFTER_END_DATE);
             } else {
                 viewModel.setDateSpecOption((daysAfterRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.BEFORE_END_DATE);
+                startDateRadioButton.setChecked(false);
             }
         }
     }
@@ -289,7 +311,47 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onValidChanged(Boolean isValid) {
+        Log.d(LOG_TAG, "Valid changed to " + isValid);
         saveImageButton.setEnabled(null != isValid && isValid);
+    }
+
+    private void onSaveOperationFinished(ValidationMessage.ResourceMessageResult messages) {
+        Log.d(LOG_TAG, "Enter onSaveOperationFinished");
+        if (messages.isSucceeded()) {
+            requireActivity().finish();
+        } else {
+            Resources resources = getResources();
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            dialog.dismiss();
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            androidx.appcompat.app.AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
+        }
+    }
+
+    private void onSaveFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error saving assessment", throwable);
+        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
+                .showDialog(() -> requireActivity().finish());
+    }
+
+    private void onDeleteSucceeded() {
+        Log.d(LOG_TAG, "Enter onDeleteSucceeded");
+        dismiss();
+    }
+
+    private void onDeleteFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error deleting assessment", throwable);
+        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), requireContext()).showDialog();
     }
 
 }

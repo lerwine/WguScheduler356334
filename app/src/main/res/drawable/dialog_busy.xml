@@ -5,7 +5,7 @@
     android:viewportHeight="24">
     <path
         android:fillColor="@color/color_secondary_variant"
-        android:strokeColor="@color/color_primary_variant"
+        android:strokeColor="@color/color_accent_disabled"
         android:strokeWidth="0.5"
-        android:pathData="M12.5,8c-2.65,0 -5.05,0.99 -6.9,2.6L2,7v9h9l-3.62,-3.62c1.39,-1.16 3.16,-1.88 5.12,-1.88 3.54,0 6.55,2.31 7.6,5.5l2.37,-0.78C21.08,11.03 17.15,8 12.5,8z" />
+        android:pathData="M6,2v6h0.01L6,8.01 10,12l-4,4 0.01,0.01L6,16.01L6,22h12v-5.99h-0.01L18,16l-4,-4 4,-3.99 -0.01,-0.01L18,8L18,2L6,2zM16,16.5L16,20L8,20v-3.5l4,-4 4,4zM12,11.5l-4,-4L8,4h8v3.5l-4,4z" />
 </vector>

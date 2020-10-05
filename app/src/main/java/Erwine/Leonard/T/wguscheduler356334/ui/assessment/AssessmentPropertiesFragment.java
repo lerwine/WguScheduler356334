@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -22,14 +23,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
@@ -85,15 +84,6 @@ public class AssessmentPropertiesFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onEntityLoaded);
-        viewModel.getCoursesLiveData().observe(viewLifecycleOwner, this::onCoursesLoaded);
-    }
-
-    private void onCoursesLoaded(List<TermCourseListItem> courseListItems) {
-        Log.d(LOG_TAG, String.format("Loaded %d courses", courseListItems.size()));
-        AbstractCourseEntity<?> course = viewModel.initializeCourseProperty(courseListItems);
-        if (null != course) {
-            onCourseChanged(course);
-        }
     }
 
     private void onEntityLoaded(AssessmentDetails assessmentDetails) {
@@ -103,7 +93,7 @@ public class AssessmentPropertiesFragment extends Fragment {
         Log.d(LOG_TAG, String.format("Enter onEntityLoaded(%s)", assessmentDetails));
         codeEditText.setText(viewModel.getCode());
         notesEditText.setText(viewModel.getNotes());
-        viewModel.initializeCourseProperty(viewModel.getCoursesLiveData().getValue());
+        viewModel.setSelectedCourse(assessmentDetails.getCourse());
         onCourseChanged(viewModel.getSelectedCourse());
         onTypeChanged();
         onStatusChanged();
@@ -115,15 +105,21 @@ public class AssessmentPropertiesFragment extends Fragment {
 
     private void onCourseButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onCourseButtonClick");
-        List<TermCourseListItem> courseListItems = viewModel.getCoursesLiveData().getValue();
-        if (null != courseListItems) {
-            AlertHelper.showSingleSelectDialog(R.string.title_select_course, viewModel.getSelectedCourse(), courseListItems, requireContext(), AbstractCourseEntity::getTitle, t -> {
-                viewModel.setSelectedCourse(t);
-                onCourseChanged(t);
-            });
-        } else {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_db_read_operation_in_progress, requireContext()).showDialog();
-        }
+        compositeDisposable.clear();
+        compositeDisposable.add(viewModel.loadCourses().subscribe(termCourseListItems ->
+                AlertHelper.showSingleSelectDialog(R.string.title_select_course, viewModel.getSelectedCourse(), termCourseListItems, requireContext(),
+                        AbstractCourseEntity::getTitle, t -> {
+                            viewModel.setSelectedCourse(t);
+                            onCourseChanged(t);
+                        }), throwable -> {
+            AlertDialog dlg = new AlertDialog.Builder(requireActivity())
+                    .setTitle(R.string.title_read_error)
+                    .setMessage(getString(R.string.format_message_save_error, throwable.getMessage()))
+                    .setIcon(R.drawable.dialog_error)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                    .create();
+            dlg.show();
+        }));
     }
 
     private void onTypeButtonClick(View view) {

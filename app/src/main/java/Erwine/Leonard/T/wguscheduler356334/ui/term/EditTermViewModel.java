@@ -62,7 +62,7 @@ public class EditTermViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
     private final CurrentValues currentValues;
-    private boolean fromSavedState;
+    private boolean fromInitializedState;
     private String normalizedName;
     private String normalizedNotes;
 
@@ -140,20 +140,20 @@ public class EditTermViewModel extends AndroidViewModel {
         return titleFactoryLiveData;
     }
 
-    public boolean isFromSavedState() {
-        return fromSavedState;
+    public boolean isFromInitializedState() {
+        return fromInitializedState;
     }
 
     public synchronized Single<TermEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
-        fromSavedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
-        Bundle state = (fromSavedState) ? savedInstanceState : getArguments.get();
+        fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
+        Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         termEntity = new TermEntity();
         if (null != state) {
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
-            if (ID_NEW == id || fromSavedState) {
-                termEntity.restoreState(state, fromSavedState);
+            if (ID_NEW == id || fromInitializedState) {
+                termEntity.restoreState(state, fromInitializedState);
             } else {
                 return dbLoader.getTermById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)

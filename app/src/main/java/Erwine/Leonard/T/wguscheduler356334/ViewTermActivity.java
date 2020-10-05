@@ -32,6 +32,7 @@ public class ViewTermActivity extends AppCompatActivity {
     @SuppressWarnings("FieldCanBeLocal")
     private ViewTermPagerAdapter adapter;
     private EditTermViewModel viewModel;
+    private AlertDialog waitDialog;
 
     public ViewTermActivity() {
         compositeDisposable = new CompositeDisposable();
@@ -47,14 +48,22 @@ public class ViewTermActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+
+        waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
+        waitDialog.show();
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoaded, this::onEntityLoadFailed));
     }
 
-    private void onEntityLoaded(TermEntity termEntity) {
-        long termId = termEntity.getId();
+    private void onEntityLoaded(TermEntity entity) {
+        waitDialog.dismiss();
+        if (null == entity) {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_term_not_found : R.string.message_term_not_restored, this).showDialog(this::finish);
+            return;
+        }
+        long termId = entity.getId();
         if (ID_NEW == termId) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_id_not_specified, this).showDialog(this::finish);
         } else {
@@ -67,6 +76,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
+        waitDialog.dismiss();
         Log.e(LOG_TAG, "Error loading term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
