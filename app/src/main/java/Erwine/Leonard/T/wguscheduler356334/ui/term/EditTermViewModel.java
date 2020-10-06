@@ -4,7 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -58,6 +63,7 @@ public class EditTermViewModel extends AndroidViewModel {
     private TermEntity termEntity;
     private final MutableLiveData<TermEntity> entityLiveData;
     private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final MutableLiveData<Function<Resources, Spannable>> overviewFactoryLiveData;
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
@@ -70,7 +76,8 @@ public class EditTermViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_term));
+        titleFactoryLiveData = new MutableLiveData<>(r -> r.getString(R.string.title_activity_view_term));
+        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
         normalizedName = normalizedNotes = "";
         entityLiveData = new MutableLiveData<>();
         startMessageLiveData = new MutableLiveData<>();
@@ -140,6 +147,10 @@ public class EditTermViewModel extends AndroidViewModel {
         return titleFactoryLiveData;
     }
 
+    public MutableLiveData<Function<Resources, Spannable>> getOverviewFactoryLiveData() {
+        return overviewFactoryLiveData;
+    }
+
     public boolean isFromInitializedState() {
         return fromInitializedState;
     }
@@ -162,12 +173,30 @@ public class EditTermViewModel extends AndroidViewModel {
         }
         entityLiveData.postValue(termEntity);
         normalizedName = termEntity.getName();
-        titleFactoryLiveData.postValue(r -> {
-            String t = r.getString(R.string.format_term, normalizedName);
-            int i = t.indexOf(':');
-            return (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
-        });
+        titleFactoryLiveData.postValue(this::calculateTitle);
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public String calculateTitle(Resources resources) {
+        String t = resources.getString(R.string.format_term, normalizedName);
+        int i = t.indexOf(':');
+        return (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
+    }
+
+    public Spannable calculateOverview(Resources resources) {
+        LocalDate date = currentValues.getStart();
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        if (null == date) {
+            if (null == (date = currentValues.getEnd())) {
+                return builder.append("No dates specified", new StyleSpan(Typeface.ITALIC), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            return builder.append("(unknown)", new StyleSpan(Typeface.ITALIC), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE).append(" to ").append(FORMATTER.format(date));
+        }
+        builder.append(FORMATTER.format(date)).append(" to ");
+        if (null != (date = currentValues.getEnd())) {
+            return builder.append(FORMATTER.format(date));
+        }
+        return builder.append("(unknown)", new StyleSpan(Typeface.ITALIC), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     public void saveViewModelState(Bundle outState) {
@@ -278,11 +307,7 @@ public class EditTermViewModel extends AndroidViewModel {
                 nameValidLiveData.postValue(true);
             }
 
-            titleFactoryLiveData.postValue(r -> {
-                String t = r.getString(R.string.format_term, normalizedName);
-                int i = t.indexOf(':');
-                return (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
-            });
+            titleFactoryLiveData.postValue(EditTermViewModel.this::calculateTitle);
         }
 
         @Nullable
@@ -296,6 +321,7 @@ public class EditTermViewModel extends AndroidViewModel {
             if (!Objects.equals(this.start, start)) {
                 this.start = start;
                 startMessageLiveData.postValue(validateDateRange().orElse(null));
+                overviewFactoryLiveData.postValue(EditTermViewModel.this::calculateOverview);
             }
         }
 
@@ -310,6 +336,7 @@ public class EditTermViewModel extends AndroidViewModel {
             if (!Objects.equals(this.end, end)) {
                 this.end = end;
                 startMessageLiveData.postValue(validateDateRange().orElse(null));
+                overviewFactoryLiveData.postValue(EditTermViewModel.this::calculateOverview);
             }
         }
 

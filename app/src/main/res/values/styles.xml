@@ -92,6 +92,31 @@
         <item name="android:button">@drawable/radio_button_selector</item>
     </style>
 
+    <style name="WGU.Scheduler.ShareFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@android:drawable/ic_menu_share</item>
+        <item name="srcCompat">@android:drawable/ic_menu_share</item>
+    </style>
+
+    <style name="WGU.Scheduler.DeleteFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/delete_icon</item>
+        <item name="srcCompat">@drawable/delete_icon</item>
+    </style>
+
+    <style name="WGU.Scheduler.AddFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/add_item_icon</item>
+        <item name="srcCompat">@drawable/add_item_icon</item>
+    </style>
+
+    <style name="WGU.Scheduler.SaveFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/save_icon</item>
+        <item name="srcCompat">@drawable/save_icon</item>
+    </style>
+
+    <style name="WGU.Scheduler.CancelFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/undo_icon</item>
+        <item name="srcCompat">@drawable/undo_icon</item>
+    </style>
+
     <style name="WGU.Scheduler.ShareImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
         <item name="android:src">@android:drawable/ic_menu_share</item>
         <item name="srcCompat">@android:drawable/ic_menu_share</item>
@@ -100,11 +125,6 @@
     <style name="WGU.Scheduler.AlertImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
         <item name="android:src">@drawable/alerts_icon</item>
         <item name="srcCompat">@drawable/alerts_icon</item>
-    </style>
-
-    <style name="WGU.Scheduler.AddFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
-        <item name="android:src">@drawable/add_item_icon</item>
-        <item name="srcCompat">@drawable/add_item_icon</item>
     </style>
 
     <style name="WGU.Scheduler.SaveImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">

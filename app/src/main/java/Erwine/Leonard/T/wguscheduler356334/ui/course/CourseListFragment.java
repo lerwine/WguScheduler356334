@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +24,6 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
-import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -41,6 +39,7 @@ public class CourseListFragment extends Fragment {
     private EditTermViewModel editTermViewModel;
     private TermCourseListViewModel courseListViewModel;
     private TermCourseListAdapter adapter;
+    private TextView overviewTextView;
     private TextView noCoursesTextView;
 
     /**
@@ -61,6 +60,7 @@ public class CourseListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        overviewTextView = view.findViewById(R.id.overviewTextView);
         noCoursesTextView = view.findViewById(R.id.noCoursesTextView);
         // Set the adapter
         adapter = new TermCourseListAdapter(list);
@@ -71,8 +71,6 @@ public class CourseListFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) courseListingRecyclerView.getLayoutManager());
         DividerItemDecoration decoration = new DividerItemDecoration(courseListingRecyclerView.getContext(), linearLayoutManager.getOrientation());
         courseListingRecyclerView.addItemDecoration(decoration);
-
-        view.findViewById(R.id.addCourseButton).setOnClickListener(this::onAddCourseButtonClick);
     }
 
     @Override
@@ -82,6 +80,8 @@ public class CourseListFragment extends Fragment {
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
         editTermViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
+        editTermViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+                f -> overviewTextView.setText(f.apply(getResources())));
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
@@ -105,22 +105,6 @@ public class CourseListFragment extends Fragment {
         if (null != adapter) {
             adapter.notifyDataSetChanged();
         }
-    }
-
-    private void onAddCourseButtonClick(View view) {
-        LocalDate nextStart = ComparisonHelper.maxWithinRange(editTermViewModel.getStart(), editTermViewModel.getEnd(), list.stream().map(t -> {
-            LocalDate d = t.getActualEnd();
-            return (null == d && null == (d = t.getExpectedEnd()) && null == (d = t.getActualStart())) ? t.getExpectedStart() : d;
-        }), LocalDate::compareTo).map(t -> t.plusDays(1L)).orElseGet(() -> {
-            LocalDate s = editTermViewModel.getStart();
-            if (null != s) {
-                return s;
-            }
-            s = LocalDate.now();
-            LocalDate e = editTermViewModel.getEnd();
-            return (null != e && e.compareTo(s) < 0) ? e : s;
-        });
-        EditCourseViewModel.startAddCourseActivity(requireContext(), courseListViewModel.getId(), nextStart);
     }
 
 }

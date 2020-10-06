@@ -1,48 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.term.EditTermFragment">
 
-    <fragment
-        android:id="@+id/termPropertiesFragment"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/shareImageButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_term_properties" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/shareImageButton"
-        style="@style/WGU.Scheduler.ShareImageButtonStyle"
-        android:contentDescription="@string/label_share_term"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/saveImageButton" />
+        <TextView
+            android:id="@+id/termNameLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/termNameEditText"
+            android:text="@string/label_name_of_term" />
 
-    <ImageButton
-        android:id="@+id/saveImageButton"
-        style="@style/WGU.Scheduler.SaveImageButtonStyle"
-        android:contentDescription="@string/command_save_changes"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/deleteImageButton" />
+        <EditText
+            android:id="@+id/termNameEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="29dp"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:importantForAutofill="no" />
 
-    <ImageButton
-        android:id="@+id/deleteImageButton"
-        style="@style/WGU.Scheduler.DeleteImageButtonStyle"
-        android:contentDescription="@string/command_delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
+        <TextView
+            android:id="@+id/termStartLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/termStartTextView"
+            android:text="@string/label_start_of_term" />
 
-    <ImageButton
-        android:id="@+id/cancelImageButton"
-        style="@style/WGU.Scheduler.CancelImageButtonStyle"
-        android:contentDescription="@android:string/cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:id="@+id/termStartTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:textSize="18sp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/termEndLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/termEndValueTextView"
+            android:text="@string/label_end_of_term" />
+
+        <TextView
+            android:id="@+id/termEndValueTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/termNotesLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/notesEditText"
+            android:text="@string/label_notes" />
+
+        <EditText
+            android:id="@+id/notesEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:importantForAutofill="no" />
+
+    </LinearLayout>
+
+</ScrollView>
