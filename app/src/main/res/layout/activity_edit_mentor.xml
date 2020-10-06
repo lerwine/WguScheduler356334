@@ -1,110 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditMentorActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/mentorNameLabelTextView"
-            style="@style/WGU.Scheduler.FieldLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:labelFor="@id/mentorNameEditText"
-            android:text="@string/label_mentor_name" />
-
-        <EditText
-            android:id="@+id/mentorNameEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:autofillHints="name"
-            android:inputType="textPersonName" />
-
-        <TextView
-            android:id="@+id/phoneNumberLabelTextView"
-            style="@style/WGU.Scheduler.FieldLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:labelFor="@id/phoneNumberEditText"
-            android:text="@string/label_phone_number" />
-
-        <EditText
-            android:id="@+id/phoneNumberEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:autofillHints="phone"
-            android:inputType="phone" />
-
-        <TextView
-            android:id="@+id/emailAddressLabelTextView"
-            style="@style/WGU.Scheduler.FieldLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:labelFor="@id/emailAddressEditText"
-            android:text="@string/label_email_address" />
-
-        <EditText
-            android:id="@+id/emailAddressEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:autofillHints="emailAddress"
-            android:inputType="textEmailAddress" />
-
-        <TextView
-            android:id="@+id/mentorNotesLabelTextView"
-            style="@style/WGU.Scheduler.FieldLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:labelFor="@id/notesEditText"
-            android:text="@string/label_notes" />
-
-        <EditText
-            android:id="@+id/notesEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="start|top"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine" />
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/shareImageButton"
-                style="@style/WGU.Scheduler.ShareImageButtonStyle"
-                android:contentDescription="@string/label_share_contact" />
+            <TextView
+                android:id="@+id/mentorNameLabelTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/mentorNameEditText"
+                android:text="@string/label_mentor_name" />
 
-            <ImageButton
-                android:id="@+id/saveMentorImageButton"
-                style="@style/WGU.Scheduler.SaveImageButtonStyle"
-                android:contentDescription="@string/command_save_changes" />
+            <EditText
+                android:id="@+id/mentorNameEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="name"
+                android:ems="10"
+                android:inputType="textPersonName" />
 
-            <ImageButton
-                android:id="@+id/deleteMentorImageButton"
-                style="@style/WGU.Scheduler.DeleteImageButtonStyle"
-                android:contentDescription="@string/command_delete" />
+            <TextView
+                android:id="@+id/phoneNumberLabelTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/phoneNumberEditText"
+                android:text="@string/label_phone_number" />
 
-            <ImageButton
-                android:id="@+id/cancelImageButton"
-                style="@style/WGU.Scheduler.CancelImageButtonStyle"
-                android:contentDescription="@android:string/cancel" />
+            <EditText
+                android:id="@+id/phoneNumberEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="phone"
+                android:ems="10"
+                android:inputType="phone" />
+
+            <TextView
+                android:id="@+id/emailAddressLabelTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/emailAddressEditText"
+                android:text="@string/label_email_address" />
+
+            <EditText
+                android:id="@+id/emailAddressEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="emailAddress"
+                android:ems="10"
+                android:inputType="textEmailAddress" />
+
+            <TextView
+                android:id="@+id/mentorNotesLabelTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/notesEditText"
+                android:text="@string/label_notes" />
+
+            <EditText
+                android:id="@+id/notesEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="start|top"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine" />
         </LinearLayout>
-    </LinearLayout>
 
-</ScrollView>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/shareFloatingActionButton"
+        style="@style/WGU.Scheduler.ShareFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/label_share_contact"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/saveFloatingActionButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveFloatingActionButton"
+        style="@style/WGU.Scheduler.SaveFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/command_save_changes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deleteFloatingActionButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/deleteFloatingActionButton"
+        style="@style/WGU.Scheduler.DeleteFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/title_delete_mentor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

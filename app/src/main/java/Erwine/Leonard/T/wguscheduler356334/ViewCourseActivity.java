@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -12,9 +13,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import java.time.LocalDate;
+
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertDialog;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertViewModel;
+import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.ViewCoursePagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
@@ -36,6 +43,11 @@ public class ViewCourseActivity extends AppCompatActivity {
     @SuppressWarnings("FieldCanBeLocal")
     private ViewCoursePagerAdapter adapter;
     private AlertDialog waitDialog;
+    private FloatingActionButton addAssessmentFloatingActionButton;
+    private FloatingActionButton addAlertFloatingActionButton;
+    private FloatingActionButton shareFloatingActionButton;
+    private FloatingActionButton saveFloatingActionButton;
+    private FloatingActionButton deleteFloatingActionButton;
 
     public ViewCourseActivity() {
         compositeDisposable = new CompositeDisposable();
@@ -50,6 +62,11 @@ public class ViewCourseActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+        addAssessmentFloatingActionButton = findViewById(R.id.addAssessmentFloatingActionButton);
+        addAlertFloatingActionButton = findViewById(R.id.addAlertFloatingActionButton);
+        shareFloatingActionButton = findViewById(R.id.shareFloatingActionButton);
+        saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
+        deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
         compositeDisposable.clear();
@@ -77,7 +94,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
                 compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveCourseCompleted, this::onSaveCourseError));
             }, null);
         } else {
             finish();
@@ -99,19 +116,41 @@ public class ViewCourseActivity extends AppCompatActivity {
             viewPager.setAdapter(adapter);
             TabLayout tabs = findViewById(R.id.courseListTabLayout);
             tabs.setupWithViewPager(viewPager);
+            addAssessmentFloatingActionButton.setOnClickListener(this::onAddAssessmentFloatingActionButtonClick);
+            addAlertFloatingActionButton.setOnClickListener(this::onAddAlertFloatingActionButtonClick);
+            shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButton);
+            saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
+            deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
         }
     }
 
-    private void onEntityLoadFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error loading course", throwable);
-        waitDialog.dismiss();
-        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage())
-                .showDialog(this::finish);
+    private void onAddAssessmentFloatingActionButtonClick(View view) {
+        LocalDate d = viewModel.getActualEnd();
+        if (null == d && null == (d = viewModel.getExpectedEnd())) {
+            d = LocalDate.now();
+        }
+        EditAssessmentViewModel.startAddAssessmentActivity(this, viewModel.getId(), d);
     }
 
-    private void onSaveOperationSucceeded(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onAddAlertFloatingActionButtonClick(View view) {
+        if (viewModel.isChanged()) {
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
+                    this::finish,
+                    () -> {
+                        compositeDisposable.clear();
+                        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveForNewAlertFinished, this::onSaveCourseError));
+                        finish();
+                    }, null);
+        } else {
+            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+            dlg.show(getSupportFragmentManager(), null);
+        }
+    }
+
+    private void onSaveForNewAlertFinished(ValidationMessage.ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
-            finish();
+            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+            dlg.show(getSupportFragmentManager(), null);
         } else {
             Resources resources = getResources();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -120,7 +159,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveForNewAlertFinished, this::onSaveCourseError));
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -131,10 +170,85 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
     }
 
-    private void onSaveFailed(Throwable throwable) {
+    private void onShareFloatingActionButton(View view) {
+        // TODO: Implement onShareFloatingActionButton
+    }
+
+    private void onSaveFloatingActionButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
+        compositeDisposable.clear();
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveCourseCompleted, this::onSaveCourseError));
+    }
+
+    private void onDeleteFloatingActionButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(viewModel.delete(false).subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
+        }, null);
+    }
+
+    private void onEntityLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading course", throwable);
+        waitDialog.dismiss();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage())
+                .showDialog(this::finish);
+    }
+
+    private void onSaveCourseCompleted(@NonNull ValidationMessage.ResourceMessageResult messages) {
+        if (messages.isSucceeded()) {
+            finish();
+        } else {
+            Resources resources = getResources();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_save_warning)
+                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveCourseCompleted, this::onSaveCourseError));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
+        }
+    }
+
+    private void onSaveCourseError(Throwable throwable) {
         Log.e(LOG_TAG, "Error saving course", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
                 .showDialog();
+    }
+
+    private void onDeleteSucceeded(ValidationMessage.ResourceMessageResult messages) {
+        Log.d(LOG_TAG, "Enter onDeleteSucceeded");
+        if (messages.isSucceeded()) {
+            finish();
+        } else {
+            Resources resources = getResources();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (messages.isWarning()) {
+                builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
+                        .setMessage(messages.join("\n", resources))
+                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                            compositeDisposable.clear();
+                            compositeDisposable.add(viewModel.delete(true).subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
+                            dialog.dismiss();
+                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+            } else {
+                builder.setTitle(R.string.title_delete_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+            }
+            AlertDialog dlg = builder.setCancelable(true).create();
+            dlg.show();
+        }
+    }
+
+    private void onDeleteFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error deleting course", throwable);
+        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
     }
 
 }

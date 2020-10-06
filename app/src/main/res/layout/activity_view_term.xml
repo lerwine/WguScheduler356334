@@ -34,23 +34,26 @@
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/shareFloatingActionButton"
-        style="@style/WGU.Scheduler.ShareFabButtonStyle"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/addFloatingActionButton" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addFloatingActionButton"
         style="@style/WGU.Scheduler.AddFabButtonStyle"
         android:clickable="true"
+        android:contentDescription="@string/title_add_course"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/saveFloatingActionButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/shareFloatingActionButton"
+        style="@style/WGU.Scheduler.ShareFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/label_share_term"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/addFloatingActionButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/saveFloatingActionButton"
         style="@style/WGU.Scheduler.SaveFabButtonStyle"
         android:clickable="true"
+        android:contentDescription="@string/command_save_changes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteFloatingActionButton" />
 
@@ -58,6 +61,7 @@
         android:id="@+id/deleteFloatingActionButton"
         style="@style/WGU.Scheduler.DeleteFabButtonStyle"
         android:clickable="true"
+        android:contentDescription="@string/title_delete_term"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

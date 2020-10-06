@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
@@ -25,7 +27,7 @@ public class AddTermActivity extends AppCompatActivity {
     private final CompositeDisposable compositeDisposable;
     private EditTermViewModel viewModel;
     private AlertDialog waitDialog;
-
+    private FloatingActionButton saveFloatingActionButton;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -45,8 +47,7 @@ public class AddTermActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-        findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveTermImageButtonClick);
-        findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelTermEditImageButtonClick);
+        saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
         compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
@@ -58,6 +59,7 @@ public class AddTermActivity extends AppCompatActivity {
         waitDialog.dismiss();
         if (null != entity) {
             Log.d(LOG_TAG, String.format("Loaded %s", entity));
+            saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
         } else {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_not_restored, this).showDialog(this::finish);
         }
@@ -92,8 +94,8 @@ public class AddTermActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private void onSaveTermImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onSaveTermImageButtonClick");
+    private void onSaveFloatingActionButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
     }
@@ -125,11 +127,6 @@ public class AddTermActivity extends AppCompatActivity {
     private void onSaveFailed(Throwable throwable) {
         Log.e(LOG_TAG, "Error saving term", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
-    }
-
-    private void onCancelTermEditImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onCancelTermEditImageButtonClick");
-        finish();
     }
 
     private void confirmSave() {

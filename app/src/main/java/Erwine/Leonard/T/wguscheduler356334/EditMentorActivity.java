@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -14,6 +13,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
@@ -34,8 +35,9 @@ public class EditMentorActivity extends AppCompatActivity {
     private EditText phoneNumberEditText;
     private EditText emailAddressEditText;
     private EditText notesEditText;
-    private ImageButton saveMentorImageButton;
-    private ImageButton deleteMentorImageButton;
+    private FloatingActionButton shareFloatingActionButton;
+    private FloatingActionButton saveFloatingActionButton;
+    private FloatingActionButton deleteFloatingActionButton;
     private AlertDialog waitDialog;
 
     /**
@@ -61,8 +63,9 @@ public class EditMentorActivity extends AppCompatActivity {
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         emailAddressEditText = findViewById(R.id.emailAddressEditText);
         notesEditText = findViewById(R.id.notesEditText);
-        saveMentorImageButton = findViewById(R.id.saveMentorImageButton);
-        deleteMentorImageButton = findViewById(R.id.deleteMentorImageButton);
+        shareFloatingActionButton = findViewById(R.id.shareFloatingActionButton);
+        saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
+        deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
         compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
@@ -118,15 +121,16 @@ public class EditMentorActivity extends AppCompatActivity {
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
         phoneNumberEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setPhoneNumber));
         emailAddressEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setEmailAddress));
-        saveMentorImageButton.setOnClickListener(this::onSaveMentorImageButtonClick);
+        saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
         if (ID_NEW == entity.getId()) {
-            deleteMentorImageButton.setVisibility(View.GONE);
+            shareFloatingActionButton.setVisibility(View.GONE);
+            deleteFloatingActionButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
         } else {
-            setTitle(R.string.format_mentor);
-            deleteMentorImageButton.setOnClickListener(this::onDeleteMentorImageButtonClick);
+            viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
+            shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
+            deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
         }
-        findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
         viewModel.getNameValidLiveData().observe(this, this::onNameValidChanged);
         viewModel.getContactValidLiveData().observe(this, this::onContactValidChanged);
         viewModel.getNameLiveData().observe(this, this::onNameChanged);
@@ -160,12 +164,23 @@ public class EditMentorActivity extends AppCompatActivity {
         }
     }
 
-    private void onSaveMentorImageButtonClick(View view) {
+    private void onSaveFloatingActionButtonClick(View view) {
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
     }
 
-    private void onSaveOperationSucceeded(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onShareFloatingActionButtonClick(View view) {
+        // TODO: Implement onShareFloatingActionButton
+    }
+
+    private void onDeleteFloatingActionButtonClick(View view) {
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() -> {
+            compositeDisposable.clear();
+            compositeDisposable.add(viewModel.delete(false).subscribe(this::onDeleteMentorFinished, this::onDeleteMentorError));
+        }, null);
+    }
+
+    private void onSaveMentorCompleted(@NonNull ValidationMessage.ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationSucceeded");
         if (messages.isSucceeded()) {
             finish();
@@ -177,7 +192,7 @@ public class EditMentorActivity extends AppCompatActivity {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -188,19 +203,12 @@ public class EditMentorActivity extends AppCompatActivity {
         }
     }
 
-    private void onSaveFailed(Throwable throwable) {
+    private void onSaveMentorError(Throwable throwable) {
         Log.e(LOG_TAG, "Error saving mentor", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 
-    private void onDeleteMentorImageButtonClick(View view) {
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() -> {
-            compositeDisposable.clear();
-            compositeDisposable.add(viewModel.delete(false).subscribe(this::onDeleteFinished, this::onDeleteFailed));
-        }, null);
-    }
-
-    private void onDeleteFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onDeleteMentorFinished(ValidationMessage.ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             finish();
         } else {
@@ -211,7 +219,7 @@ public class EditMentorActivity extends AppCompatActivity {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onDeleteFinished, this::onDeleteFailed));
+                            compositeDisposable.add(viewModel.save(true).subscribe(this::onDeleteMentorFinished, this::onDeleteMentorError));
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -222,20 +230,16 @@ public class EditMentorActivity extends AppCompatActivity {
         }
     }
 
-    private void onDeleteFailed(Throwable throwable) {
+    private void onDeleteMentorError(Throwable throwable) {
         Log.e(LOG_TAG, "Error deleting mentor", throwable);
         new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
-    }
-
-    private void onCancelImageButtonClick(View view) {
-        verifySaveChanges();
     }
 
     private void verifySaveChanges() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(() -> {
                 compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
             }, this::finish, null);
         } else {
             finish();

@@ -7,6 +7,17 @@
     android:name="Erwine.Leonard.T.wguscheduler356334.AssessmentAlertListFragment"
     tools:context=".ui.alert.AssessmentAlertListFragment">
 
+    <TextView
+        android:id="@+id/overviewTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/control_margin"
+        android:ems="10"
+        android:gravity="start|top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/alertsRecyclerView"
         android:layout_width="0dp"
@@ -14,7 +25,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/overviewTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -26,18 +37,11 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="@color/color_secondary"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/overviewTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="@string/message_no_alerts" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addFloatingActionButton"
-        style="@style/WGU.Scheduler.AddFabButtonStyle"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

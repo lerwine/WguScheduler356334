@@ -80,8 +80,6 @@ public class CourseListFragment extends Fragment {
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
         editTermViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
-        editTermViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
-                f -> overviewTextView.setText(f.apply(getResources())));
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
@@ -90,6 +88,8 @@ public class CourseListFragment extends Fragment {
             courseListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(TermCourseListViewModel.class);
             courseListViewModel.setId(termId);
             courseListViewModel.getCourses().observe(getViewLifecycleOwner(), this::onCourseListChanged);
+            editTermViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+                    f -> overviewTextView.setText(f.apply(getResources())));
         }
     }
 

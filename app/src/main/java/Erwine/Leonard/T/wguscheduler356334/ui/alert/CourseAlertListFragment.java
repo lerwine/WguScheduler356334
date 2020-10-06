@@ -37,6 +37,7 @@ public class CourseAlertListFragment extends Fragment {
     private final CompositeDisposable compositeDisposable;
     private final List<CourseAlert> items;
     private CourseAlertListViewModel listViewModel;
+    private TextView overviewTextView;
     private TextView noAlertsTextView;
     private RecyclerView alertsRecyclerView;
     private CourseAlertListAdapter adapter;
@@ -61,11 +62,11 @@ public class CourseAlertListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        overviewTextView = view.findViewById(R.id.overviewTextView);
         noAlertsTextView = view.findViewById(R.id.noAlertsTextView);
         alertsRecyclerView = view.findViewById(R.id.alertsRecyclerView);
         adapter = new CourseAlertListAdapter(items, this::onEditAlert);
         alertsRecyclerView.setAdapter(adapter);
-        view.findViewById(R.id.addFloatingActionButton).setOnClickListener(this::onAddFloatingActionButtonClick);
     }
 
     @Override
@@ -97,6 +98,8 @@ public class CourseAlertListFragment extends Fragment {
         if (null != courseDetails) {
             currentCourse = courseDetails;
             listViewModel.setCourse(courseDetails, getViewLifecycleOwner());
+            courseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+                    f -> overviewTextView.setText(f.apply(getResources())));
         }
     }
 
@@ -122,50 +125,12 @@ public class CourseAlertListFragment extends Fragment {
                     () -> requireActivity().finish(),
                     () -> {
                         compositeDisposable.clear();
-                        compositeDisposable.add(courseViewModel.save(false).subscribe(this::onSaveForEditAlertFinished, this::onSaveFailed));
+                        compositeDisposable.add(courseViewModel.save(false).subscribe(this::onSaveForEditAlertFinished, this::onSaveCourseError));
                         requireActivity().finish();
                     }, null);
         } else {
             EditAlertDialog dlg = EditAlertViewModel.existingCourseAlertEditor(courseAlert.getAlert().getId(), courseViewModel.getId());
             dlg.show(getParentFragmentManager(), null);
-        }
-    }
-
-    private void onAddFloatingActionButtonClick(View view) {
-        if (courseViewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                    () -> requireActivity().finish(),
-                    () -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(courseViewModel.save(false).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
-                        requireActivity().finish();
-                    }, null);
-        } else {
-            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(courseViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
-        }
-    }
-
-    private void onSaveForNewAlertFinished(ValidationMessage.ResourceMessageResult messages) {
-        if (messages.isSucceeded()) {
-            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(courseViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
-        } else {
-            Resources resources = getResources();
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_save_warning)
-                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(courseViewModel.save(true).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
-                            dialog.dismiss();
-                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
-            } else {
-                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
-            }
-            AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
         }
     }
 
@@ -181,7 +146,7 @@ public class CourseAlertListFragment extends Fragment {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             compositeDisposable.clear();
-                            compositeDisposable.add(courseViewModel.save(true).subscribe(this::onSaveForEditAlertFinished, this::onSaveFailed));
+                            compositeDisposable.add(courseViewModel.save(true).subscribe(this::onSaveForEditAlertFinished, this::onSaveCourseError));
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -192,7 +157,7 @@ public class CourseAlertListFragment extends Fragment {
         }
     }
 
-    private void onSaveFailed(Throwable throwable) {
+    private void onSaveCourseError(Throwable throwable) {
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
                 .showDialog(() -> requireActivity().finish());
     }

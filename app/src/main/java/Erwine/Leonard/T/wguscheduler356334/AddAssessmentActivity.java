@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
@@ -24,6 +26,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
     private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
     private AlertDialog waitDialog;
+    private FloatingActionButton saveFloatingActionButton;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,8 +46,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-        findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
-        findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
+        saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditAssessmentViewModel.class);
         compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
@@ -87,13 +89,9 @@ public class AddAssessmentActivity extends AppCompatActivity {
         }
     }
 
-    private void onSaveImageButtonClick(View view) {
+    private void onSaveFloatingActionButtonClick(View view) {
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-    }
-
-    private void onCancelImageButtonClick(View view) {
-        confirmSave();
     }
 
     private void onAssessmentLoadSuccess(AssessmentDetails entity) {
@@ -101,6 +99,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
         waitDialog.dismiss();
         if (null != entity) {
             Log.d(LOG_TAG, String.format("Loaded %s", entity));
+            saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
         } else {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_assessment_not_restored, this).showDialog(this::finish);
         }

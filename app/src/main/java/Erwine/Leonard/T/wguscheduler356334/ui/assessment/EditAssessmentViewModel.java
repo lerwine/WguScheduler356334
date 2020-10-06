@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -56,11 +59,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private MentorEntity mentorEntity;
     private final MutableLiveData<AssessmentDetails> entityLiveData;
     private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final MutableLiveData<Boolean> courseValidLiveData;
     private final MutableLiveData<Boolean> codeValidLiveData;
     private final CurrentValues currentValues;
     private final MutableLiveData<LocalDate> effectiveStartLiveData;
     private final MutableLiveData<LocalDate> effectiveEndLiveData;
+    private String viewTitle;
+    private Spanned overview;
     private LiveData<List<AssessmentEntity>> assessmentsForCourse;
     private LiveData<List<TermCourseListItem>> coursesForTerm;
     private AbstractCourseEntity<?> selectedCourse;
@@ -92,6 +98,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
+        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
         currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
         courseValidLiveData = new MutableLiveData<>(false);
@@ -105,9 +112,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return entityLiveData;
     }
 
-    @NonNull
     public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
         return titleFactoryLiveData;
+    }
+
+    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
+        return overviewFactoryLiveData;
     }
 
     @NonNull
@@ -154,8 +164,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     @NonNull
     public String getName() {
-        String name = currentValues.getName();
-        return (null == name) ? "" : name;
+        return normalizedName;
     }
 
     public void setName(String name) {
@@ -230,6 +239,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         assessmentEntity = new AssessmentDetails((AbstractCourseEntity<?>) null);
+        viewTitle = null;
+        overview = null;
         if (null != state) {
             Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
             currentValues.restoreState(state, false);
@@ -251,13 +262,56 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         assessmentEntity.saveState(outState, true);
     }
 
-    private void onEntityLoaded() {
-        String n = assessmentEntity.getName();
-        if (null == n) {
-            titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(assessmentEntity.getType().displayResourceId()), assessmentEntity.getCode()));
-        } else {
-            titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(assessmentEntity.getType().displayResourceId()), assessmentEntity.getCode(), n));
+    @NonNull
+    public synchronized Spanned calculateOverview(Resources resources) {
+        if (null != overview) {
+            return overview;
         }
+        Spanned result;
+        LocalDate completionDate = currentValues.getCompletionDate();
+        LocalDate goalDate = currentValues.getGoalDate();
+        if (null != completionDate) {
+            if (null != goalDate) {
+                result = Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_completed, resources.getString(currentValues.status.displayResourceId()),
+                        completionDate, goalDate), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            } else {
+                result = Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_completed_no_goal, resources.getString(currentValues.status.displayResourceId()),
+                        completionDate), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            }
+        } else if (currentValues.status == AssessmentStatus.NOT_STARTED) {
+            if (null != goalDate) {
+                result = Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_goal, resources.getString(currentValues.status.displayResourceId()),
+                        goalDate), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            } else {
+                result = Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_no_goal, resources.getString(currentValues.status.displayResourceId())), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            }
+        } else if (null != goalDate) {
+            result = Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_completed_required, resources.getString(currentValues.status.displayResourceId()),
+                    goalDate), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+        } else {
+            result = Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_completed_required_no_goal, resources.getString(currentValues.status.displayResourceId())),
+                    Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+        }
+        overview = result;
+        return result;
+    }
+
+    @NonNull
+    public synchronized String calculateViewTitle(Resources resources) {
+        if (null == viewTitle) {
+            String n = currentValues.name;
+            if (null == n) {
+                viewTitle = resources.getString(R.string.format_assessment, resources.getString(currentValues.type.displayResourceId()), currentValues.code);
+            } else {
+                viewTitle = resources.getString(R.string.format_assessment_name, resources.getString(currentValues.type.displayResourceId()), currentValues.code, n);
+            }
+        }
+        return viewTitle;
+    }
+
+    private void onEntityLoaded() {
+        titleFactoryLiveData.postValue(this::calculateViewTitle);
+        overviewFactoryLiveData.postValue(this::calculateOverview);
         entityLiveData.postValue(assessmentEntity);
     }
 
@@ -324,11 +378,17 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private class CurrentValues implements Assessment {
         private long id;
         private Long courseId;
+        @NonNull
         private String code = "";
-        private String name = "";
+        @Nullable
+        private String name;
+        @NonNull
         private AssessmentStatus status = AssessmentStatusConverter.DEFAULT;
+        @Nullable
         private LocalDate goalDate;
+        @Nullable
         private LocalDate completionDate;
+        @NonNull
         private AssessmentType type = AssessmentType.OBJECTIVE_ASSESSMENT;
         private String notes;
 
@@ -373,10 +433,8 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 codeValidLiveData.postValue(true);
             }
-            if (normalizedName.isEmpty()) {
-                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(type.displayResourceId()), normalizedCode));
-            } else {
-                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(type.displayResourceId()), normalizedCode, normalizedName));
+            if (!normalizedCode.equals(oldValue)) {
+                titleFactoryLiveData.postValue(EditAssessmentViewModel.this::calculateViewTitle);
             }
         }
 
@@ -388,13 +446,15 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
+            String oldValue = normalizedName;
             normalizedName = AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER.apply(name);
             if (normalizedName.isEmpty()) {
                 this.name = null;
-                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(type.displayResourceId()), normalizedCode));
             } else {
                 this.name = name;
-                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(type.displayResourceId()), normalizedCode, normalizedName));
+            }
+            if (!normalizedName.equals(oldValue)) {
+                titleFactoryLiveData.postValue(EditAssessmentViewModel.this::calculateViewTitle);
             }
         }
 
@@ -405,7 +465,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setStatus(AssessmentStatus status) {
+        public void setStatus(@NonNull AssessmentStatus status) {
             this.status = status;
         }
 
@@ -418,22 +478,28 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         @Override
         public synchronized void setGoalDate(LocalDate goalDate) {
             if (!Objects.equals(goalDate, this.goalDate)) {
+                LocalDate oldValue = effectiveStartLiveData.getValue();
                 this.goalDate = goalDate;
-                effectiveStartLiveData.setValue(goalDate);
+                if ((null == completionDate || this.status == AssessmentStatus.NOT_STARTED) && !Objects.equals(oldValue, goalDate)) {
+                    effectiveStartLiveData.setValue(goalDate);
+                }
             }
         }
 
         @Nullable
         @Override
         public LocalDate getCompletionDate() {
-            return completionDate;
+            return (this.status == AssessmentStatus.NOT_STARTED) ? null : completionDate;
         }
 
         @Override
         public synchronized void setCompletionDate(LocalDate completionDate) {
             if (!Objects.equals(completionDate, this.completionDate)) {
+                LocalDate oldValue = effectiveStartLiveData.getValue();
                 this.completionDate = completionDate;
-                effectiveStartLiveData.setValue(completionDate);
+                if (this.status != AssessmentStatus.NOT_STARTED && !Objects.equals(oldValue, completionDate)) {
+                    effectiveStartLiveData.setValue(completionDate);
+                }
             }
         }
 
@@ -445,11 +511,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
         @Override
         public void setType(AssessmentType type) {
+            AssessmentType oldValue = this.type;
             this.type = AssessmentTypeConverter.asNonNull(type);
-            if (normalizedName.isEmpty()) {
-                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment, r.getString(this.type.displayResourceId()), normalizedCode));
-            } else {
-                titleFactoryLiveData.postValue(r -> r.getString(R.string.format_assessment_name, r.getString(this.type.displayResourceId()), normalizedCode, normalizedName));
+            if (this.type != oldValue) {
+                titleFactoryLiveData.postValue(EditAssessmentViewModel.this::calculateViewTitle);
             }
         }
 

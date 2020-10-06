@@ -33,7 +33,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment;
+import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -42,7 +42,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class EditAlertViewModel extends AndroidViewModel {
 
-    private static final String LOG_TAG = CoursePropertiesFragment.class.getName();
+    private static final String LOG_TAG = EditCourseFragment.class.getName();
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
     static final String ARG_KEY_ALERT_ID = "alert_id";

@@ -1,3 +1,4 @@
+<!DOCTYPE resources [<!ENTITY termColon "Term:">]>
 <resources>
     <string name="app_name">WGU Scheduler</string>
     <string name="command_clear_database">Clear Database</string>
@@ -112,10 +113,11 @@
     <string name="title_activity_new_mentor">Add New Mentor</string>
     <string name="title_activity_new_term">Add New Term</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="format_course">Course: %s – %s</string>
-    <string name="format_assessment">%s: %s</string>
-    <string name="format_assessment_name">%s: %s– %s</string>
-    <string name="format_term">Term: %s</string>
+    <string name="format_course">Course %s: %s</string>
+    <string name="format_assessment">%s %s</string>
+    <string name="format_assessment_name">%s %s: %s</string>
+    <string name="label_term_colon">&termColon;</string>
+    <string name="format_term">&termColon; %s</string>
     <string name="title_actual">Actual:</string>
     <string name="title_add_sample_data_error">Add Sample Data Error</string>
     <string name="title_assessments">Assessments</string>
@@ -169,8 +171,6 @@
     <string name="label_past">Past</string>
     <string name="label_upcoming">Upcoming</string>
     <string name="message_no_alerts">No alerts to show.</string>
-    <string name="title_activity_add_assessment">Add Assessment</string>
-    <string name="title_activity_add_course">Add Course</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="label_unknown_to_unknown_range">\? to ?</string>
@@ -248,4 +248,20 @@
     <string name="label_share_contact">Share Contact Information</string>
     <string name="title_daily_alarm_time">Daily Alarm Time</string>
     <string name="format_alarm_time_summary">%s\n\nThis is the time of day when course and assessment alerts will be generated, even if this app is not running.</string>
+    <string name="title_add_assessment">Add Assessment</string>
+    <string name="title_add_course">Add Course</string>
+    <string name="title_add_alert">Add Alert</string>
+    <string name="title_add_term">Add Term</string>
+    <string name="html_no_dates_specified"><i>No dates specified</i></string>
+    <string name="format_ends_on">Ends on %s</string>
+    <string name="format_starts_on">Starts on %s</string>
+    <string name="html_format_assessment_overview_completed"><b>%s</b>: <b>Completed On </b> %s; <b>Goal Date was </b> %s</string>
+    <string name="html_format_assessment_overview_completed_no_goal"><b>%s</b>: <b>Completed On </b> %s</string>
+    <string name="html_format_assessment_overview_completed_required"><b>%s</b>: <i style="color: red">Completed on required</i>; <b>Goal Date was </b> %s</string>
+    <string name="html_format_assessment_overview_completed_required_no_goal"><b>%s</b>: <i style="color: red">Completed on required</i></string>
+    <string name="html_format_assessment_overview_goal"><b>%s</b>: <b>Goal Date is </b> %s</string>
+    <string name="html_format_assessment_overview_no_goal"><b>%s</b>: <i>(no goal date)</i></string>
+    <string name="html_format_mentor_phone_and_email"><b>Phone</b>: %s; <b>Email: </b> %s</string>
+    <string name="html_format_mentor_phone"><b>Phone</b>: %s</string>
+    <string name="html_format_mentor_email"><b>Email: </b> %s</string>
 </resources>

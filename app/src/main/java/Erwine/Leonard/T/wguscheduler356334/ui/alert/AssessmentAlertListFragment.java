@@ -38,6 +38,7 @@ public class AssessmentAlertListFragment extends Fragment {
     private final List<AssessmentAlert> items;
     private AssessmentAlertListViewModel listViewModel;
     private AssessmentAlertListAdapter adapter;
+    private TextView overviewTextView;
     private TextView noAlertsTextView;
     private RecyclerView alertsRecyclerView;
     private EditAssessmentViewModel assessmentViewModel;
@@ -61,11 +62,11 @@ public class AssessmentAlertListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        overviewTextView = view.findViewById(R.id.overviewTextView);
         noAlertsTextView = view.findViewById(R.id.noAlertsTextView);
         alertsRecyclerView = view.findViewById(R.id.alertsRecyclerView);
         adapter = new AssessmentAlertListAdapter(items, this::onEditAlert);
         alertsRecyclerView.setAdapter(adapter);
-        view.findViewById(R.id.addFloatingActionButton).setOnClickListener(this::onAddFloatingActionButtonClick);
     }
 
     @Override
@@ -96,6 +97,8 @@ public class AssessmentAlertListFragment extends Fragment {
         if (null != assessmentDetails) {
             currentAssessment = assessmentDetails;
             listViewModel.setAssessment(assessmentDetails, getViewLifecycleOwner());
+            assessmentViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+                    f -> overviewTextView.setText(f.apply(getResources())));
         }
     }
 
@@ -127,44 +130,6 @@ public class AssessmentAlertListFragment extends Fragment {
         } else {
             EditAlertDialog dlg = EditAlertViewModel.existingAssessmentAlertEditor(assessmentAlert.getAlert().getId(), assessmentViewModel.getId());
             dlg.show(getParentFragmentManager(), null);
-        }
-    }
-
-    private void onAddFloatingActionButtonClick(View view) {
-        if (assessmentViewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                    () -> requireActivity().finish(),
-                    () -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(assessmentViewModel.save(false).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
-                        requireActivity().finish();
-                    }, null);
-        } else {
-            EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(assessmentViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
-        }
-    }
-
-    private void onSaveForNewAlertFinished(ValidationMessage.ResourceMessageResult messages) {
-        if (messages.isSucceeded()) {
-            EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(assessmentViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
-        } else {
-            Resources resources = getResources();
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_save_warning)
-                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(assessmentViewModel.save(true).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
-                            dialog.dismiss();
-                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
-            } else {
-                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
-            }
-            AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
         }
     }
 

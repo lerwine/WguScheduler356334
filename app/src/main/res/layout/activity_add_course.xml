@@ -9,28 +9,22 @@
 
     <fragment
         android:id="@+id/coursePropertiesFragment"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/saveImageButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        tools:layout="@layout/fragment_course_properties" />
+        tools:layout="@layout/fragment_edit_course" />
 
-    <ImageButton
-        android:id="@+id/saveImageButton"
-        style="@style/WGU.Scheduler.SaveImageButtonStyle"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveFloatingActionButton"
+        style="@style/WGU.Scheduler.SaveFabButtonStyle"
+        android:clickable="true"
         android:contentDescription="@string/command_save_changes"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cancelImageButton" />
-
-    <ImageButton
-        android:id="@+id/cancelImageButton"
-        style="@style/WGU.Scheduler.CancelImageButtonStyle"
-        android:contentDescription="@android:string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

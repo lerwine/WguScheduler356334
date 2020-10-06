@@ -4,12 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Spannable;
+import android.text.Html;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
+import android.text.Spanned;
+import android.text.SpannedString;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -63,11 +62,13 @@ public class EditTermViewModel extends AndroidViewModel {
     private TermEntity termEntity;
     private final MutableLiveData<TermEntity> entityLiveData;
     private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final MutableLiveData<Function<Resources, Spannable>> overviewFactoryLiveData;
+    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final DbLoader dbLoader;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
     private final CurrentValues currentValues;
+    private String viewTitle;
+    private Spanned overview;
     private boolean fromInitializedState;
     private String normalizedName;
     private String normalizedNotes;
@@ -147,7 +148,7 @@ public class EditTermViewModel extends AndroidViewModel {
         return titleFactoryLiveData;
     }
 
-    public MutableLiveData<Function<Resources, Spannable>> getOverviewFactoryLiveData() {
+    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
         return overviewFactoryLiveData;
     }
 
@@ -160,6 +161,8 @@ public class EditTermViewModel extends AndroidViewModel {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         termEntity = new TermEntity();
+        viewTitle = null;
+        overview = null;
         if (null != state) {
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
@@ -170,33 +173,46 @@ public class EditTermViewModel extends AndroidViewModel {
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
+        } else {
+            normalizedName = termEntity.getName();
         }
+        titleFactoryLiveData.postValue(this::calculateViewTitle);
         entityLiveData.postValue(termEntity);
-        normalizedName = termEntity.getName();
-        titleFactoryLiveData.postValue(this::calculateTitle);
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public String calculateTitle(Resources resources) {
-        String t = resources.getString(R.string.format_term, normalizedName);
-        int i = t.indexOf(':');
-        return (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
+
+    @NonNull
+    public synchronized String calculateViewTitle(Resources resources) {
+        if (null == viewTitle) {
+            String t = resources.getString(R.string.format_term, normalizedName);
+            int i = t.indexOf(':');
+            viewTitle = (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
+        }
+        return viewTitle;
     }
 
-    public Spannable calculateOverview(Resources resources) {
-        LocalDate date = currentValues.getStart();
-        SpannableStringBuilder builder = new SpannableStringBuilder();
-        if (null == date) {
-            if (null == (date = currentValues.getEnd())) {
-                return builder.append("No dates specified", new StyleSpan(Typeface.ITALIC), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    @NonNull
+    public synchronized Spanned calculateOverview(Resources resources) {
+        if (null != overview) {
+            return overview;
+        }
+        LocalDate startDate = currentValues.getStart();
+        LocalDate endDate = currentValues.getEnd();
+        Spanned result;
+        if (null == startDate) {
+            if (null == endDate) {
+                result = Html.fromHtml(resources.getString(R.string.html_no_dates_specified), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            } else {
+                result = new SpannedString(resources.getString(R.string.format_ends_on, FORMATTER.format(endDate)));
             }
-            return builder.append("(unknown)", new StyleSpan(Typeface.ITALIC), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE).append(" to ").append(FORMATTER.format(date));
+        } else if (null != endDate) {
+            result = new SpannedString(resources.getString(R.string.format_range_start_to_end, FORMATTER.format(startDate), FORMATTER.format(endDate)));
+        } else {
+            result = new SpannedString(resources.getString(R.string.format_starts_on, FORMATTER.format(startDate)));
         }
-        builder.append(FORMATTER.format(date)).append(" to ");
-        if (null != (date = currentValues.getEnd())) {
-            return builder.append(FORMATTER.format(date));
-        }
-        return builder.append("(unknown)", new StyleSpan(Typeface.ITALIC), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        overview = result;
+        return result;
     }
 
     public void saveViewModelState(Bundle outState) {
@@ -306,8 +322,8 @@ public class EditTermViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 nameValidLiveData.postValue(true);
             }
-
-            titleFactoryLiveData.postValue(EditTermViewModel.this::calculateTitle);
+            viewTitle = null;
+            titleFactoryLiveData.postValue(EditTermViewModel.this::calculateViewTitle);
         }
 
         @Nullable
@@ -321,6 +337,7 @@ public class EditTermViewModel extends AndroidViewModel {
             if (!Objects.equals(this.start, start)) {
                 this.start = start;
                 startMessageLiveData.postValue(validateDateRange().orElse(null));
+                overview = null;
                 overviewFactoryLiveData.postValue(EditTermViewModel.this::calculateOverview);
             }
         }
@@ -336,6 +353,7 @@ public class EditTermViewModel extends AndroidViewModel {
             if (!Objects.equals(this.end, end)) {
                 this.end = end;
                 startMessageLiveData.postValue(validateDateRange().orElse(null));
+                overview = null;
                 overviewFactoryLiveData.postValue(EditTermViewModel.this::calculateOverview);
             }
         }

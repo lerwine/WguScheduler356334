@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +40,7 @@ public class AssessmentListFragment extends Fragment {
     private AssessmentListAdapter adapter;
     private EditCourseViewModel editCourseViewModel;
     private AssessmentListViewModel assessmentListViewModel;
+    private TextView overviewTextView;
     private TextView noAssessmentsTextView;
 
     /**
@@ -62,6 +62,8 @@ public class AssessmentListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        overviewTextView = view.findViewById(R.id.overviewTextView);
+        noAssessmentsTextView = view.findViewById(R.id.noAssessmentsTextView);
         adapter = new AssessmentListAdapter(requireContext(), list);
         RecyclerView assessmentListRecyclerView = view.findViewById(R.id.assessmentListRecyclerView);
         assessmentListRecyclerView.setAdapter(adapter);
@@ -70,8 +72,6 @@ public class AssessmentListFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = Objects.requireNonNull((LinearLayoutManager) assessmentListRecyclerView.getLayoutManager());
         DividerItemDecoration decoration = new DividerItemDecoration(assessmentListRecyclerView.getContext(), linearLayoutManager.getOrientation());
         assessmentListRecyclerView.addItemDecoration(decoration);
-        noAssessmentsTextView = view.findViewById(R.id.noAssessmentsTextView);
-        view.findViewById(R.id.addAssessmentButton).setOnClickListener(this::onAddAssessmentButtonClick);
     }
 
     @Override
@@ -80,6 +80,8 @@ public class AssessmentListFragment extends Fragment {
         // Get shared view model, which is initialized by ViewCourseActivity
         editCourseViewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
         editCourseViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
+        editCourseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+                f -> overviewTextView.setText(f.apply(getResources())));
     }
 
     private void onEntityLoaded(CourseDetails entity) {
@@ -89,6 +91,8 @@ public class AssessmentListFragment extends Fragment {
             assessmentListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentListViewModel.class);
             assessmentListViewModel.setId(courseId);
             assessmentListViewModel.getAssessments().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);
+            editCourseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+                    f -> overviewTextView.setText(f.apply(getResources())));
         }
     }
 
@@ -105,11 +109,4 @@ public class AssessmentListFragment extends Fragment {
         }
     }
 
-    private void onAddAssessmentButtonClick(View view) {
-        LocalDate d = editCourseViewModel.getActualEnd();
-        if (null == d && null == (d = editCourseViewModel.getExpectedEnd())) {
-            d = LocalDate.now();
-        }
-        EditAssessmentViewModel.startAddAssessmentActivity(requireContext(), assessmentListViewModel.getId(), d);
-    }
 }

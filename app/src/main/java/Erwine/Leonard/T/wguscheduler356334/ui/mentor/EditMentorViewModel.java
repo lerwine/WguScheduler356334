@@ -3,7 +3,13 @@ package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,9 +18,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
+import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
@@ -27,18 +35,23 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class EditMentorViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditMentorViewModel.class.getName();
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
 
-    private final MutableLiveData<MentorEntity> entityLiveData;
     private final DbLoader dbLoader;
+    private final MutableLiveData<MentorEntity> entityLiveData;
+    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Boolean> contactValidLiveData;
     private final MutableLiveData<String> nameLiveData;
     private final CurrentValues currentValues;
+    private String viewTitle;
+    private Spanned overview;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
     private String normalizedNotes;
@@ -50,6 +63,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
+        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_mentor_detail));
+        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
         normalizedNotes = normalizedName = normalizedPhoneNumber = normalizedEmailAddress = "";
         entityLiveData = new MutableLiveData<>();
         nameValidLiveData = new MutableLiveData<>(false);
@@ -112,6 +127,35 @@ public class EditMentorViewModel extends AndroidViewModel {
         return normalizedNotes;
     }
 
+    @NonNull
+    public synchronized Spanned calculateOverview(Resources resources) {
+        if (null != overview) {
+            return overview;
+        }
+        Spanned result;
+        if (normalizedPhoneNumber.isEmpty()) {
+            if (normalizedEmailAddress.isEmpty()) {
+                result = new SpannableStringBuilder().append(resources.getString(R.string.message_phone_or_email_required),
+                        new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                result = Html.fromHtml(resources.getString(R.string.html_format_mentor_email, normalizedEmailAddress), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            }
+        } else if (normalizedEmailAddress.isEmpty()) {
+            result = Html.fromHtml(resources.getString(R.string.html_format_mentor_phone, normalizedPhoneNumber), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+        } else {
+            result = Html.fromHtml(resources.getString(R.string.html_format_mentor_phone_and_email, normalizedPhoneNumber, normalizedEmailAddress), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+        }
+        overview = result;
+        return result;
+    }
+
+    private synchronized String calculateViewTitle(Resources resources) {
+        if (null != viewTitle) {
+            viewTitle = resources.getString(R.string.format_mentor, normalizedName);
+        }
+        return viewTitle;
+    }
+
     public LiveData<Boolean> getNameValidLiveData() {
         return nameValidLiveData;
     }
@@ -122,6 +166,14 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     public LiveData<MentorEntity> getEntityLiveData() {
         return entityLiveData;
+    }
+
+    public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
+        return titleFactoryLiveData;
+    }
+
+    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
+        return overviewFactoryLiveData;
     }
 
     public MutableLiveData<String> getNameLiveData() {
@@ -136,6 +188,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         mentorEntity = new MentorEntity();
+        viewTitle = null;
+        overview = null;
         if (null != state) {
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
@@ -147,6 +201,8 @@ public class EditMentorViewModel extends AndroidViewModel {
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
             }
         }
+        titleFactoryLiveData.postValue(this::calculateViewTitle);
+        overviewFactoryLiveData.postValue(this::calculateOverview);
         entityLiveData.postValue(mentorEntity);
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
@@ -180,9 +236,12 @@ public class EditMentorViewModel extends AndroidViewModel {
     private void onEntityLoaded(MentorEntity entity) {
         Log.d(LOG_TAG, "Enter onEntityLoaded");
         mentorEntity = entity;
+        viewTitle = null;
         setName(entity.getName());
+        titleFactoryLiveData.postValue(this::calculateViewTitle);
         setPhoneNumber(entity.getPhoneNumber());
         setEmailAddress(entity.getEmailAddress());
+        overviewFactoryLiveData.postValue(this::calculateOverview);
         setNotes(entity.getNotes());
         entityLiveData.postValue(entity);
     }
@@ -205,10 +264,13 @@ public class EditMentorViewModel extends AndroidViewModel {
     private class CurrentValues implements Mentor {
 
         private long id;
+        @NonNull
         private String name = "";
+        @NonNull
         private String phoneNumber = "";
+        @NonNull
         private String emailAddress = "";
-        private String notes = "";
+        private String notes;
 
         @Override
         public long getId() {
@@ -238,7 +300,11 @@ public class EditMentorViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty()) {
                 nameValidLiveData.postValue(true);
             }
-            nameLiveData.postValue(normalizedName);
+            if (!oldValue.equals(normalizedName)) {
+                viewTitle = null;
+                titleFactoryLiveData.postValue(EditMentorViewModel.this::calculateViewTitle);
+                nameLiveData.postValue(normalizedName);
+            }
         }
 
         @NonNull
@@ -259,6 +325,10 @@ public class EditMentorViewModel extends AndroidViewModel {
             } else if (oldValue.isEmpty() && !normalizedEmailAddress.isEmpty()) {
                 contactValidLiveData.postValue(true);
             }
+            if (!oldValue.equals(normalizedPhoneNumber)) {
+                overview = null;
+                overviewFactoryLiveData.postValue(EditMentorViewModel.this::calculateOverview);
+            }
         }
 
         @NonNull
@@ -278,6 +348,10 @@ public class EditMentorViewModel extends AndroidViewModel {
                 }
             } else if (oldValue.isEmpty() && !normalizedPhoneNumber.isEmpty()) {
                 contactValidLiveData.postValue(true);
+            }
+            if (!oldValue.equals(normalizedEmailAddress)) {
+                overview = null;
+                overviewFactoryLiveData.postValue(EditMentorViewModel.this::calculateOverview);
             }
         }
 

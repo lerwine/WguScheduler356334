@@ -4,7 +4,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -48,6 +54,9 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+import static Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.DATE_FORMATTER;
+import static Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.NUMBER_FORMATTER;
+import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 /**
  * View model shared by {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity}, {@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity},
@@ -91,16 +100,21 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> actualEndMessageLiveData;
     private final MutableLiveData<Integer> competencyUnitsMessageLiveData;
     private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final CurrentValues currentValues;
     private final ArrayList<TermCourseListItem> coursesForTerm;
     private LiveData<List<TermCourseListItem>> coursesLiveData;
     private final Observer<List<TermListItem>> termsLoadedObserver;
     private final Observer<List<MentorListItem>> mentorsLoadedObserver;
+    private String viewTitle;
+    private Spanned overview;
     private Observer<List<TermCourseListItem>> coursesLoadedObserver;
     private boolean fromInitializedState;
     private AbstractTermEntity<?> selectedTerm;
     private AbstractMentorEntity<?> selectedMentor;
+    @NonNull
     private String normalizedNumber = "";
+    @NonNull
     private String normalizedTitle = "";
     private String normalizedNotes = "";
     private String competencyUnitsText = "";
@@ -126,6 +140,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         actualEndMessageLiveData = new MutableLiveData<>();
         competencyUnitsMessageLiveData = new MutableLiveData<>();
         titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_course));
+        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
         coursesForTerm = new ArrayList<>();
         termsLoadedObserver = this::onTermsLoaded;
         mentorsLoadedObserver = this::onMentorsLoaded;
@@ -167,6 +182,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
             expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
             actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
+            resetOverview();
+            overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
         }
     }
 
@@ -179,6 +196,8 @@ public class EditCourseViewModel extends AndroidViewModel {
             Log.d(LOG_TAG, String.format("selectedMentor changing from:\n\t%s\n\tto\n\t%s", this.selectedMentor, selectedMentor));
             this.selectedMentor = selectedMentor;
             currentValues.mentorId = (null == selectedMentor) ? null : selectedMentor.getId();
+            resetOverview();
+            overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
         }
     }
 
@@ -351,6 +370,10 @@ public class EditCourseViewModel extends AndroidViewModel {
         return titleFactoryLiveData;
     }
 
+    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
+        return overviewFactoryLiveData;
+    }
+
     public boolean isFromInitializedState() {
         return fromInitializedState;
     }
@@ -359,6 +382,8 @@ public class EditCourseViewModel extends AndroidViewModel {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         courseEntity = new CourseDetails(null);
+        viewTitle = null;
+        resetOverview();
         if (null != state) {
             Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
             currentValues.restoreState(state, false);
@@ -404,8 +429,129 @@ public class EditCourseViewModel extends AndroidViewModel {
         onEntityLoaded();
     }
 
+    private synchronized void resetOverview() {
+        overview = null;
+    }
+
+    @NonNull
+    public synchronized Spanned calculateOverview(Resources resources) {
+        if (null != overview) {
+            return overview;
+        }
+        CourseStatus status = currentValues.status;
+        SpannableStringBuilder result = new SpannableStringBuilder("Status: ");
+        result.setSpan(new StyleSpan(Typeface.BOLD), 0, result.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+        result.append(resources.getString(status.displayResourceId())).append("; ")
+                .append("Competency Units: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+        Integer v = currentValues.competencyUnits;
+        if (null == v) {
+            result.append(resources.getString((competencyUnitsText.trim().isEmpty()) ? R.string.message_required : R.string.message_invalid_number),
+                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else if (v < 0) {
+            result.append(resources.getString(R.string.message_invalid_number),
+                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            result.append(NUMBER_FORMATTER.format(v));
+        }
+        int position = result.append("\n").length();
+        LocalDate date = currentValues.getActualStart();
+        if (null != date) {
+            result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else if (null != (date = currentValues.getExpectedStart())) {
+            result.append("Expected Start: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                    .append(DATE_FORMATTER.format(date));
+            switch (status) {
+                case IN_PROGRESS:
+                case NOT_PASSED:
+                case PASSED:
+                    result.append(DATE_FORMATTER.format(date)).append(" (actual start date missing)",
+                            new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
+                default:
+                    result.append(DATE_FORMATTER.format(date));
+                    break;
+            }
+        } else {
+            switch (status) {
+                case IN_PROGRESS:
+                case NOT_PASSED:
+                case PASSED:
+                    result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                            .append(resources.getString(R.string.message_required),
+                                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
+                default:
+                    break;
+            }
+        }
+        date = currentValues.getActualEnd();
+        if (null != date) {
+            if (position > result.length()) {
+                result.append("; ");
+            }
+            result.append("Ended On: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else if (null != (date = currentValues.getExpectedEnd())) {
+            if (position > result.length()) {
+                result.append("; ");
+            }
+            result.append("Expected End: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                    .append(DATE_FORMATTER.format(date));
+            switch (status) {
+                case NOT_PASSED:
+                case PASSED:
+                    result.append(DATE_FORMATTER.format(date)).append(" (actual end date missing)",
+                            new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
+                default:
+                    result.append(DATE_FORMATTER.format(date));
+                    break;
+            }
+        } else {
+            switch (status) {
+                case NOT_PASSED:
+                case PASSED:
+                    if (position > result.length()) {
+                        result.append("; ");
+                    }
+                    result.append("Ended on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                            .append(resources.getString(R.string.message_required),
+                                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (position > result.length()) {
+            result.append("\n");
+        }
+        if (null != selectedMentor) {
+            result.append("Mentor: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(selectedMentor.getName()).append("; ");
+        }
+        result.append("Term: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (null == selectedTerm) {
+            result.append(resources.getString(R.string.message_required),
+                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            String n = selectedTerm.getName();
+            String t = resources.getString(R.string.format_term, n);
+            int i = t.indexOf(':');
+            result.append((i > 0 && n.startsWith(t.substring(0, i))) ? n.substring(i).trim() : n);
+        }
+        overview = result;
+        return result;
+    }
+
+    @NonNull
+    public synchronized String calculateViewTitle(Resources resources) {
+        if (null == viewTitle) {
+            viewTitle = resources.getString(R.string.format_course, normalizedNumber, normalizedTitle);
+        }
+        return viewTitle;
+    }
+
     private void onEntityLoaded() {
-        titleFactoryLiveData.postValue(c -> c.getString(R.string.format_course, courseEntity.getNumber(), courseEntity.getTitle()));
+        titleFactoryLiveData.postValue(this::calculateViewTitle);
+        overviewFactoryLiveData.postValue(this::calculateOverview);
         entityLiveData.postValue(courseEntity);
         termsLiveData.observeForever(termsLoadedObserver);
         mentorsLiveData.observeForever(mentorsLoadedObserver);
@@ -643,9 +789,11 @@ public class EditCourseViewModel extends AndroidViewModel {
     private class CurrentValues implements Course {
 
         private long id;
+        @NonNull
         private String number = "";
         private long termId;
         private Long mentorId;
+        @NonNull
         private String title = "";
         private LocalDate expectedStart;
         private LocalDate actualStart;
@@ -690,7 +838,10 @@ public class EditCourseViewModel extends AndroidViewModel {
                 Log.d(LOG_TAG, "Setting numberValidLiveData to true");
                 numberValidLiveData.postValue(true);
             }
-            titleFactoryLiveData.postValue(c -> c.getString(R.string.format_course, normalizedNumber, normalizedTitle));
+            if (!oldValue.equals(normalizedNumber)) {
+                viewTitle = null;
+                titleFactoryLiveData.postValue(EditCourseViewModel.this::calculateViewTitle);
+            }
             Log.d(LOG_TAG, "Number change complete");
         }
 
@@ -738,7 +889,10 @@ public class EditCourseViewModel extends AndroidViewModel {
                     titleValidLiveData.postValue(true);
                 }
             }
-            titleFactoryLiveData.postValue(c -> c.getString(R.string.format_course, normalizedNumber, normalizedTitle));
+            if (!oldValue.equals(normalizedTitle)) {
+                viewTitle = null;
+                titleFactoryLiveData.postValue(EditCourseViewModel.this::calculateViewTitle);
+            }
             Log.d(LOG_TAG, "Title change complete");
         }
 
@@ -771,6 +925,8 @@ public class EditCourseViewModel extends AndroidViewModel {
                 expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
                 LocalDate newStart = getEffectiveStart();
                 if (!Objects.equals(oldStart, newStart)) {
+                    resetOverview();
+                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
                     effectiveStartLiveData.postValue(newStart);
                 }
             }
@@ -797,6 +953,8 @@ public class EditCourseViewModel extends AndroidViewModel {
                 actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
                 LocalDate newStart = getEffectiveStart();
                 if (!Objects.equals(oldStart, newStart)) {
+                    resetOverview();
+                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
                     effectiveStartLiveData.postValue(newStart);
                 }
             }
@@ -831,6 +989,8 @@ public class EditCourseViewModel extends AndroidViewModel {
                 expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
                 LocalDate newEnd = getEffectiveEnd();
                 if (!Objects.equals(oldEnd, newEnd)) {
+                    resetOverview();
+                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
                     effectiveEndLiveData.postValue(newEnd);
                 }
             }
@@ -857,6 +1017,8 @@ public class EditCourseViewModel extends AndroidViewModel {
                 actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
                 LocalDate newEnd = getEffectiveEnd();
                 if (!Objects.equals(oldEnd, newEnd)) {
+                    resetOverview();
+                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
                     effectiveEndLiveData.postValue(newEnd);
                 }
             }
@@ -890,6 +1052,8 @@ public class EditCourseViewModel extends AndroidViewModel {
                 if (!Objects.equals(oldEnd, newEnd)) {
                     effectiveEndLiveData.postValue(newEnd);
                 }
+                resetOverview();
+                overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
             }
         }
 
@@ -899,8 +1063,12 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setCompetencyUnits(int competencyUnits) {
-            this.competencyUnits = competencyUnits;
+        public synchronized void setCompetencyUnits(int competencyUnits) {
+            if (this.competencyUnits != competencyUnits) {
+                this.competencyUnits = competencyUnits;
+                resetOverview();
+                overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
+            }
         }
 
         @NonNull

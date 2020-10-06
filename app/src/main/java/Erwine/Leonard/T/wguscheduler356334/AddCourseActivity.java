@@ -12,16 +12,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
-/**
- * Adds a new course using {@link Erwine.Leonard.T.wguscheduler356334.ui.course.CoursePropertiesFragment}.
- * This initializes the shared view model {@link EditCourseViewModel}.
- */
 public class AddCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddCourseActivity.class.getName();
@@ -29,6 +27,7 @@ public class AddCourseActivity extends AppCompatActivity {
     private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
     private AlertDialog waitDialog;
+    private FloatingActionButton saveFloatingActionButton;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,8 +48,7 @@ public class AddCourseActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-        findViewById(R.id.saveImageButton).setOnClickListener(this::onSaveImageButtonClick);
-        findViewById(R.id.cancelImageButton).setOnClickListener(this::onCancelImageButtonClick);
+        saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
@@ -97,6 +95,7 @@ public class AddCourseActivity extends AppCompatActivity {
         waitDialog.dismiss();
         if (null != entity) {
             Log.d(LOG_TAG, String.format("Loaded %s", entity));
+            saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
         } else {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_course_not_restored, this).showDialog(this::finish);
         }
@@ -108,15 +107,10 @@ public class AddCourseActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 
-    private void onSaveImageButtonClick(View view) {
+    private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
         compositeDisposable.clear();
         compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-    }
-
-    private void onCancelImageButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onCancelImageButtonClick");
-        confirmSave();
     }
 
     private void onSaveOperationFinished(@NonNull ValidationMessage.ResourceMessageResult messages) {
