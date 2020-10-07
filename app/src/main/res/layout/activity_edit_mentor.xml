@@ -114,7 +114,7 @@
         android:layout_height="57dp"
         android:clickable="true"
         android:contentDescription="@string/title_delete_mentor"
-        android:src="@drawable/fab_bg"
+        android:src="@drawable/delete_fab"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

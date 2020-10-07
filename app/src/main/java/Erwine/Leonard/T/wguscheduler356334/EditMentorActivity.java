@@ -20,6 +20,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -150,17 +151,23 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onNameValidChanged(Boolean isValid) {
         if (null != isValid && isValid) {
+            Log.d(LOG_TAG, "Enter onNameValidChanged(true); calling mentorNameEditText.setError(null)");
             mentorNameEditText.setError(null);
         } else {
+            Log.d(LOG_TAG, "Enter onNameValidChanged(" + ToStringBuilder.toEscapedString(isValid) + "); calling mentorNameEditText.setError(R.string.message_required, R.drawable.dialog_error)");
             mentorNameEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
     }
 
     private void onContactValidChanged(Boolean isValid) {
         if (null != isValid && isValid) {
-            mentorNameEditText.setError(null);
+            Log.d(LOG_TAG, "Enter onContactValidChanged(true); calling setError(null) on phoneNumberEditText and emailAddressEditText");
+            phoneNumberEditText.setError(null);
+            emailAddressEditText.setError(null);
         } else {
-            mentorNameEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
+            Log.d(LOG_TAG, "Enter onContactValidChanged(" + ToStringBuilder.toEscapedString(isValid) + "); calling setError(R.string.message_phone_or_email_required, R.drawable.dialog_error) on phoneNumberEditText and emailAddressEditText");
+            phoneNumberEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
+            emailAddressEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
     }
 
@@ -237,10 +244,11 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void verifySaveChanges() {
         if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(() -> {
-                compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
-            }, this::finish, null);
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
+                    .showYesNoCancelDialog(this::finish, () -> {
+                        compositeDisposable.clear();
+                        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
+                    }, null);
         } else {
             finish();
         }

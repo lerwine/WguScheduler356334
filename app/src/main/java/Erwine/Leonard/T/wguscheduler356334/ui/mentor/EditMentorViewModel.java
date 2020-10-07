@@ -289,19 +289,24 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
+            Log.d(LOG_TAG, "Enter setName:  current: " + ToStringBuilder.toEscapedString(this.phoneNumber) + "; new: " + ToStringBuilder.toEscapedString(phoneNumber));
             this.name = (null == name) ? "" : name;
             String oldValue = normalizedName;
             normalizedName = TermEntity.SINGLE_LINE_NORMALIZER.apply(name);
             if (normalizedName.isEmpty()) {
                 if (!oldValue.isEmpty()) {
+                    Log.d(LOG_TAG, "setName:  Posting false to nameValidLiveData");
                     nameValidLiveData.postValue(false);
                 }
             } else if (oldValue.isEmpty()) {
+                Log.d(LOG_TAG, "setName:  Posting true to nameValidLiveData");
                 nameValidLiveData.postValue(true);
             }
             if (!oldValue.equals(normalizedName)) {
                 viewTitle = null;
+                Log.d(LOG_TAG, "setName:  Posting new recalculation to titleFactoryLiveData");
                 titleFactoryLiveData.postValue(EditMentorViewModel.this::calculateViewTitle);
+                Log.d(LOG_TAG, "setName: Posting " + ToStringBuilder.toEscapedString(normalizedName) + " to overviewFactoryLiveData");
                 nameLiveData.postValue(normalizedName);
             }
         }
@@ -314,18 +319,22 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setPhoneNumber(String phoneNumber) {
+            Log.d(LOG_TAG, "Enter setPhoneNumber:  current: " + ToStringBuilder.toEscapedString(this.phoneNumber) + "; new: " + ToStringBuilder.toEscapedString(phoneNumber));
             this.phoneNumber = (null == phoneNumber) ? "" : phoneNumber;
             String oldValue = normalizedPhoneNumber;
             normalizedPhoneNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(phoneNumber);
             if (normalizedPhoneNumber.isEmpty()) {
                 if (!oldValue.isEmpty() && normalizedEmailAddress.isEmpty()) {
+                    Log.d(LOG_TAG, "setPhoneNumber:  Posting false to contactValidLiveData");
                     contactValidLiveData.postValue(false);
                 }
             } else if (oldValue.isEmpty() && !normalizedEmailAddress.isEmpty()) {
+                Log.d(LOG_TAG, "setPhoneNumber:  Posting true to contactValidLiveData");
                 contactValidLiveData.postValue(true);
             }
             if (!oldValue.equals(normalizedPhoneNumber)) {
                 overview = null;
+                Log.d(LOG_TAG, "setPhoneNumber:  Posting new recalculation to overviewFactoryLiveData");
                 overviewFactoryLiveData.postValue(EditMentorViewModel.this::calculateOverview);
             }
         }
@@ -338,18 +347,22 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setEmailAddress(String emailAddress) {
+            Log.d(LOG_TAG, "Enter setEmailAddress:  current: " + ToStringBuilder.toEscapedString(this.emailAddress) + "; new: " + ToStringBuilder.toEscapedString(emailAddress));
             this.emailAddress = (null == emailAddress) ? "" : emailAddress;
             String oldValue = normalizedEmailAddress;
             normalizedEmailAddress = TermEntity.SINGLE_LINE_NORMALIZER.apply(emailAddress);
             if (normalizedEmailAddress.isEmpty()) {
                 if (!oldValue.isEmpty() && normalizedPhoneNumber.isEmpty()) {
+                    Log.d(LOG_TAG, "setEmailAddress:  Posting false to contactValidLiveData");
                     contactValidLiveData.postValue(false);
                 }
             } else if (oldValue.isEmpty() && !normalizedPhoneNumber.isEmpty()) {
+                Log.d(LOG_TAG, "setEmailAddress:  Posting true to contactValidLiveData");
                 contactValidLiveData.postValue(true);
             }
             if (!oldValue.equals(normalizedEmailAddress)) {
                 overview = null;
+                Log.d(LOG_TAG, "setEmailAddress:  Posting new recalculation to overviewFactoryLiveData");
                 overviewFactoryLiveData.postValue(EditMentorViewModel.this::calculateOverview);
             }
         }
