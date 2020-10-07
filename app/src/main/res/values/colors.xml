@@ -22,4 +22,5 @@
     <color name="color_on_error">#FFFFFF</color>
     <color name="color_error_light">#E10B0B</color>
     <color name="color_error_accent">#A63E0E</color>
+    <color name="accent_tfifty">#7f6c2f00</color>
 </resources>

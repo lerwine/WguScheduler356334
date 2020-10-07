@@ -18,7 +18,6 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
-import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
@@ -26,11 +25,6 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
 import static Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel.FORMATTER;
 
-/**
- * Fragment for editing the properties of a {@link TermEntity}.
- * This is included in the layouts for {@link EditTermFragment} and {@link Erwine.Leonard.T.wguscheduler356334.AddTermActivity}.
- * This assumes that the containing {@link Fragment} or {@link android.app.Activity} invokes {@link EditTermViewModel#initializeViewModelState(Bundle, Supplier)}
- */
 public class EditTermFragment extends Fragment {
 
     private static final String LOG_TAG = EditTermFragment.class.getName();

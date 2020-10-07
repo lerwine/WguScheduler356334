@@ -1,5 +1,11 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.course;
 
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.SpannedString;
+import android.text.style.StyleSpan;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -14,7 +20,18 @@ import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 
+import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+
 public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> extends AbstractNotedEntity<T> implements Course {
+
+    public static Spanned toPickerItemDescription(AbstractCourseEntity<?> source) {
+        if (null == source) {
+            return SpannedString.valueOf("");
+        }
+        SpannableStringBuilder builder = new SpannableStringBuilder(source.getNumber());
+        builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+        return builder.append(": ").append(source.getTitle());
+    }
 
     @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_TERM_ID)

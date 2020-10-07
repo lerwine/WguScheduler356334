@@ -67,12 +67,12 @@
     <style name="WGU.Scheduler.FloatingActionButton" parent="@style/Widget.Design.FloatingActionButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/color_on_primary</item>
         <item name="android:layout_gravity">end</item>
-        <item name="android:tint">@color/color_on_accent</item>
-        <item name="maxImageSize">42dp</item>
+        <item name="maxImageSize">56dp</item>
         <item name="android:layout_margin">@dimen/fab_margin</item>
-        <item name="android:backgroundTint">@color/color_accent</item>
+        <item name="android:background">@drawable/fab_bg</item>
+        <item name="android:backgroundTint">#00ffffff</item>
+        <item name="borderWidth">0dp</item>
     </style>
 
     <style name="WGU.Scheduler.ImageButtonStyle" parent="@style/TextAppearance.AppCompat.Widget.Button.Colored">
@@ -93,23 +93,33 @@
     </style>
 
     <style name="WGU.Scheduler.ShareFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
-        <item name="android:src">@android:drawable/ic_menu_share</item>
-        <item name="srcCompat">@android:drawable/ic_menu_share</item>
+        <item name="android:src">@drawable/share_fab_selector</item>
+        <item name="srcCompat">@drawable/share_fab_selector</item>
     </style>
 
     <style name="WGU.Scheduler.DeleteFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
-        <item name="android:src">@drawable/delete_icon</item>
-        <item name="srcCompat">@drawable/delete_icon</item>
+        <item name="android:src">@drawable/delete_fab</item>
+        <item name="srcCompat">@drawable/delete_fab</item>
     </style>
 
     <style name="WGU.Scheduler.AddFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
-        <item name="android:src">@drawable/add_item_icon</item>
-        <item name="srcCompat">@drawable/add_item_icon</item>
+        <item name="android:src">@drawable/add_item_fab</item>
+        <item name="srcCompat">@drawable/add_item_fab</item>
+    </style>
+
+    <style name="WGU.Scheduler.AddAssessmentFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/add_assessment_fab</item>
+        <item name="srcCompat">@drawable/add_assessment_fab</item>
+    </style>
+
+    <style name="WGU.Scheduler.AddAlertFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
+        <item name="android:src">@drawable/add_alert_fab</item>
+        <item name="srcCompat">@drawable/add_alert_fab</item>
     </style>
 
     <style name="WGU.Scheduler.SaveFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
-        <item name="android:src">@drawable/save_icon</item>
-        <item name="srcCompat">@drawable/save_icon</item>
+        <item name="android:src">@drawable/save_fab_selector</item>
+        <item name="srcCompat">@drawable/save_fab_selector</item>
     </style>
 
     <style name="WGU.Scheduler.CancelFabButtonStyle" parent="@style/WGU.Scheduler.FloatingActionButton">
@@ -133,8 +143,8 @@
     </style>
 
     <style name="WGU.Scheduler.DeleteImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">
-        <item name="android:src">@drawable/delete_icon</item>
-        <item name="srcCompat">@drawable/delete_icon</item>
+        <item name="android:src">@drawable/delete_icon_old</item>
+        <item name="srcCompat">@drawable/delete_icon_old</item>
     </style>
 
     <style name="WGU.Scheduler.CancelImageButtonStyle" parent="@style/WGU.Scheduler.ImageButtonStyle">

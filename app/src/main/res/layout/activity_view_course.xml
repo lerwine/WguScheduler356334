@@ -31,10 +31,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar_Layout" />
 
-    <!-- TODO: Create icons to distinguish different add buttons -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addAssessmentFloatingActionButton"
-        style="@style/WGU.Scheduler.AddFabButtonStyle"
+        style="@style/WGU.Scheduler.AddAssessmentFabButtonStyle"
         android:clickable="true"
         android:contentDescription="@string/title_add_assessment"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +41,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addAlertFloatingActionButton"
-        style="@style/WGU.Scheduler.AddFabButtonStyle"
+        style="@style/WGU.Scheduler.AddAlertFabButtonStyle"
         android:clickable="true"
         android:contentDescription="@string/title_add_alert"
         app:layout_constraintBottom_toBottomOf="parent"

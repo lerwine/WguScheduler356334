@@ -36,14 +36,11 @@ public interface TermDAO {
     @Insert
     List<Long> insertAllSynchronous(List<TermEntity> items);
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable updateAll(List<TermEntity> terms);
+    @Delete
+    Single<Integer> delete(TermEntity term);
 
     @Delete
-    Completable delete(TermEntity term);
-
-    @Query("SELECT * FROM terms WHERE ROWID = :rowId")
-    Single<TermEntity> getByRowId(int rowId);
+    int deleteSynchronous(TermEntity term);
 
     @Query("SELECT * FROM terms WHERE id = :id")
     Single<TermEntity> getById(long id);
@@ -59,8 +56,5 @@ public interface TermDAO {
 
     @Query("SELECT COUNT(*) FROM terms")
     Single<Integer> getCount();
-
-    @Query("DELETE FROM terms")
-    Single<Integer> deleteAll();
 
 }

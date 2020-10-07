@@ -13,7 +13,6 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
-import io.reactivex.Completable;
 import io.reactivex.Single;
 
 @Dao
@@ -35,7 +34,10 @@ public interface AssessmentAlertDAO {
     List<Long> insertAllSynchronous(List<AssessmentAlertLink> list);
 
     @Delete
-    Completable delete(AssessmentAlertLink course);
+    Single<Integer> delete(AssessmentAlertLink course);
+
+    @Delete
+    int deleteSynchronous(AssessmentAlertLink course);
 
     @Transaction
     @Query("SELECT * FROM assessmentAlerts WHERE alertId = :alertId AND targetId=:assessmentId")

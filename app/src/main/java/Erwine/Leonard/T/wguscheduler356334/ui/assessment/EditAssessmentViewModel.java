@@ -43,7 +43,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
-import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -345,7 +344,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         return dbLoader.saveAssessment(entity, ignoreWarnings);
     }
 
-    public Completable delete() {
+    public Single<Integer> delete() {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
         AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
         return dbLoader.deleteAssessment(entity).doOnError(throwable -> Log.e(getClass().getName(),
@@ -373,6 +372,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
         }
         return dbLoader.getMentorById(assessmentEntity.getMentorId()).doOnSuccess(t -> mentorEntity = t);
+    }
+
+    public synchronized Long getMentorId() {
+        return (null == selectedCourse) ? null : selectedCourse.getMentorId();
     }
 
     private class CurrentValues implements Assessment {

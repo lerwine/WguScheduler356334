@@ -1064,7 +1064,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         @Override
         public synchronized void setCompetencyUnits(int competencyUnits) {
-            if (this.competencyUnits != competencyUnits) {
+            if (!Objects.equals(this.competencyUnits, competencyUnits)) {
                 this.competencyUnits = competencyUnits;
                 resetOverview();
                 overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);

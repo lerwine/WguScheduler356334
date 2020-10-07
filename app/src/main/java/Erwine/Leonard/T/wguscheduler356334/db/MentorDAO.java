@@ -35,17 +35,11 @@ public interface MentorDAO {
     @Insert
     List<Long> insertAllSynchronous(List<MentorEntity> items);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable updateAll(List<MentorEntity> mentors);
+    @Delete
+    Single<Integer> delete(MentorEntity mentor);
 
     @Delete
-    Completable delete(MentorEntity mentor);
-
-    @Delete
-    void deleteSynchronous(MentorEntity mentor);
-
-    @Query("SELECT * FROM mentors WHERE ROWID = :rowId")
-    Single<MentorEntity> getByRowId(int rowId);
+    int deleteSynchronous(MentorEntity mentor);
 
     @Query("SELECT * FROM mentors WHERE id = :id")
     Single<MentorEntity> getById(long id);
@@ -61,8 +55,5 @@ public interface MentorDAO {
 
     @Query("SELECT COUNT(*) FROM mentors")
     Single<Integer> getCount();
-
-    @Query("DELETE FROM mentors")
-    Single<Integer> deleteAll();
 
 }

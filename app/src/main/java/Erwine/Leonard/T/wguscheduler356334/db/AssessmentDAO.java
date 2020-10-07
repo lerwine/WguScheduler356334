@@ -36,17 +36,11 @@ public interface AssessmentDAO {
     @Insert
     List<Long> insertAllSynchronous(List<AssessmentEntity> list);
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable updateAll(List<AssessmentEntity> list);
+    @Delete
+    Single<Integer> delete(AssessmentEntity assessment);
 
     @Delete
-    Completable delete(AssessmentEntity assessment);
-
-    @Delete
-    void deleteSynchronous(AssessmentEntity assessment);
-
-    @Query("SELECT * FROM assessments WHERE ROWID = :rowId")
-    Single<AssessmentEntity> getByRowId(int rowId);
+    int deleteSynchronous(AssessmentEntity assessment);
 
     @Query("SELECT * FROM assessmentDetailView WHERE id = :id")
     Single<AssessmentDetails> getById(long id);

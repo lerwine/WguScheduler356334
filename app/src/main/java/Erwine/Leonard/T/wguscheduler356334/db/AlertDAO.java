@@ -28,17 +28,20 @@ public interface AlertDAO {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Completable update(AlertEntity item);
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void updateSynchronous(AlertEntity item);
+
     @Insert
     Single<List<Long>> insertAll(List<AlertEntity> list);
 
     @Insert
     List<Long> insertAllSynchronous(List<AlertEntity> list);
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    Completable updateAll(List<AlertEntity> list);
+    @Delete
+    Single<Integer> delete(AlertEntity item);
 
     @Delete
-    Completable delete(AlertEntity item);
+    int deleteSynchronous(AlertEntity item);
 
     @Query("SELECT * FROM alertListView ORDER BY alertDate DESC, eventDate DESC, code, title")
     LiveData<List<AlertListItem>> getAll();
@@ -60,11 +63,5 @@ public interface AlertDAO {
 
     @Query("SELECT * FROM alertListView WHERE eventDate IS NULL ORDER BY code, title")
     LiveData<List<AlertListItem>> getDatePendingAlerts();
-
-//    @Query("SELECT COUNT(*) FROM alertListView")
-//    Single<Integer> getCount();
-//
-//    @Query("SELECT COUNT(*) FROM alertListView WHERE courseId=:courseId")
-//    Single<Integer> getCountByCourse(long courseId);
 
 }

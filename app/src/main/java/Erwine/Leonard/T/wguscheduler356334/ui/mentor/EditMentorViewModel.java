@@ -224,13 +224,12 @@ public class EditMentorViewModel extends AndroidViewModel {
             mentorEntity.setPhoneNumber(originalPhoneNumber);
             mentorEntity.setEmailAddress(originalEmailAddress);
             mentorEntity.setNotes(originalNotes);
-            Log.e(getClass().getName(), "Error saving mentor", throwable);
         });
     }
 
     public Single<ValidationMessage.ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete");
-        return dbLoader.deleteMentor(mentorEntity, ignoreWarnings).doOnError(throwable -> Log.e(getClass().getName(), "Error deleting mentor", throwable));
+        return dbLoader.deleteMentor(mentorEntity, ignoreWarnings);
     }
 
     private void onEntityLoaded(MentorEntity entity) {

@@ -253,9 +253,14 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }, null);
     }
 
-    private void onDeleteSucceeded() {
+    private void onDeleteSucceeded(Integer count) {
         Log.d(LOG_TAG, "Enter onDeleteSucceeded");
-        finish();
+        Log.d(LOG_TAG, "Enter onDeleteSucceeded");
+        if (null == count || count < 1) {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.message_delete_term_fail), this).showDialog();
+        } else {
+            finish();
+        }
     }
 
     private void onDeleteFailed(Throwable throwable) {

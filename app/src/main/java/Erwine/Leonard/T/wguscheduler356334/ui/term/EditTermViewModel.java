@@ -238,7 +238,6 @@ public class EditTermViewModel extends AndroidViewModel {
             termEntity.setStart(originalStart);
             termEntity.setEnd(originalEnd);
             termEntity.setNotes(originalNotes);
-            Log.e(getClass().getName(), "Error saving term", throwable);
         }).doOnSuccess(t -> {
             if (t.isError() || !(ignoreWarnings || t.isSucceeded())) {
                 termEntity.setName(originalName);

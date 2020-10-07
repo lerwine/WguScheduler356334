@@ -5,7 +5,7 @@
     tools:context=".ui.term.EditTermActivity">
     <item
         android:id="@+id/action_term_delete"
-        android:icon="@drawable/delete_icon"
+        android:icon="@drawable/delete_icon_old"
         android:orderInCategory="100"
         android:title="@string/command_delete"
         app:showAsAction="ifRoom" />

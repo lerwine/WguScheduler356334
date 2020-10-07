@@ -60,13 +60,13 @@ public class AlertHelper {
         dlg.show();
     }
 
-    public static <T> void showSingleSelectDialog(@StringRes int titleId, @Nullable T defaultOption, @NonNull List<? extends T> options, @NonNull Context context, @NonNull Function<T, String> toDisplayText, @NonNull Consumer<T> onSelected) {
+    public static <T> void showSingleSelectDialog(@StringRes int titleId, @Nullable T defaultOption, @NonNull List<? extends T> options, @NonNull Context context, @NonNull Function<T, CharSequence> toDisplayText, @NonNull Consumer<T> onSelected) {
         showSingleSelectDialog(titleId, defaultOption, options, context, toDisplayText, onSelected, null);
     }
 
-    public static <T> void showSingleSelectDialog(@StringRes int titleId, @Nullable T defaultOption, @NonNull List<? extends T> options, @NonNull Context context, @NonNull Function<T, String> toDisplayText, @NonNull Consumer<T> onSelected, @Nullable Runnable onCancel) {
+    public static <T> void showSingleSelectDialog(@StringRes int titleId, @Nullable T defaultOption, @NonNull List<? extends T> options, @NonNull Context context, @NonNull Function<T, CharSequence> toDisplayText, @NonNull Consumer<T> onSelected, @Nullable Runnable onCancel) {
         LinkedList<T> allOptions = new LinkedList<>();
-        List<String> displayText = options.stream().map(t -> {
+        List<CharSequence> displayText = options.stream().map(t -> {
             allOptions.addLast(t);
             return toDisplayText.apply(t);
         }).collect(Collectors.toList());
@@ -76,14 +76,14 @@ public class AlertHelper {
             allOptions.addFirst(defaultOption);
             displayText.add(0, toDisplayText.apply(defaultOption));
         }
-        showSingleSelectDialog(titleId, optionIndex, displayText.toArray(new String[0]), context, i -> onSelected.accept((i < 0) ? null : allOptions.get(i)), onCancel);
+        showSingleSelectDialog(titleId, optionIndex, displayText.toArray(new CharSequence[0]), context, i -> onSelected.accept((i < 0) ? null : allOptions.get(i)), onCancel);
     }
 
-    public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull String[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected) {
+    public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull CharSequence[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected) {
         showSingleSelectDialog(titleId, defaultOption, options, context, onSelected, null);
     }
 
-    public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull String[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected, @Nullable Runnable onCancel) {
+    public static void showSingleSelectDialog(@StringRes int titleId, int defaultOption, @NonNull CharSequence[] options, @NonNull Context context, @NonNull Consumer<Integer> onSelected, @Nullable Runnable onCancel) {
         if (options.length == 0) {
             onSelected.accept(-1);
         } else if (options.length == 1) {
@@ -212,10 +212,10 @@ public class AlertHelper {
     }
 
     private static class SingleSelector {
-        private final String[] options;
+        private final CharSequence[] options;
         private int selectedIndex;
 
-        SingleSelector(int defaultOption, @NonNull String[] options) {
+        SingleSelector(int defaultOption, @NonNull CharSequence[] options) {
             this.options = options;
             selectedIndex = (defaultOption < 0 || defaultOption >= options.length) ? -1 : defaultOption;
         }

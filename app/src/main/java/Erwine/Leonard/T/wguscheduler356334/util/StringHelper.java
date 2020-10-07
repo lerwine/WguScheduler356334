@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.text.Spanned.SPAN_INCLUSIVE_EXCLUSIVE;
 
 /**
  * Helper class for manipulating and validating string values.
@@ -101,6 +104,16 @@ public final class StringHelper {
     );
 
     private static final HashMap<Integer, Function<String, String>> NORMALIZER_MAP = new HashMap<>();
+
+    public static SpannableString createSpannableString(CharSequence source, Object what, int start, int end) {
+        SpannableString spannableString = new SpannableString(source);
+        spannableString.setSpan(what, start, end, SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableString;
+    }
+
+    public static SpannableString createSpannableString(CharSequence source, Object what) {
+        return createSpannableString(source, what, 0, source.length());
+    }
 
     private StringHelper() {
     }

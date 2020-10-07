@@ -199,7 +199,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onDeleteTermComplete(ValidationMessage.ResourceMessageResult messages) {
-        Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onDeleteTermComplete");
         if (messages.isSucceeded()) {
             finish();
         } else {

@@ -110,8 +110,11 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/deleteFloatingActionButton"
         style="@style/WGU.Scheduler.DeleteFabButtonStyle"
+        android:layout_width="57dp"
+        android:layout_height="57dp"
         android:clickable="true"
         android:contentDescription="@string/title_delete_mentor"
+        android:src="@drawable/fab_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

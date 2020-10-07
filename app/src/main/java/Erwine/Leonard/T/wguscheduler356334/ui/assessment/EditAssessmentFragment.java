@@ -23,12 +23,14 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import io.reactivex.disposables.CompositeDisposable;
@@ -106,20 +108,24 @@ public class EditAssessmentFragment extends Fragment {
     private void onCourseButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onCourseButtonClick");
         compositeDisposable.clear();
-        compositeDisposable.add(viewModel.loadCourses().subscribe(termCourseListItems ->
-                AlertHelper.showSingleSelectDialog(R.string.title_select_course, viewModel.getSelectedCourse(), termCourseListItems, requireContext(),
-                        AbstractCourseEntity::getTitle, t -> {
-                            viewModel.setSelectedCourse(t);
-                            onCourseChanged(t);
-                        }), throwable -> {
-            AlertDialog dlg = new AlertDialog.Builder(requireActivity())
-                    .setTitle(R.string.title_read_error)
-                    .setMessage(getString(R.string.format_message_save_error, throwable.getMessage()))
-                    .setIcon(R.drawable.dialog_error)
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
-                    .create();
-            dlg.show();
-        }));
+        compositeDisposable.add(viewModel.loadCourses().subscribe(this::onCoursesLoadedForPicker, this::onLoadCourseOptionsListError));
+    }
+
+    private void onCoursesLoadedForPicker(List<TermCourseListItem> termCourseListItems) {
+        AlertHelper.showSingleSelectDialog(R.string.title_select_course, viewModel.getSelectedCourse(), termCourseListItems, requireContext(), AbstractCourseEntity::toPickerItemDescription, t -> {
+            viewModel.setSelectedCourse(t);
+            onCourseChanged(t);
+        });
+    }
+
+    private void onLoadCourseOptionsListError(Throwable throwable) {
+        AlertDialog dlg = new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.title_read_error)
+                .setMessage(getString(R.string.format_message_save_error, throwable.getMessage()))
+                .setIcon(R.drawable.dialog_error)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .create();
+        dlg.show();
     }
 
     private void onTypeButtonClick(View view) {
