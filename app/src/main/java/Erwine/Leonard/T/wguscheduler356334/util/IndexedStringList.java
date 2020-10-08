@@ -14,7 +14,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import Erwine.Leonard.T.wguscheduler356334.util.live.OptionalLiveData;
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 
 public final class IndexedStringList extends AbstractList<IndexedStringList.Item> {
 
@@ -38,7 +39,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                 if (backingList.add(item)) {
                     item.observeContentChange(contentChangeObserver);
                     item.observeEmptyChange(emptyStateChangeObserver);
-                    item.lineNumber.set(++index);
+                    item.lineNumber.onNext(++index);
                     if (!item.empty.currentValue) {
                         n = true;
                     }
@@ -190,7 +191,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                     Item item = new Item(iterator.next());
                     item.observeContentChange(contentChangeObserver);
                     item.observeEmptyChange(emptyStateChangeObserver);
-                    item.lineNumber.set(++index);
+                    item.lineNumber.onNext(++index);
                     backingList.add(item);
                 } while (iterator.hasNext());
             } else {
@@ -202,7 +203,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                 Item item = new Item("");
                 item.observeContentChange(contentChangeObserver);
                 item.observeEmptyChange(emptyStateChangeObserver);
-                item.lineNumber.set(1);
+                item.lineNumber.onNext(1);
                 backingList.add(item);
             }
             raiseListChanged();
@@ -216,7 +217,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
             throw new IllegalStateException();
         }
         if (backingList.add(item)) {
-            item.lineNumber.set(backingList.size());
+            item.lineNumber.onNext(backingList.size());
             item.observeContentChange(contentChangeObserver);
             item.observeEmptyChange(emptyStateChangeObserver);
             if (!item.empty.currentValue) {
@@ -234,7 +235,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         for (String v : value) {
             Item item = new Item(v);
             if (backingList.add(item)) {
-                item.lineNumber.set(++index);
+                item.lineNumber.onNext(++index);
                 item.observeContentChange(contentChangeObserver);
                 item.observeEmptyChange(emptyStateChangeObserver);
                 if (!item.empty.currentValue) {
@@ -291,7 +292,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         backingList.forEach((t) -> {
             t.removeContentChangeObserver(contentChangeObserver);
             t.removeEmptyChangeObserver(emptyStateChangeObserver);
-            t.lineNumber.set(null);
+            t.lineNumber.onNext(-1);
         });
         super.clear();
     }
@@ -314,7 +315,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                 }
                 v.observeContentChange(contentChangeObserver);
                 v.observeEmptyChange(emptyStateChangeObserver);
-                v.lineNumber.set(i + 1);
+                v.lineNumber.onNext(i + 1);
             }
             anyElementNonEmpty.set(n);
         }
@@ -325,12 +326,12 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
     public synchronized Item remove(int index) {
         Item result = backingList.remove(index);
         if (null != result) {
-            result.lineNumber.set(null);
+            result.lineNumber.onNext(-1);
             result.removeContentChangeObserver(contentChangeObserver);
             result.removeEmptyChangeObserver(emptyStateChangeObserver);
             if (result.empty.currentValue) {
                 for (int i = index; i < backingList.size(); i++) {
-                    backingList.get(i).lineNumber.set(i + 1);
+                    backingList.get(i).lineNumber.onNext(i + 1);
                 }
             } else {
                 boolean n = false;
@@ -339,7 +340,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                     if (!v.empty.currentValue) {
                         n = true;
                     }
-                    v.lineNumber.set(i + 1);
+                    v.lineNumber.onNext(i + 1);
                 }
                 anyElementNonEmpty.set(n);
             }
@@ -352,17 +353,17 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
     public synchronized boolean remove(@Nullable Object o) {
         if (o instanceof Item) {
             Item item = (Item) o;
-            if (item.lineNumber.getValue().isPresent()) {
-                @SuppressWarnings("ConstantConditions") int index = item.lineNumber.getValueLiveData().getValue() - 1;
+            if (item.lineNumber.getValue() >= 0) {
+                @SuppressWarnings("ConstantConditions") int index = item.lineNumber.getValue() - 1;
                 if (index < backingList.size() && backingList.get(index) == item && null != (item = backingList.remove(index))) {
-                    item.lineNumber.set(null);
+                    item.lineNumber.onNext(-1);
                     item.removeContentChangeObserver(contentChangeObserver);
                     item.removeEmptyChangeObserver(emptyStateChangeObserver);
                     if (backingList.isEmpty()) {
                         anyElementNonEmpty.set(false);
                     } else if (item.empty.currentValue) {
                         for (int i = index; i < backingList.size(); i++) {
-                            backingList.get(i).lineNumber.set(i + 1);
+                            backingList.get(i).lineNumber.onNext(i + 1);
                         }
                     } else {
                         boolean n = false;
@@ -371,7 +372,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                             if (!v.empty.currentValue) {
                                 n = true;
                             }
-                            v.lineNumber.set(i + 1);
+                            v.lineNumber.onNext(i + 1);
                         }
                         anyElementNonEmpty.set(n);
                     }
@@ -385,7 +386,6 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
 
     private static class LiveBoolean extends LiveData<Boolean> {
         private boolean currentValue = false;
-
         LiveBoolean(boolean initialValue) {
             super(initialValue);
         }
@@ -413,18 +413,18 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         }
     }
 
-    private static class NumberData extends OptionalLiveData<Integer> {
-        private Integer currentValue;
-
-        NumberData() {
-            super(Optional.empty());
-        }
-
-        private void set(Integer value) {
-            postValue(Optional.ofNullable(value));
-        }
-
-    }
+//    private static class NumberData extends OptionalLiveData<Integer> {
+//        private Integer currentValue;
+//
+//        NumberData() {
+//            super(Optional.empty());
+//        }
+//
+//        private void set(Integer value) {
+//            postValue(Optional.ofNullable(value));
+//        }
+//
+//    }
 
     private static class StringData extends LiveData<String> {
         private String postedValue;
@@ -441,7 +441,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
     }
 
     public static class Item {
-        private final NumberData lineNumber;
+        private final BehaviorSubject<Integer> lineNumber;
         private final MutableLiveData<String> rawValue;
         private final StringData normalizedValue;
         private final LiveBoolean empty;
@@ -450,7 +450,7 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
         private final ArrayList<WeakReference<Observer<Item>>> emptyChangeObservers = new ArrayList<>();
 
         public Item(String content) {
-            lineNumber = new NumberData();
+            lineNumber = BehaviorSubject.create();
             normalizedValue = new StringData(content);
             empty = new LiveBoolean(normalizedValue.postedValue.isEmpty());
             rawValue = new MutableLiveData<String>(content) {
@@ -492,17 +492,17 @@ public final class IndexedStringList extends AbstractList<IndexedStringList.Item
                     super.postValue(value);
                 }
             };
-            lineNumber.observeForever(t -> raiseLineNumberChanged());
+            lineNumber.subscribe(t -> raiseLineNumberChanged());
             normalizedValue.observeForever(t -> raiseContentChanged());
             empty.observeForever(t -> raiseEmptyChanged());
         }
 
         public Integer getLineNumber() {
-            return lineNumber.getValueLiveData().getValue();
+            return lineNumber.getValue();
         }
 
-        public LiveData<Integer> lineNumber() {
-            return lineNumber.getValueLiveData();
+        public Observable<Integer> lineNumber() {
+            return lineNumber;
         }
 
         public String getRawValue() {

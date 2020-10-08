@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -15,8 +14,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -31,8 +28,11 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.BehaviorSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
@@ -43,33 +43,58 @@ public class EditMentorViewModel extends AndroidViewModel {
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
 
     private final DbLoader dbLoader;
-    private final MutableLiveData<MentorEntity> entityLiveData;
-    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
-    private final MutableLiveData<Boolean> nameValidLiveData;
-    private final MutableLiveData<Boolean> contactValidLiveData;
-    private final MutableLiveData<String> nameLiveData;
+    private final BehaviorSubject<MentorEntity> currentEntitySubject;
+    private final Observable<MentorEntity> currentEntityObservable;
+    private final BehaviorSubject<Function<Resources, String>> titleFactorySubject;
+    private final Observable<Function<Resources, String>> titleFactoryObservable;
+    private final BehaviorSubject<Function<Resources, Spanned>> overviewFactorySubject;
+    private final Observable<Function<Resources, Spanned>> overviewFactoryObservable;
+    private final BehaviorSubject<Boolean> nameValidSubject;
+    private final Observable<Boolean> nameValidObservable;
+    private final BehaviorSubject<Boolean> phoneNotEmptySubject;
+    private final BehaviorSubject<Boolean> emailNotEmptySubject;
+    private final Observable<Boolean> contactValidObservable;
+    private final BehaviorSubject<Boolean> hasChangesSubject;
+    private final Observable<Boolean> validObservable;
+    private final Observable<Boolean> canShareObservable;
+    private final Observable<Boolean> canSaveObservable;
+    private final BehaviorSubject<String> currentNameSubject;
+    private final Observable<String> currentNameObservable;
     private final CurrentValues currentValues;
     private String viewTitle;
     private Spanned overview;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
-    private String normalizedNotes;
-    private String normalizedName;
-    private String normalizedPhoneNumber;
-    private String normalizedEmailAddress;
+    @NonNull
+    private String normalizedNotes = "";
+    @NonNull
+    private String normalizedName = "";
+    @NonNull
+    private String normalizedPhoneNumber = "";
+    @NonNull
+    private String normalizedEmailAddress = "";
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_mentor_detail));
-        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
-        normalizedNotes = normalizedName = normalizedPhoneNumber = normalizedEmailAddress = "";
-        entityLiveData = new MutableLiveData<>();
-        nameValidLiveData = new MutableLiveData<>(false);
-        contactValidLiveData = new MutableLiveData<>(false);
-        nameLiveData = new MutableLiveData<>("");
+        titleFactorySubject = BehaviorSubject.create();
+        titleFactoryObservable = titleFactorySubject.observeOn(AndroidSchedulers.mainThread());
+        overviewFactorySubject = BehaviorSubject.create();
+        overviewFactoryObservable = overviewFactorySubject.observeOn(AndroidSchedulers.mainThread());
+        currentEntitySubject = BehaviorSubject.create();
+        currentEntityObservable = currentEntitySubject.observeOn(AndroidSchedulers.mainThread());
+        nameValidSubject = BehaviorSubject.create();
+        nameValidObservable = nameValidSubject.observeOn(AndroidSchedulers.mainThread());
+        phoneNotEmptySubject = BehaviorSubject.create();
+        emailNotEmptySubject = BehaviorSubject.create();
+        contactValidObservable = Observable.combineLatest(phoneNotEmptySubject, emailNotEmptySubject, (p, e) -> p || e).observeOn(AndroidSchedulers.mainThread());
+        hasChangesSubject = BehaviorSubject.create();
+        validObservable = Observable.combineLatest(nameValidSubject, contactValidObservable, (n, c) -> n && c).observeOn(AndroidSchedulers.mainThread());
+        canShareObservable = Observable.combineLatest(validObservable, hasChangesSubject, (v, c) -> v && !c).observeOn(AndroidSchedulers.mainThread());
+        canSaveObservable = Observable.combineLatest(validObservable, hasChangesSubject, (v, c) -> v && c).observeOn(AndroidSchedulers.mainThread());
+        currentNameSubject = BehaviorSubject.create();
+        currentNameObservable = currentNameSubject.observeOn(AndroidSchedulers.mainThread());
         currentValues = new CurrentValues();
     }
 
@@ -117,13 +142,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
+    @NonNull
     public String getNormalizedNotes() {
-        if (null == normalizedNotes) {
-            normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
-            if (normalizedNotes.equals(currentValues.notes)) {
-                currentValues.notes = null;
-            }
-        }
         return normalizedNotes;
     }
 
@@ -156,28 +176,40 @@ public class EditMentorViewModel extends AndroidViewModel {
         return viewTitle;
     }
 
-    public LiveData<Boolean> getNameValidLiveData() {
-        return nameValidLiveData;
+    public Observable<Boolean> getNameValid() {
+        return nameValidObservable;
     }
 
-    public LiveData<Boolean> getContactValidLiveData() {
-        return contactValidLiveData;
+    public Observable<Boolean> getContactValid() {
+        return contactValidObservable;
     }
 
-    public LiveData<MentorEntity> getEntityLiveData() {
-        return entityLiveData;
+    public Observable<MentorEntity> getCurrentEntity() {
+        return currentEntityObservable;
     }
 
-    public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
-        return titleFactoryLiveData;
+    public Observable<Function<Resources, String>> getTitleFactory() {
+        return titleFactoryObservable;
     }
 
-    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
-        return overviewFactoryLiveData;
+    public Observable<Function<Resources, Spanned>> getOverviewFactory() {
+        return overviewFactoryObservable;
     }
 
-    public MutableLiveData<String> getNameLiveData() {
-        return nameLiveData;
+    public Observable<String> getCurrentName() {
+        return currentNameObservable;
+    }
+
+    public Observable<Boolean> getValid() {
+        return validObservable;
+    }
+
+    public Observable<Boolean> getCanShareObservable() {
+        return canShareObservable;
+    }
+
+    public Observable<Boolean> getCanSaveObservable() {
+        return canSaveObservable;
     }
 
     public boolean isFromInitializedState() {
@@ -197,13 +229,11 @@ public class EditMentorViewModel extends AndroidViewModel {
                 mentorEntity.restoreState(state, fromInitializedState);
             } else {
                 return dbLoader.getMentorById(id)
-                        .doOnSuccess(this::onEntityLoaded)
+                        .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
             }
         }
-        titleFactoryLiveData.postValue(this::calculateViewTitle);
-        overviewFactoryLiveData.postValue(this::calculateOverview);
-        entityLiveData.postValue(mentorEntity);
+        onEntityLoaded();
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -232,17 +262,25 @@ public class EditMentorViewModel extends AndroidViewModel {
         return dbLoader.deleteMentor(mentorEntity, ignoreWarnings);
     }
 
-    private void onEntityLoaded(MentorEntity entity) {
+    private void onEntityLoadedFromDb(MentorEntity entity) {
         Log.d(LOG_TAG, "Enter onEntityLoaded");
         mentorEntity = entity;
         viewTitle = null;
+        setNotes(entity.getNotes());
         setName(entity.getName());
-        titleFactoryLiveData.postValue(this::calculateViewTitle);
         setPhoneNumber(entity.getPhoneNumber());
         setEmailAddress(entity.getEmailAddress());
-        overviewFactoryLiveData.postValue(this::calculateOverview);
-        setNotes(entity.getNotes());
-        entityLiveData.postValue(entity);
+        onEntityLoaded();
+    }
+
+    private void onEntityLoaded() {
+        titleFactorySubject.onNext(this::calculateViewTitle);
+        overviewFactorySubject.onNext(this::calculateOverview);
+        nameValidSubject.onNext(!normalizedName.isEmpty());
+        phoneNotEmptySubject.onNext(!normalizedPhoneNumber.isEmpty());
+        emailNotEmptySubject.onNext(!normalizedEmailAddress.isEmpty());
+        hasChangesSubject.onNext(isChanged());
+        currentEntitySubject.onNext(mentorEntity);
     }
 
     public void saveState(Bundle outState) {
@@ -255,7 +293,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     public boolean isChanged() {
         if (ID_NEW != mentorEntity.getId() && normalizedName.equals(mentorEntity.getName()) && normalizedPhoneNumber.equals(mentorEntity.getPhoneNumber()) &&
                 normalizedEmailAddress.equals(mentorEntity.getEmailAddress())) {
-            return !getNormalizedNotes().equals(mentorEntity.getNotes());
+            return !normalizedNotes.equals(mentorEntity.getNotes());
         }
         return true;
     }
@@ -289,25 +327,26 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
-            Log.d(LOG_TAG, "Enter setName:  current: " + ToStringBuilder.toEscapedString(this.phoneNumber) + "; new: " + ToStringBuilder.toEscapedString(phoneNumber));
+            Log.d(LOG_TAG, "Enter setName:  current: " + ToStringBuilder.toEscapedString(this.name) + "; new: " + ToStringBuilder.toEscapedString(name));
             this.name = (null == name) ? "" : name;
             String oldValue = normalizedName;
             normalizedName = TermEntity.SINGLE_LINE_NORMALIZER.apply(name);
             if (normalizedName.isEmpty()) {
                 if (!oldValue.isEmpty()) {
                     Log.d(LOG_TAG, "setName:  Posting false to nameValidLiveData");
-                    nameValidLiveData.postValue(false);
+                    nameValidSubject.onNext(false);
                 }
             } else if (oldValue.isEmpty()) {
                 Log.d(LOG_TAG, "setName:  Posting true to nameValidLiveData");
-                nameValidLiveData.postValue(true);
+                nameValidSubject.onNext(true);
             }
             if (!oldValue.equals(normalizedName)) {
                 viewTitle = null;
                 Log.d(LOG_TAG, "setName:  Posting new recalculation to titleFactoryLiveData");
-                titleFactoryLiveData.postValue(EditMentorViewModel.this::calculateViewTitle);
+                titleFactorySubject.onNext(EditMentorViewModel.this::calculateViewTitle);
                 Log.d(LOG_TAG, "setName: Posting " + ToStringBuilder.toEscapedString(normalizedName) + " to overviewFactoryLiveData");
-                nameLiveData.postValue(normalizedName);
+                currentNameSubject.onNext(normalizedName);
+                hasChangesSubject.onNext(isChanged());
             }
         }
 
@@ -323,19 +362,12 @@ public class EditMentorViewModel extends AndroidViewModel {
             this.phoneNumber = (null == phoneNumber) ? "" : phoneNumber;
             String oldValue = normalizedPhoneNumber;
             normalizedPhoneNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(phoneNumber);
-            if (normalizedPhoneNumber.isEmpty()) {
-                if (!oldValue.isEmpty() && normalizedEmailAddress.isEmpty()) {
-                    Log.d(LOG_TAG, "setPhoneNumber:  Posting false to contactValidLiveData");
-                    contactValidLiveData.postValue(false);
-                }
-            } else if (oldValue.isEmpty() && !normalizedEmailAddress.isEmpty()) {
-                Log.d(LOG_TAG, "setPhoneNumber:  Posting true to contactValidLiveData");
-                contactValidLiveData.postValue(true);
-            }
+            phoneNotEmptySubject.onNext(!normalizedPhoneNumber.isEmpty());
             if (!oldValue.equals(normalizedPhoneNumber)) {
                 overview = null;
                 Log.d(LOG_TAG, "setPhoneNumber:  Posting new recalculation to overviewFactoryLiveData");
-                overviewFactoryLiveData.postValue(EditMentorViewModel.this::calculateOverview);
+                overviewFactorySubject.onNext(EditMentorViewModel.this::calculateOverview);
+                hasChangesSubject.onNext(isChanged());
             }
         }
 
@@ -351,19 +383,19 @@ public class EditMentorViewModel extends AndroidViewModel {
             this.emailAddress = (null == emailAddress) ? "" : emailAddress;
             String oldValue = normalizedEmailAddress;
             normalizedEmailAddress = TermEntity.SINGLE_LINE_NORMALIZER.apply(emailAddress);
-            if (normalizedEmailAddress.isEmpty()) {
-                if (!oldValue.isEmpty() && normalizedPhoneNumber.isEmpty()) {
-                    Log.d(LOG_TAG, "setEmailAddress:  Posting false to contactValidLiveData");
-                    contactValidLiveData.postValue(false);
-                }
-            } else if (oldValue.isEmpty() && !normalizedPhoneNumber.isEmpty()) {
-                Log.d(LOG_TAG, "setEmailAddress:  Posting true to contactValidLiveData");
-                contactValidLiveData.postValue(true);
-            }
+            emailNotEmptySubject.onNext(!normalizedEmailAddress.isEmpty());
             if (!oldValue.equals(normalizedEmailAddress)) {
                 overview = null;
                 Log.d(LOG_TAG, "setEmailAddress:  Posting new recalculation to overviewFactoryLiveData");
-                overviewFactoryLiveData.postValue(EditMentorViewModel.this::calculateOverview);
+                overviewFactorySubject.onNext(EditMentorViewModel.this::calculateOverview);
+
+                CompositeDisposable d = new CompositeDisposable();
+                d.add(hasChangesSubject.last(false).subscribe(t -> {
+                    d.clear();
+                    if (!t) {
+                        hasChangesSubject.onNext(isChanged());
+                    }
+                }));
             }
         }
 
@@ -375,13 +407,24 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setNotes(String notes) {
+            String oldValue = normalizedNotes;
             if (null == notes || notes.isEmpty()) {
+                if (normalizedNotes.isEmpty()) {
+                    return;
+                }
                 normalizedNotes = "";
                 this.notes = null;
             } else if (!getNotes().equals(notes)) {
-                this.notes = notes;
-                normalizedNotes = null;
+                normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(notes);
+                this.notes = (normalizedNotes.equals(notes)) ? null : notes;
             }
+            CompositeDisposable d = new CompositeDisposable();
+            d.add(hasChangesSubject.last(false).subscribe(t -> {
+                d.clear();
+                if (!(t || normalizedNotes.equals(oldValue))) {
+                    hasChangesSubject.onNext(isChanged());
+                }
+            }));
         }
 
         @NonNull

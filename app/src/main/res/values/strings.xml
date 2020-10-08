@@ -61,7 +61,7 @@
     <string name="message_course_number_required">Course number cannot be empty</string>
     <string name="message_assessment_code_required">Assessment Code cannot be empty</string>
     <string name="message_completion_date_required">Completion date is required</string>
-    <string name="message_delete_mentor_confirm">This action cannot be undone!\n\nAre you sure you want to delete this mentor?</string>
+    <string name="message_delete_mentor_confirm">This action cannot be undone!\n\nAll courses currently associated with this mentor will no longer have one.\n\nAre you sure you want to delete this mentor?</string>
     <string name="message_delete_term_confirm">This action cannot be undone!\n\nAre you sure you want to delete this term?</string>
     <string name="message_delete_course_confirm">This action cannot be undone!\n\nAre you sure you want to delete this course?</string>
     <string name="message_delete_course_fail">Failed to delete course.\n\nPerhaps one or more assessments or alerts could not be deleted.</string>

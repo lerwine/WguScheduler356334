@@ -301,7 +301,7 @@ public class DbLoader {
             if (ID_NEW == id) {
                 return ValidationMessage.ofSingleWarning(R.string.message_item_never_saved);
             }
-            if (!(ignoreWarnings || appDb.courseDAO().getCountByMentorIdSynchronous(id) > 0)) {
+            if (!(ignoreWarnings || appDb.courseDAO().getCountByMentorIdSynchronous(id) == 0)) {
                 return ValidationMessage.ofSingleWarning(R.string.message_mentor_has_courses);
             }
             if (appDb.mentorDAO().deleteSynchronous(entity) < 0) {
