@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
@@ -18,7 +20,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.TermCourseListViewModel;
@@ -30,6 +34,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
 
 public class ViewTermActivity extends AppCompatActivity {
 
@@ -123,8 +128,74 @@ public class ViewTermActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
 
-    private void onShareFloatingActionButtonClick(View view) {
+    private final Observer<List<TermCourseListItem>> coursesLoadListener = this::oCoursesLoadedForSharing;
 
+    private void onShareFloatingActionButtonClick(View view) {
+        // FIXME: java.lang.NullPointerException: Attempt to invoke virtual method 'void androidx.lifecycle.LiveData.observe(androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Observer)' on a null object reference
+        courseListViewModel.getCourses().observe(this, coursesLoadListener);
+    }
+
+    private void oCoursesLoadedForSharing(List<TermCourseListItem> termCourseListItems) {
+        if (null == termCourseListItems) {
+            return;
+        }
+        courseListViewModel.getCourses().removeObserver(coursesLoadListener);
+        Resources resources = getResources();
+        String s = editTermViewModel.getName();
+        String t = resources.getString(R.string.format_term, s);
+        int i = t.indexOf(':');
+        StringBuilder sb = new StringBuilder((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t).append(" Report");
+        String title = sb.toString();
+        LocalDate date = editTermViewModel.getStart();
+        if (null != date) {
+            sb.append("\n\tStart: ").append(FORMATTER.format(date));
+            if (null != (date = editTermViewModel.getEnd())) {
+                sb.append("; End: ").append(FORMATTER.format(date));
+            }
+        } else if (null != (date = editTermViewModel.getEnd())) {
+            sb.append("\n\tEnd: ").append(FORMATTER.format(date));
+        }
+        if (!termCourseListItems.isEmpty()) {
+            sb.append("\nCourses:").append(s);
+            for (TermCourseListItem c : termCourseListItems) {
+                sb.append("\n\t").append(c.getNumber()).append(": ").append(c.getTitle());
+                date = c.getActualStart();
+                if (null != date) {
+                    sb.append("\n\t\tStarted: ").append(FORMATTER.format(date));
+                    if (null != (date = c.getActualEnd())) {
+                        sb.append("; Ended: ").append(FORMATTER.format(date));
+                    } else if (null != (date = c.getExpectedEnd())) {
+                        sb.append("; Expected End: ").append(FORMATTER.format(date));
+                    }
+                } else if (null != (date = c.getExpectedStart())) {
+                    sb.append("\n\t\tExpected Start: ").append(FORMATTER.format(date));
+                    if (null != (date = c.getActualEnd())) {
+                        sb.append("; Ended: ").append(FORMATTER.format(date));
+                    } else if (null != (date = c.getExpectedEnd())) {
+                        sb.append("; Expected End: ").append(FORMATTER.format(date));
+                    }
+                } else if (null != (date = c.getActualEnd())) {
+                    sb.append("\n\t\tEnded: ").append(FORMATTER.format(date));
+                } else if (null != (date = c.getExpectedEnd())) {
+                    sb.append("\n\t\tExpected End: ").append(FORMATTER.format(date));
+                }
+                sb.append("\n\t\tStatus:").append(resources.getString(c.getStatus().displayResourceId()));
+                s = c.getMentorName();
+                if (null != s && !s.isEmpty()) {
+                    sb.append("\n\tMentor: ").append(s);
+                }
+            }
+        }
+        if (!(s = editTermViewModel.getNotes()).trim().isEmpty()) {
+            sb.append("\nTerm Notes:\n").append(s);
+        }
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+        sendIntent.setType("text/plain");
+        Intent shareIntent = Intent.createChooser(sendIntent, title);
+        startActivity(shareIntent);
     }
 
     private void onAddFloatingActionButtonClick(View view) {

@@ -171,66 +171,79 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onCourseMentorLoadedForSharing(MentorEntity mentorEntity) {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
         Resources resources = getResources();
-        StringBuilder sb = new StringBuilder(resources.getString(viewModel.getType().displayResourceId())).append(": ")
-                .append(viewModel.getCode());
+        StringBuilder sb = new StringBuilder(resources.getString(viewModel.getType().displayResourceId())).append(" ")
+                .append(viewModel.getCode()).append(" Report");
+        String title = sb.toString();
         String s = viewModel.getName();
         if (!s.isEmpty()) {
-            sb.append(" - ").append(s);
+            sb.append(": ").append(s);
         }
-        sb.append("\r\n\tStatus:").append(resources.getString(viewModel.getStatus().displayResourceId()));
         LocalDate date = viewModel.getCompletionDate();
         if (null != date) {
-            sb.append("\r\n\tCompleted: ").append(FORMATTER.format(date));
+            sb.append("\nCompleted: ").append(FORMATTER.format(date));
+            if (null != (date = viewModel.getGoalDate())) {
+                sb.append("; Goal Date: ").append(FORMATTER.format(date));
+            }
         } else if (null != (date = viewModel.getGoalDate())) {
-            sb.append("\r\n\tGoal Date: ").append(FORMATTER.format(date));
+            sb.append("\nGoal Date: ").append(FORMATTER.format(date));
         }
+        sb.append("\nStatus:").append(resources.getString(viewModel.getStatus().displayResourceId()));
         AbstractCourseEntity<?> course = viewModel.getSelectedCourse();
-        sb.append("\r\nCourse: ").append(course.getNumber()).append(" - ").append(course.getTitle())
-                .append("\r\n\tStatus:").append(resources.getString(course.getStatus().displayResourceId()));
+        sb.append("\nCourse ").append(course.getNumber()).append(": ").append(course.getTitle())
+                .append("\n\tStatus:").append(resources.getString(course.getStatus().displayResourceId()));
         if (null != (date = course.getActualStart())) {
-            sb.append("\r\n\tStarted: ").append(FORMATTER.format(date));
+            sb.append("\n\tStarted: ").append(FORMATTER.format(date));
+            if (null != (date = course.getActualEnd())) {
+                sb.append("; Ended: ").append(FORMATTER.format(date));
+            } else if (null != (date = course.getExpectedEnd())) {
+                sb.append("; Expected End: ").append(FORMATTER.format(date));
+            }
         } else if (null != (date = course.getExpectedStart())) {
-            sb.append("\r\n\tExpected Start: ").append(FORMATTER.format(date));
-        }
-        if (null != (date = course.getActualEnd())) {
-            sb.append("\r\n\tEnded: ").append(FORMATTER.format(date));
+            sb.append("\n\tExpected Start: ").append(FORMATTER.format(date));
+            if (null != (date = course.getActualEnd())) {
+                sb.append("; Ended: ").append(FORMATTER.format(date));
+            } else if (null != (date = course.getExpectedEnd())) {
+                sb.append("; Expected End: ").append(FORMATTER.format(date));
+            }
+        } else if (null != (date = course.getActualEnd())) {
+            sb.append("\n\tEnded: ").append(FORMATTER.format(date));
         } else if (null != (date = course.getExpectedEnd())) {
-            sb.append("\r\n\tExpected End: ").append(FORMATTER.format(date));
+            sb.append("\n\tExpected End: ").append(FORMATTER.format(date));
         }
-        sb.append("\r\nMentor:").append(mentorEntity.getName());
-        if (!(s = mentorEntity.getPhoneNumber()).isEmpty()) {
-            sb.append("\r\tPhone:").append(s);
-        }
-        if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
-            sb.append("\r\tEmail:").append(s);
+        if (null != mentorEntity) {
+            sb.append("\nMentor:").append(mentorEntity.getName());
+            if (!(s = mentorEntity.getPhoneNumber()).isEmpty()) {
+                sb.append("\n\tPhone:").append(s);
+                if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
+                    sb.append("; Email:").append(s);
+                }
+            } else if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
+                sb.append("\n\tEmail:").append(s);
+            }
         }
         s = termEntity.getName();
-        if (s.toLowerCase().startsWith("term")) {
-            sb.append("\r\n").append(s);
-        } else {
-            sb.append("\r\nTerm: ").append(s);
-        }
+        String t = resources.getString(R.string.format_term, s);
+        int i = t.indexOf(':');
+        sb.append("\n").append((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t);
         date = termEntity.getStart();
         if (null != date) {
-            sb.append(", ").append(FORMATTER.format(date)).append(" - ");
-            if (null == (date = termEntity.getEnd())) {
-                sb.append("?");
-            } else {
-                sb.append(FORMATTER.format(date));
+            sb.append("\n\tStart: ").append(FORMATTER.format(date));
+            if (null != (date = termEntity.getEnd())) {
+                sb.append("; End: ").append(FORMATTER.format(date));
             }
         } else if (null != (date = termEntity.getEnd())) {
-            sb.append(", ? - ").append(FORMATTER.format(date));
+            sb.append("\n\tEnd: ").append(FORMATTER.format(date));
         }
         if (!(s = viewModel.getNotes()).trim().isEmpty()) {
-            sb.append("\r\nNotes:\r\n").append(s);
+            sb.append("\nAssessment Notes:\n").append(s);
         }
 
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
         sendIntent.setType("text/plain");
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        Intent shareIntent = Intent.createChooser(sendIntent, title);
         startActivity(shareIntent);
     }
 

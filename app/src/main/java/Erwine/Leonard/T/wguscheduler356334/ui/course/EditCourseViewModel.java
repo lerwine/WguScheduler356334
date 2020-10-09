@@ -35,6 +35,7 @@ import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
@@ -118,6 +119,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     private String normalizedTitle = "";
     private String normalizedNotes = "";
     private String competencyUnitsText = "";
+    private LiveData<List<AssessmentEntity>> assessments;
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
@@ -144,6 +146,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         coursesForTerm = new ArrayList<>();
         termsLoadedObserver = this::onTermsLoaded;
         mentorsLoadedObserver = this::onMentorsLoaded;
+
     }
 
     public long getId() {
@@ -372,6 +375,13 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
         return overviewFactoryLiveData;
+    }
+
+    public synchronized LiveData<List<AssessmentEntity>> getAssessments() {
+        if (null == assessments) {
+            assessments = dbLoader.getAssessmentsLiveDataByCourseId(courseEntity.getId());
+        }
+        return assessments;
     }
 
     public boolean isFromInitializedState() {
