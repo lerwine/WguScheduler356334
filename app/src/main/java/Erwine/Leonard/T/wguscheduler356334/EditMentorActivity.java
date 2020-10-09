@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Html;
@@ -21,6 +22,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.time.LocalDate;
+
+import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
@@ -31,6 +35,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class EditMentorActivity extends AppCompatActivity {
@@ -256,7 +261,59 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onShareFloatingActionButtonClick(View view) {
-        // TODO: Implement onShareFloatingActionButton
+        OneTimeObserve.observeOnce(viewModel.getCoursesLiveData(), this, mentorCourseListItems -> {
+            StringBuilder sb = new StringBuilder("Course Mentor Information\nName: ").append(viewModel.getName());
+            String s = viewModel.getPhoneNumber();
+            if (!s.isEmpty()) {
+                sb.append("\nPhone Number: ").append(s);
+            }
+            s = viewModel.getEmailAddress();
+            if (!s.isEmpty()) {
+                sb.append("\nEmail Address: ").append(s);
+            }
+            if (!mentorCourseListItems.isEmpty()) {
+                Resources resources = getResources();
+                sb.append("\nCourses:");
+                for (MentorCourseListItem course : mentorCourseListItems) {
+                    sb.append("\n").append(course.getNumber()).append(": ").append(course.getTitle());
+                    LocalDate date = course.getActualStart();
+                    if (null != date) {
+                        sb.append("\n\tStarted: ").append(FORMATTER.format(date));
+                        if (null != (date = course.getActualEnd())) {
+                            sb.append("; Ended: ").append(FORMATTER.format(date));
+                        } else if (null != (date = course.getExpectedEnd())) {
+                            sb.append("; Expected End: ").append(FORMATTER.format(date));
+                        }
+                    } else if (null != (date = course.getExpectedStart())) {
+                        sb.append("\n\tExpected Start: ").append(FORMATTER.format(date));
+                        if (null != (date = course.getActualEnd())) {
+                            sb.append("; Ended: ").append(FORMATTER.format(date));
+                        } else if (null != (date = course.getExpectedEnd())) {
+                            sb.append("; Expected End: ").append(FORMATTER.format(date));
+                        }
+                    } else if (null != (date = course.getActualEnd())) {
+                        sb.append("\n\tEnded: ").append(FORMATTER.format(date));
+                    } else if (null != (date = course.getExpectedEnd())) {
+                        sb.append("\n\tExpected End: ").append(FORMATTER.format(date));
+                    }
+                    sb.append("\n\tStatus:").append(resources.getString(course.getStatus().displayResourceId()));
+                    s = course.getTermName();
+                    String t = resources.getString(R.string.format_term, s);
+                    int i = t.indexOf(':');
+                    sb.append("\n\t").append((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t);
+                }
+            }
+            if (!(s = viewModel.getNotes()).trim().isEmpty()) {
+                sb.append("\nMentor Notes:\n").append(s);
+            }
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+            sendIntent.setType("text/plain");
+            Intent shareIntent = Intent.createChooser(sendIntent, "Course Mentor Information: " + viewModel.getName());
+            startActivity(shareIntent);
+        });
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {

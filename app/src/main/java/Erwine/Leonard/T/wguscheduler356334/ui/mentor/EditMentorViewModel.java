@@ -14,7 +14,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -23,6 +27,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
@@ -61,6 +66,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     private final BehaviorSubject<String> currentNameSubject;
     private final Observable<String> currentNameObservable;
     private final CurrentValues currentValues;
+    private LiveData<List<MentorCourseListItem>> coursesLiveData;
     private String viewTitle;
     private Spanned overview;
     private MentorEntity mentorEntity;
@@ -234,6 +240,7 @@ public class EditMentorViewModel extends AndroidViewModel {
             }
         }
         onEntityLoaded();
+        coursesLiveData = new MutableLiveData<>(Collections.emptyList());
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -270,6 +277,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         setName(entity.getName());
         setPhoneNumber(entity.getPhoneNumber());
         setEmailAddress(entity.getEmailAddress());
+        coursesLiveData = dbLoader.getCoursesByMentorId(entity.getId());
         onEntityLoaded();
     }
 
@@ -296,6 +304,10 @@ public class EditMentorViewModel extends AndroidViewModel {
             return !normalizedNotes.equals(mentorEntity.getNotes());
         }
         return true;
+    }
+
+    public LiveData<List<MentorCourseListItem>> getCoursesLiveData() {
+        return coursesLiveData;
     }
 
     private class CurrentValues implements Mentor {
