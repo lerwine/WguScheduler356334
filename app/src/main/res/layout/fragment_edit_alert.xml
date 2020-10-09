@@ -162,11 +162,6 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/shareImageButton"
-            style="@style/WGU.Scheduler.ShareImageButtonStyle"
-            android:contentDescription="@string/label_share_calendar_event" />
-
-        <ImageButton
             android:id="@+id/saveImageButton"
             style="@style/WGU.Scheduler.SaveImageButtonStyle"
             android:contentDescription="@string/command_save_changes" />
