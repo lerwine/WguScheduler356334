@@ -29,16 +29,15 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditAlertDialog extends DialogFragment {
 
     private static final String LOG_TAG = EditAlertDialog.class.getName();
-    private final CompositeDisposable compositeDisposable;
     private EditAlertViewModel viewModel;
     private TextView eventDateTextView;
     private EditText daysEditText;
@@ -57,7 +56,6 @@ public class EditAlertDialog extends DialogFragment {
 
     public EditAlertDialog() {
         Log.d(LOG_TAG, "Constructing EditAlertDialog");
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -198,16 +196,13 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onDeleteButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() -> {
-            compositeDisposable.clear();
-            compositeDisposable.add(viewModel.delete().subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
-        }, null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() ->
+                OneTimeObserve.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
     }
 
     private void onCancelButtonClick(View view) {
@@ -334,8 +329,7 @@ public class EditAlertDialog extends DialogFragment {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
                 builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);

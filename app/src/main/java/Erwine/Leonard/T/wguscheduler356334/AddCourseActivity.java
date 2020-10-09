@@ -17,14 +17,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class AddCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddCourseActivity.class.getName();
 
-    private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
     private AlertDialog waitDialog;
     private FloatingActionButton saveFloatingActionButton;
@@ -35,7 +34,6 @@ public class AddCourseActivity extends AppCompatActivity {
      */
     public AddCourseActivity() {
         Log.d(LOG_TAG, "Constructing AddCourseActivity");
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -50,10 +48,9 @@ public class AddCourseActivity extends AppCompatActivity {
         }
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
-        compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onCourseLoadSuccess, this::onCourseLoadFailed));
+        OneTimeObserve.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onCourseLoadSuccess, this::onCourseLoadFailed);
     }
 
     @Override
@@ -82,10 +79,8 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private void confirmSave() {
         if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
-                compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-            }, null);
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
+                    OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed), null);
         } else {
             finish();
         }
@@ -109,8 +104,7 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onSaveOperationFinished(@NonNull ValidationMessage.ResourceMessageResult messages) {
@@ -123,8 +117,7 @@ public class AddCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
@@ -38,7 +39,6 @@ public class EditMentorActivity extends AppCompatActivity {
     private static final String STATE_KEY_NOTIFIED_SHARING_DISABLED = "EditMentorActivity:notifiedSharingDisabled";
     private static final String STATE_KEY_NOTIFYING_SHARING_DISABLED = "EditMentorActivity:notifyingSharingDisabled";
 
-    private final CompositeDisposable transientCompositeDisposable;
     private final CompositeDisposable subscriptionCompositeDisposable;
     private EditMentorViewModel viewModel;
     private EditText mentorNameEditText;
@@ -60,7 +60,6 @@ public class EditMentorActivity extends AppCompatActivity {
      */
     public EditMentorActivity() {
         Log.d(LOG_TAG, "Constructing EditMentorActivity");
-        transientCompositeDisposable = new CompositeDisposable();
         subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
@@ -90,10 +89,9 @@ public class EditMentorActivity extends AppCompatActivity {
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
-        transientCompositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        transientCompositeDisposable.add(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onLoadSuccess, this::onLoadFailed));
+        OneTimeObserve.subscribeOnce(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()), this::onLoadSuccess, this::onLoadFailed);
     }
 
     @Override
@@ -216,21 +214,6 @@ public class EditMentorActivity extends AppCompatActivity {
                 }).show();
     }
 
-//    private void onChangedChanged(Boolean isChanged) {
-//        CompositeDisposable d = new CompositeDisposable();
-//        d.add(viewModel.getValid().last(false).subscribe(isValid -> {
-//            if (Boolean.TRUE.equals(isChanged)) {
-//                Log.d(LOG_TAG, "Enter onChangedChanged(true); isValid=" + ToStringBuilder.toEscapedString(isValid) + "; disabling shareFloatingActionButton; calling saveFloatingActionButton.setEnabled(" + Boolean.TRUE.equals(isValid) + ")");
-//                saveFloatingActionButton.setEnabled(Boolean.TRUE.equals(isValid));
-//                setSharingEnabled(false);
-//            } else {
-//                Log.d(LOG_TAG, "Enter onChangedChanged(" + ToStringBuilder.toEscapedString(isChanged) + "); isValid=" + ToStringBuilder.toEscapedString(isValid) + "; disabling saveFloatingActionButton; calling shareFloatingActionButton.setEnabled(" + Boolean.TRUE.equals(isValid) + ")");
-//                saveFloatingActionButton.setEnabled(false);
-//                setSharingEnabled(Boolean.TRUE.equals(isValid));
-//            }
-//        }));
-//    }
-
     private void onNameChanged(String s) {
         Log.d(LOG_TAG, "Enter onNameChanged(" + ToStringBuilder.toEscapedString(s) + ")");
         String v = getResources().getString(R.string.format_mentor, s);
@@ -269,8 +252,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
-        transientCompositeDisposable.clear();
-        transientCompositeDisposable.add(viewModel.save(false).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
+        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
     }
 
     private void onShareFloatingActionButtonClick(View view) {
@@ -278,10 +260,8 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() -> {
-            transientCompositeDisposable.clear();
-            transientCompositeDisposable.add(viewModel.delete(false).subscribe(this::onDeleteMentorFinished, this::onDeleteMentorError));
-        }, null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() ->
+                OneTimeObserve.subscribeOnce(viewModel.delete(false), this::onDeleteMentorFinished, this::onDeleteMentorError), null);
     }
 
     private void onSaveMentorCompleted(@NonNull ValidationMessage.ResourceMessageResult messages) {
@@ -295,8 +275,7 @@ public class EditMentorActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            transientCompositeDisposable.clear();
-                            transientCompositeDisposable.add(viewModel.save(true).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveMentorCompleted, this::onSaveMentorError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -322,8 +301,7 @@ public class EditMentorActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_delete_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            transientCompositeDisposable.clear();
-                            transientCompositeDisposable.add(viewModel.delete(true).subscribe(this::onDeleteMentorFinished, this::onDeleteMentorError));
+                            OneTimeObserve.subscribeOnce(viewModel.delete(true), this::onDeleteMentorFinished, this::onDeleteMentorError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -342,10 +320,8 @@ public class EditMentorActivity extends AppCompatActivity {
     private void verifySaveChanges() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                    .showYesNoCancelDialog(this::finish, () -> {
-                        transientCompositeDisposable.clear();
-                        transientCompositeDisposable.add(viewModel.save(false).subscribe(this::onSaveMentorCompleted, this::onSaveMentorError));
-                    }, null);
+                    .showYesNoCancelDialog(this::finish, () ->
+                            OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError), null);
         } else {
             finish();
         }

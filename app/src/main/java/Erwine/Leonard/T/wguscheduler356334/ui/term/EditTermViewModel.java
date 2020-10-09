@@ -20,6 +20,8 @@ import androidx.lifecycle.MutableLiveData;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,6 +33,7 @@ import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
@@ -67,6 +70,7 @@ public class EditTermViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> nameValidLiveData;
     private final MutableLiveData<Integer> startMessageLiveData;
     private final CurrentValues currentValues;
+    private LiveData<List<TermCourseListItem>> coursesLiveData;
     private String viewTitle;
     private Spanned overview;
     private boolean fromInitializedState;
@@ -156,6 +160,10 @@ public class EditTermViewModel extends AndroidViewModel {
         return fromInitializedState;
     }
 
+    public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
+        return coursesLiveData;
+    }
+
     public synchronized Single<TermEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
@@ -176,6 +184,7 @@ public class EditTermViewModel extends AndroidViewModel {
         } else {
             normalizedName = termEntity.getName();
         }
+        coursesLiveData = new MutableLiveData<>(Collections.emptyList());
         titleFactoryLiveData.postValue(this::calculateViewTitle);
         entityLiveData.postValue(termEntity);
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
@@ -260,6 +269,7 @@ public class EditTermViewModel extends AndroidViewModel {
         setStart(entity.getStart());
         setEnd(entity.getEnd());
         setNotes(entity.getNotes());
+        coursesLiveData = dbLoader.getCoursesByTermId(entity.getId());
         entityLiveData.postValue(termEntity);
     }
 

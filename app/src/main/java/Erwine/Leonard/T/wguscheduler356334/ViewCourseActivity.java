@@ -31,8 +31,8 @@ import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.ViewCoursePagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -45,7 +45,6 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewCourseActivity.class.getName();
 
-    private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewCoursePagerAdapter adapter;
@@ -58,7 +57,6 @@ public class ViewCourseActivity extends AppCompatActivity {
     private Observer<List<AssessmentEntity>> assessmentsLoadListener = this::onAssessmentsLoadedForSharing;
 
     public ViewCourseActivity() {
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -77,10 +75,9 @@ public class ViewCourseActivity extends AppCompatActivity {
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
-        compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoadSucceeded, this::onEntityLoadFailed));
+        OneTimeObserve.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
     }
 
     @Override
@@ -100,10 +97,8 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private void confirmSave() {
         if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
-                compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveCourseCompleted, this::onSaveCourseError));
-            }, null);
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
+                    OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveCourseCompleted, this::onSaveCourseError), null);
         } else {
             finish();
         }
@@ -145,8 +140,7 @@ public class ViewCourseActivity extends AppCompatActivity {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
                     this::finish,
                     () -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveForNewAlertFinished, this::onSaveCourseError));
+                        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveCourseError);
                         finish();
                     }, null);
         } else {
@@ -166,8 +160,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveForNewAlertFinished, this::onSaveCourseError));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -273,16 +266,13 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveCourseCompleted, this::onSaveCourseError));
+        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveCourseCompleted, this::onSaveCourseError);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() -> {
-            compositeDisposable.clear();
-            compositeDisposable.add(viewModel.delete(false).subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
-        }, null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() ->
+                OneTimeObserve.subscribeOnce(viewModel.delete(false), this::onDeleteSucceeded, this::onDeleteFailed), null);
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
@@ -302,8 +292,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveCourseCompleted, this::onSaveCourseError));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveCourseCompleted, this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -331,8 +320,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
                         .setMessage(messages.join("\n", resources))
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.delete(true).subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
+                            OneTimeObserve.subscribeOnce(viewModel.delete(true), this::onDeleteSucceeded, this::onDeleteFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

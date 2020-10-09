@@ -27,8 +27,8 @@ import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.ViewAssessmentPagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
 import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -37,7 +37,6 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewAssessmentActivity.class.getName();
 
-    private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewAssessmentPagerAdapter adapter;
@@ -49,7 +48,6 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private TermEntity termEntity;
 
     public ViewAssessmentActivity() {
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -67,10 +65,9 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditAssessmentViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
-        compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onEntityLoadSucceeded, this::onEntityLoadFailed));
+        OneTimeObserve.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
     }
 
     @Override
@@ -90,10 +87,8 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
     private void confirmSave() {
         if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
-                compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
-            }, null);
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
+                    OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed), null);
         } else {
             finish();
         }
@@ -126,8 +121,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
                     this::finish,
                     () -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
+                        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveFailed);
                         finish();
                     }, null);
         } else {
@@ -147,8 +141,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveForNewAlertFinished, this::onSaveFailed));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -160,14 +153,12 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onShareFloatingActionButton(View view) {
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.getCurrentTerm().subscribe(this::onTermLoadedForSharing, this::onLoadForSharingFailed));
+        OneTimeObserve.subscribeOnce(viewModel.getCurrentTerm(), this::onTermLoadedForSharing, this::onLoadForSharingFailed);
     }
 
     private void onTermLoadedForSharing(TermEntity termEntity) {
         this.termEntity = termEntity;
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.getCourseMentor().subscribe(this::onCourseMentorLoadedForSharing, this::onLoadForSharingFailed));
+        OneTimeObserve.subscribeOnce(viewModel.getCourseMentor(), this::onCourseMentorLoadedForSharing, this::onLoadForSharingFailed);
     }
 
     private void onCourseMentorLoadedForSharing(MentorEntity mentorEntity) {
@@ -254,16 +245,13 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_assessment, R.string.message_delete_assessment_confirm, this).showYesNoDialog(() -> {
-            compositeDisposable.clear();
-            compositeDisposable.add(viewModel.delete().subscribe(this::onDeleteSucceeded, this::onDeleteFailed));
-        }, null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_assessment, R.string.message_delete_assessment_confirm, this).showYesNoDialog(() ->
+                OneTimeObserve.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
     }
 
     private void onDeleteSucceeded(Integer count) {
@@ -298,8 +286,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationSucceeded, this::onSaveFailed));
+                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveOperationSucceeded, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
