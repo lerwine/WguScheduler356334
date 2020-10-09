@@ -41,6 +41,7 @@ public class ViewTermActivity extends AppCompatActivity {
     private static final String LOG_TAG = ViewTermActivity.class.getName();
 
     private final CompositeDisposable compositeDisposable;
+    private final Observer<List<TermCourseListItem>> coursesLoadListener;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewTermPagerAdapter adapter;
     private EditTermViewModel editTermViewModel;
@@ -53,6 +54,7 @@ public class ViewTermActivity extends AppCompatActivity {
 
     public ViewTermActivity() {
         compositeDisposable = new CompositeDisposable();
+        coursesLoadListener = this::onCoursesLoadedForSharing;
     }
 
     @Override
@@ -115,6 +117,7 @@ public class ViewTermActivity extends AppCompatActivity {
             viewPager.setAdapter(adapter);
             TabLayout tabs = findViewById(R.id.viewTermTabLayout);
             tabs.setupWithViewPager(viewPager);
+            courseListViewModel.setId(termId);
             shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
             addFloatingActionButton.setOnClickListener(this::onAddFloatingActionButtonClick);
             saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
@@ -128,14 +131,11 @@ public class ViewTermActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog(this::finish);
     }
 
-    private final Observer<List<TermCourseListItem>> coursesLoadListener = this::oCoursesLoadedForSharing;
-
     private void onShareFloatingActionButtonClick(View view) {
-        // FIXME: java.lang.NullPointerException: Attempt to invoke virtual method 'void androidx.lifecycle.LiveData.observe(androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Observer)' on a null object reference
         courseListViewModel.getCourses().observe(this, coursesLoadListener);
     }
 
-    private void oCoursesLoadedForSharing(List<TermCourseListItem> termCourseListItems) {
+    private void onCoursesLoadedForSharing(List<TermCourseListItem> termCourseListItems) {
         if (null == termCourseListItems) {
             return;
         }
