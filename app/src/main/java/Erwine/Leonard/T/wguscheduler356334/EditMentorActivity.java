@@ -28,10 +28,10 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -96,7 +96,7 @@ public class EditMentorActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        OneTimeObserve.subscribeOnce(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()), this::onLoadSuccess, this::onLoadFailed);
+        OneTimeObservers.subscribeOnce(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()), this::onLoadSuccess, this::onLoadFailed);
     }
 
     @Override
@@ -154,42 +154,19 @@ public class EditMentorActivity extends AppCompatActivity {
             shareFloatingActionButton.setVisibility(View.GONE);
             deleteFloatingActionButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
-            subscriptionCompositeDisposable.add(viewModel.getValid().subscribe(this::onCanSaveChanged));
+            subscriptionCompositeDisposable.add(viewModel.getIsValid().subscribe(b -> saveFloatingActionButton.setEnabled(b)));
         } else {
             subscriptionCompositeDisposable.add(viewModel.getTitleFactory().subscribe(f -> setTitle(f.apply(getResources()))));
             shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
-            subscriptionCompositeDisposable.add(viewModel.getCanSaveObservable().subscribe(this::onCanSaveChanged));
-            subscriptionCompositeDisposable.add(viewModel.getCanShareObservable().subscribe(this::onCanShareChanged));
+            subscriptionCompositeDisposable.add(viewModel.getCanSave().subscribe(b -> saveFloatingActionButton.setEnabled(b)));
+            subscriptionCompositeDisposable.add(viewModel.getCanShare().subscribe(b -> shareFloatingActionButton.setEnabled(b)));
         }
         subscriptionCompositeDisposable.add(viewModel.getNameValid().subscribe(this::onNameValidChanged));
         subscriptionCompositeDisposable.add(viewModel.getContactValid().subscribe(this::onContactValidChanged));
-        subscriptionCompositeDisposable.add(viewModel.getCurrentName().subscribe(this::onNameChanged));
+        subscriptionCompositeDisposable.add(viewModel.getNormalizedName().subscribe(this::onNameChanged));
         if (notifyingSharingDisabled) {
             notifyingSharingDisabled = notifiedSharingDisabled = false;
-            showSharingDisabledSnackbar();
-        }
-    }
-
-    private void onCanSaveChanged(boolean canSave) {
-        Log.d(LOG_TAG, "Enter onCanSaveChanged(" + canSave + ")");
-        saveFloatingActionButton.setEnabled(canSave);
-    }
-
-    private void onCanShareChanged(boolean canShare) {
-        Log.d(LOG_TAG, "Enter onCanShareChanged(" + canShare + ")");
-        if (canShare == shareFloatingActionButton.isEnabled()) {
-            return;
-        }
-        shareFloatingActionButton.setEnabled(canShare);
-        if (canShare) {
-            if (null != snackBar) {
-                if (snackBar.isShownOrQueued()) {
-                    snackBar.dismiss();
-                }
-                snackBar = null;
-            }
-        } else {
             showSharingDisabledSnackbar();
         }
     }
@@ -257,11 +234,11 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
-        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
     }
 
     private void onShareFloatingActionButtonClick(View view) {
-        OneTimeObserve.observeOnce(viewModel.getCoursesLiveData(), this, mentorCourseListItems -> {
+        OneTimeObservers.observeOnce(viewModel.getCoursesLiveData(), this, mentorCourseListItems -> {
             StringBuilder sb = new StringBuilder("Course Mentor Information\nName: ").append(viewModel.getName());
             String s = viewModel.getPhoneNumber();
             if (!s.isEmpty()) {
@@ -318,10 +295,10 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onDeleteFloatingActionButtonClick(View view) {
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() ->
-                OneTimeObserve.subscribeOnce(viewModel.delete(false), this::onDeleteMentorFinished, this::onDeleteMentorError), null);
+                OneTimeObservers.subscribeOnce(viewModel.delete(false), this::onDeleteMentorFinished, this::onDeleteMentorError), null);
     }
 
-    private void onSaveMentorCompleted(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveMentorCompleted(@NonNull ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationSucceeded");
         if (messages.isSucceeded()) {
             finish();
@@ -332,7 +309,7 @@ public class EditMentorActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveMentorCompleted, this::onSaveMentorError);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveMentorCompleted, this::onSaveMentorError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -348,7 +325,7 @@ public class EditMentorActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 
-    private void onDeleteMentorFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onDeleteMentorFinished(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             finish();
         } else {
@@ -358,7 +335,7 @@ public class EditMentorActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_delete_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.delete(true), this::onDeleteMentorFinished, this::onDeleteMentorError);
+                            OneTimeObservers.subscribeOnce(viewModel.delete(true), this::onDeleteMentorFinished, this::onDeleteMentorError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -375,13 +352,21 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void verifySaveChanges() {
-        if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                    .showYesNoCancelDialog(this::finish, () ->
-                            OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError), null);
-        } else {
-            finish();
-        }
+        OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
+                        .showYesNoCancelDialog(this::finish, () -> {
+                            OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                                if (!isValid) {
+                                    return;
+                                }
+                                OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
+                            });
+                        }, null);
+            } else {
+                finish();
+            }
+        });
     }
 
 }

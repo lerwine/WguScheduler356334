@@ -29,8 +29,8 @@ import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.ViewCoursePagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -74,7 +74,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        OneTimeObserve.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
+        OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ViewCourseActivity extends AppCompatActivity {
     private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveCourseCompleted, this::onSaveCourseError), null);
+                    OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveCourseCompleted, this::onSaveCourseError), null);
         } else {
             finish();
         }
@@ -137,7 +137,7 @@ public class ViewCourseActivity extends AppCompatActivity {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
                     this::finish,
                     () -> {
-                        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveCourseError);
+                        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveCourseError);
                         finish();
                     }, null);
         } else {
@@ -146,7 +146,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
     }
 
-    private void onSaveForNewAlertFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveForNewAlertFinished(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
             dlg.show(getSupportFragmentManager(), null);
@@ -157,7 +157,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveCourseError);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -169,7 +169,7 @@ public class ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onShareFloatingActionButton(View view) {
-        OneTimeObserve.observeOnce(viewModel.getAssessments(), this, assessments -> {
+        OneTimeObservers.observeOnce(viewModel.getAssessments(), this, assessments -> {
             Resources resources = getResources();
             StringBuilder sb = new StringBuilder("Course ").append(viewModel.getNumber()).append(" Report: ").append(viewModel.getTitle());
             String title = sb.toString();
@@ -257,13 +257,13 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveCourseCompleted, this::onSaveCourseError);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveCourseCompleted, this::onSaveCourseError);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() ->
-                OneTimeObserve.subscribeOnce(viewModel.delete(false), this::onDeleteSucceeded, this::onDeleteFailed), null);
+                OneTimeObservers.subscribeOnce(viewModel.delete(false), this::onDeleteSucceeded, this::onDeleteFailed), null);
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
@@ -273,7 +273,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 .showDialog(this::finish);
     }
 
-    private void onSaveCourseCompleted(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveCourseCompleted(@NonNull ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             finish();
         } else {
@@ -283,7 +283,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveCourseCompleted, this::onSaveCourseError);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveCourseCompleted, this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -300,7 +300,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 .showDialog();
     }
 
-    private void onDeleteSucceeded(ValidationMessage.ResourceMessageResult messages) {
+    private void onDeleteSucceeded(ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onDeleteSucceeded");
         if (messages.isSucceeded()) {
             finish();
@@ -311,7 +311,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
                         .setMessage(messages.join("\n", resources))
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.delete(true), this::onDeleteSucceeded, this::onDeleteFailed);
+                            OneTimeObservers.subscribeOnce(viewModel.delete(true), this::onDeleteSucceeded, this::onDeleteFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

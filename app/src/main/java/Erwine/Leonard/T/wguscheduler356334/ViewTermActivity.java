@@ -27,8 +27,9 @@ import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.ViewTermPagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -37,9 +38,10 @@ public class ViewTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
 
+    private final CompositeDisposable subscriptionCompositeDisposable;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewTermPagerAdapter adapter;
-    private EditTermViewModel editTermViewModel;
+    private EditTermViewModel viewModel;
     private AlertDialog waitDialog;
     private FloatingActionButton shareFloatingActionButton;
     private FloatingActionButton addFloatingActionButton;
@@ -47,6 +49,8 @@ public class ViewTermActivity extends AppCompatActivity {
     private FloatingActionButton deleteFloatingActionButton;
 
     public ViewTermActivity() {
+        Log.d(LOG_TAG, "Constructing ViewTermActivity");
+        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -66,14 +70,14 @@ public class ViewTermActivity extends AppCompatActivity {
         addFloatingActionButton = findViewById(R.id.addFloatingActionButton);
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
-        editTermViewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
-        editTermViewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
-        OneTimeObserve.subscribeOnce(editTermViewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoaded, this::onEntityLoadFailed);
+        viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
+        subscriptionCompositeDisposable.add(viewModel.getTitleFactory().subscribe(f -> setTitle(f.apply(getResources()))));
+        OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoaded, this::onEntityLoadFailed);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        editTermViewModel.saveViewModelState(outState);
+        viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
@@ -93,9 +97,10 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onEntityLoaded(TermEntity entity) {
+        Log.d(LOG_TAG, "Enter onEntityLoaded(" + entity + ")");
         waitDialog.dismiss();
         if (null == entity) {
-            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (editTermViewModel.isFromInitializedState()) ? R.string.message_term_not_found : R.string.message_term_not_restored, this).showDialog(this::finish);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_term_not_found : R.string.message_term_not_restored, this).showDialog(this::finish);
             return;
         }
         long termId = entity.getId();
@@ -111,6 +116,14 @@ public class ViewTermActivity extends AppCompatActivity {
             addFloatingActionButton.setOnClickListener(this::onAddFloatingActionButtonClick);
             saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
+            subscriptionCompositeDisposable.add(viewModel.getCanSave().subscribe(b -> {
+                Log.d(LOG_TAG, "getCanSaveObservable().subscribe(" + b + ")");
+                saveFloatingActionButton.setEnabled(b);
+            }));
+            subscriptionCompositeDisposable.add(viewModel.getCanShare().subscribe(b -> {
+                Log.d(LOG_TAG, "getCanShareObservable().subscribe(" + b + ")");
+                shareFloatingActionButton.setEnabled(b);
+            }));
         }
     }
 
@@ -121,20 +134,20 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private synchronized void onShareFloatingActionButtonClick(View view) {
-        OneTimeObserve.observeOnce(editTermViewModel.getCoursesLiveData(), this, termCourseListItems -> {
+        OneTimeObservers.observeOnce(viewModel.getCoursesLiveData(), this, termCourseListItems -> {
             Resources resources = getResources();
-            String s = editTermViewModel.getName();
+            String s = viewModel.getName();
             String t = resources.getString(R.string.format_term, s);
             int i = t.indexOf(':');
             StringBuilder sb = new StringBuilder((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t).append(" Report");
             String title = sb.toString();
-            LocalDate date = editTermViewModel.getStart();
+            LocalDate date = viewModel.getStart();
             if (null != date) {
                 sb.append("\n\tStart: ").append(FORMATTER.format(date));
-                if (null != (date = editTermViewModel.getEnd())) {
+                if (null != (date = viewModel.getEnd())) {
                     sb.append("; End: ").append(FORMATTER.format(date));
                 }
-            } else if (null != (date = editTermViewModel.getEnd())) {
+            } else if (null != (date = viewModel.getEnd())) {
                 sb.append("\n\tEnd: ").append(FORMATTER.format(date));
             }
             if (!termCourseListItems.isEmpty()) {
@@ -168,7 +181,7 @@ public class ViewTermActivity extends AppCompatActivity {
                     }
                 }
             }
-            if (!(s = editTermViewModel.getNotes()).trim().isEmpty()) {
+            if (!(s = viewModel.getNotes()).trim().isEmpty()) {
                 sb.append("\nTerm Notes:\n").append(s);
             }
 
@@ -182,44 +195,53 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private synchronized void onAddFloatingActionButtonClick(View view) {
-        OneTimeObserve.observeOnce(editTermViewModel.getCoursesLiveData(), this, termCourseListItems -> {
-            LocalDate nextStart = ComparisonHelper.maxWithinRange(editTermViewModel.getStart(), editTermViewModel.getEnd(), termCourseListItems.stream().map(t -> {
+        OneTimeObservers.observeOnce(viewModel.getCoursesLiveData(), this, termCourseListItems -> {
+            LocalDate nextStart = ComparisonHelper.maxWithinRange(viewModel.getStart(), viewModel.getEnd(), termCourseListItems.stream().map(t -> {
                 LocalDate d = t.getActualEnd();
                 return (null == d && null == (d = t.getExpectedEnd()) && null == (d = t.getActualStart())) ? t.getExpectedStart() : d;
             }), LocalDate::compareTo).map(t -> t.plusDays(1L)).orElseGet(() -> {
-                LocalDate s = editTermViewModel.getStart();
+                LocalDate s = viewModel.getStart();
                 if (null != s) {
                     return s;
                 }
                 s = LocalDate.now();
-                LocalDate e = editTermViewModel.getEnd();
+                LocalDate e = viewModel.getEnd();
                 return (null != e && e.compareTo(s) < 0) ? e : s;
             });
-            EditCourseViewModel.startAddCourseActivity(this, editTermViewModel.getId(), nextStart);
+            EditCourseViewModel.startAddCourseActivity(this, viewModel.getId(), nextStart);
         });
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        OneTimeObserve.subscribeOnce(editTermViewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, this).showYesNoDialog(() ->
-                OneTimeObserve.subscribeOnce(editTermViewModel.delete(false), this::onDeleteTermComplete, this::onDeleteTermError), null);
+                OneTimeObservers.subscribeOnce(viewModel.delete(false), this::onDeleteTermComplete, this::onDeleteTermError), null);
     }
 
     private void confirmSave() {
-        if (editTermViewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    OneTimeObserve.subscribeOnce(editTermViewModel.save(false), this::onSaveTermComplete, this::onSaveTermError), null);
-        } else {
-            finish();
-        }
+        OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
+                        .showYesNoCancelDialog(this::finish, () -> {
+                            OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                                if (!isValid) {
+                                    return;
+                                }
+                                OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
+                            });
+                        }, null);
+            } else {
+                finish();
+            }
+        });
     }
 
-    private void onSaveTermComplete(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveTermComplete(@NonNull ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationFinished");
         if (messages.isSucceeded()) {
             finish();
@@ -231,7 +253,7 @@ public class ViewTermActivity extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources))).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            OneTimeObserve.subscribeOnce(editTermViewModel.save(true), this::onSaveTermComplete, this::onSaveTermError);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveTermComplete, this::onSaveTermError);
                         })
                         .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -248,7 +270,7 @@ public class ViewTermActivity extends AppCompatActivity {
                 .showDialog();
     }
 
-    private void onDeleteTermComplete(ValidationMessage.ResourceMessageResult messages) {
+    private void onDeleteTermComplete(ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onDeleteTermComplete");
         if (messages.isSucceeded()) {
             finish();
@@ -260,7 +282,7 @@ public class ViewTermActivity extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.format_message_delete_warning, messages.join("\n", resources)))
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            OneTimeObserve.subscribeOnce(editTermViewModel.delete(true), this::onDeleteTermComplete, this::onDeleteTermError);
+                            OneTimeObservers.subscribeOnce(viewModel.delete(true), this::onDeleteTermComplete, this::onDeleteTermError);
                         })
                         .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

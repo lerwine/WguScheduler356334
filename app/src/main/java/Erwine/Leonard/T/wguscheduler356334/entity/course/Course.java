@@ -16,7 +16,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public interface Course extends NoteColumnIncludedEntity {
     /**
@@ -60,7 +60,7 @@ public interface Course extends NoteColumnIncludedEntity {
      */
     String COLNAME_COMPETENCY_UNITS = "competencyUnits";
 
-    static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull CourseEntity entity) {
+    static void validate(@NonNull ResourceMessageBuilder builder, @NonNull CourseEntity entity) {
         if (entity.getTermId() == ID_NEW) {
             builder.acceptError(R.string.message_term_not_selected);
         }

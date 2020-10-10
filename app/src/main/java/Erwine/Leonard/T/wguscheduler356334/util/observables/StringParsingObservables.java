@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 
 public abstract class StringParsingObservables<R> extends MessageValidatedBehaviorObservables<String, R> {
     public static final Function<String, String> SINGLE_LINE_NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
@@ -25,9 +25,9 @@ public abstract class StringParsingObservables<R> extends MessageValidatedBehavi
 
     @NonNull
     @Override
-    protected Optional<R> mapNext(@NonNull String s, Consumer<ValidationMessage.ResourceMessageFactory> onMessage) {
+    protected Optional<R> mapNext(@NonNull String s, Consumer<ResourceMessageFactory> onMessage) {
         return tryParse(normalizer.apply(s), onMessage);
     }
 
-    protected abstract Optional<R> tryParse(String apply, Consumer<ValidationMessage.ResourceMessageFactory> onMessage);
+    protected abstract Optional<R> tryParse(String apply, Consumer<ResourceMessageFactory> onMessage);
 }

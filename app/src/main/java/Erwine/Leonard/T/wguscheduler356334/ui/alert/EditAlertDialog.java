@@ -29,9 +29,10 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -167,7 +168,7 @@ public class EditAlertDialog extends DialogFragment {
         }
     }
 
-    private void onInitializationFailure(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onInitializationFailure(@NonNull ResourceMessageResult messages) {
         FragmentActivity activity = requireActivity();
         requireDialog().dismiss();
         AlertDialog dlg = new AlertDialog.Builder(activity).setTitle(R.string.title_read_error)
@@ -189,20 +190,20 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onDeleteButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() ->
-                OneTimeObserve.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
+                OneTimeObservers.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
     }
 
     private void onCancelButtonClick(View view) {
         dismiss();
     }
 
-    private void onDaysValidationChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
+    private void onDaysValidationChanged(ResourceMessageFactory resourceMessageFactory) {
         if (null == resourceMessageFactory) {
             daysEditText.setError(null);
         } else {
@@ -211,7 +212,7 @@ public class EditAlertDialog extends DialogFragment {
         }
     }
 
-    private void onSelectedDateValidationLChanged(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
+    private void onSelectedDateValidationLChanged(ResourceMessageFactory resourceMessageFactory) {
         if (null == resourceMessageFactory) {
             specificDateTextView.setError(null);
         } else {
@@ -310,7 +311,7 @@ public class EditAlertDialog extends DialogFragment {
         saveImageButton.setEnabled(null != isValid && isValid);
     }
 
-    private void onSaveOperationFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveOperationFinished(ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationFinished");
         if (messages.isSucceeded()) {
             requireActivity().finish();
@@ -322,7 +323,7 @@ public class EditAlertDialog extends DialogFragment {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
                 builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);

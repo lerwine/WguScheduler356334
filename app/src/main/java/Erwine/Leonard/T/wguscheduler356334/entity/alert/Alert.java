@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public interface Alert extends IdIndexedEntity {
 
@@ -29,7 +29,7 @@ public interface Alert extends IdIndexedEntity {
      */
     String COLNAME_CUSTOM_MESSAGE = "customMessage";
 
-    static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull AlertEntity entity) {
+    static void validate(@NonNull ResourceMessageBuilder builder, @NonNull AlertEntity entity) {
         Boolean subsequent = entity.isSubsequent();
         if (null != subsequent) {
             long timeSpec = entity.getTimeSpec();

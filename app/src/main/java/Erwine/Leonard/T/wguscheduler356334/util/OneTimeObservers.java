@@ -6,12 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
-public class OneTimeObserve {
+public class OneTimeObservers {
 
     public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull LifecycleOwner owner, @NonNull Observer<T> target, boolean acceptNull) {
         ObserverProxy<T> proxy = new ObserverProxy<>(source, target, acceptNull);
@@ -49,6 +50,33 @@ public class OneTimeObserve {
         subscribeOnce(source, onNext, false);
     }
 
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError, @NonNull Action onComplete, boolean skipFirstNull) {
+        ConsumerProxy2<T> proxy = new ConsumerProxy3<>(onNext, onError, onComplete, skipFirstNull);
+        proxy.onSubscribeObservable(source);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError, @NonNull Action onComplete) {
+        subscribeOnce(source, onNext, onError, false);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError, boolean skipFirstNull) {
+        ConsumerProxy2<T> proxy = new ConsumerProxy2<>(onNext, onError, skipFirstNull);
+        proxy.onSubscribeObservable(source);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError) {
+        subscribeOnce(source, onNext, onError, false);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, boolean skipFirstNull) {
+        ConsumerProxy1<T> proxy = new ConsumerProxy1<>(onNext, skipFirstNull);
+        proxy.onSubscribeObservable(source);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext) {
+        subscribeOnce(source, onNext, false);
+    }
+
     public static void subscribeOnce(@NonNull Completable source, @NonNull Action onComplete, @NonNull Consumer<? super Throwable> onError) {
         ActionProxy2 proxy = new ActionProxy2(onComplete, onError);
         proxy.subscribeCompletable(source);
@@ -59,7 +87,7 @@ public class OneTimeObserve {
         proxy.subscribeCompletable(source);
     }
 
-    private OneTimeObserve() {
+    private OneTimeObservers() {
     }
 
     private static abstract class ActionProxy implements Disposable {
@@ -143,7 +171,13 @@ public class OneTimeObserve {
             disposable = onSubscribeSingle(source);
         }
 
+        void subscribeObservable(Observable<T> source) {
+            disposable = onSubscribeObservable(source);
+        }
+
         protected abstract Disposable onSubscribeSingle(Single<T> source);
+
+        protected abstract Disposable onSubscribeObservable(Observable<T> source);
 
         protected void acceptNext(T t) throws Exception {
             if (!skipFirstNull || null != t) {
@@ -174,6 +208,11 @@ public class OneTimeObserve {
         protected Disposable onSubscribeSingle(Single<T> source) {
             return source.subscribe(this::acceptNext);
         }
+
+        @Override
+        protected Disposable onSubscribeObservable(Observable<T> source) {
+            return source.subscribe(this::acceptNext);
+        }
     }
 
     private static class ConsumerProxy2<T> extends ConsumerProxy1<T> {
@@ -195,6 +234,10 @@ public class OneTimeObserve {
             return source.subscribe(this::acceptNext, this::acceptError);
         }
 
+        @Override
+        protected Disposable onSubscribeObservable(Observable<T> source) {
+            return source.subscribe(this::acceptNext, this::acceptError);
+        }
     }
 
     private static class ConsumerProxy3<T> extends ConsumerProxy2<T> {
@@ -210,6 +253,11 @@ public class OneTimeObserve {
         @Override
         protected Disposable onSubscribeSingle(Single<T> source) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected Disposable onSubscribeObservable(Observable<T> source) {
+            return source.subscribe(this::acceptNext, this::acceptError, this::acceptComplete);
         }
 
         void acceptComplete() throws Exception {

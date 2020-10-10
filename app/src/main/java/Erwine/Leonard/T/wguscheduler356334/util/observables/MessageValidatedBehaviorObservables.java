@@ -5,16 +5,16 @@ import androidx.core.util.Consumer;
 
 import java.util.Optional;
 
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.MaybeSubject;
 
 public abstract class MessageValidatedBehaviorObservables<T, R> extends ValidatedBehaviorObservables<T, R> {
-    private final MaybeSubject<ValidationMessage.ResourceMessageFactory> errorSubject;
-    private final MaybeSubject<ValidationMessage.ResourceMessageFactory> warningSubject;
-    private final Maybe<ValidationMessage.ResourceMessageFactory> errorMaybe;
-    private final Maybe<ValidationMessage.ResourceMessageFactory> warningMaybe;
+    private final MaybeSubject<ResourceMessageFactory> errorSubject;
+    private final MaybeSubject<ResourceMessageFactory> warningSubject;
+    private final Maybe<ResourceMessageFactory> errorMaybe;
+    private final Maybe<ResourceMessageFactory> warningMaybe;
     private boolean emitted;
 
     public MessageValidatedBehaviorObservables() {
@@ -24,16 +24,16 @@ public abstract class MessageValidatedBehaviorObservables<T, R> extends Validate
         warningMaybe = warningSubject.observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<ValidationMessage.ResourceMessageFactory> getErrorMaybe() {
+    public Maybe<ResourceMessageFactory> getErrorMaybe() {
         return errorMaybe;
     }
 
-    public Maybe<ValidationMessage.ResourceMessageFactory> getWarningMaybe() {
+    public Maybe<ResourceMessageFactory> getWarningMaybe() {
         return warningMaybe;
     }
 
     @NonNull
-    protected abstract Optional<R> mapNext(@NonNull T t, Consumer<ValidationMessage.ResourceMessageFactory> onMessage);
+    protected abstract Optional<R> mapNext(@NonNull T t, Consumer<ResourceMessageFactory> onMessage);
 
     @NonNull
     @Override
@@ -47,7 +47,7 @@ public abstract class MessageValidatedBehaviorObservables<T, R> extends Validate
         return result;
     }
 
-    private void acceptMessage(ValidationMessage.ResourceMessageFactory resourceMessageFactory) {
+    private void acceptMessage(ResourceMessageFactory resourceMessageFactory) {
         emitted = true;
         if (null == resourceMessageFactory) {
             errorSubject.onComplete();

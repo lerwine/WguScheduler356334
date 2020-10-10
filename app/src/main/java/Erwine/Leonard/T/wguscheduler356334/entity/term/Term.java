@@ -11,7 +11,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public interface Term extends NoteColumnIncludedEntity {
 
@@ -28,7 +28,7 @@ public interface Term extends NoteColumnIncludedEntity {
      */
     String COLNAME_END = "end";
 
-    static void validate(ValidationMessage.ResourceMessageBuilder builder, TermEntity entity) {
+    static void validate(ResourceMessageBuilder builder, TermEntity entity) {
         if (entity.getName().isEmpty()) {
             builder.acceptError(R.string.message_name_required);
         }

@@ -50,7 +50,8 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -737,7 +738,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         return Optional.empty();
     }
 
-    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
+    public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         if (null == selectedTerm) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_term_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
@@ -762,7 +763,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         return dbLoader.saveCourse(entity, ignoreWarnings);
     }
 
-    public Single<ValidationMessage.ResourceMessageResult> delete(boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
         return dbLoader.deleteCourse(Objects.requireNonNull(entityLiveData.getValue()).toEntity(), ignoreWarnings);
     }

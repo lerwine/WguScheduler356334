@@ -8,7 +8,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuildable;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -24,7 +24,7 @@ public interface AlertLink extends ToStringBuildable {
      */
     String COLNAME_TARGET_ID = "targetId";
 
-    static void validate(@NonNull ValidationMessage.ResourceMessageBuilder builder, @NonNull AlertLinkEntity<?> entity) {
+    static void validate(@NonNull ResourceMessageBuilder builder, @NonNull AlertLinkEntity<?> entity) {
         AlertLink link = entity.getLink();
         long id = link.getTargetId();
         if (id == ID_NEW) {

@@ -17,7 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class AddAssessmentActivity extends AppCompatActivity {
@@ -111,7 +111,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 
-    private void onSaveOperationFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveOperationFinished(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             finish();
         } else {

@@ -76,14 +76,14 @@ public class CourseListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        editTermViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
+        editTermViewModel.getEntitySubject().observe(getViewLifecycleOwner(), this::onEntityLoaded);
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
         long termId = termEntity.getId();
         if (ID_NEW != termId) {
             editTermViewModel.getCoursesLiveData().observe(getViewLifecycleOwner(), this::onCourseListChanged);
-            editTermViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
+            editTermViewModel.getOverviewFactory().observe(getViewLifecycleOwner(),
                     f -> overviewTextView.setText(f.apply(getResources())));
         }
     }

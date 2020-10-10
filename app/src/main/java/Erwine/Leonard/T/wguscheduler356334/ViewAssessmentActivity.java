@@ -27,8 +27,8 @@ import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.ViewAssessmentPagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -45,7 +45,6 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private FloatingActionButton shareFloatingActionButton;
     private FloatingActionButton saveFloatingActionButton;
     private FloatingActionButton deleteFloatingActionButton;
-    private TermEntity termEntity;
 
     public ViewAssessmentActivity() {
     }
@@ -67,7 +66,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        OneTimeObserve.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
+        OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
     }
 
     @Override
@@ -88,7 +87,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed), null);
+                    OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed), null);
         } else {
             finish();
         }
@@ -121,7 +120,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
                     this::finish,
                     () -> {
-                        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveFailed);
+                        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveFailed);
                         finish();
                     }, null);
         } else {
@@ -130,7 +129,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }
     }
 
-    private void onSaveForNewAlertFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveForNewAlertFinished(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
             dlg.show(getSupportFragmentManager(), null);
@@ -141,7 +140,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveFailed);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -153,15 +152,22 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onShareFloatingActionButton(View view) {
-        OneTimeObserve.subscribeOnce(viewModel.getCurrentTerm(), this::onTermLoadedForSharing, this::onLoadForSharingFailed);
+        OneTimeObservers.subscribeOnce(viewModel.getCurrentTerm(), termEntity -> {
+            if (null == viewModel.getMentorId()) {
+                onShareAssessment(termEntity, null);
+            } else {
+                OneTimeObservers.subscribeOnce(viewModel.getCourseMentor(), mentorEntity -> onShareAssessment(termEntity, mentorEntity), throwable -> {
+                    Log.e(LOG_TAG, "Error loading mentor", throwable);
+                    new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog();
+                });
+            }
+        }, throwable -> {
+            Log.e(LOG_TAG, "Error loading term", throwable);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog();
+        });
     }
 
-    private void onTermLoadedForSharing(TermEntity termEntity) {
-        this.termEntity = termEntity;
-        OneTimeObserve.subscribeOnce(viewModel.getCourseMentor(), this::onCourseMentorLoadedForSharing, this::onLoadForSharingFailed);
-    }
-
-    private void onCourseMentorLoadedForSharing(MentorEntity mentorEntity) {
+    private void onShareAssessment(TermEntity termEntity, MentorEntity mentorEntity) {
         Resources resources = getResources();
         StringBuilder sb = new StringBuilder(resources.getString(viewModel.getType().displayResourceId())).append(" ")
                 .append(viewModel.getCode()).append(" Report");
@@ -238,20 +244,15 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         startActivity(shareIntent);
     }
 
-    private void onLoadForSharingFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error loading term and mentor", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog();
-    }
-
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_assessment, R.string.message_delete_assessment_confirm, this).showYesNoDialog(() ->
-                OneTimeObserve.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
+                OneTimeObservers.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
     }
 
     private void onDeleteSucceeded(Integer count) {
@@ -276,7 +277,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 .showDialog(this::finish);
     }
 
-    private void onSaveOperationSucceeded(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveOperationSucceeded(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             finish();
         } else {
@@ -286,7 +287,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveOperationSucceeded, this::onSaveFailed);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveOperationSucceeded, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

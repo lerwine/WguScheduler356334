@@ -42,7 +42,8 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -328,7 +329,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         onEntityLoaded();
     }
 
-    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
+    public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         if (null == selectedCourse) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_course_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }

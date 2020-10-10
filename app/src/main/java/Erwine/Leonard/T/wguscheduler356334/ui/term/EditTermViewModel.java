@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.util.Log;
@@ -32,15 +31,19 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -62,38 +65,133 @@ public class EditTermViewModel extends AndroidViewModel {
         context.startActivity(intent);
     }
 
-    private TermEntity termEntity;
-    private final MutableLiveData<TermEntity> entityLiveData;
-    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final DbLoader dbLoader;
-    private final MutableLiveData<Boolean> nameValidLiveData;
-    private final MutableLiveData<Integer> startMessageLiveData;
+    private final BehaviorSubject<TermEntity> entitySubject;
+    private final BehaviorSubject<String> nameSubject;
+    private final BehaviorSubject<Optional<LocalDate>> startDateSubject;
+    private final BehaviorSubject<Optional<LocalDate>> endDateSubject;
+    private final BehaviorSubject<String> notesSubject;
+    @SuppressWarnings("FieldCanBeLocal")
     private final CurrentValues currentValues;
+
+    private final Observable<TermEntity> entity;
+    private final Observable<Function<Resources, String>> titleFactory;
+    private final Observable<Function<Resources, Spanned>> overviewFactory;
+    private final Observable<Boolean> nameValid;
+    private final Observable<Optional<ResourceMessageFactory>> startMessage;
+    private final Observable<Optional<ResourceMessageFactory>> endMessage;
+    private final Observable<Boolean> canShare;
+    private final Observable<Boolean> canSave;
+    private final Observable<Boolean> hasChanges;
+    private final Observable<Boolean> isValid;
+
+    private TermEntity termEntity;
+
     private LiveData<List<TermCourseListItem>> coursesLiveData;
-    private String viewTitle;
-    private Spanned overview;
     private boolean fromInitializedState;
-    private String normalizedName;
-    private String normalizedNotes;
 
     public EditTermViewModel(@NonNull Application application) {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        titleFactoryLiveData = new MutableLiveData<>(r -> r.getString(R.string.title_activity_view_term));
-        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
-        normalizedName = normalizedNotes = "";
-        entityLiveData = new MutableLiveData<>();
-        startMessageLiveData = new MutableLiveData<>();
-        nameValidLiveData = new MutableLiveData<>(false);
+        entitySubject = BehaviorSubject.create();
+        nameSubject = BehaviorSubject.create();
+        startDateSubject = BehaviorSubject.create();
+        endDateSubject = BehaviorSubject.create();
+        notesSubject = BehaviorSubject.create();
         currentValues = new CurrentValues();
+
+        Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
+        Observable<Optional<ResourceMessageFactory>> startMessageObservable = Observable.combineLatest(startDateSubject, endDateSubject, (s, e) -> {
+            if (s.isPresent()) {
+                if (e.isPresent() && s.get().compareTo(e.get()) > 0) {
+                    return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
+                }
+                return Optional.empty();
+            }
+            if (e.isPresent()) {
+                return Optional.of(ResourceMessageFactory.ofError(R.string.message_required));
+            }
+            return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
+        });
+        Observable<Optional<ResourceMessageFactory>> endMessageObservable = Observable.combineLatest(startDateSubject, endDateSubject, (s, e) -> {
+            if (s.isPresent()) {
+                if (e.isPresent()) {
+                    if (s.get().compareTo(e.get()) > 0) {
+                        return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
+                    }
+                    return Optional.empty();
+                }
+            } else if (e.isPresent()) {
+                return Optional.empty();
+            }
+            return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
+        });
+        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
+                normalizedNameObservable.map(n -> !n.equals(termEntity.getName())),
+                startDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getStart())),
+                endDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getEnd())),
+                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(termEntity.getNotes())),
+                (n, p, e, s) -> n || p || e || s
+        );
+        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n && !(s.isPresent() || e.isPresent()));
+
+        nameValid = nameValidObservable.observeOn(AndroidSchedulers.mainThread());
+        entity = entitySubject.observeOn(AndroidSchedulers.mainThread());
+        startMessage = startMessageObservable.observeOn(AndroidSchedulers.mainThread());
+        endMessage = endMessageObservable.observeOn(AndroidSchedulers.mainThread());
+        hasChanges = hasChangesObservable.observeOn(AndroidSchedulers.mainThread());
+        canShare = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c).observeOn(AndroidSchedulers.mainThread());
+        canSave = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).observeOn(AndroidSchedulers.mainThread());
+        isValid = validObservable.observeOn(AndroidSchedulers.mainThread());
+        titleFactory = normalizedNameObservable.map(this::getViewTitleFactory).observeOn(AndroidSchedulers.mainThread());
+        overviewFactory = Observable.combineLatest(startDateSubject, endDateSubject, (s, e) -> getOverviewFactory(s.orElse(null), e.orElse(null))).observeOn(AndroidSchedulers.mainThread());
     }
 
+    @NonNull
+    private Function<Resources, Spanned> getOverviewFactory(LocalDate startDate, LocalDate endDate) {
+        return new Function<Resources, Spanned>() {
+            Spanned result;
+            Resources resources;
+
+            @Override
+            public Spanned apply(Resources resources) {
+                if (null != result && Objects.equals(resources, this.resources)) {
+                    return result;
+                }
+                this.resources = resources;
+                if (null == startDate) {
+                    if (null == endDate) {
+                        result = Html.fromHtml(resources.getString(R.string.html_no_dates_specified), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+                    } else {
+                        result = new SpannedString(resources.getString(R.string.format_ends_on, FORMATTER.format(endDate)));
+                    }
+                } else if (null != endDate) {
+                    result = new SpannedString(resources.getString(R.string.format_range_start_to_end, FORMATTER.format(startDate), FORMATTER.format(endDate)));
+                } else {
+                    result = new SpannedString(resources.getString(R.string.format_starts_on, FORMATTER.format(startDate)));
+                }
+                return result;
+            }
+        };
+    }
+
+    @NonNull
+    private synchronized Function<Resources, String> getViewTitleFactory(String name) {
+        return r -> {
+            String t = r.getString(R.string.format_term, name);
+            int i = t.indexOf(':');
+            return (i > 0 && name.startsWith(t.substring(0, i))) ? name : t;
+        };
+    }
+
+    @Nullable
     public Long getId() {
         return (null == termEntity) ? null : termEntity.getId();
     }
 
+    @NonNull
     public String getName() {
         return currentValues.getName();
     }
@@ -102,22 +200,25 @@ public class EditTermViewModel extends AndroidViewModel {
         currentValues.setName(value);
     }
 
+    @Nullable
     public LocalDate getStart() {
         return currentValues.getStart();
     }
 
-    public synchronized void setStart(LocalDate value) {
+    public synchronized void setStart(@Nullable LocalDate value) {
         currentValues.setStart(value);
     }
 
+    @Nullable
     public LocalDate getEnd() {
         return currentValues.getEnd();
     }
 
-    public synchronized void setEnd(LocalDate value) {
+    public synchronized void setEnd(@Nullable LocalDate value) {
         currentValues.setEnd(value);
     }
 
+    @NonNull
     public String getNotes() {
         return currentValues.getNotes();
     }
@@ -126,34 +227,40 @@ public class EditTermViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
-    public String getNormalizedNotes() {
-        if (null == normalizedNotes) {
-            normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
-            if (normalizedNotes.equals(currentValues.notes)) {
-                currentValues.notes = null;
-            }
-        }
-        return normalizedNotes;
+    public Observable<Boolean> getNameValid() {
+        return nameValid;
     }
 
-    LiveData<Boolean> getNameValidLiveData() {
-        return nameValidLiveData;
+    public Observable<Optional<ResourceMessageFactory>> getStartMessage() {
+        return startMessage;
     }
 
-    LiveData<Integer> getStartMessageLiveData() {
-        return startMessageLiveData;
+    public Observable<Optional<ResourceMessageFactory>> getEndMessage() {
+        return endMessage;
     }
 
-    public MutableLiveData<TermEntity> getEntityLiveData() {
-        return entityLiveData;
+    public Observable<Boolean> getCanSave() {
+        return canSave;
     }
 
-    public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
-        return titleFactoryLiveData;
+    public Observable<Boolean> getCanShare() {
+        return canShare;
     }
 
-    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
-        return overviewFactoryLiveData;
+    public Observable<Boolean> getHasChanges() {
+        return hasChanges;
+    }
+
+    public Observable<Function<Resources, String>> getTitleFactory() {
+        return titleFactory;
+    }
+
+    public Observable<Function<Resources, Spanned>> getOverviewFactory() {
+        return overviewFactory;
+    }
+
+    public Observable<TermEntity> getEntity() {
+        return entity;
     }
 
     public boolean isFromInitializedState() {
@@ -164,13 +271,15 @@ public class EditTermViewModel extends AndroidViewModel {
         return coursesLiveData;
     }
 
+    public Observable<Boolean> getIsValid() {
+        return isValid;
+    }
+
     public synchronized Single<TermEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         termEntity = new TermEntity();
-        viewTitle = null;
-        overview = null;
         if (null != state) {
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
@@ -181,64 +290,27 @@ public class EditTermViewModel extends AndroidViewModel {
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
             }
-        } else {
-            normalizedName = termEntity.getName();
         }
         coursesLiveData = new MutableLiveData<>(Collections.emptyList());
-        titleFactoryLiveData.postValue(this::calculateViewTitle);
-        entityLiveData.postValue(termEntity);
+        onEntityLoaded(termEntity);
         return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
-
-    @NonNull
-    public synchronized String calculateViewTitle(Resources resources) {
-        if (null == viewTitle) {
-            String t = resources.getString(R.string.format_term, normalizedName);
-            int i = t.indexOf(':');
-            viewTitle = (i > 0 && normalizedName.startsWith(t.substring(0, i))) ? normalizedName : t;
-        }
-        return viewTitle;
-    }
-
-    @NonNull
-    public synchronized Spanned calculateOverview(Resources resources) {
-        if (null != overview) {
-            return overview;
-        }
-        LocalDate startDate = currentValues.getStart();
-        LocalDate endDate = currentValues.getEnd();
-        Spanned result;
-        if (null == startDate) {
-            if (null == endDate) {
-                result = Html.fromHtml(resources.getString(R.string.html_no_dates_specified), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
-            } else {
-                result = new SpannedString(resources.getString(R.string.format_ends_on, FORMATTER.format(endDate)));
-            }
-        } else if (null != endDate) {
-            result = new SpannedString(resources.getString(R.string.format_range_start_to_end, FORMATTER.format(startDate), FORMATTER.format(endDate)));
-        } else {
-            result = new SpannedString(resources.getString(R.string.format_starts_on, FORMATTER.format(startDate)));
-        }
-        overview = result;
-        return result;
-    }
-
-    public void saveViewModelState(Bundle outState) {
+    public void saveViewModelState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         currentValues.saveState(outState, false);
         termEntity.saveState(outState, true);
     }
 
-    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
+    public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         LocalDate newStart = currentValues.start;
         LocalDate newEnd = currentValues.end;
         String originalName = termEntity.getName();
         LocalDate originalStart = termEntity.getStart();
         LocalDate originalEnd = termEntity.getEnd();
         String originalNotes = termEntity.getNotes();
-        termEntity.setName(normalizedName);
+        termEntity.setName(currentValues.name);
         termEntity.setStart(newStart);
         termEntity.setEnd(newEnd);
         termEntity.setNotes(currentValues.notes);
@@ -257,12 +329,12 @@ public class EditTermViewModel extends AndroidViewModel {
         });
     }
 
-    public Single<ValidationMessage.ResourceMessageResult> delete(boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.delete");
-        return dbLoader.deleteTerm(entityLiveData.getValue(), ignoreWarnings);
+        return dbLoader.deleteTerm(entitySubject.getValue(), ignoreWarnings);
     }
 
-    private void onEntityLoadedFromDb(TermEntity entity) {
+    private void onEntityLoadedFromDb(@NonNull TermEntity entity) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.onEntityLoaded");
         termEntity = entity;
         setName(entity.getName());
@@ -270,34 +342,21 @@ public class EditTermViewModel extends AndroidViewModel {
         setEnd(entity.getEnd());
         setNotes(entity.getNotes());
         coursesLiveData = dbLoader.getCoursesByTermId(entity.getId());
-        entityLiveData.postValue(termEntity);
+        onEntityLoaded(termEntity);
     }
 
-    private synchronized Optional<Integer> validateDateRange() {
-        if (null != currentValues.end) {
-            if (null == currentValues.start) {
-                return Optional.of(R.string.message_required);
-            }
-            if (currentValues.start.compareTo(currentValues.end) > 0) {
-                return Optional.of(R.string.message_start_after_end);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public boolean isChanged() {
-        if (ID_NEW != termEntity.getId() && normalizedName.equals(termEntity.getName()) && Objects.equals(currentValues.start, termEntity.getStart()) && Objects.equals(currentValues.end, termEntity.getEnd())) {
-            return !getNormalizedNotes().equals(termEntity.getNotes());
-        }
-        return true;
+    private void onEntityLoaded(TermEntity termEntity) {
+        entitySubject.onNext(termEntity);
     }
 
     private class CurrentValues implements Term {
 
         private Long id;
+        @NonNull
         private String name = "";
         private LocalDate start;
         private LocalDate end;
+        @NonNull
         private String notes = "";
 
         @Override
@@ -321,18 +380,16 @@ public class EditTermViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
-            this.name = (null == name) ? "" : name;
-            String oldValue = normalizedName;
-            normalizedName = TermEntity.SINGLE_LINE_NORMALIZER.apply(name);
-            if (normalizedName.isEmpty()) {
-                if (!oldValue.isEmpty()) {
-                    nameValidLiveData.postValue(false);
+            if (null == name || name.isEmpty()) {
+                if (this.name.isEmpty()) {
+                    return;
                 }
-            } else if (oldValue.isEmpty()) {
-                nameValidLiveData.postValue(true);
+                nameSubject.onNext("");
+            } else if (!name.equals(this.name)) {
+                this.name = name;
+                nameSubject.onNext(this.name);
             }
-            viewTitle = null;
-            titleFactoryLiveData.postValue(EditTermViewModel.this::calculateViewTitle);
+            nameSubject.onNext(this.name);
         }
 
         @Nullable
@@ -342,12 +399,11 @@ public class EditTermViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setStart(LocalDate start) {
+        public void setStart(@Nullable LocalDate start) {
             if (!Objects.equals(this.start, start)) {
+                Log.d(LOG_TAG, "Enter setStart(" + ToStringBuilder.toEscapedString(start, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.start, true));
                 this.start = start;
-                startMessageLiveData.postValue(validateDateRange().orElse(null));
-                overview = null;
-                overviewFactoryLiveData.postValue(EditTermViewModel.this::calculateOverview);
+                startDateSubject.onNext(Optional.ofNullable(this.start));
             }
         }
 
@@ -358,29 +414,31 @@ public class EditTermViewModel extends AndroidViewModel {
         }
 
         @Override
-        public void setEnd(LocalDate end) {
+        public void setEnd(@Nullable LocalDate end) {
             if (!Objects.equals(this.end, end)) {
+                Log.d(LOG_TAG, "Enter setEnd(" + ToStringBuilder.toEscapedString(end, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.end, true));
                 this.end = end;
-                startMessageLiveData.postValue(validateDateRange().orElse(null));
-                overview = null;
-                overviewFactoryLiveData.postValue(EditTermViewModel.this::calculateOverview);
+                endDateSubject.onNext(Optional.ofNullable(this.end));
             }
         }
 
         @NonNull
         @Override
         public String getNotes() {
-            return (null == notes) ? normalizedNotes : notes;
+            return notes;
         }
 
         @Override
         public void setNotes(String notes) {
+            Log.d(LOG_TAG, "Enter setNotes(" + ToStringBuilder.toEscapedString(notes) + "); oldValue = " + ToStringBuilder.toEscapedString(EditTermViewModel.this.getNotes()));
             if (null == notes || notes.isEmpty()) {
-                normalizedNotes = "";
-                this.notes = null;
-            } else if (!getNotes().equals(notes)) {
+                if (this.notes.isEmpty()) {
+                    return;
+                }
+                notesSubject.onNext("");
+            } else if (!notes.equals(this.notes)) {
                 this.notes = notes;
-                normalizedNotes = null;
+                notesSubject.onNext(this.notes);
             }
         }
 

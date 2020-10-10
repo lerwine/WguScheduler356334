@@ -1,4 +1,4 @@
-package Erwine.Leonard.T.wguscheduler356334.util;
+package Erwine.Leonard.T.wguscheduler356334.util.validation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,7 +47,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
             isEmptyLiveData = new LiveBoolean(true);
         } else {
             c.forEach(node -> {
-                if (null != ((ValidationTrackable) node).tracker) {
+                if (null != node.tracker) {
                     throw new IllegalStateException();
                 }
                 link(node, false);
@@ -262,7 +262,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
         List<T> removed = new ArrayList<>(this);
         super.clear();
         removed.forEach(t -> {
-            ValidationTrackable node = (ValidationTrackable) t;
+            ValidationTrackable node = t;
             node.tracker = null;
             node.next = node.previous = null;
         });
@@ -344,7 +344,7 @@ public class ValidationTracker<T extends ValidationTracker.ValidationTrackable> 
     }
 
     public void setAll(List<T> phoneNumberEntities) {
-        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.util.ValidationTracker.setAll
+        // TODO: Implement Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationTracker.setAll
     }
 
     private static class LiveBoolean extends LiveData<Boolean> {

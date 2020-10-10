@@ -25,7 +25,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -134,7 +134,7 @@ public class CourseAlertListFragment extends Fragment {
         }
     }
 
-    private void onSaveForEditAlertFinished(ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveForEditAlertFinished(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             EditAlertDialog dlg = EditAlertViewModel.existingCourseAlertEditor(editAlertId, courseViewModel.getId());
             dlg.show(getParentFragmentManager(), null);

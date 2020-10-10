@@ -15,7 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public interface Assessment extends NoteColumnIncludedEntity {
     /**
@@ -48,7 +48,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
      */
     String COLNAME_COMPLETION_DATE = "completionDate";
 
-    static void validate(ValidationMessage.ResourceMessageBuilder builder, AssessmentEntity entity) {
+    static void validate(ResourceMessageBuilder builder, AssessmentEntity entity) {
         if (entity.getCourseId() == ID_NEW) {
             builder.acceptError(R.string.message_assessment_has_no_course);
         }

@@ -34,7 +34,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -95,7 +97,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private final MutableLiveData<AlertEntity> alertEntityLiveData;
-    private final MutableLiveData<ValidationMessage.ResourceMessageResult> initializationFailureLiveData;
+    private final MutableLiveData<ResourceMessageResult> initializationFailureLiveData;
     private final MutableLiveData<String> eventDateLiveData;
     private final MutableLiveData<String> calculatedDateLiveData;
     private final IsValid validLiveData;
@@ -298,15 +300,15 @@ public class EditAlertViewModel extends AndroidViewModel {
         return calculatedDateLiveData;
     }
 
-    public LiveData<ValidationMessage.ResourceMessageResult> getInitializationFailureLiveData() {
+    public LiveData<ResourceMessageResult> getInitializationFailureLiveData() {
         return initializationFailureLiveData;
     }
 
-    public LiveData<ValidationMessage.ResourceMessageFactory> getDaysValidationLiveData() {
+    public LiveData<ResourceMessageFactory> getDaysValidationLiveData() {
         return validLiveData.daysValidationLiveData;
     }
 
-    public LiveData<ValidationMessage.ResourceMessageFactory> getSelectedDateValidationLiveData() {
+    public LiveData<ResourceMessageFactory> getSelectedDateValidationLiveData() {
         return validLiveData.selectedDateValidationLiveData;
     }
 
@@ -502,7 +504,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         alertEntityLiveData.postValue(alertEntity);
     }
 
-    public synchronized Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
+    public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         AlertEntity entity = new AlertEntity(alertEntity);
         if (dateSpecOption.isExplicit()) {
             entity.setSubsequent(null);
@@ -537,8 +539,8 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     private static class IsValid extends LiveData<Boolean> {
 
-        private final MutableLiveData<ValidationMessage.ResourceMessageFactory> daysValidationLiveData;
-        private final MutableLiveData<ValidationMessage.ResourceMessageFactory> selectedDateValidationLiveData;
+        private final MutableLiveData<ResourceMessageFactory> daysValidationLiveData;
+        private final MutableLiveData<ResourceMessageFactory> selectedDateValidationLiveData;
 
         private IsValid() {
             super(true);
@@ -548,23 +550,23 @@ public class EditAlertViewModel extends AndroidViewModel {
 
         void clearSelectedDateMessage() {
             selectedDateValidationLiveData.postValue(null);
-            ValidationMessage.ResourceMessageFactory m = daysValidationLiveData.getValue();
+            ResourceMessageFactory m = daysValidationLiveData.getValue();
             postValue(null == m || m.isWarning());
         }
 
         void postSelectedDateMessage(@StringRes int id) {
-            selectedDateValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(id));
+            selectedDateValidationLiveData.postValue(ResourceMessageFactory.ofError(id));
             postValue(false);
         }
 
         void clearDaysMessage() {
             daysValidationLiveData.postValue(null);
-            ValidationMessage.ResourceMessageFactory m = selectedDateValidationLiveData.getValue();
+            ResourceMessageFactory m = selectedDateValidationLiveData.getValue();
             postValue(null == m || m.isWarning());
         }
 
         public void postDaysMessage(@StringRes int id) {
-            daysValidationLiveData.postValue(ValidationMessage.ResourceMessageFactory.ofError(id));
+            daysValidationLiveData.postValue(ResourceMessageFactory.ofError(id));
             postValue(false);
         }
     }

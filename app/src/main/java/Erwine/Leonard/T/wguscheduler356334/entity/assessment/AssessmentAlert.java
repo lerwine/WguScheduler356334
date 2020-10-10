@@ -15,7 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertListViewModel;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     @Embedded
@@ -122,7 +122,7 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         return !Objects.equals(oldValue, alertDate);
     }
 
-    public synchronized void validate(ValidationMessage.ResourceMessageBuilder builder) {
+    public synchronized void validate(ResourceMessageBuilder builder) {
         AlertLink.validate(builder, this);
         Boolean subsequent = alert.isSubsequent();
         if (null != subsequent && !subsequent && alert.getTimeSpec() < 0L) {

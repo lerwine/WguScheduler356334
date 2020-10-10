@@ -47,7 +47,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -149,10 +151,10 @@ public class DbLoader {
     }
 
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> saveTerm(TermEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> saveTerm(TermEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called saveTerm(%s)", entity));
         return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Term.validate(builder, entity);
             TermDAO dao = appDb.termDAO();
             List<TermListItem> list = dao.getAllSynchronous();
@@ -203,7 +205,7 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> deleteTerm(TermEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> deleteTerm(TermEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called deleteTerm(%s)", entity));
         return Single.fromCallable(() -> {
             long id = entity.getId();
@@ -255,10 +257,10 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> saveMentor(MentorEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> saveMentor(MentorEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called saveMentor(%s)", entity));
         return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Mentor.validate(builder, entity);
             MentorDAO dao = appDb.mentorDAO();
             List<MentorListItem> list = dao.getAllSynchronous();
@@ -294,7 +296,7 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> deleteMentor(MentorEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> deleteMentor(MentorEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called deleteMentor(%s)", entity));
         return Single.fromCallable(() -> {
             long id = entity.getId();
@@ -330,7 +332,7 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> deleteCourse(CourseEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> deleteCourse(CourseEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called deleteCourse(%s)", entity));
         return Single.fromCallable(() -> {
             long id = entity.getId();
@@ -411,10 +413,10 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> saveCourse(CourseEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> saveCourse(CourseEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called saveCourse(%s)", entity));
         return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Course.validate(builder, entity);
             CourseDAO dao = appDb.courseDAO();
             long termId = entity.getTermId();
@@ -554,10 +556,10 @@ public class DbLoader {
      * @return The {@link Completable} that can be observed for DB operation completion status.
      */
     @NonNull
-    public Single<ValidationMessage.ResourceMessageResult> saveAssessment(AssessmentEntity entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> saveAssessment(AssessmentEntity entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called saveAssessment(%s)", entity));
         return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Assessment.validate(builder, entity);
             AssessmentDAO dao = appDb.assessmentDAO();
             LocalDate date = entity.getCompletionDate();
@@ -638,10 +640,10 @@ public class DbLoader {
         })).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<ValidationMessage.ResourceMessageResult> saveCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> saveCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
         return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             AlertEntity alert = entity.getAlert();
             AlertLink.validate(builder, entity);
             if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
@@ -670,10 +672,10 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<ValidationMessage.ResourceMessageResult> saveAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> saveAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertAssessmentAlert(%s)", entity));
         return Single.fromCallable(() -> {
-            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
+            final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             entity.validate(builder);
             if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
                 return builder.build();

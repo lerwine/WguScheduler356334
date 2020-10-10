@@ -19,6 +19,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -26,17 +27,17 @@ import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -49,59 +50,91 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     private final DbLoader dbLoader;
     private final BehaviorSubject<MentorEntity> currentEntitySubject;
-    private final Observable<MentorEntity> currentEntityObservable;
-    private final BehaviorSubject<Function<Resources, String>> titleFactorySubject;
-    private final Observable<Function<Resources, String>> titleFactoryObservable;
-    private final BehaviorSubject<Function<Resources, Spanned>> overviewFactorySubject;
-    private final Observable<Function<Resources, Spanned>> overviewFactoryObservable;
-    private final BehaviorSubject<Boolean> nameValidSubject;
-    private final Observable<Boolean> nameValidObservable;
-    private final BehaviorSubject<Boolean> phoneNotEmptySubject;
-    private final BehaviorSubject<Boolean> emailNotEmptySubject;
-    private final Observable<Boolean> contactValidObservable;
-    private final BehaviorSubject<Boolean> hasChangesSubject;
-    private final Observable<Boolean> validObservable;
-    private final Observable<Boolean> canShareObservable;
-    private final Observable<Boolean> canSaveObservable;
-    private final BehaviorSubject<String> currentNameSubject;
-    private final Observable<String> currentNameObservable;
+    private final Observable<Function<Resources, String>> titleFactory;
+    private final Observable<Function<Resources, Spanned>> overviewFactory;
+    private final BehaviorSubject<String> nameSubject;
+    private final BehaviorSubject<String> phoneNumberSubject;
+    private final BehaviorSubject<String> emailAddressSubject;
+    private final BehaviorSubject<String> notesSubject;
+    private final Observable<Boolean> canShare;
+    private final Observable<Boolean> canSave;
+    private final Observable<String> normalizedName;
     private final CurrentValues currentValues;
+    private final Observable<Boolean> nameValid;
+    private final Observable<Boolean> contactValid;
+    private final Observable<Boolean> isValid;
+    private final Observable<Boolean> hasChanges;
     private LiveData<List<MentorCourseListItem>> coursesLiveData;
-    private String viewTitle;
-    private Spanned overview;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
-    @NonNull
-    private String normalizedNotes = "";
-    @NonNull
-    private String normalizedName = "";
-    @NonNull
-    private String normalizedPhoneNumber = "";
-    @NonNull
-    private String normalizedEmailAddress = "";
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        titleFactorySubject = BehaviorSubject.create();
-        titleFactoryObservable = titleFactorySubject.observeOn(AndroidSchedulers.mainThread());
-        overviewFactorySubject = BehaviorSubject.create();
-        overviewFactoryObservable = overviewFactorySubject.observeOn(AndroidSchedulers.mainThread());
         currentEntitySubject = BehaviorSubject.create();
-        currentEntityObservable = currentEntitySubject.observeOn(AndroidSchedulers.mainThread());
-        nameValidSubject = BehaviorSubject.create();
-        nameValidObservable = nameValidSubject.observeOn(AndroidSchedulers.mainThread());
-        phoneNotEmptySubject = BehaviorSubject.create();
-        emailNotEmptySubject = BehaviorSubject.create();
-        contactValidObservable = Observable.combineLatest(phoneNotEmptySubject, emailNotEmptySubject, (p, e) -> p || e).observeOn(AndroidSchedulers.mainThread());
-        hasChangesSubject = BehaviorSubject.create();
-        validObservable = Observable.combineLatest(nameValidSubject, contactValidObservable, (n, c) -> n && c).observeOn(AndroidSchedulers.mainThread());
-        canShareObservable = Observable.combineLatest(validObservable, hasChangesSubject, (v, c) -> v && !c).observeOn(AndroidSchedulers.mainThread());
-        canSaveObservable = Observable.combineLatest(validObservable, hasChangesSubject, (v, c) -> v && c).observeOn(AndroidSchedulers.mainThread());
-        currentNameSubject = BehaviorSubject.create();
-        currentNameObservable = currentNameSubject.observeOn(AndroidSchedulers.mainThread());
+        nameSubject = BehaviorSubject.create();
+        phoneNumberSubject = BehaviorSubject.create();
+        emailAddressSubject = BehaviorSubject.create();
+        notesSubject = BehaviorSubject.create();
         currentValues = new CurrentValues();
+
+        Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
+        Observable<String> normalizedPhoneObservable = phoneNumberSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<String> normalizedEmailObservable = emailAddressSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<Boolean> contactValidObservable = Observable.combineLatest(normalizedPhoneObservable.map(String::isEmpty), normalizedEmailObservable.map(String::isEmpty), (p, e) -> !(p || e));
+        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
+                normalizedNameObservable.map(n -> !n.equals(mentorEntity.getName())),
+                normalizedPhoneObservable.map(n -> !n.equals(mentorEntity.getPhoneNumber())),
+                normalizedEmailObservable.map(n -> !n.equals(mentorEntity.getEmailAddress())),
+                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(mentorEntity.getNotes())),
+                (n, p, e, s) -> n || p || e || s);
+        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, contactValidObservable, (n, c) -> n && c);
+
+        canShare = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c).observeOn(AndroidSchedulers.mainThread());
+        canSave = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).observeOn(AndroidSchedulers.mainThread());
+        normalizedName = normalizedNameObservable.observeOn(AndroidSchedulers.mainThread());
+        nameValid = nameValidObservable.observeOn(AndroidSchedulers.mainThread());
+        contactValid = contactValidObservable.observeOn(AndroidSchedulers.mainThread());
+        titleFactory = normalizedName.map(this::getViewTitleFactory).observeOn(AndroidSchedulers.mainThread());
+        overviewFactory = Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable, this::getOverviewFactory).observeOn(AndroidSchedulers.mainThread());
+        isValid = validObservable.observeOn(AndroidSchedulers.mainThread());
+        hasChanges = hasChangesObservable.observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @NonNull
+    private Function<Resources, Spanned> getOverviewFactory(String phoneNumber, String emailAddress) {
+        return new Function<Resources, Spanned>() {
+            Spanned result;
+            Resources resources;
+
+            @Override
+            public Spanned apply(Resources resources) {
+                if (null != result && Objects.equals(resources, this.resources)) {
+                    return result;
+                }
+                this.resources = resources;
+                if (phoneNumber.isEmpty()) {
+                    if (emailAddress.isEmpty()) {
+                        result = new SpannableStringBuilder().append(resources.getString(R.string.message_phone_or_email_required),
+                                new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    } else {
+                        result = Html.fromHtml(resources.getString(R.string.html_format_mentor_email, emailAddress), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+                    }
+                } else if (emailAddress.isEmpty()) {
+                    result = Html.fromHtml(resources.getString(R.string.html_format_mentor_phone, phoneNumber), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+                } else {
+                    result = Html.fromHtml(resources.getString(R.string.html_format_mentor_phone_and_email, phoneNumber, emailAddress), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+                }
+                return result;
+            }
+        };
+    }
+
+    @NonNull
+    private synchronized Function<Resources, String> getViewTitleFactory(String name) {
+        return r -> r.getString(R.string.format_mentor, name);
     }
 
     public static void startEditMentorActivity(Context context, Long id) {
@@ -148,74 +181,40 @@ public class EditMentorViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
-    @NonNull
-    public String getNormalizedNotes() {
-        return normalizedNotes;
-    }
-
-    @NonNull
-    public synchronized Spanned calculateOverview(Resources resources) {
-        if (null != overview) {
-            return overview;
-        }
-        Spanned result;
-        if (normalizedPhoneNumber.isEmpty()) {
-            if (normalizedEmailAddress.isEmpty()) {
-                result = new SpannableStringBuilder().append(resources.getString(R.string.message_phone_or_email_required),
-                        new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-            } else {
-                result = Html.fromHtml(resources.getString(R.string.html_format_mentor_email, normalizedEmailAddress), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
-            }
-        } else if (normalizedEmailAddress.isEmpty()) {
-            result = Html.fromHtml(resources.getString(R.string.html_format_mentor_phone, normalizedPhoneNumber), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
-        } else {
-            result = Html.fromHtml(resources.getString(R.string.html_format_mentor_phone_and_email, normalizedPhoneNumber, normalizedEmailAddress), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
-        }
-        overview = result;
-        return result;
-    }
-
-    private synchronized String calculateViewTitle(Resources resources) {
-        if (null != viewTitle) {
-            viewTitle = resources.getString(R.string.format_mentor, normalizedName);
-        }
-        return viewTitle;
-    }
-
     public Observable<Boolean> getNameValid() {
-        return nameValidObservable;
+        return nameValid;
     }
 
     public Observable<Boolean> getContactValid() {
-        return contactValidObservable;
-    }
-
-    public Observable<MentorEntity> getCurrentEntity() {
-        return currentEntityObservable;
+        return contactValid;
     }
 
     public Observable<Function<Resources, String>> getTitleFactory() {
-        return titleFactoryObservable;
+        return titleFactory;
     }
 
     public Observable<Function<Resources, Spanned>> getOverviewFactory() {
-        return overviewFactoryObservable;
+        return overviewFactory;
     }
 
-    public Observable<String> getCurrentName() {
-        return currentNameObservable;
+    public Observable<String> getNormalizedName() {
+        return normalizedName;
     }
 
-    public Observable<Boolean> getValid() {
-        return validObservable;
+    public Observable<Boolean> getIsValid() {
+        return isValid;
     }
 
-    public Observable<Boolean> getCanShareObservable() {
-        return canShareObservable;
+    public Observable<Boolean> getCanShare() {
+        return canShare;
     }
 
-    public Observable<Boolean> getCanSaveObservable() {
-        return canSaveObservable;
+    public Observable<Boolean> getCanSave() {
+        return canSave;
+    }
+
+    public Observable<Boolean> getHasChanges() {
+        return hasChanges;
     }
 
     public boolean isFromInitializedState() {
@@ -226,8 +225,6 @@ public class EditMentorViewModel extends AndroidViewModel {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         mentorEntity = new MentorEntity();
-        viewTitle = null;
-        overview = null;
         if (null != state) {
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
@@ -239,12 +236,12 @@ public class EditMentorViewModel extends AndroidViewModel {
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
             }
         }
-        onEntityLoaded();
+        currentEntitySubject.onNext(mentorEntity);
         coursesLiveData = new MutableLiveData<>(Collections.emptyList());
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<ValidationMessage.ResourceMessageResult> save(boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         String newName = currentValues.name;
         String newPhone = currentValues.phoneNumber;
         String newEmail = currentValues.emailAddress;
@@ -264,7 +261,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         });
     }
 
-    public Single<ValidationMessage.ResourceMessageResult> delete(boolean ignoreWarnings) {
+    public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete");
         return dbLoader.deleteMentor(mentorEntity, ignoreWarnings);
     }
@@ -272,22 +269,11 @@ public class EditMentorViewModel extends AndroidViewModel {
     private void onEntityLoadedFromDb(MentorEntity entity) {
         Log.d(LOG_TAG, "Enter onEntityLoaded");
         mentorEntity = entity;
-        viewTitle = null;
         setNotes(entity.getNotes());
         setName(entity.getName());
         setPhoneNumber(entity.getPhoneNumber());
         setEmailAddress(entity.getEmailAddress());
         coursesLiveData = dbLoader.getCoursesByMentorId(entity.getId());
-        onEntityLoaded();
-    }
-
-    private void onEntityLoaded() {
-        titleFactorySubject.onNext(this::calculateViewTitle);
-        overviewFactorySubject.onNext(this::calculateOverview);
-        nameValidSubject.onNext(!normalizedName.isEmpty());
-        phoneNotEmptySubject.onNext(!normalizedPhoneNumber.isEmpty());
-        emailNotEmptySubject.onNext(!normalizedEmailAddress.isEmpty());
-        hasChangesSubject.onNext(isChanged());
         currentEntitySubject.onNext(mentorEntity);
     }
 
@@ -296,14 +282,6 @@ public class EditMentorViewModel extends AndroidViewModel {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         currentValues.saveState(outState, false);
         mentorEntity.saveState(outState, true);
-    }
-
-    public boolean isChanged() {
-        if (ID_NEW != mentorEntity.getId() && normalizedName.equals(mentorEntity.getName()) && normalizedPhoneNumber.equals(mentorEntity.getPhoneNumber()) &&
-                normalizedEmailAddress.equals(mentorEntity.getEmailAddress())) {
-            return !normalizedNotes.equals(mentorEntity.getNotes());
-        }
-        return true;
     }
 
     public LiveData<List<MentorCourseListItem>> getCoursesLiveData() {
@@ -319,7 +297,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         private String phoneNumber = "";
         @NonNull
         private String emailAddress = "";
-        private String notes;
+        @NonNull
+        private String notes = "";
 
         @Override
         public long getId() {
@@ -341,25 +320,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         public void setName(String name) {
             Log.d(LOG_TAG, "Enter setName:  current: " + ToStringBuilder.toEscapedString(this.name) + "; new: " + ToStringBuilder.toEscapedString(name));
             this.name = (null == name) ? "" : name;
-            String oldValue = normalizedName;
-            normalizedName = TermEntity.SINGLE_LINE_NORMALIZER.apply(name);
-            if (normalizedName.isEmpty()) {
-                if (!oldValue.isEmpty()) {
-                    Log.d(LOG_TAG, "setName:  Posting false to nameValidLiveData");
-                    nameValidSubject.onNext(false);
-                }
-            } else if (oldValue.isEmpty()) {
-                Log.d(LOG_TAG, "setName:  Posting true to nameValidLiveData");
-                nameValidSubject.onNext(true);
-            }
-            if (!oldValue.equals(normalizedName)) {
-                viewTitle = null;
-                Log.d(LOG_TAG, "setName:  Posting new recalculation to titleFactoryLiveData");
-                titleFactorySubject.onNext(EditMentorViewModel.this::calculateViewTitle);
-                Log.d(LOG_TAG, "setName: Posting " + ToStringBuilder.toEscapedString(normalizedName) + " to overviewFactoryLiveData");
-                currentNameSubject.onNext(normalizedName);
-                hasChangesSubject.onNext(isChanged());
-            }
+            nameSubject.onNext(this.name);
         }
 
         @NonNull
@@ -372,15 +333,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         public void setPhoneNumber(String phoneNumber) {
             Log.d(LOG_TAG, "Enter setPhoneNumber:  current: " + ToStringBuilder.toEscapedString(this.phoneNumber) + "; new: " + ToStringBuilder.toEscapedString(phoneNumber));
             this.phoneNumber = (null == phoneNumber) ? "" : phoneNumber;
-            String oldValue = normalizedPhoneNumber;
-            normalizedPhoneNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(phoneNumber);
-            phoneNotEmptySubject.onNext(!normalizedPhoneNumber.isEmpty());
-            if (!oldValue.equals(normalizedPhoneNumber)) {
-                overview = null;
-                Log.d(LOG_TAG, "setPhoneNumber:  Posting new recalculation to overviewFactoryLiveData");
-                overviewFactorySubject.onNext(EditMentorViewModel.this::calculateOverview);
-                hasChangesSubject.onNext(isChanged());
-            }
+            phoneNumberSubject.onNext(this.phoneNumber);
         }
 
         @NonNull
@@ -393,50 +346,19 @@ public class EditMentorViewModel extends AndroidViewModel {
         public void setEmailAddress(String emailAddress) {
             Log.d(LOG_TAG, "Enter setEmailAddress:  current: " + ToStringBuilder.toEscapedString(this.emailAddress) + "; new: " + ToStringBuilder.toEscapedString(emailAddress));
             this.emailAddress = (null == emailAddress) ? "" : emailAddress;
-            String oldValue = normalizedEmailAddress;
-            normalizedEmailAddress = TermEntity.SINGLE_LINE_NORMALIZER.apply(emailAddress);
-            emailNotEmptySubject.onNext(!normalizedEmailAddress.isEmpty());
-            if (!oldValue.equals(normalizedEmailAddress)) {
-                overview = null;
-                Log.d(LOG_TAG, "setEmailAddress:  Posting new recalculation to overviewFactoryLiveData");
-                overviewFactorySubject.onNext(EditMentorViewModel.this::calculateOverview);
-
-                CompositeDisposable d = new CompositeDisposable();
-                d.add(hasChangesSubject.last(false).subscribe(t -> {
-                    d.clear();
-                    if (!t) {
-                        hasChangesSubject.onNext(isChanged());
-                    }
-                }));
-            }
+            emailAddressSubject.onNext(this.emailAddress);
         }
 
         @NonNull
         @Override
         public String getNotes() {
-            return (null == notes) ? normalizedNotes : notes;
+            return notes;
         }
 
         @Override
         public void setNotes(String notes) {
-            String oldValue = normalizedNotes;
-            if (null == notes || notes.isEmpty()) {
-                if (normalizedNotes.isEmpty()) {
-                    return;
-                }
-                normalizedNotes = "";
-                this.notes = null;
-            } else if (!getNotes().equals(notes)) {
-                normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(notes);
-                this.notes = (normalizedNotes.equals(notes)) ? null : notes;
-            }
-            CompositeDisposable d = new CompositeDisposable();
-            d.add(hasChangesSubject.last(false).subscribe(t -> {
-                d.clear();
-                if (!(t || normalizedNotes.equals(oldValue))) {
-                    hasChangesSubject.onNext(isChanged());
-                }
-            }));
+            this.notes = (null == notes) ? "" : notes;
+            notesSubject.onNext(this.notes);
         }
 
         @NonNull

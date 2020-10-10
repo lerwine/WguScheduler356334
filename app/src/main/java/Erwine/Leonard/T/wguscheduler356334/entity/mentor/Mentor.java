@@ -8,7 +8,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public interface Mentor extends NoteColumnIncludedEntity {
 
@@ -25,7 +25,7 @@ public interface Mentor extends NoteColumnIncludedEntity {
      */
     String COLNAME_EMAIL_ADDRESS = "emailAddress";
 
-    static void validate(ValidationMessage.ResourceMessageBuilder builder, MentorEntity entity) {
+    static void validate(ResourceMessageBuilder builder, MentorEntity entity) {
         if (entity.getName().isEmpty()) {
             builder.acceptError(R.string.message_name_required);
         }

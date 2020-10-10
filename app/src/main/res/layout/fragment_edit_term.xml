@@ -33,11 +33,11 @@
             style="@style/WGU.Scheduler.FieldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/termStartTextView"
+            android:labelFor="@id/termStartValueTextView"
             android:text="@string/label_start_of_term" />
 
         <TextView
-            android:id="@+id/termStartTextView"
+            android:id="@+id/termStartValueTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/edit_text"

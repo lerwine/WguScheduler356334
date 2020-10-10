@@ -17,14 +17,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class AddTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddTermActivity.class.getName();
 
-    private final CompositeDisposable compositeDisposable;
+    private final CompositeDisposable subscriptionCompositeDisposable;
     private EditTermViewModel viewModel;
     private AlertDialog waitDialog;
     private FloatingActionButton saveFloatingActionButton;
@@ -34,7 +35,7 @@ public class AddTermActivity extends AppCompatActivity {
      */
     public AddTermActivity() {
         Log.d(LOG_TAG, "Constructing AddTermActivity");
-        compositeDisposable = new CompositeDisposable();
+        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -49,10 +50,9 @@ public class AddTermActivity extends AppCompatActivity {
         }
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
-        compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onTermLoadSuccess, this::onTermLoadFailed));
+        OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onTermLoadSuccess, this::onTermLoadFailed);
     }
 
     private void onTermLoadSuccess(TermEntity entity) {
@@ -60,6 +60,10 @@ public class AddTermActivity extends AppCompatActivity {
         if (null != entity) {
             Log.d(LOG_TAG, String.format("Loaded %s", entity));
             saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
+            subscriptionCompositeDisposable.add(viewModel.getIsValid().subscribe(b -> {
+                Log.d(LOG_TAG, "getIsValid().subscribe(" + b + ")");
+                saveFloatingActionButton.setEnabled(b);
+            }));
         } else {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_not_restored, this).showDialog(this::finish);
         }
@@ -96,11 +100,10 @@ public class AddTermActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
-    private void onSaveOperationFinished(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveOperationFinished(@NonNull ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
         if (messages.isSucceeded()) {
             finish();
@@ -112,8 +115,7 @@ public class AddTermActivity extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources)))
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
                         })
                         .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -130,14 +132,21 @@ public class AddTermActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
-                compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-            }, null);
-        } else {
-            finish();
-        }
+        OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
+                        .showYesNoCancelDialog(this::finish, () -> {
+                            OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                                if (!isValid) {
+                                    return;
+                                }
+                                OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+                            });
+                        }, null);
+            } else {
+                finish();
+            }
+        });
     }
 
 }

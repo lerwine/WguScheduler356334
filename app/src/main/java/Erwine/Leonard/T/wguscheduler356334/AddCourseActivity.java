@@ -17,8 +17,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObserve;
-import Erwine.Leonard.T.wguscheduler356334.util.ValidationMessage;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 
 public class AddCourseActivity extends AppCompatActivity {
 
@@ -50,7 +50,7 @@ public class AddCourseActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        OneTimeObserve.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onCourseLoadSuccess, this::onCourseLoadFailed);
+        OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onCourseLoadSuccess, this::onCourseLoadFailed);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class AddCourseActivity extends AppCompatActivity {
     private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed), null);
+                    OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed), null);
         } else {
             finish();
         }
@@ -104,10 +104,10 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
-        OneTimeObserve.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
-    private void onSaveOperationFinished(@NonNull ValidationMessage.ResourceMessageResult messages) {
+    private void onSaveOperationFinished(@NonNull ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             finish();
         } else {
@@ -117,7 +117,7 @@ public class AddCourseActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObserve.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
+                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
