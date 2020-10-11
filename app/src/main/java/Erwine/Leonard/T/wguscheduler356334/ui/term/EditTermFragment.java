@@ -1,14 +1,11 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,13 +18,14 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
+import io.reactivex.MaybeObserver;
 import io.reactivex.disposables.CompositeDisposable;
-
-import static Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel.FORMATTER;
+import io.reactivex.disposables.Disposable;
 
 public class EditTermFragment extends Fragment {
 
@@ -36,8 +34,8 @@ public class EditTermFragment extends Fragment {
     private final CompositeDisposable subscriptionCompositeDisposable;
     private EditTermViewModel viewModel;
     private EditText termNameEditText;
-    private TextView termStartValueTextView;
-    private TextView termEndValueTextView;
+    private DatePickerEditView termStartEditText;
+    private DatePickerEditView termEndEditText;
     private EditText notesEditText;
 
     /**
@@ -55,8 +53,8 @@ public class EditTermFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_term, container, false);
 
         termNameEditText = view.findViewById(R.id.termNameEditText);
-        termStartValueTextView = view.findViewById(R.id.termStartValueTextView);
-        termEndValueTextView = view.findViewById(R.id.termEndValueTextView);
+        termStartEditText = view.findViewById(R.id.termStartEditView);
+        termEndEditText = view.findViewById(R.id.termEndEditView);
         notesEditText = view.findViewById(R.id.notesEditText);
 
         return view;
@@ -78,42 +76,78 @@ public class EditTermFragment extends Fragment {
 
         if (viewModel.isFromInitializedState()) {
             termNameEditText.setText(viewModel.getName());
-            LocalDate date = viewModel.getStart();
-            if (null != date) {
-                termStartValueTextView.setText(FORMATTER.format(date));
-            } else {
-                termStartValueTextView.setText("");
-            }
-            date = viewModel.getEnd();
-            if (null != date) {
-                termEndValueTextView.setText(FORMATTER.format(date));
-            } else {
-                termEndValueTextView.setText("");
-            }
+            termStartEditText.setSelectedDate(viewModel.getStart());
+            termEndEditText.setSelectedDate(viewModel.getEnd());
             notesEditText.setText(viewModel.getNotes());
         } else {
             termNameEditText.setText(entity.getName());
-            LocalDate date = entity.getStart();
-            if (null != date) {
-                termStartValueTextView.setText(FORMATTER.format(date));
-            } else {
-                termStartValueTextView.setText("");
-            }
-            date = entity.getEnd();
-            if (null != date) {
-                termEndValueTextView.setText(FORMATTER.format(date));
-            } else {
-                termEndValueTextView.setText("");
-            }
+            termStartEditText.setSelectedDate(entity.getStart());
+            termEndEditText.setSelectedDate(entity.getEnd());
             notesEditText.setText(entity.getNotes());
         }
 
         termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
-        termStartValueTextView.setOnClickListener(this::onStartClick);
-        termEndValueTextView.setOnClickListener(this::onEndClick);
-
+        termStartEditText.setInitialPickerDateFactory(d -> (null == d) ? termEndEditText.getSelectedDate() : d);
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
+        termStartEditText.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+            }
+
+            @Override
+            public void onSuccess(LocalDate localDate) {
+                Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
+                viewModel.setStart(localDate);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                String m = e.getMessage();
+                Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
+                if (null == m || m.trim().isEmpty()) {
+                    viewModel.setStart(ResourceMessageFactory.ofError(R.string.message_invalid_date));
+                } else {
+                    viewModel.setStart(ResourceMessageFactory.ofError(R.string.format_date_parse_error, e.getMessage()));
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onComplete()");
+                viewModel.setStart((LocalDate) null);
+            }
+        });
+        termEndEditText.setInitialPickerDateFactory(d -> (null == d) ? termStartEditText.getSelectedDate() : d);
+        termEndEditText.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+            }
+
+            @Override
+            public void onSuccess(LocalDate localDate) {
+                Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
+                viewModel.setEnd(localDate);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                String m = e.getMessage();
+                Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
+                if (null == m || m.trim().isEmpty()) {
+                    viewModel.setEnd(ResourceMessageFactory.ofError(R.string.message_invalid_date));
+                } else {
+                    viewModel.setEnd(ResourceMessageFactory.ofError(R.string.format_date_parse_error, e.getMessage()));
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onComplete()");
+                viewModel.setEnd((LocalDate) null);
+            }
+        });
+
         subscriptionCompositeDisposable.add(viewModel.getNameValid().subscribe(isValid -> {
             Log.d(LOG_TAG, "nameValidObservable.onNext(" + isValid + ")");
             if (isValid) {
@@ -128,9 +162,9 @@ public class EditTermFragment extends Fragment {
                         ResourceMessageFactory f = o.get();
                         String m = f.apply(getResources());
                         Log.d(LOG_TAG, "startMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", isWarning: " + f.isWarning() + ")");
-                        termStartValueTextView.setError(m, AppCompatResources.getDrawable(requireContext(), (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+                        termStartEditText.setError(m, AppCompatResources.getDrawable(requireContext(), (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
                     } else {
-                        termStartValueTextView.setError(null);
+                        termStartEditText.setError(null);
                     }
                 }
         ));
@@ -140,40 +174,12 @@ public class EditTermFragment extends Fragment {
                         ResourceMessageFactory f = o.get();
                         String m = f.apply(getResources());
                         Log.d(LOG_TAG, "endMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", isWarning: " + f.isWarning() + ")");
-                        termEndValueTextView.setError(m, AppCompatResources.getDrawable(requireContext(), (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+                        termEndEditText.setError(m, AppCompatResources.getDrawable(requireContext(), (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
                     } else {
-                        termEndValueTextView.setError(null);
+                        termEndEditText.setError(null);
                     }
                 }
         ));
-    }
-
-    private void onStartClick(View view) {
-        LocalDate date = viewModel.getStart();
-        if (null == date && null == (date = viewModel.getEnd())) {
-            date = LocalDate.now();
-        }
-        new DatePickerDialog(requireActivity(), this::onStartDateChanged, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
-    }
-
-    private void onEndClick(View view) {
-        LocalDate date = viewModel.getEnd();
-        if (null == date && null == (date = viewModel.getStart())) {
-            date = LocalDate.now();
-        }
-        new DatePickerDialog(requireActivity(), this::onEndDateChanged, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
-    }
-
-    void onStartDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        LocalDate d = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
-        termStartValueTextView.setText(FORMATTER.format(d));
-        viewModel.setStart(d);
-    }
-
-    void onEndDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        LocalDate d = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
-        termEndValueTextView.setText(FORMATTER.format(d));
-        viewModel.setEnd(d);
     }
 
 }

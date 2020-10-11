@@ -197,6 +197,8 @@
     <string name="message_item_never_saved">Item was never saved. Nothing to delete.</string>
     <string name="message_term_has_courses">Term still has one or more courses. This will delete all courses, assessments and alerts for this term as well!</string>
     <string name="format_error">Error: %s</string>
+    <string name="format_date_parse_error">Error parsing date: %s</string>
+    <string name="message_invalid_date">Invalid date string</string>
     <string name="format_warning">Warning: %s</string>
     <string name="message_mentor_has_courses">Mentor is still associated one or more courses. This will delete all courses, assessments and alerts associated with this mentor as well!</string>
     <string name="message_assessment_date_before_course_start">Assessment date is earlier the start date of its course.</string>

@@ -69,7 +69,9 @@ public class EditTermViewModel extends AndroidViewModel {
     private final BehaviorSubject<TermEntity> entitySubject;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<Optional<LocalDate>> startDateSubject;
+    private final BehaviorSubject<Optional<ResourceMessageFactory>> startMessageOverride;
     private final BehaviorSubject<Optional<LocalDate>> endDateSubject;
+    private final BehaviorSubject<Optional<ResourceMessageFactory>> endMessageOverride;
     private final BehaviorSubject<String> notesSubject;
     @SuppressWarnings("FieldCanBeLocal")
     private final CurrentValues currentValues;
@@ -97,35 +99,67 @@ public class EditTermViewModel extends AndroidViewModel {
         entitySubject = BehaviorSubject.create();
         nameSubject = BehaviorSubject.create();
         startDateSubject = BehaviorSubject.create();
+        startMessageOverride = BehaviorSubject.create();
         endDateSubject = BehaviorSubject.create();
+        endMessageOverride = BehaviorSubject.create();
         notesSubject = BehaviorSubject.create();
         currentValues = new CurrentValues();
 
         Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
-        Observable<Optional<ResourceMessageFactory>> startMessageObservable = Observable.combineLatest(startDateSubject, endDateSubject, (s, e) -> {
+        Observable<Optional<ResourceMessageFactory>> startMessageObservable = Observable.combineLatest(startMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
+            if (o.isPresent()) {
+                Log.d(LOG_TAG, "startMessageObservable: startMessageOverride.isPresent()=true");
+                return o;
+            }
             if (s.isPresent()) {
-                if (e.isPresent() && s.get().compareTo(e.get()) > 0) {
-                    return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
+                LocalDate sd = s.get();
+                if (e.isPresent()) {
+                    LocalDate ed = e.get();
+                    Log.d(LOG_TAG, "startMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=" + ToStringBuilder.toEscapedString(ed, true) + "; startMessageOverride=EMPTY");
+                    if (sd.compareTo(ed) > 0) {
+                        return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
+                    }
+                } else {
+                    Log.d(LOG_TAG, "startMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=EMPTY; startMessageOverride=EMPTY");
                 }
                 return Optional.empty();
             }
             if (e.isPresent()) {
+                Log.d(LOG_TAG, "startMessageObservable: startDateSubject=EMPTY; endDateSubject=" + ToStringBuilder.toEscapedString(e.get(), true) +
+                        "; startMessageOverride=EMPTY");
                 return Optional.of(ResourceMessageFactory.ofError(R.string.message_required));
             }
+            Log.d(LOG_TAG, "startMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; startMessageOverride=EMPTY");
             return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
         });
-        Observable<Optional<ResourceMessageFactory>> endMessageObservable = Observable.combineLatest(startDateSubject, endDateSubject, (s, e) -> {
+        Observable<Optional<ResourceMessageFactory>> endMessageObservable = Observable.combineLatest(endMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
+            if (o.isPresent()) {
+                Log.d(LOG_TAG, "endMessageObservable: endMessageOverride.isPresent()=true");
+                return o;
+            }
             if (s.isPresent()) {
+                LocalDate sd = s.get();
                 if (e.isPresent()) {
-                    if (s.get().compareTo(e.get()) > 0) {
+                    LocalDate ed = e.get();
+                    Log.d(LOG_TAG, "endMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=" + ToStringBuilder.toEscapedString(ed, true) + "; endMessageOverride=EMPTY");
+                    if (sd.compareTo(ed) > 0) {
                         return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
                     }
                     return Optional.empty();
+                } else {
+                    Log.d(LOG_TAG, "endMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=EMPTY; endMessageOverride=EMPTY");
                 }
             } else if (e.isPresent()) {
+                Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=" + ToStringBuilder.toEscapedString(e.get(), true) +
+                        "; endMessageOverride=EMPTY");
                 return Optional.empty();
             }
+            Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; endMessageOverride=EMPTY");
             return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
         });
         Observable<Boolean> hasChangesObservable = Observable.combineLatest(
@@ -206,7 +240,15 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public synchronized void setStart(@Nullable LocalDate value) {
+        Log.d(LOG_TAG, "Enter setStart(" + ToStringBuilder.toEscapedString(value, true) + ")");
+        startMessageOverride.onNext(Optional.empty());
         currentValues.setStart(value);
+    }
+
+    public synchronized void setStart(@NonNull ResourceMessageFactory value) {
+        Log.d(LOG_TAG, "Enter setStart(" + value + ")");
+        startMessageOverride.onNext(Optional.of(value));
+        currentValues.setStart(null);
     }
 
     @Nullable
@@ -215,7 +257,15 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public synchronized void setEnd(@Nullable LocalDate value) {
+        Log.d(LOG_TAG, "Enter setEnd(" + ToStringBuilder.toEscapedString(value, true) + ")");
+        endMessageOverride.onNext(Optional.empty());
         currentValues.setEnd(value);
+    }
+
+    public synchronized void setEnd(@NonNull ResourceMessageFactory value) {
+        Log.d(LOG_TAG, "Enter setEnd(" + value + ")");
+        endMessageOverride.onNext(Optional.of(value));
+        currentValues.setEnd(null);
     }
 
     @NonNull
@@ -304,6 +354,7 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
+        Log.d(LOG_TAG, "Enter save(" + ToStringBuilder.toEscapedString(ignoreWarnings) + ")");
         LocalDate newStart = currentValues.start;
         LocalDate newEnd = currentValues.end;
         String originalName = termEntity.getName();
@@ -330,12 +381,12 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.delete");
+        Log.d(LOG_TAG, "Enter delete(" + ToStringBuilder.toEscapedString(ignoreWarnings) + ")");
         return dbLoader.deleteTerm(entitySubject.getValue(), ignoreWarnings);
     }
 
     private void onEntityLoadedFromDb(@NonNull TermEntity entity) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.onEntityLoaded");
+        Log.d(LOG_TAG, "Enter onEntityLoadedFromDb(" + ToStringBuilder.toEscapedString(entity, true) + ")");
         termEntity = entity;
         setName(entity.getName());
         setStart(entity.getStart());
@@ -380,6 +431,7 @@ public class EditTermViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
+            Log.d(LOG_TAG, "Enter CurrentValues.setNotes(" + ToStringBuilder.toEscapedString(name) + "); oldValue = " + ToStringBuilder.toEscapedString(this.name));
             if (null == name || name.isEmpty()) {
                 if (this.name.isEmpty()) {
                     return;
@@ -401,7 +453,7 @@ public class EditTermViewModel extends AndroidViewModel {
         @Override
         public void setStart(@Nullable LocalDate start) {
             if (!Objects.equals(this.start, start)) {
-                Log.d(LOG_TAG, "Enter setStart(" + ToStringBuilder.toEscapedString(start, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.start, true));
+                Log.d(LOG_TAG, "Enter CurrentValues.setStart(" + ToStringBuilder.toEscapedString(start, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.start, true));
                 this.start = start;
                 startDateSubject.onNext(Optional.ofNullable(this.start));
             }
@@ -416,7 +468,7 @@ public class EditTermViewModel extends AndroidViewModel {
         @Override
         public void setEnd(@Nullable LocalDate end) {
             if (!Objects.equals(this.end, end)) {
-                Log.d(LOG_TAG, "Enter setEnd(" + ToStringBuilder.toEscapedString(end, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.end, true));
+                Log.d(LOG_TAG, "Enter CurrentValues.setEnd(" + ToStringBuilder.toEscapedString(end, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.end, true));
                 this.end = end;
                 endDateSubject.onNext(Optional.ofNullable(this.end));
             }
@@ -430,7 +482,7 @@ public class EditTermViewModel extends AndroidViewModel {
 
         @Override
         public void setNotes(String notes) {
-            Log.d(LOG_TAG, "Enter setNotes(" + ToStringBuilder.toEscapedString(notes) + "); oldValue = " + ToStringBuilder.toEscapedString(EditTermViewModel.this.getNotes()));
+            Log.d(LOG_TAG, "Enter CurrentValues.setNotes(" + ToStringBuilder.toEscapedString(notes) + "); oldValue = " + ToStringBuilder.toEscapedString(EditTermViewModel.this.getNotes()));
             if (null == notes || notes.isEmpty()) {
                 if (this.notes.isEmpty()) {
                     return;

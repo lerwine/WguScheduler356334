@@ -23,36 +23,35 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="29dp"
             android:ems="10"
-            android:inputType="textCapWords"
-            android:importantForAutofill="no" />
+            android:importantForAutofill="no"
+            android:inputType="textCapWords" />
 
         <TextView
-            android:id="@+id/termStartLabelTextView"
+            android:id="@+id/termStartTextView"
             style="@style/WGU.Scheduler.FieldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/termStartValueTextView"
+            android:labelFor="@id/termStartEditView"
             android:text="@string/label_start_of_term" />
 
-        <TextView
-            android:id="@+id/termStartValueTextView"
+        <Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView
+            android:id="@+id/termStartEditView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/edit_text"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/termEndLabelTextView"
+            android:id="@+id/termEndTextView"
             style="@style/WGU.Scheduler.FieldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/termEndValueTextView"
+            android:labelFor="@id/termEndEditView"
             android:text="@string/label_end_of_term" />
 
-        <TextView
-            android:id="@+id/termEndValueTextView"
+        <Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView
+            android:id="@+id/termEndEditView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/edit_text"

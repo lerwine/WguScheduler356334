@@ -4,11 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Action;
+import io.reactivex.plugins.RxJavaPlugins;
 
 @SuppressWarnings("unchecked")
 public abstract class BinaryOptional<T, U> {
@@ -48,7 +51,12 @@ public abstract class BinaryOptional<T, U> {
 
         @Override
         public void switchPresence(@NonNull Consumer<Object> ifPrimary, @NonNull Consumer<Object> ifSecondary, @NonNull Action ifNotPresent) {
-
+            try {
+                ifNotPresent.run();
+            } catch (Throwable ex) {
+                Exceptions.throwIfFatal(ex);
+                RxJavaPlugins.onError(ex);
+            }
         }
 
         @Override
@@ -94,6 +102,22 @@ public abstract class BinaryOptional<T, U> {
         @Override
         public boolean isPresent() {
             return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return -1;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            return this == obj;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "BinaryOptional.EMPTY";
         }
     };
 
@@ -160,6 +184,29 @@ public abstract class BinaryOptional<T, U> {
             @Override
             public <R> R flatMap(@NonNull Function<T, R> primaryMapper, @NonNull Function<U, R> secondaryMapper, @NonNull Supplier<R> ifNotPresent) {
                 return primaryMapper.apply(value);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(value, true, false);
+            }
+
+            @Override
+            public boolean equals(@Nullable Object obj) {
+                if (this == obj) {
+                    return true;
+                }
+                if (obj instanceof BinaryOptional) {
+                    BinaryOptional<?, ?> other = (BinaryOptional<?, ?>) obj;
+                    return other.isPrimary() && Objects.equals(value, other.getPrimary());
+                }
+                return false;
+            }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return "BinaryOptional.primary(" + value + ")";
             }
         };
     }
@@ -231,6 +278,29 @@ public abstract class BinaryOptional<T, U> {
             public <R> R flatMap(@NonNull Function<T, R> primaryMapper, @NonNull Function<U, R> secondaryMapper, @NonNull Supplier<R> ifNotPresent) {
                 return secondaryMapper.apply(value);
             }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(value, false, true);
+            }
+
+            @Override
+            public boolean equals(@Nullable Object obj) {
+                if (this == obj) {
+                    return true;
+                }
+                if (obj instanceof BinaryOptional) {
+                    BinaryOptional<?, ?> other = (BinaryOptional<?, ?>) obj;
+                    return other.isSecondary() && Objects.equals(value, other.getSecondary());
+                }
+                return false;
+            }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return "BinaryOptional.primary(" + value + ")";
+            }
         };
     }
 
@@ -287,4 +357,5 @@ public abstract class BinaryOptional<T, U> {
     }
 
     public abstract <R> R flatMap(@NonNull Function<T, R> primaryMapper, @NonNull Function<U, R> secondaryMapper, @NonNull Supplier<R> ifNotPresent);
+
 }
