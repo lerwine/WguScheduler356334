@@ -23,6 +23,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
@@ -32,12 +33,12 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class EditAlertViewModel extends AndroidViewModel {
 
@@ -97,7 +98,6 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final MutableLiveData<String> eventDateLiveData;
     private final MutableLiveData<String> calculatedDateLiveData;
     private final IsValid validLiveData;
-    private final CompositeDisposable compositeDisposable;
     private final DbLoader dbLoader;
     private LocalDate calculatedDate;
     private CourseAlertDetails courseAlertDetails;
@@ -119,6 +119,16 @@ public class EditAlertViewModel extends AndroidViewModel {
     private String daysText = "";
     private LocalDate selectedDate;
 
+    public EditAlertViewModel(@NonNull Application application) {
+        super(application);
+        dbLoader = DbLoader.getInstance(getApplication());
+        eventDateLiveData = new MutableLiveData<>();
+        calculatedDateLiveData = new MutableLiveData<>();
+        validLiveData = new IsValid();
+        alertEntityLiveData = new MutableLiveData<>();
+        initializationFailureLiveData = new MutableLiveData<>();
+    }
+
     @StringRes
     public int getStartLabelTextResourceId() {
         return startLabelTextResourceId;
@@ -127,17 +137,6 @@ public class EditAlertViewModel extends AndroidViewModel {
     @StringRes
     public int getEndLabelTextResourceId() {
         return endLabelTextResourceId;
-    }
-
-    public EditAlertViewModel(@NonNull Application application) {
-        super(application);
-        compositeDisposable = new CompositeDisposable();
-        dbLoader = DbLoader.getInstance(getApplication());
-        eventDateLiveData = new MutableLiveData<>();
-        calculatedDateLiveData = new MutableLiveData<>();
-        validLiveData = new IsValid();
-        alertEntityLiveData = new MutableLiveData<>();
-        initializationFailureLiveData = new MutableLiveData<>();
     }
 
     public AlertDateOption getDateSpecOption() {
@@ -152,8 +151,10 @@ public class EditAlertViewModel extends AndroidViewModel {
                 validLiveData.postSelectedDateMessage(R.string.message_required);
                 Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
                 calculatedDateLiveData.postValue(null);
+                calculatedDate = null;
             } else {
                 Log.d(LOG_TAG, "calculateAlertDate: Posting " + DATE_FORMATTER.format(selectedDate) + " to calculatedDateLiveData");
+                calculatedDate = selectedDate;
                 calculatedDateLiveData.postValue(DATE_FORMATTER.format(selectedDate));
                 Log.d(LOG_TAG, "calculateAlertDate: Posting null to selectedDateValidationLiveData");
                 validLiveData.clearSelectedDateMessage();
@@ -289,6 +290,17 @@ public class EditAlertViewModel extends AndroidViewModel {
         validLiveData.clearDaysMessage();
     }
 
+    public boolean isAssessmentAlert() {
+        return null != assessmentAlertDetails;
+    }
+
+    public AlertLink getAlertLink() {
+        if (null == assessmentAlertDetails) {
+            return courseAlertDetails.getLink();
+        }
+        return assessmentAlertDetails.getLink();
+    }
+
     public LiveData<AlertEntity> getAlertEntityLiveData() {
         return alertEntityLiveData;
     }
@@ -344,23 +356,19 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private void loadCourseAlert(long alertId, long courseId) {
-        compositeDisposable.clear();
-        compositeDisposable.add(dbLoader.getCourseAlertDetailsId(alertId, courseId).subscribe(this::onCourseAlertLoaded, this::onCourseAlertLoadFailed));
+        OneTimeObservers.subscribeOnce(dbLoader.getCourseAlertDetailsById(alertId, courseId), this::onCourseAlertLoaded, this::onCourseAlertLoadFailed);
     }
 
     private void loadAssessmentAlert(long alertId, long assessmentId) {
-        compositeDisposable.clear();
-        compositeDisposable.add(dbLoader.getAssessmentAlertDetailsId(alertId, assessmentId).subscribe(this::onAssessmentAlertLoaded, this::onAssessmentAlertLoadFailed));
+        OneTimeObservers.subscribeOnce(dbLoader.getAssessmentAlertDetailsById(alertId, assessmentId), this::onAssessmentAlertLoaded, this::onAssessmentAlertLoadFailed);
     }
 
     private void initializeNewCourseAlert(long courseId) {
-        compositeDisposable.clear();
-        compositeDisposable.add(dbLoader.getCourseById(courseId).subscribe(this::onCourseLoaded, this::onCourseLoadFailed));
+        OneTimeObservers.subscribeOnce(dbLoader.getCourseById(courseId), this::onCourseLoaded, this::onCourseLoadFailed);
     }
 
     private void initializeNewAssessmentAlert(long assessmentId) {
-        compositeDisposable.clear();
-        compositeDisposable.add(dbLoader.getAssessmentById(assessmentId).subscribe(this::onAssessmentLoaded, this::onAssessmentLoadFailed));
+        OneTimeObservers.subscribeOnce(dbLoader.getAssessmentById(assessmentId), this::onAssessmentLoaded, this::onAssessmentLoadFailed);
     }
 
     public synchronized void saveViewModelState(Bundle outState) {
@@ -406,7 +414,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         alertEntityLiveData.postValue(alertEntity);
     }
 
-    private synchronized void onCourseAlertLoaded(CourseAlertDetails courseAlertDetails) {
+    private synchronized void onCourseAlertLoaded(@NonNull CourseAlertDetails courseAlertDetails) {
         this.courseAlertDetails = courseAlertDetails;
         assessmentAlertDetails = null;
         alertEntity = courseAlertDetails.getAlert();
@@ -418,7 +426,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private synchronized void onAssessmentAlertLoaded(AssessmentAlertDetails assessmentAlertDetails) {
+    private synchronized void onAssessmentAlertLoaded(@NonNull AssessmentAlertDetails assessmentAlertDetails) {
         this.assessmentAlertDetails = assessmentAlertDetails;
         alertEntity = assessmentAlertDetails.getAlert();
         courseAlertDetails = null;
@@ -430,7 +438,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private void onCourseLoaded(CourseDetails courseDetails) {
+    private void onCourseLoaded(@NonNull CourseDetails courseDetails) {
         alertEntity = new AlertEntity();
         courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(alertEntity.getId(), courseDetails.getId()), alertEntity, new CourseEntity(courseDetails));
         initializeCourseAlert();
@@ -441,7 +449,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private void onAssessmentLoaded(AssessmentDetails assessmentDetails) {
+    private void onAssessmentLoaded(@NonNull AssessmentDetails assessmentDetails) {
         alertEntity = new AlertEntity();
         assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(alertEntity.getId(), assessmentDetails.getId()), alertEntity, new AssessmentEntity(assessmentDetails));
         initializeAssessmentAlert();

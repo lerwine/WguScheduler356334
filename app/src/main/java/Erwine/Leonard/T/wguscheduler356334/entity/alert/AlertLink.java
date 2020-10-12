@@ -14,7 +14,6 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuildable;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
-import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.COLNAME_ID;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public interface AlertLink extends ToStringBuildable {
@@ -97,8 +96,16 @@ public interface AlertLink extends ToStringBuildable {
 
     default <T extends BroadcastReceiver> PendingIntent createAlertIntent(Context packageContext, Class<T> cls) {
         Intent intent = new Intent(packageContext, cls);
-        intent.putExtra(COLNAME_ID, getAlertId());
+        intent.putExtra(COLNAME_ALERT_ID, getAlertId());
+        intent.putExtra(COLNAME_TARGET_ID, getTargetId());
         return PendingIntent.getBroadcast(packageContext, getNotificationId(), intent, 0);
+    }
+
+    default <T extends BroadcastReceiver> PendingIntent getAlertIntent(Context packageContext, Class<T> cls) {
+        Intent intent = new Intent(packageContext, cls);
+        intent.putExtra(COLNAME_ALERT_ID, getAlertId());
+        intent.putExtra(COLNAME_TARGET_ID, getTargetId());
+        return PendingIntent.getBroadcast(packageContext, getNotificationId(), intent, PendingIntent.FLAG_NO_CREATE);
     }
 
 }

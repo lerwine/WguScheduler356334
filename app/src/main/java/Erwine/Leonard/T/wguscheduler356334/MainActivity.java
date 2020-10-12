@@ -16,6 +16,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertBroadcastReceiver;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertBroadcastReceiver;
+
 public class MainActivity extends AppCompatActivity {
 
     private static ViewModelProvider.AndroidViewModelFactory viewModelFactory;
@@ -30,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AssessmentAlertBroadcastReceiver.createNotificationChannel(this);
+        CourseAlertBroadcastReceiver.createNotificationChannel(this);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

@@ -3,32 +3,34 @@ package Erwine.Leonard.T.wguscheduler356334.util;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
 import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.Single;
+import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
 public class OneTimeObservers {
 
-    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull LifecycleOwner owner, @NonNull Observer<T> target, boolean acceptNull) {
-        ObserverProxy<T> proxy = new ObserverProxy<>(source, target, acceptNull);
+    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull LifecycleOwner owner, @NonNull androidx.lifecycle.Observer<T> target, boolean acceptNull) {
+        LiveDataObserverProxy<T> proxy = new LiveDataObserverProxy<>(source, target, acceptNull);
         source.observe(owner, proxy);
     }
 
-    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull LifecycleOwner owner, @NonNull Observer<T> target) {
+    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull LifecycleOwner owner, @NonNull androidx.lifecycle.Observer<T> target) {
         observeOnce(source, owner, target, false);
     }
 
-    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull Observer<T> target, boolean acceptNull) {
-        ObserverProxy<T> proxy = new ObserverProxy<>(source, target, acceptNull);
+    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull androidx.lifecycle.Observer<T> target, boolean acceptNull) {
+        LiveDataObserverProxy<T> proxy = new LiveDataObserverProxy<>(source, target, acceptNull);
         source.observeForever(proxy);
     }
 
-    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull Observer<T> target) {
+    public static <T> void observeOnce(@NonNull LiveData<T> source, @NonNull androidx.lifecycle.Observer<T> target) {
         observeOnce(source, target, false);
     }
 
@@ -46,8 +48,33 @@ public class OneTimeObservers {
         proxy.subscribeSingle(source);
     }
 
+    public static <T> void subscribeOnce(@NonNull Single<T> source, @NonNull SingleObserver<T> observer, boolean skipFirstNull) {
+        if (skipFirstNull) {
+            source.subscribe(new SingleObserverProxy<T>(observer) {
+                boolean isFirst = true;
+
+                @Override
+                public void onSuccess(T t) {
+                    if (isFirst) {
+                        isFirst = false;
+                        if (null == t) {
+                            return;
+                        }
+                    }
+                    super.onSuccess(t);
+                }
+            });
+        } else {
+            source.subscribe(new SingleObserverProxy<>(observer));
+        }
+    }
+
     public static <T> void subscribeOnce(@NonNull Single<T> source, @NonNull Consumer<T> onNext) {
         subscribeOnce(source, onNext, false);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Single<T> source, @NonNull SingleObserver<T> observer) {
+        subscribeOnce(source, observer, false);
     }
 
     public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError, @NonNull Action onComplete, boolean skipFirstNull) {
@@ -73,8 +100,33 @@ public class OneTimeObservers {
         proxy.onSubscribeObservable(source);
     }
 
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Observer<T> observer, boolean skipFirstNull) {
+        if (skipFirstNull) {
+            source.subscribe(new ObserverProxy<T>(observer) {
+                boolean isFirst = true;
+
+                @Override
+                public void onNext(T t) {
+                    if (isFirst) {
+                        isFirst = false;
+                        if (null == t) {
+                            return;
+                        }
+                    }
+                    super.onNext(t);
+                }
+            });
+        } else {
+            source.subscribe(new ObserverProxy<>(observer));
+        }
+    }
+
     public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext) {
         subscribeOnce(source, onNext, false);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Observer<T> observer) {
+        subscribeOnce(source, observer, false);
     }
 
     public static void subscribeOnce(@NonNull Completable source, @NonNull Action onComplete, @NonNull Consumer<? super Throwable> onError) {
@@ -85,6 +137,30 @@ public class OneTimeObservers {
     public static <T> void subscribeOnce(@NonNull Completable source, @NonNull Action onComplete) {
         ActionProxy1 proxy = new ActionProxy1(onComplete);
         proxy.subscribeCompletable(source);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Completable source, @NonNull CompletableObserver observer) {
+        source.subscribe(new CompletableObserver() {
+            private Disposable disposable;
+
+            @Override
+            public void onSubscribe(Disposable d) {
+                disposable = d;
+                observer.onSubscribe(d);
+            }
+
+            @Override
+            public void onComplete() {
+                observer.onComplete();
+                disposable.dispose();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                observer.onError(e);
+                disposable.dispose();
+            }
+        });
     }
 
     private OneTimeObservers() {
@@ -266,13 +342,13 @@ public class OneTimeObservers {
         }
     }
 
-    private static class ObserverProxy<T> implements Observer<T> {
+    private static class LiveDataObserverProxy<T> implements androidx.lifecycle.Observer<T> {
 
         private final LiveData<T> source;
-        private final Observer<T> target;
+        private final androidx.lifecycle.Observer<T> target;
         private final boolean acceptNull;
 
-        ObserverProxy(@NonNull LiveData<T> source, @NonNull Observer<T> target, boolean acceptNull) {
+        LiveDataObserverProxy(@NonNull LiveData<T> source, @NonNull androidx.lifecycle.Observer<T> target, boolean acceptNull) {
             this.source = source;
             this.target = target;
             this.acceptNull = acceptNull;
@@ -281,9 +357,92 @@ public class OneTimeObservers {
         @Override
         public void onChanged(T t) {
             if (acceptNull || null != t) {
-                source.removeObserver(ObserverProxy.this);
+                source.removeObserver(LiveDataObserverProxy.this);
                 target.onChanged(t);
             }
         }
     }
+
+    private static class ObserverProxy<T> implements Observer<T>, Disposable {
+
+        private final Observer<T> backingObserver;
+        private Disposable disposable;
+
+        ObserverProxy(Observer<T> backingObserver) {
+            this.backingObserver = backingObserver;
+        }
+
+        @Override
+        public final void onSubscribe(Disposable d) {
+            disposable = d;
+            backingObserver.onSubscribe(d);
+        }
+
+        @Override
+        public void onNext(T t) {
+            backingObserver.onNext(t);
+            disposable.dispose();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            backingObserver.onError(e);
+            disposable.dispose();
+        }
+
+        @Override
+        public void onComplete() {
+            backingObserver.onComplete();
+            disposable.dispose();
+        }
+
+        @Override
+        public void dispose() {
+            disposable.dispose();
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return disposable.isDisposed();
+        }
+    }
+
+    private static class SingleObserverProxy<T> implements SingleObserver<T>, Disposable {
+
+        private final SingleObserver<T> backingObserver;
+        private Disposable disposable;
+
+        SingleObserverProxy(SingleObserver<T> backingObserver) {
+            this.backingObserver = backingObserver;
+        }
+
+        @Override
+        public final void onSubscribe(Disposable d) {
+            disposable = d;
+            backingObserver.onSubscribe(d);
+        }
+
+        @Override
+        public void onSuccess(T t) {
+            backingObserver.onSuccess(t);
+            disposable.dispose();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            backingObserver.onError(e);
+            disposable.dispose();
+        }
+
+        @Override
+        public void dispose() {
+            disposable.dispose();
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return disposable.isDisposed();
+        }
+    }
+
 }

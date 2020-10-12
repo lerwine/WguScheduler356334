@@ -19,7 +19,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-public class CourseAlertBroadcastReceiver extends BroadcastReceiver {
+public class AssessmentAlertBroadcastReceiver extends BroadcastReceiver {
     private static final String LOG_TAG = AssessmentAlertBroadcastReceiver.class.getName();
 
     @Override
@@ -27,23 +27,23 @@ public class CourseAlertBroadcastReceiver extends BroadcastReceiver {
         long alertId = intent.getLongExtra(AlertLink.COLNAME_ALERT_ID, -1);
         long assessmentId = intent.getLongExtra(AlertLink.COLNAME_TARGET_ID, -1);
         createNotificationChannel(context);
-        OneTimeObservers.subscribeOnce(DbLoader.getInstance(context.getApplicationContext()).getCourseAlertDetailsById(alertId, assessmentId), courseAlertDetails -> {
+        OneTimeObservers.subscribeOnce(DbLoader.getInstance(context.getApplicationContext()).getAssessmentAlertDetailsById(alertId, assessmentId), assessmentAlertDetails -> {
             // TODO: Configure notification
             Notification n = new NotificationCompat.Builder(context, context.getResources().getString(R.string.notification_channel_assessment_alert))
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentText(courseAlertDetails.getCourse().toString())
-                    .setContentTitle(courseAlertDetails.getCourse().getNumber())
+                    .setContentText(assessmentAlertDetails.getAssessment().toString())
+                    .setContentTitle(assessmentAlertDetails.getAssessment().getCode())
                     .build();
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.notify(courseAlertDetails.getLink().getNotificationId(), n);
-        }, throwable -> Log.e(LOG_TAG, "Error loading course alert", throwable));
+            notificationManager.notify(assessmentAlertDetails.getLink().getNotificationId(), n);
+        }, throwable -> Log.e(LOG_TAG, "Error loading assessment alert", throwable));
     }
 
     public static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Resources resources = context.getResources();
-            NotificationChannel channel = new NotificationChannel(resources.getString(R.string.notification_channel_course_alert),
-                    resources.getString(R.string.name_channel_course_alert), NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(resources.getString(R.string.notification_channel_assessment_alert),
+                    resources.getString(R.string.name_channel_assessment_alert), NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

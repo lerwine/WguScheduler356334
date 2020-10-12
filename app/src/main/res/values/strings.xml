@@ -273,4 +273,8 @@
     <string name="html_format_mentor_phone"><b>Phone</b>: %s</string>
     <string name="html_format_mentor_email"><b>Email: </b> %s</string>
     <string name="message_unknown_parentheses">(missing)</string>
+    <string name="notification_channel_course_alert">WguScheduler356334:CourseAlert</string>
+    <string name="name_channel_course_alert">Course Alerts</string>
+    <string name="notification_channel_assessment_alert">WguScheduler356334:AssessmentAlert</string>
+    <string name="name_channel_assessment_alert">Assessment Alerts</string>
 </resources>

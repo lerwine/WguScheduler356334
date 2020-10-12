@@ -17,7 +17,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 @Entity(
         tableName = AppDb.TABLE_NAME_ASSESSMENT_ALERTS,
-//        primaryKeys = {AlertLink.COLNAME_ALERT_ID, AlertLink.COLNAME_TARGET_ID},
+        primaryKeys = {AlertLink.COLNAME_ALERT_ID, AlertLink.COLNAME_TARGET_ID},
         indices = {
 //                @Index(value = AlertLink.COLNAME_ALERT_ID, name = AssessmentAlertLink.INDEX_ALERT, unique = true)
                 @Index(value = AlertLink.COLNAME_NOTIFICATION_ID, name = AssessmentAlertLink.INDEX_REQUEST_CODE, unique = true),
@@ -34,7 +34,7 @@ public class AssessmentAlertLink implements AlertLink {
     /**
      * The name of the unique index for the {@link #COLNAME_ALERT_ID "requestCode"} database column.
      */
-    public static final String INDEX_REQUEST_CODE = "IDX_REQUEST_CODE";
+    public static final String INDEX_REQUEST_CODE = "IDX_ASSESSMENT_REQUEST_CODE";
 
     @ForeignKey(entity = AlertEntity.class, parentColumns = {AlertEntity.COLNAME_ID}, childColumns = {COLNAME_ALERT_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_ALERT_ID)

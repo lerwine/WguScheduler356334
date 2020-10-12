@@ -279,6 +279,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
     private void onSaveOperationSucceeded(ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
+            // TODO: Need to see if any date changes have effected any alarms
             finish();
         } else {
             Resources resources = getResources();

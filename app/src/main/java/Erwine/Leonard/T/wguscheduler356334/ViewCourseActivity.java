@@ -275,6 +275,7 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     private void onSaveCourseCompleted(@NonNull ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
+            // TODO: Need to see if any date changes have effected any alarms
             finish();
         } else {
             Resources resources = getResources();

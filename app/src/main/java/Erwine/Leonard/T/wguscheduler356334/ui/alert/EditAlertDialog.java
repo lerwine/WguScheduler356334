@@ -1,7 +1,10 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,15 +27,19 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -190,7 +197,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+        OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener());
     }
 
     private void onDeleteButtonClick(View view) {
@@ -311,36 +318,6 @@ public class EditAlertDialog extends DialogFragment {
         saveImageButton.setEnabled(null != isValid && isValid);
     }
 
-    private void onSaveOperationFinished(ResourceMessageResult messages) {
-        Log.d(LOG_TAG, "Enter onSaveOperationFinished");
-        if (messages.isSucceeded()) {
-            // TODO: Create/update the alarm
-
-            dismiss();
-        } else {
-            Resources resources = getResources();
-            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_save_warning)
-                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            dialog.dismiss();
-                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
-                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
-            } else {
-                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
-            }
-            androidx.appcompat.app.AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
-        }
-    }
-
-    private void onSaveFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error saving assessment", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
-                .showDialog(() -> requireActivity().finish());
-    }
-
     private void onDeleteSucceeded() {
         Log.d(LOG_TAG, "Enter onDeleteSucceeded");
         dismiss();
@@ -351,4 +328,71 @@ public class EditAlertDialog extends DialogFragment {
         new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), requireContext()).showDialog();
     }
 
+    private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
+        LocalDate originalDate = viewModel.getCalculatedDate();
+
+        @Override
+        public void onSubscribe(Disposable d) {
+        }
+
+        @Override
+        public void onSuccess(ResourceMessageResult messages) {
+            Log.d(LOG_TAG, "Enter onSaveOperationFinished");
+            if (messages.isSucceeded()) {
+                LocalDate d = viewModel.getCalculatedDate();
+                if (null != d) {
+                    PendingIntent intent;
+                    Context context = requireContext();
+                    if (viewModel.isAssessmentAlert()) {
+                        intent = viewModel.getAlertLink().createAlertIntent(context, AssessmentAlertBroadcastReceiver.class);
+                    } else {
+                        intent = viewModel.getAlertLink().createAlertIntent(context, CourseAlertBroadcastReceiver.class);
+                    }
+                    AlarmManager alarmManager = (AlarmManager) requireActivity().getSystemService(Context.ALARM_SERVICE);
+                    OneTimeObservers.subscribeOnce(DbLoader.getPreferAlertTime(), t -> {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(d.getYear(), d.getMonthValue() - 1, d.getDayOfMonth(), t.getHour(), t.getMinute());
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
+                        dismiss();
+                    });
+                } else if (null != originalDate) {
+                    Context context = requireContext();
+                    PendingIntent intent;
+                    if (viewModel.isAssessmentAlert()) {
+                        intent = viewModel.getAlertLink().getAlertIntent(context, AssessmentAlertBroadcastReceiver.class);
+                    } else {
+                        intent = viewModel.getAlertLink().getAlertIntent(context, CourseAlertBroadcastReceiver.class);
+                    }
+                    if (null != intent) {
+                        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                        if (null != alarmManager) {
+                            alarmManager.cancel(intent);
+                        }
+                    }
+                }
+            } else {
+                Resources resources = getResources();
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+                if (messages.isWarning()) {
+                    builder.setTitle(R.string.title_save_warning)
+                            .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                            .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                                dialog.dismiss();
+                                OneTimeObservers.subscribeOnce(viewModel.save(true), this);
+                            }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                } else {
+                    builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                }
+                androidx.appcompat.app.AlertDialog dlg = builder.setCancelable(true).create();
+                dlg.show();
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e(LOG_TAG, "Error saving assessment", e);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, e.getMessage()), requireContext())
+                    .showDialog(() -> requireActivity().finish());
+        }
+    }
 }

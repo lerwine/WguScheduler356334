@@ -796,12 +796,12 @@ public class DbLoader {
     }
 
     @NonNull
-    public Single<CourseAlertDetails> getCourseAlertDetailsId(long alertId, long courseId) {
+    public Single<CourseAlertDetails> getCourseAlertDetailsById(long alertId, long courseId) {
         return appDb.courseAlertDAO().getDetailsAlertId(alertId, courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
-    public Single<AssessmentAlertDetails> getAssessmentAlertDetailsId(long alertId, long courseId) {
+    public Single<AssessmentAlertDetails> getAssessmentAlertDetailsById(long alertId, long courseId) {
         return appDb.assessmentAlertDAO().getByDetailByAlertId(alertId, courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
