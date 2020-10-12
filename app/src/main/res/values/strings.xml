@@ -104,6 +104,7 @@
     <string name="message_title_required">Title cannot be empty</string>
     <string name="preference_prefer_email">prefer_email</string>
     <string name="preference_alert_time">alert_time</string>
+    <string name="preference_next_notification_id">next_notification_id</string>
     <string name="response_no">No</string>
     <string name="response_yes">Yes</string>
     <string name="tab_title_email">Email</string>

@@ -9,13 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreference;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-
-import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -49,11 +46,11 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
-        private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
+//        private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
         private final Preference.OnPreferenceChangeListener prefAlertTimeChangeListener;
 
         public SettingsFragment() {
-            onPreferEmailChangeListener = this::onPreferenceChange;
+//            onPreferEmailChangeListener = this::onPreferenceChange;
             prefAlertTimeChangeListener = this::onAlertTimeChange;
         }
 
@@ -61,10 +58,10 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
             Resources resources = getResources();
-            final SwitchPreference preference = findPreference(resources.getString(R.string.preference_prefer_email));
-            if (null != preference) {
-                preference.setOnPreferenceChangeListener(onPreferEmailChangeListener);
-            }
+//            final SwitchPreference preference = findPreference(resources.getString(R.string.preference_prefer_email));
+//            if (null != preference) {
+//                preference.setOnPreferenceChangeListener(onPreferEmailChangeListener);
+//            }
             final TimePreference timePreference = findPreference(resources.getString(R.string.preference_alert_time));
             if (null != timePreference) {
                 timePreference.setOnPreferenceChangeListener(prefAlertTimeChangeListener);
@@ -73,16 +70,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
-        @SuppressWarnings("SameReturnValue")
-        private boolean onPreferenceChange(Preference preference, Object newValue) {
-            DbLoader.getPreferEmailLiveData().postValue(null != newValue && (Boolean) newValue);
-            return true;
-        }
+//        @SuppressWarnings("SameReturnValue")
+//        private boolean onPreferenceChange(Preference preference, Object newValue) {
+//            DbLoader.getPreferEmail().postValue(null != newValue && (Boolean) newValue);
+//            return true;
+//        }
 
         private boolean onAlertTimeChange(Preference preference, Object newValue) {
             int value = (null == newValue) ? TimePreference.DEFAULT_VALUE : (int) newValue;
             LocalTime time = LocalTime.of(value / 60, value % 60);
-            DbLoader.getPreferAlertTimeLiveData().postValue(time);
+//            DbLoader.getPreferAlertTime().postValue(time);
             setSummary(preference, time);
             return true;
         }
@@ -98,7 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
                 dialogFragment = TimePreferenceDialog.newInstance(preference.getKey());
             }
 
-            // If it was one of our cutom Preferences, show its dialog
+            // If it was one of our custom Preferences, show its dialog
             if (dialogFragment != null) {
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(this.getParentFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");

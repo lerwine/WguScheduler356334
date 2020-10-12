@@ -43,6 +43,19 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
         this.alert = alert;
     }
 
+    @Ignore
+    public CourseAlert(@NonNull CourseAlert source) {
+        if (IdIndexedEntity.assertNotNewId(alert.getId()) != link.getAlertId()) {
+            throw new IllegalArgumentException();
+        }
+        alert = new AlertEntity(source.alert);
+        link = new CourseAlertLink(source.link);
+        alertDate = source.alertDate;
+        relativeDays = source.relativeDays;
+        messagePresent = source.messagePresent;
+        message = source.message;
+    }
+
     public boolean isMessagePresent() {
         return messagePresent;
     }

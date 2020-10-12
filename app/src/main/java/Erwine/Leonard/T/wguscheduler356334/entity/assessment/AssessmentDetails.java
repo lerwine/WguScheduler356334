@@ -290,4 +290,19 @@ public final class AssessmentDetails extends AbstractAssessmentEntity<Assessment
         sb.append("course", course, false);
     }
 
+    public void applyChanges(AssessmentEntity entity, AbstractCourseEntity<?> courseEntity) {
+        super.applyChanges(entity);
+        course = courseEntity;
+        courseNumber = course.getNumber();
+        courseTitle = course.getTitle();
+        courseNotes = course.getNotes();
+        courseStatus = course.getStatus();
+        expectedCourseStart = course.getExpectedStart();
+        actualCourseStart = course.getActualStart();
+        expectedCourseEnd = course.getExpectedEnd();
+        actualCourseEnd = course.getActualEnd();
+        competencyUnits = course.getCompetencyUnits();
+        termId = course.getTermId();
+        mentorId = course.getMentorId();
+    }
 }

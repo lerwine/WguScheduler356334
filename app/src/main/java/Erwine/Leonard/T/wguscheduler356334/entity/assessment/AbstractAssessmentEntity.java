@@ -211,4 +211,20 @@ public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntit
         return Objects.hash(courseId, code, name, status, goalDate, completionDate, type, getNotes());
     }
 
+    protected void applyChanges(AbstractAssessmentEntity<?> source) {
+        if (source.getId() != getId()) {
+            if (getId() != ID_NEW) {
+                throw new IllegalStateException();
+            }
+            setId(source.getId());
+        }
+        setNotes(source.getNotes());
+        this.courseId = source.courseId;
+        this.completionDate = source.completionDate;
+        this.code = source.code;
+        this.name = source.name;
+        this.status = source.status;
+        this.goalDate = source.goalDate;
+        this.type = source.type;
+    }
 }

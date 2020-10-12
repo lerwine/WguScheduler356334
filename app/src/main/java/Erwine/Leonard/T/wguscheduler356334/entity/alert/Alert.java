@@ -72,15 +72,17 @@ public interface Alert extends IdIndexedEntity {
     @Override
     default void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
         IdIndexedEntity.super.restoreState(bundle, isOriginal);
-        if (bundle.containsKey(COLNAME_SUBSEQUENT)) {
-            setSubsequent(bundle.getBoolean(COLNAME_SUBSEQUENT, false));
-            setTimeSpec(bundle.getLong(COLNAME_TIME_SPEC, 0L));
+        String key = stateKey(COLNAME_SUBSEQUENT, isOriginal);
+        if (bundle.containsKey(key)) {
+            setSubsequent(bundle.getBoolean(key, false));
+            setTimeSpec(bundle.getLong(stateKey(COLNAME_TIME_SPEC, isOriginal), 0L));
         } else {
             setSubsequent(null);
-            setTimeSpec(bundle.getLong(COLNAME_TIME_SPEC, LocalDate.now().toEpochDay()));
+            setTimeSpec(bundle.getLong(stateKey(COLNAME_TIME_SPEC, isOriginal), LocalDate.now().toEpochDay()));
         }
-        if (bundle.containsKey(COLNAME_CUSTOM_MESSAGE)) {
-            setCustomMessage(bundle.getString(COLNAME_CUSTOM_MESSAGE));
+        key = stateKey(COLNAME_CUSTOM_MESSAGE, isOriginal);
+        if (bundle.containsKey(key)) {
+            setCustomMessage(bundle.getString(key));
         } else {
             setCustomMessage(null);
         }
@@ -91,12 +93,12 @@ public interface Alert extends IdIndexedEntity {
         IdIndexedEntity.super.saveState(bundle, isOriginal);
         Boolean subsequent = isSubsequent();
         if (null != subsequent) {
-            bundle.putBoolean(COLNAME_SUBSEQUENT, subsequent);
+            bundle.putBoolean(stateKey(COLNAME_SUBSEQUENT, isOriginal), subsequent);
         }
-        bundle.putLong(COLNAME_TIME_SPEC, getTimeSpec());
+        bundle.putLong(stateKey(COLNAME_TIME_SPEC, isOriginal), getTimeSpec());
         String message = getCustomMessage();
         if (null != message) {
-            bundle.putString(COLNAME_CUSTOM_MESSAGE, message);
+            bundle.putString(stateKey(COLNAME_CUSTOM_MESSAGE, isOriginal), message);
         }
     }
 

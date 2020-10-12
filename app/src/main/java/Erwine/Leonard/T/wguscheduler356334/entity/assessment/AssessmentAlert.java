@@ -20,7 +20,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilde
 public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     @Embedded
     @NonNull
-    AssessmentAlertLink link;
+    private AssessmentAlertLink link;
 
     @Relation(
             parentColumn = AlertLink.COLNAME_ALERT_ID,
@@ -43,6 +43,19 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         }
         this.link = link;
         this.alert = alert;
+    }
+
+    @Ignore
+    public AssessmentAlert(@NonNull AssessmentAlert source) {
+        if (IdIndexedEntity.assertNotNewId(alert.getId()) != link.getAlertId()) {
+            throw new IllegalArgumentException();
+        }
+        alert = new AlertEntity(source.alert);
+        link = new AssessmentAlertLink(source.link);
+        alertDate = source.alertDate;
+        relativeDays = source.relativeDays;
+        messagePresent = source.messagePresent;
+        message = source.message;
     }
 
     public boolean isMessagePresent() {

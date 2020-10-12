@@ -7,7 +7,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
 import java.time.LocalDate;
@@ -51,10 +50,13 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilde
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -65,9 +67,14 @@ public class DbLoader {
 
     private static final String LOG_TAG = DbLoader.class.getName();
 
-    private static final MutableLiveData<Boolean> preferEmailLiveData = new MutableLiveData<>(false);
-    private static final MutableLiveData<LocalTime> preferAlertTimeLiveData = new MutableLiveData<>(LocalTime.of(TimePreference.DEFAULT_HOUR, TimePreference.DEFAULT_MINUTE));
+    private final BehaviorSubject<Boolean> preferEmailSubject;
+    private final Observable<Boolean> preferEmail;
+    private final BehaviorSubject<LocalTime> preferAlertTimeSubject;
+    private final Observable<LocalTime> preferAlertTime;
+    private final BehaviorSubject<Integer> preferNextNotificationIdSubject;
+    private final Observable<Integer> preferNextNotificationId;
     private static DbLoader instance;
+    private final CompositeDisposable subscriptionCompositeDisposable;
     private final AppDb appDb;
     private final Scheduler scheduler;
     @SuppressWarnings("FieldCanBeLocal")
@@ -94,19 +101,51 @@ public class DbLoader {
     }
 
     protected DbLoader(Context context, AppDb appDb) {
+        subscriptionCompositeDisposable = new CompositeDisposable();
         this.appDb = appDb;
         dataExecutor = Executors.newSingleThreadExecutor();
         scheduler = Schedulers.from(dataExecutor);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferEmailLiveData.postValue(sharedPreferences.getBoolean(context.getResources().getString(R.string.preference_prefer_email), false));
+        preferEmailSubject = BehaviorSubject.create();
+        preferAlertTimeSubject = BehaviorSubject.create();
+        preferNextNotificationIdSubject = BehaviorSubject.create();
+
+        final String preference_alert_time = context.getResources().getString(R.string.preference_alert_time);
+        int minutes = sharedPreferences.getInt(preference_alert_time, TimePreference.DEFAULT_VALUE);
+        preferAlertTimeSubject.onNext(LocalTime.of(minutes / 60, minutes % 60));
+        final String preference_prefer_email = context.getResources().getString(R.string.preference_prefer_email);
+        preferEmailSubject.onNext(sharedPreferences.getBoolean(preference_prefer_email, false));
+        final String preference_next_notification_id = context.getResources().getString(R.string.preference_next_notification_id);
+        preferNextNotificationIdSubject.onNext(sharedPreferences.getInt(preference_next_notification_id, 1));
+
+        preferEmail = preferEmailSubject.observeOn(AndroidSchedulers.mainThread());
+        preferAlertTime = preferAlertTimeSubject.observeOn(AndroidSchedulers.mainThread());
+        preferNextNotificationId = preferNextNotificationIdSubject.observeOn(AndroidSchedulers.mainThread());
+
+        subscriptionCompositeDisposable.add(preferNextNotificationId.subscribe(id -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            try {
+                editor.putInt(preference_next_notification_id, id);
+            } finally {
+                editor.apply();
+            }
+        }));
+        sharedPreferences.registerOnSharedPreferenceChangeListener((sp, key) -> {
+            if (preference_alert_time.equals(key)) {
+                int m = sp.getInt(key, TimePreference.DEFAULT_VALUE);
+                preferAlertTimeSubject.onNext(LocalTime.of(m / 60, m % 60));
+            } else if (preference_prefer_email.equals(key)) {
+                preferEmailSubject.onNext(sp.getBoolean(key, false));
+            }
+        });
     }
 
-    public static MutableLiveData<Boolean> getPreferEmailLiveData() {
-        return preferEmailLiveData;
+    public static Observable<Boolean> getPreferEmail() {
+        return instance.preferEmail;
     }
 
-    public static MutableLiveData<LocalTime> getPreferAlertTimeLiveData() {
-        return preferAlertTimeLiveData;
+    public static Observable<LocalTime> getPreferAlertTime() {
+        return instance.preferAlertTime;
     }
 
     AppDb getAppDb() {
@@ -640,6 +679,20 @@ public class DbLoader {
         })).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    private int getNextNotificationId() {
+        int id = preferNextNotificationIdSubject.getValue();
+        CourseAlertDAO courseAlertDAO = appDb.courseAlertDAO();
+        AssessmentAlertDAO assessmentAlertDAO = appDb.assessmentAlertDAO();
+        while (courseAlertDAO.countByRequestCodeSynchronous(id) > 0 || assessmentAlertDAO.countByRequestCodeSynchronous(id) > 0) {
+            if (id == Integer.MAX_VALUE) {
+                id = 1;
+            } else {
+                id++;
+            }
+        }
+        return id;
+    }
+
     public Single<ResourceMessageResult> saveCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
         Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
         return Single.fromCallable(() -> {
@@ -649,6 +702,7 @@ public class DbLoader {
             if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
                 return builder.build();
             }
+
             appDb.runInTransaction(() -> {
                 CourseAlertLink link = entity.getLink();
                 if (alert.getTimeSpec() < 0L) {
@@ -661,7 +715,11 @@ public class DbLoader {
                 }
                 if (alert.getId() == ID_NEW) {
                     long id = appDb.alertDAO().insertSynchronous(alert);
-                    link.setAlertIdAndRun(id, () -> appDb.courseAlertDAO().insertSynchronous(link));
+                    link.setNotificationId(getNextNotificationId());
+                    link.setAlertIdAndRun(id, () -> {
+                        appDb.courseAlertDAO().insertSynchronous(link);
+                        preferNextNotificationIdSubject.onNext(link.getNotificationId() + 1);
+                    });
                     alert.setId(id);
                 } else {
                     appDb.courseAlertDAO().updateSynchronous(entity.getLink());
@@ -685,7 +743,11 @@ public class DbLoader {
                 AssessmentAlertLink link = entity.getLink();
                 if (alert.getId() == ID_NEW) {
                     long id = appDb.alertDAO().insertSynchronous(alert);
-                    link.setAlertIdAndRun(id, () -> appDb.assessmentAlertDAO().insertSynchronous(link));
+                    link.setNotificationId(getNextNotificationId());
+                    link.setAlertIdAndRun(id, () -> {
+                        appDb.assessmentAlertDAO().insertSynchronous(link);
+                        preferNextNotificationIdSubject.onNext(link.getNotificationId() + 1);
+                    });
                     alert.setId(id);
                 } else {
                     appDb.assessmentAlertDAO().updateSynchronous(link);

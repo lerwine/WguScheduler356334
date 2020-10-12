@@ -61,4 +61,7 @@ public interface AssessmentAlertDAO {
     @Query("SELECT COUNT(targetId) FROM assessmentAlerts WHERE alertId=:alertId")
     int countByAlertIdSynchronous(long alertId);
 
+    @Query("SELECT COUNT(alertId) FROM assessmentAlerts WHERE  notificationId=:notificationId")
+    int countByRequestCodeSynchronous(int notificationId);
+
 }

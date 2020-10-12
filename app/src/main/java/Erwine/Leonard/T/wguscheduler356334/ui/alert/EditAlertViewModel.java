@@ -23,12 +23,10 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
@@ -39,7 +37,6 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class EditAlertViewModel extends AndroidViewModel {
@@ -60,7 +57,6 @@ public class EditAlertViewModel extends AndroidViewModel {
     private static final String STATE_KEY_TYPE = "type";
     @StringRes
     private static final int TYPE_VALUE_COURSE = R.string.label_course;
-    private LocalDate calculatedDate;
 
     public static EditAlertDialog existingCourseAlertEditor(long alertId, long courseId) {
         Bundle args = new Bundle();
@@ -103,8 +99,9 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final IsValid validLiveData;
     private final CompositeDisposable compositeDisposable;
     private final DbLoader dbLoader;
-    private CourseEntity courseEntity;
-    private AssessmentEntity assessmentEntity;
+    private LocalDate calculatedDate;
+    private CourseAlertDetails courseAlertDetails;
+    private AssessmentAlertDetails assessmentAlertDetails;
     private AlertEntity alertEntity;
     private int type;
     private AlertDateOption dateSpecOption = AlertDateOption.EXPLICIT;
@@ -381,10 +378,10 @@ public class EditAlertViewModel extends AndroidViewModel {
         if (null != selectedDate) {
             outState.putLong(STATE_KEY_SELECTED_DATE, selectedDate.toEpochDay());
         }
-        if (null != courseEntity) {
-            courseEntity.saveState(outState, true);
+        if (null != courseAlertDetails) {
+            courseAlertDetails.saveState(outState, true);
         } else {
-            assessmentEntity.saveState(outState, true);
+            assessmentAlertDetails.saveState(outState, true);
         }
         alertEntity.saveState(outState, true);
     }
@@ -393,11 +390,11 @@ public class EditAlertViewModel extends AndroidViewModel {
         type = state.getInt(STATE_KEY_TYPE, 0);
         alertEntity = new AlertEntity();
         if (type == TYPE_VALUE_COURSE) {
-            courseEntity = new CourseEntity();
-            courseEntity.restoreState(state, true);
+            courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(), new AlertEntity(), new CourseEntity());
+            courseAlertDetails.restoreState(state, true);
         } else {
-            assessmentEntity = new AssessmentEntity();
-            assessmentEntity.restoreState(state, true);
+            assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(), new AlertEntity(), new AssessmentEntity());
+            assessmentAlertDetails.restoreState(state, true);
         }
         alertEntity.restoreState(state, true);
         setDateSpecOption(AlertDateOption.values()[state.getInt(STATE_KEY_RELATIVITY, 0)]);
@@ -410,8 +407,8 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private synchronized void onCourseAlertLoaded(CourseAlertDetails courseAlertDetails) {
-        courseEntity = courseAlertDetails.getCourse();
-        assessmentEntity = null;
+        this.courseAlertDetails = courseAlertDetails;
+        assessmentAlertDetails = null;
         alertEntity = courseAlertDetails.getAlert();
         initializeCourseAlert();
     }
@@ -422,9 +419,9 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private synchronized void onAssessmentAlertLoaded(AssessmentAlertDetails assessmentAlertDetails) {
-        assessmentEntity = assessmentAlertDetails.getAssessment();
+        this.assessmentAlertDetails = assessmentAlertDetails;
         alertEntity = assessmentAlertDetails.getAlert();
-        courseEntity = null;
+        courseAlertDetails = null;
         initializeAssessmentAlert();
     }
 
@@ -434,8 +431,8 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private void onCourseLoaded(CourseDetails courseDetails) {
-        courseEntity = new CourseEntity(courseDetails);
         alertEntity = new AlertEntity();
+        courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(alertEntity.getId(), courseDetails.getId()), alertEntity, new CourseEntity(courseDetails));
         initializeCourseAlert();
     }
 
@@ -445,8 +442,8 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private void onAssessmentLoaded(AssessmentDetails assessmentDetails) {
-        assessmentEntity = new AssessmentEntity(assessmentDetails);
         alertEntity = new AlertEntity();
+        assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(alertEntity.getId(), assessmentDetails.getId()), alertEntity, new AssessmentEntity(assessmentDetails));
         initializeAssessmentAlert();
     }
 
@@ -457,6 +454,7 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     private void initializeCourseAlert() {
         type = TYPE_VALUE_COURSE;
+        CourseEntity courseEntity = courseAlertDetails.getCourse();
         eventStart = courseEntity.getActualStart();
         if (null == eventStart) {
             eventStart = courseEntity.getExpectedStart();
@@ -477,6 +475,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     private void initializeAssessmentAlert() {
+        AssessmentEntity assessmentEntity = assessmentAlertDetails.getAssessment();
         type = assessmentEntity.getType().displayResourceId();
         startLabelTextResourceId = R.string.label_goal_date;
         endLabelTextResourceId = R.string.label_completion_date;
@@ -505,36 +504,54 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
-        AlertEntity entity = new AlertEntity(alertEntity);
+        if (null == assessmentAlertDetails) {
+            CourseAlertDetails course = new CourseAlertDetails(courseAlertDetails);
+            ResourceMessageResult validationMessage = onSave(course.getAlert());
+            if (null != validationMessage) {
+                return Single.just(validationMessage);
+            }
+            return dbLoader.saveCourseAlert(course, ignoreWarnings).doOnSuccess(m -> {
+                if (m.isSucceeded()) {
+                    courseAlertDetails = course;
+                }
+            });
+        }
+        AssessmentAlertDetails assessment = new AssessmentAlertDetails(assessmentAlertDetails);
+        ResourceMessageResult validationMessage = onSave(assessment.getAlert());
+        if (null != validationMessage) {
+            return Single.just(validationMessage);
+        }
+        return dbLoader.saveAssessmentAlert(assessment, ignoreWarnings).doOnSuccess(m -> {
+            if (m.isSucceeded()) {
+                assessmentAlertDetails = assessment;
+            }
+        });
+    }
+
+    @Nullable
+    private ResourceMessageResult onSave(AlertEntity entity) {
         if (dateSpecOption.isExplicit()) {
             entity.setSubsequent(null);
             if (null == selectedDate) {
-                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_date_required)).observeOn(AndroidSchedulers.mainThread());
+                return ValidationMessage.ofSingleError(R.string.message_alert_date_required);
             }
             entity.setTimeSpec(selectedDate.toEpochDay());
         } else {
             entity.setSubsequent(dateSpecOption.isEnd());
             if (null == daysValue) {
-                return Single.just(ValidationMessage.ofSingleError(R.string.message_alert_days_required)).observeOn(AndroidSchedulers.mainThread());
+                return ValidationMessage.ofSingleError(R.string.message_alert_days_required);
             }
             entity.setTimeSpec(daysValue);
         }
         entity.setCustomMessage((message.isEmpty()) ? null : message);
-        if (null == assessmentEntity) {
-            CourseAlert courseAlert = new CourseAlert(new CourseAlertLink(alertEntity.getId(), courseEntity.getId()), entity);
-            return dbLoader.saveCourseAlert(courseAlert, ignoreWarnings);
-        }
-        AssessmentAlert assessmentAlert = new AssessmentAlert(new AssessmentAlertLink(alertEntity.getId(), courseEntity.getId()), entity);
-        return dbLoader.saveAssessmentAlert(assessmentAlert, ignoreWarnings);
+        return null;
     }
 
     public synchronized Completable delete() {
-        if (null == assessmentEntity) {
-            CourseAlert courseAlert = new CourseAlert(new CourseAlertLink(alertEntity.getId(), courseEntity.getId()), new AlertEntity(alertEntity));
-            return dbLoader.deleteCourseAlert(courseAlert);
+        if (null == assessmentAlertDetails) {
+            return dbLoader.deleteCourseAlert(courseAlertDetails);
         }
-        AssessmentAlert assessmentAlert = new AssessmentAlert(new AssessmentAlertLink(alertEntity.getId(), courseEntity.getId()), new AlertEntity(alertEntity));
-        return dbLoader.deleteAssessmentAlert(assessmentAlert);
+        return dbLoader.deleteAssessmentAlert(assessmentAlertDetails);
     }
 
     private static class IsValid extends LiveData<Boolean> {

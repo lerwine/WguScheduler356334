@@ -1,10 +1,13 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.course;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.room.Relation;
 
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
@@ -21,6 +24,11 @@ public class CourseAlertDetails extends CourseAlert {
     public CourseAlertDetails(@NonNull CourseAlertLink link, @NonNull AlertEntity alert, @NonNull CourseEntity course) {
         super(link, alert);
         this.course = course;
+    }
+
+    public CourseAlertDetails(@NonNull CourseAlertDetails courseAlert) {
+        super(courseAlert);
+        course = new CourseEntity(courseAlert.course);
     }
 
     @NonNull
@@ -41,4 +49,22 @@ public class CourseAlertDetails extends CourseAlert {
         super.setLink(link);
     }
 
+    public void saveState(Bundle outState, boolean isOriginal) {
+        course.saveState(outState, isOriginal);
+        getAlert().saveState(outState, isOriginal);
+        outState.putInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSE_ALERTS, AlertLink.COLNAME_NOTIFICATION_ID, isOriginal), getLink().getNotificationId());
+    }
+
+    public void restoreState(Bundle state, boolean isOriginal) {
+        course.restoreState(state, isOriginal);
+        AlertEntity alert = getAlert();
+        alert.restoreState(state, isOriginal);
+        CourseAlertLink link = getLink();
+        link.setAlertId(alert.getId());
+        link.setTargetId(course.getId());
+        String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSE_ALERTS, AlertLink.COLNAME_NOTIFICATION_ID, isOriginal);
+        if (state.containsKey(key)) {
+            getLink().setNotificationId(state.getInt(key));
+        }
+    }
 }

@@ -342,7 +342,11 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         entity.setStatus(currentValues.getStatus());
         entity.setType(currentValues.getType());
         entity.setNotes(currentValues.getNotes());
-        return dbLoader.saveAssessment(entity, ignoreWarnings);
+        return dbLoader.saveAssessment(entity, ignoreWarnings).doOnSuccess(m -> {
+            if (m.isSucceeded()) {
+                assessmentEntity.applyChanges(entity, selectedCourse);
+            }
+        });
     }
 
     public Single<Integer> delete() {

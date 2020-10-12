@@ -314,7 +314,9 @@ public class EditAlertDialog extends DialogFragment {
     private void onSaveOperationFinished(ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onSaveOperationFinished");
         if (messages.isSucceeded()) {
-            requireActivity().finish();
+            // TODO: Create/update the alarm
+
+            dismiss();
         } else {
             Resources resources = getResources();
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());

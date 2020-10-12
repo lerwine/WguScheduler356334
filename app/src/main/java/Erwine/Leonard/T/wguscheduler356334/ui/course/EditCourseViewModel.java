@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -760,7 +761,11 @@ public class EditCourseViewModel extends AndroidViewModel {
         entity.setCompetencyUnits(currentValues.getCompetencyUnits());
         entity.setNotes(currentValues.getNotes());
         Log.d(LOG_TAG, String.format("Saving %s to database", entity));
-        return dbLoader.saveCourse(entity, ignoreWarnings);
+        return dbLoader.saveCourse(entity, ignoreWarnings).doOnSuccess(m -> {
+            if (m.isSucceeded()) {
+                courseEntity.applyEntity(entity, Collections.singletonList(selectedTerm), Collections.singletonList(selectedMentor));
+            }
+        });
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {

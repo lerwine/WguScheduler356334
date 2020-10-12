@@ -21,10 +21,11 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
+@SuppressWarnings("unused")
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_COURSE_DETAIL,
-        value = "SELECT courses.*," +
-                "terms.name as [termName], terms.start as [termStart], terms.[end] as [termEnd], terms.notes as [termNotes]," +
+        value = "SELECT courses.*, " +
+                "terms.name as [termName], terms.start as [termStart], terms.[end] as [termEnd], terms.notes as [termNotes], " +
                 "mentors.name as [mentorName], mentors.phoneNumber, mentors.emailAddress, mentors.notes as [mentorNotes]\n" +
                 "FROM courses LEFT JOIN mentors ON courses.mentorId = mentors.id\n" +
                 "LEFT JOIN terms ON courses.termId = terms.id\n" +
