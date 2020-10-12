@@ -108,7 +108,6 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
             LocalDate date = (subsequent) ?
                     viewModel.getEffectiveStartDate() :
                     viewModel.getEffectiveEndDate();
-            LocalDate oldValue = alertDate;
             alertDate = (null == date) ? null : date.plusDays(relativeDays);
         }
         String m = alert.getCustomMessage();

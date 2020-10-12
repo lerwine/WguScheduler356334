@@ -1,10 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,17 +24,20 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 
@@ -203,7 +203,7 @@ public class EditAlertDialog extends DialogFragment {
     private void onDeleteButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() ->
-                OneTimeObservers.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
+                OneTimeObservers.subscribeOnce(viewModel.delete(), new DeleteOperationListener()), null);
     }
 
     private void onCancelButtonClick(View view) {
@@ -318,16 +318,6 @@ public class EditAlertDialog extends DialogFragment {
         saveImageButton.setEnabled(null != isValid && isValid);
     }
 
-    private void onDeleteSucceeded() {
-        Log.d(LOG_TAG, "Enter onDeleteSucceeded");
-        dismiss();
-    }
-
-    private void onDeleteFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error deleting assessment", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), requireContext()).showDialog();
-    }
-
     private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
         LocalDate originalDate = viewModel.getCalculatedDate();
 
@@ -341,33 +331,21 @@ public class EditAlertDialog extends DialogFragment {
             if (messages.isSucceeded()) {
                 LocalDate d = viewModel.getCalculatedDate();
                 if (null != d) {
-                    PendingIntent intent;
-                    Context context = requireContext();
-                    if (viewModel.isAssessmentAlert()) {
-                        intent = viewModel.getAlertLink().createAlertIntent(context, AssessmentAlertBroadcastReceiver.class);
-                    } else {
-                        intent = viewModel.getAlertLink().createAlertIntent(context, CourseAlertBroadcastReceiver.class);
-                    }
-                    AlarmManager alarmManager = (AlarmManager) requireActivity().getSystemService(Context.ALARM_SERVICE);
                     OneTimeObservers.subscribeOnce(DbLoader.getPreferAlertTime(), t -> {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.set(d.getYear(), d.getMonthValue() - 1, d.getDayOfMonth(), t.getHour(), t.getMinute());
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
+                        AlertLink link = viewModel.getAlertLink();
+                        if (viewModel.isAssessmentAlert()) {
+                            AssessmentAlertBroadcastReceiver.setPendingAlert(d.atTime(t), (AssessmentAlertLink) link, requireContext());
+                        } else {
+                            CourseAlertBroadcastReceiver.setPendingAlert(d.atTime(t), (CourseAlertLink) link, requireContext());
+                        }
                         dismiss();
                     });
                 } else if (null != originalDate) {
-                    Context context = requireContext();
-                    PendingIntent intent;
+                    AlertLink link = viewModel.getAlertLink();
                     if (viewModel.isAssessmentAlert()) {
-                        intent = viewModel.getAlertLink().getAlertIntent(context, AssessmentAlertBroadcastReceiver.class);
+                        AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
                     } else {
-                        intent = viewModel.getAlertLink().getAlertIntent(context, CourseAlertBroadcastReceiver.class);
-                    }
-                    if (null != intent) {
-                        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                        if (null != alarmManager) {
-                            alarmManager.cancel(intent);
-                        }
+                        CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
                     }
                 }
             } else {
@@ -393,6 +371,41 @@ public class EditAlertDialog extends DialogFragment {
             Log.e(LOG_TAG, "Error saving assessment", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, e.getMessage()), requireContext())
                     .showDialog(() -> requireActivity().finish());
+        }
+    }
+
+    private class DeleteOperationListener implements CompletableObserver {
+        @Nullable
+        Integer notificationId;
+
+        DeleteOperationListener() {
+            if (null != viewModel.getCalculatedDate()) {
+                notificationId = viewModel.getAlertLink().getNotificationId();
+            }
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+        }
+
+        @Override
+        public void onComplete() {
+            Log.d(LOG_TAG, "Enter DeleteOperationListener.onComplete");
+            if (null != notificationId) {
+                AlertLink link = viewModel.getAlertLink();
+                if (viewModel.isAssessmentAlert()) {
+                    AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
+                } else {
+                    CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
+                }
+            }
+            dismiss();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e(LOG_TAG, "Error deleting alert", e);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), requireContext()).showDialog();
         }
     }
 }

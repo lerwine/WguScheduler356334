@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AssessmentAlertBroadcastReceiver.createNotificationChannel(this);
-        CourseAlertBroadcastReceiver.createNotificationChannel(this);
+        new AssessmentAlertBroadcastReceiver().createNotificationChannel(this);
+        new CourseAlertBroadcastReceiver().createNotificationChannel(this);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

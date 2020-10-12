@@ -796,13 +796,28 @@ public class DbLoader {
     }
 
     @NonNull
+    public LiveData<List<AlertListItem>> getAllAlertsByCourseId(long courseId) {
+        return appDb.alertDAO().getAllByCourseId(courseId);
+    }
+
+    @NonNull
+    public LiveData<List<AlertListItem>> getAllAlertsByTermId(long termId) {
+        return appDb.alertDAO().getAllByTermId(termId);
+    }
+
+    @NonNull
+    public LiveData<List<AlertListItem>> getAllAlertsByMentorId(long mentorId) {
+        return appDb.alertDAO().getAllByMentorId(mentorId);
+    }
+
+    @NonNull
     public Single<CourseAlertDetails> getCourseAlertDetailsById(long alertId, long courseId) {
         return appDb.courseAlertDAO().getDetailsAlertId(alertId, courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
-    public Single<AssessmentAlertDetails> getAssessmentAlertDetailsById(long alertId, long courseId) {
-        return appDb.assessmentAlertDAO().getByDetailByAlertId(alertId, courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
+    public Single<AssessmentAlertDetails> getAssessmentAlertDetailsById(long alertId, long assessmentId) {
+        return appDb.assessmentAlertDAO().getByDetailByAlertId(alertId, assessmentId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull

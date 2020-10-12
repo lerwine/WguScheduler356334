@@ -30,6 +30,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
@@ -286,6 +287,16 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     public LiveData<List<MentorCourseListItem>> getCoursesLiveData() {
         return coursesLiveData;
+    }
+
+    public LiveData<List<AlertListItem>> getAllAlerts() {
+        long id = mentorEntity.getId();
+        if (id != ID_NEW) {
+            return dbLoader.getAllAlertsByMentorId(id);
+        }
+        MutableLiveData<List<AlertListItem>> result = new MutableLiveData<>();
+        result.postValue(Collections.emptyList());
+        return result;
     }
 
     private class CurrentValues implements Mentor {

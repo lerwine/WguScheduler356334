@@ -1,9 +1,5 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.alert;
 
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -92,20 +88,6 @@ public interface AlertLink extends ToStringBuildable {
     default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         sb.append(COLNAME_ALERT_ID, getAlertId())
                 .append(COLNAME_TARGET_ID, getTargetId());
-    }
-
-    default <T extends BroadcastReceiver> PendingIntent createAlertIntent(Context packageContext, Class<T> cls) {
-        Intent intent = new Intent(packageContext, cls);
-        intent.putExtra(COLNAME_ALERT_ID, getAlertId());
-        intent.putExtra(COLNAME_TARGET_ID, getTargetId());
-        return PendingIntent.getBroadcast(packageContext, getNotificationId(), intent, 0);
-    }
-
-    default <T extends BroadcastReceiver> PendingIntent getAlertIntent(Context packageContext, Class<T> cls) {
-        Intent intent = new Intent(packageContext, cls);
-        intent.putExtra(COLNAME_ALERT_ID, getAlertId());
-        intent.putExtra(COLNAME_TARGET_ID, getTargetId());
-        return PendingIntent.getBroadcast(packageContext, getNotificationId(), intent, PendingIntent.FLAG_NO_CREATE);
     }
 
 }

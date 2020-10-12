@@ -36,8 +36,10 @@ import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
@@ -384,6 +386,26 @@ public class EditCourseViewModel extends AndroidViewModel {
             assessments = dbLoader.getAssessmentsLiveDataByCourseId(courseEntity.getId());
         }
         return assessments;
+    }
+
+    public synchronized LiveData<List<AlertListItem>> getAllAlerts() {
+        long id = courseEntity.getId();
+        if (id != ID_NEW) {
+            return dbLoader.getAllAlertsByCourseId(id);
+        }
+        MutableLiveData<List<AlertListItem>> result = new MutableLiveData<>();
+        result.postValue(Collections.emptyList());
+        return result;
+    }
+
+    public synchronized LiveData<List<CourseAlert>> getAllCourseAlerts() {
+        long id = courseEntity.getId();
+        if (id != ID_NEW) {
+            return dbLoader.getAlertsByCourseId(id);
+        }
+        MutableLiveData<List<CourseAlert>> result = new MutableLiveData<>();
+        result.postValue(Collections.emptyList());
+        return result;
     }
 
     public boolean isFromInitializedState() {

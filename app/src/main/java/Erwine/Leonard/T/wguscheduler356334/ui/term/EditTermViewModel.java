@@ -34,6 +34,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
@@ -220,9 +221,8 @@ public class EditTermViewModel extends AndroidViewModel {
         };
     }
 
-    @Nullable
-    public Long getId() {
-        return (null == termEntity) ? null : termEntity.getId();
+    public long getId() {
+        return (null == termEntity) ? ID_NEW : termEntity.getId();
     }
 
     @NonNull
@@ -319,6 +319,16 @@ public class EditTermViewModel extends AndroidViewModel {
 
     public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
         return coursesLiveData;
+    }
+
+    public LiveData<List<AlertListItem>> getAllAlerts() {
+        long id = termEntity.getId();
+        if (id != ID_NEW) {
+            return dbLoader.getAllAlertsByTermId(id);
+        }
+        MutableLiveData<List<AlertListItem>> result = new MutableLiveData<>();
+        result.postValue(Collections.emptyList());
+        return result;
     }
 
     public Observable<Boolean> getIsValid() {

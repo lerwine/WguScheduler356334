@@ -5,13 +5,33 @@ import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
 public class EntityHelper {
+
+    public static <T extends AbstractEntity<T>> Map<Long, T> mapById(@NonNull Collection<T> source) {
+        return mapById(source, AbstractEntity::getId);
+    }
+
+    public static <T extends AbstractEntity<T>> Map<Long, T> mapById(@NonNull Stream<T> source) {
+        return mapById(source, AbstractEntity::getId);
+    }
+
+    public static <T> Map<Long, T> mapById(@NonNull Collection<T> source, @NonNull Function<T, Long> mapper) {
+        return mapById(source.stream(), mapper);
+    }
+
+    public static <T> Map<Long, T> mapById(@NonNull Stream<T> source, @NonNull Function<T, Long> mapper) {
+        return source.collect(Collectors.toMap(mapper, t -> t));
+    }
+
     @NonNull
     public static <T extends AbstractEntity<T>> Optional<T> findById(@Nullable Long id, @NonNull Collection<T> source) {
         if (null == id) {

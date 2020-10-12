@@ -23,16 +23,21 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertBroadcastReceiver;
 import Erwine.Leonard.T.wguscheduler356334.ui.mentor.EditMentorViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.SingleObserver;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -295,7 +300,7 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onDeleteFloatingActionButtonClick(View view) {
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() ->
-                OneTimeObservers.subscribeOnce(viewModel.delete(false), this::onDeleteMentorFinished, this::onDeleteMentorError), null);
+                OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> OneTimeObservers.subscribeOnce(viewModel.delete(false), new DeleteOperationListener(alerts))), null);
     }
 
     private void onSaveMentorCompleted(@NonNull ResourceMessageResult messages) {
@@ -325,48 +330,66 @@ public class EditMentorActivity extends AppCompatActivity {
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), this).showDialog();
     }
 
-    private void onDeleteMentorFinished(ResourceMessageResult messages) {
-        if (messages.isSucceeded()) {
-            finish();
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            Resources resources = getResources();
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_delete_warning)
-                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObservers.subscribeOnce(viewModel.delete(true), this::onDeleteMentorFinished, this::onDeleteMentorError);
-                            dialog.dismiss();
-                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
-            } else {
-                builder.setTitle(R.string.title_delete_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
-            }
-            AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
-        }
-    }
-
-    private void onDeleteMentorError(Throwable throwable) {
-        Log.e(LOG_TAG, "Error deleting mentor", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
-    }
-
     private void verifySaveChanges() {
         OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> {
-                            OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
-                                if (!isValid) {
-                                    return;
-                                }
-                                OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
-                            });
-                        }, null);
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                            if (!isValid) {
+                                return;
+                            }
+                            OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
+                        }), null);
             } else {
                 finish();
             }
         });
     }
 
+    private class DeleteOperationListener implements SingleObserver<ResourceMessageResult> {
+
+        private final AlertListItem[] alerts;
+
+        DeleteOperationListener(List<AlertListItem> alerts) {
+            this.alerts = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AlertListItem[]::new);
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+        }
+
+        @Override
+        public void onSuccess(ResourceMessageResult messages) {
+            Log.d(LOG_TAG, "Enter DeleteOperationListener.onSuccess");
+            if (messages.isSucceeded()) {
+                if (alerts.length > 0) {
+                    for (AlertListItem a : alerts) {
+                        CourseAlertBroadcastReceiver.cancelPendingAlert(a, EditMentorActivity.this);
+                    }
+                }
+                finish();
+            } else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditMentorActivity.this);
+                Resources resources = getResources();
+                if (messages.isWarning()) {
+                    builder.setTitle(R.string.title_delete_warning)
+                            .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                            .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                                OneTimeObservers.subscribeOnce(viewModel.delete(true), this);
+                                dialog.dismiss();
+                            }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                } else {
+                    builder.setTitle(R.string.title_delete_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                }
+                AlertDialog dlg = builder.setCancelable(true).create();
+                dlg.show();
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e(LOG_TAG, "Error deleting mentor", e);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), EditMentorActivity.this).showDialog();
+        }
+    }
 }

@@ -19,9 +19,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertBroadcastReceiver;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.ViewTermPagerAdapter;
@@ -29,7 +32,9 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.SingleObserver;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -220,21 +225,19 @@ public class ViewTermActivity extends AppCompatActivity {
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, this).showYesNoDialog(() ->
-                OneTimeObservers.subscribeOnce(viewModel.delete(false), this::onDeleteTermComplete, this::onDeleteTermError), null);
+                OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> OneTimeObservers.subscribeOnce(viewModel.delete(false), new DeleteOperationListener(alerts))), null);
     }
 
     private void confirmSave() {
         OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> {
-                            OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
-                                if (!isValid) {
-                                    return;
-                                }
-                                OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
-                            });
-                        }, null);
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                            if (!isValid) {
+                                return;
+                            }
+                            OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
+                        }), null);
             } else {
                 finish();
             }
@@ -270,32 +273,52 @@ public class ViewTermActivity extends AppCompatActivity {
                 .showDialog();
     }
 
-    private void onDeleteTermComplete(ResourceMessageResult messages) {
-        Log.d(LOG_TAG, "Enter onDeleteTermComplete");
-        if (messages.isSucceeded()) {
-            finish();
-        } else {
-            Resources resources = getResources();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
-                        .setMessage(resources.getString(R.string.format_message_delete_warning, messages.join("\n", resources)))
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            dialog.dismiss();
-                            OneTimeObservers.subscribeOnce(viewModel.delete(true), this::onDeleteTermComplete, this::onDeleteTermError);
-                        })
-                        .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
-            } else {
-                builder.setTitle(R.string.title_delete_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
-            }
-            AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
-        }
-    }
+    private class DeleteOperationListener implements SingleObserver<ResourceMessageResult> {
 
-    private void onDeleteTermError(Throwable throwable) {
-        Log.e(LOG_TAG, "Error deleting term", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
+        private final AlertListItem[] alerts;
+
+        DeleteOperationListener(List<AlertListItem> alerts) {
+            this.alerts = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AlertListItem[]::new);
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+        }
+
+        @Override
+        public void onSuccess(ResourceMessageResult messages) {
+            Log.d(LOG_TAG, "Enter DeleteOperationListener.onSuccess");
+            if (messages.isSucceeded()) {
+                if (alerts.length > 0) {
+                    for (AlertListItem a : alerts) {
+                        CourseAlertBroadcastReceiver.cancelPendingAlert(a, ViewTermActivity.this);
+                    }
+                }
+                finish();
+            } else {
+                Resources resources = getResources();
+                AlertDialog.Builder builder = new AlertDialog.Builder(ViewTermActivity.this);
+                if (messages.isWarning()) {
+                    builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
+                            .setMessage(resources.getString(R.string.format_message_delete_warning, messages.join("\n", resources)))
+                            .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                                dialog.dismiss();
+                                OneTimeObservers.subscribeOnce(viewModel.delete(true), this);
+                            })
+                            .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                } else {
+                    builder.setTitle(R.string.title_delete_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                }
+                AlertDialog dlg = builder.setCancelable(true).create();
+                dlg.show();
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e(LOG_TAG, "Error deleting term", e);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), ViewTermActivity.this).showDialog();
+        }
     }
 
 }

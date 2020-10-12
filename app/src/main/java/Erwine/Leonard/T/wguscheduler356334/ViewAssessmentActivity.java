@@ -17,18 +17,29 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertBroadcastReceiver;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertDialog;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.ViewAssessmentPagerAdapter;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
@@ -87,7 +98,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed), null);
+                    OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(alerts))), null);
         } else {
             finish();
         }
@@ -120,34 +131,12 @@ public class ViewAssessmentActivity extends AppCompatActivity {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
                     this::finish,
                     () -> {
-                        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveForNewAlertFinished, this::onSaveFailed);
+                        OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener());
                         finish();
                     }, null);
         } else {
             EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
             dlg.show(getSupportFragmentManager(), null);
-        }
-    }
-
-    private void onSaveForNewAlertFinished(ResourceMessageResult messages) {
-        if (messages.isSucceeded()) {
-            EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
-            dlg.show(getSupportFragmentManager(), null);
-        } else {
-            Resources resources = getResources();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_save_warning)
-                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveForNewAlertFinished, this::onSaveFailed);
-                            dialog.dismiss();
-                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
-            } else {
-                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
-            }
-            AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
         }
     }
 
@@ -246,28 +235,13 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationSucceeded, this::onSaveFailed);
+        OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(alerts)));
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_assessment, R.string.message_delete_assessment_confirm, this).showYesNoDialog(() ->
-                OneTimeObservers.subscribeOnce(viewModel.delete(), this::onDeleteSucceeded, this::onDeleteFailed), null);
-    }
-
-    private void onDeleteSucceeded(Integer count) {
-        Log.d(LOG_TAG, "Enter onDeleteSucceeded");
-        Log.d(LOG_TAG, "Enter onDeleteSucceeded");
-        if (null == count || count < 1) {
-            new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.message_delete_term_fail), this).showDialog();
-        } else {
-            finish();
-        }
-    }
-
-    private void onDeleteFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error deleting assessment", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, throwable.getMessage()), this).showDialog();
+                OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> OneTimeObservers.subscribeOnce(viewModel.delete(), new DeleteOperationListener(alerts))), null);
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
@@ -277,32 +251,123 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 .showDialog(this::finish);
     }
 
-    private void onSaveOperationSucceeded(ResourceMessageResult messages) {
-        if (messages.isSucceeded()) {
-            // TODO: Need to see if any date changes have effected any alarms
-            finish();
-        } else {
-            Resources resources = getResources();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            if (messages.isWarning()) {
-                builder.setTitle(R.string.title_save_warning)
-                        .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                        .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            OneTimeObservers.subscribeOnce(viewModel.save(true), this::onSaveOperationSucceeded, this::onSaveFailed);
-                            dialog.dismiss();
-                        }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+    private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
+
+        private final boolean addingNewAlert;
+        private final AssessmentAlert[] alertsBeforeSave;
+
+        SaveOperationListener(List<AssessmentAlert> alertsBeforeSave) {
+            addingNewAlert = false;
+            this.alertsBeforeSave = alertsBeforeSave.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
+        }
+
+        SaveOperationListener() {
+            addingNewAlert = true;
+            alertsBeforeSave = new AssessmentAlert[0];
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+        }
+
+        @Override
+        public void onSuccess(ResourceMessageResult messages) {
+            if (messages.isSucceeded()) {
+                if (addingNewAlert) {
+                    EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
+                    dlg.show(getSupportFragmentManager(), null);
+                } else {
+                    OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> {
+                        AssessmentAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
+                        if (alertsAfterSave.length > 0) {
+                            OneTimeObservers.subscribeOnce(DbLoader.getPreferAlertTime(), localTime -> {
+                                if (alertsBeforeSave.length > 0) {
+                                    Map<Long, AssessmentAlert> beforeSaveMap = EntityHelper.mapById(Arrays.stream(alertsBeforeSave), t -> t.getLink().getAlertId());
+                                    Map<Long, AssessmentAlert> afterSaveMap = EntityHelper.mapById(Arrays.stream(alertsAfterSave), t -> t.getLink().getAlertId());
+                                    beforeSaveMap.keySet().forEach(k -> {
+                                        AssessmentAlert b = Objects.requireNonNull(beforeSaveMap.get(k));
+                                        if (!afterSaveMap.containsKey(k)) {
+                                            AssessmentAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), ViewAssessmentActivity.this);
+                                        }
+                                    });
+                                    afterSaveMap.keySet().forEach(k -> {
+                                        AssessmentAlert a = Objects.requireNonNull(afterSaveMap.get(k));
+                                        if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()))) {
+                                            AssessmentAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), localTime), a.getLink(), ViewAssessmentActivity.this);
+                                        }
+                                    });
+                                } else {
+                                    for (AssessmentAlert a : alertsAfterSave) {
+                                        AssessmentAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), localTime), a.getLink(), ViewAssessmentActivity.this);
+                                    }
+                                }
+                                finish();
+                            });
+                        } else if (alertsBeforeSave.length > 0) {
+                            for (AssessmentAlert a : alertsBeforeSave) {
+                                AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), ViewAssessmentActivity.this);
+                            }
+                            finish();
+                        }
+                    });
+                }
             } else {
-                builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                Resources resources = getResources();
+                AlertDialog.Builder builder = new AlertDialog.Builder(ViewAssessmentActivity.this);
+                if (messages.isWarning()) {
+                    builder.setTitle(R.string.title_save_warning)
+                            .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                            .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                                OneTimeObservers.subscribeOnce(viewModel.save(true), this);
+                                dialog.dismiss();
+                            }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                } else {
+                    builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                }
+                AlertDialog dlg = builder.setCancelable(true).create();
+                dlg.show();
             }
-            AlertDialog dlg = builder.setCancelable(true).create();
-            dlg.show();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e(LOG_TAG, "Error saving course", e);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, ViewAssessmentActivity.this, R.string.format_message_save_error, e.getMessage())
+                    .showDialog();
         }
     }
 
-    private void onSaveFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error saving course", throwable);
-        new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, this, R.string.format_message_save_error, throwable.getMessage())
-                .showDialog();
-    }
+    private class DeleteOperationListener implements SingleObserver<Integer> {
 
+        private final AssessmentAlert[] alerts;
+
+        DeleteOperationListener(List<AssessmentAlert> alerts) {
+            this.alerts = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+        }
+
+        @Override
+        public void onSuccess(Integer count) {
+            Log.d(LOG_TAG, "Enter DeleteOperationListener.onSuccess");
+            if (null == count || count < 1) {
+                new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.message_delete_term_fail), ViewAssessmentActivity.this).showDialog();
+            } else {
+                if (alerts.length > 0) {
+                    for (AssessmentAlert a : alerts) {
+                        AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), ViewAssessmentActivity.this);
+                    }
+                }
+                finish();
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e(LOG_TAG, "Error deleting assessment", e);
+            new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), ViewAssessmentActivity.this).showDialog();
+        }
+    }
 }

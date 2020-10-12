@@ -18,6 +18,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -33,6 +34,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AbstractAssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
@@ -114,6 +116,16 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
         return titleFactoryLiveData;
+    }
+
+    public LiveData<List<AssessmentAlert>> getAllAlerts() {
+        long id = assessmentEntity.getId();
+        if (id != ID_NEW) {
+            return dbLoader.getAlertsByAssessmentId(id);
+        }
+        MutableLiveData<List<AssessmentAlert>> result = new MutableLiveData<>();
+        result.postValue(Collections.emptyList());
+        return result;
     }
 
     public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
