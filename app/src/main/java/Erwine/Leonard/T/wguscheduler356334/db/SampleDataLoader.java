@@ -45,121 +45,11 @@ public class SampleDataLoader implements Action {
 
     private final DbLoader dbLoader;
     private final XmlResourceParser xmlParser;
-//    private int eventType = XmlPullParser.END_TAG;
 
     SampleDataLoader(DbLoader dbLoader, Resources resources) {
         this.dbLoader = dbLoader;
         xmlParser = resources.getXml(R.xml.sample_data);
     }
-
-//    @Nullable
-//    private String tryGetNextTag() throws IOException, XmlPullParserException {
-//        eventType = xmlParser.nextTag();
-//        if (eventType == XmlPullParser.END_TAG) {
-//            return null;
-//        }
-//        if (eventType != XmlPullParser.START_TAG ) {
-//            throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//        }
-//        if (xmlParser.getNamespace().equals(NAMESPACE_SAMPLE_DATA)) {
-//            return xmlParser.getName();
-//        }
-//        throw new UnsupportedOperationException(String.format("Unexpected XML namespace: %s, line %d", xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//    }
-//
-//    private boolean assertNextTagOrEnd(@NonNull String name, int depth) throws IOException, XmlPullParserException {
-//        eventType = xmlParser.nextTag();
-//        if (eventType == XmlPullParser.END_TAG) {
-//            return false;
-//        }
-//        if (eventType != XmlPullParser.START_TAG ) {
-//            throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//        }
-//        if (xmlParser.getNamespace().equals(NAMESPACE_SAMPLE_DATA)) {
-//            if (xmlParser.getName().equals(name)) {
-//                if (depth == xmlParser.getDepth()) {
-//                    return true;
-//                }
-//                throw new IllegalStateException(String.format("Unexpected tag name: %s, line %d", xmlParser.getName(), xmlParser.getLineNumber()));
-//            }
-//            throw new UnsupportedOperationException(String.format("Unexpected XML tag name: %s, line %d", xmlParser.getName(), xmlParser.getLineNumber()));
-//        }
-//        throw new UnsupportedOperationException(String.format("Unexpected XML namespace: %s, line %d", xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//    }
-//
-//    private boolean tryGetNextTag(@NonNull String name, int depth) throws IOException, XmlPullParserException {
-//        eventType = xmlParser.nextTag();
-//        if (eventType == XmlPullParser.END_TAG) {
-//            return false;
-//        }
-//        if (eventType != XmlPullParser.START_TAG ) {
-//            throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//        }
-//        if (xmlParser.getNamespace().equals(NAMESPACE_SAMPLE_DATA)) {
-//            if (depth == xmlParser.getDepth()) {
-//                return xmlParser.getName().equals(name);
-//            }
-//            throw new IllegalStateException(String.format("Unexpected tag name: %s, line %d", xmlParser.getName(), xmlParser.getLineNumber()));
-//        }
-//        throw new UnsupportedOperationException(String.format("Unexpected XML namespace: %s, line %d", xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//    }
-//
-//    private boolean tryGetTag(@NonNull String name, int depth) throws IOException, XmlPullParserException {
-//        if (eventType != XmlPullParser.START_TAG) {
-//            eventType = xmlParser.nextTag();
-//            if (eventType == XmlPullParser.END_TAG) {
-//                return false;
-//            }
-//            if (eventType != XmlPullParser.START_TAG) {
-//                throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//            }
-//        }
-//        if (xmlParser.getNamespace().equals(NAMESPACE_SAMPLE_DATA)) {
-//            if (depth == xmlParser.getDepth()) {
-//                return xmlParser.getName().equals(name);
-//            }
-//            throw new IllegalStateException(String.format("Unexpected tag name: %s, line %d", xmlParser.getName(), xmlParser.getLineNumber()));
-//        }
-//        throw new UnsupportedOperationException(String.format("Unexpected XML namespace: %s, line %d", xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//    }
-//
-//    private void assertStartTag(@NonNull String name) throws IOException, XmlPullParserException {
-//        if (eventType != XmlPullParser.START_TAG) {
-//            throw new IllegalStateException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//        }
-//        if (!xmlParser.getNamespace().equals(NAMESPACE_SAMPLE_DATA)) {
-//            throw new IllegalStateException(String.format("Unexpected XML namespace: %s, line %d", xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//        }
-//        if (!xmlParser.getName().equals(name)) {
-//            throw new IllegalStateException(String.format("Unexpected tag name: %s, line %d", xmlParser.getName(), xmlParser.getLineNumber()));
-//        }
-//    }
-//
-//    private void assertStartTag(@NonNull String name, int depth) throws IOException, XmlPullParserException {
-//        if (eventType != XmlPullParser.START_TAG) {
-//            throw new IllegalStateException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//        }
-//        if (xmlParser.getDepth() != depth) {
-//            throw new IllegalStateException(String.format("Unexpected tag name: %s; namespace: %s, line %d", xmlParser.getName(), xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//        }
-//        if (!xmlParser.getNamespace().equals(NAMESPACE_SAMPLE_DATA)) {
-//            throw new IllegalStateException(String.format("Unexpected XML namespace: %s, line %d", xmlParser.getNamespace(), xmlParser.getLineNumber()));
-//        }
-//        if (!xmlParser.getName().equals(name)) {
-//            throw new IllegalStateException(String.format("Unexpected tag name: %s, line %d", xmlParser.getName(), xmlParser.getLineNumber()));
-//        }
-//    }
-
-//    private boolean tryReadEndTag() throws IOException, XmlPullParserException {
-//        eventType = xmlParser.nextTag();
-//        if (eventType == XmlPullParser.END_TAG) {
-//            return true;
-//        }
-//        if (eventType == XmlPullParser.START_TAG) {
-//            return false;
-//        }
-//        throw new UnsupportedOperationException(String.format("Unexpected XML resource parser event type: %d, line %d", eventType, xmlParser.getLineNumber()));
-//    }
 
     private LocalDate getAttributeLocalDate(@NonNull String name) {
         String s = xmlParser.getAttributeValue(null, name);
@@ -184,17 +74,6 @@ public class SampleDataLoader implements Action {
                 return LocalDate.parse(s);
         }
     }
-
-//    private boolean isTextEvent(int eventType) {
-//        switch (eventType) {
-//            case XmlPullParser.ENTITY_REF:
-//            case XmlPullParser.CDSECT:
-//            case XmlPullParser.TEXT:
-//                return true;
-//            default:
-//                return false;
-//        }
-//    }
 
     private Optional<String> getText() throws XmlPullParserException, IOException {
         switch (xmlParser.getEventType()) {
@@ -385,7 +264,6 @@ public class SampleDataLoader implements Action {
 
     private void loadSampleCourseAlert(long courseId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        // TODO: Support messages in XML if time permits
         AlertEntity alert = new AlertEntity(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0),
                 xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), null);
         long id = dbLoader.getAppDb().alertDAO().insertSynchronous(alert);
@@ -426,7 +304,6 @@ public class SampleDataLoader implements Action {
 
     private void loadSampleAssessmentAlert(long assessmentId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
-        // TODO: Support messages in XML if time permits
         AlertEntity alert = new AlertEntity(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0),
                 xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), null);
         long id = dbLoader.getAppDb().alertDAO().insertSynchronous(alert);

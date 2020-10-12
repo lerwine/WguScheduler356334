@@ -232,30 +232,13 @@
                     competencyUnits="0">
                     <notes>
                         <![CDATA[Turpis egestas integer eget aliquet nibh praesent tristique. Nisl rhoncus mattis rhoncus urna neque. Proin fermentum leo vel orci porta non pulvinar neque laoreet. Ut enim blandit volutpat maecenas. In ornare quam viverra orci sagittis eu. Maecenas ultricies mi eget mauris pharetra et ultrices neque ornare. Ut diam quam nulla porttitor massa id neque.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-4" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-2" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="ORA1"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            completionDate="2015-04-21">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="2015-04-21" />
                     </assessments>
                 </item>
                 <item
@@ -270,11 +253,6 @@
                     mentorId="1">
                     <notes><![CDATA[Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus.
 Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget. Quis hendrerit dolor magna eget est lorem ipsum. Donec et odio pellentesque diam. Amet aliquam id diam maecenas ultricies mi eget mauris.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG5"
@@ -287,13 +265,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            completionDate="actualEnd">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -308,42 +280,19 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     mentorId="2">
                     <notes>
                         <![CDATA[Aenean euismod elementum nisi quis eleifend quam. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Diam in arcu cursus euismod quis. Odio euismod lacinia at quis risus sed. Malesuada fames ac turpis egestas maecenas. Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nunc mi ipsum faucibus vitae aliquet. Eget egestas purus viverra accumsan in. Suscipit tellus mauris a diam maecenas sed enim ut. Aliquet risus feugiat in ante metus dictum at tempor commodo. Id semper risus in hendrerit. Tristique senectus et netus et malesuada fames ac turpis. Sit amet justo donec enim diam vulputate ut pharetra. Gravida cum sociis natoque penatibus et. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Aliquet sagittis id consectetur purus ut. Dui id ornare arcu odio.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-9" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-2" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PIAC"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            completionDate="2015-08-23">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="2015-08-23" />
                         <item
                             code="IAC1"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            completionDate="actualEnd">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -358,14 +307,6 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     mentorId="3">
                     <notes>
                         <![CDATA[Maecenas ultricies mi eget mauris pharetra et ultrices neque ornare. Ut diam quam nulla porttitor massa id neque. Enim neque volutpat ac tincidunt. Arcu cursus euismod quis viverra nibh cras pulvinar mattis.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="EKV1"
@@ -373,13 +314,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                             goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
                             completionDate="actualEnd"
-                            name="CompTIA - Project+">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            name="CompTIA - Project+" />
                     </assessments>
                 </item>
             </courses>
@@ -402,20 +337,6 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     mentorId="4">
                     <notes>
                         <![CDATA[Egestas purus viverra accumsan in. Nisi vitae suscipit tellus mauris a diam maecenas sed.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-1" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-5" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PLMC"
@@ -428,13 +349,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            completionDate="actualEnd">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -450,26 +365,6 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     <notes><![CDATA[Dui id ornare arcu odio.
 Nam libero justo laoreet sit amet cursus sit. Risus feugiat in ante metus dictum at.
 Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum sit amet justo donec.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-7" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-5" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-2" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-8" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-5" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-2" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PYJC"
@@ -482,25 +377,13 @@ Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            completionDate="2016-05-07">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="2016-05-07" />
                         <item
                             code="YJT1"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT"
-                            completionDate="actualEnd">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            completionDate="actualEnd" />
                     </assessments>
                 </item>
                 <item
@@ -513,20 +396,6 @@ Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum
                     actualEnd="2016-06-05"
                     competencyUnits="3"
                     mentorId="6">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-11" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-5" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-2" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="DIT1"
@@ -534,52 +403,28 @@ Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             completionDate="2016-05-15"
-                            name="Task 1">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            name="Task 1" />
                         <item
                             code="DIT1"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             completionDate="2016-05-22"
-                            name="Task 2">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            name="Task 2" />
                         <item
                             code="DIT1"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             completionDate="2016-05-28"
-                            name="Task 3">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            name="Task 3" />
                         <item
                             code="DIT1"
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             completionDate="actualEnd"
-                            name="Task 4">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="false"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            name="Task 4" />
                     </assessments>
                 </item>
                 <item
@@ -594,23 +439,6 @@ Ridiculus mus mauris vitae ultricies leo integer malesuada nunc. Sit amet dictum
                     mentorId="6">
                     <notes>
                         <![CDATA[Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat. Lectus urna duis convallis convallis.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-7" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-6" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-4" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="DJT1"
@@ -672,20 +500,6 @@ Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam qui
                     mentorId="8">
                     <notes>
                         <![CDATA[Praesent tristique magna sit amet purus gravida quis blandit turpis. Magnis dis parturient montes nascetur ridiculus.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-1" />
-                        <item
-                            subsequent="false"
-                            timeSpec="0" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-4" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-3" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PCEC"
@@ -712,17 +526,6 @@ Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam qui
                     competencyUnits="4"
                     mentorId="7">
                     <notes><![CDATA[Fermentum posuere urna nec tincidunt.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-7" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-4" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-2" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="KFV1"
@@ -754,17 +557,6 @@ Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam qui
                     mentorId="9">
                     <notes><![CDATA[Euismod elementum nisi quis eleifend quam.
 Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nunc mi ipsum faucibus vitae aliquet. Eget egestas purus viverra accumsan in. Suscipit tellus mauris a diam maecenas sed enim ut.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="0" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-8" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PCGO"
@@ -792,11 +584,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     mentorId="10">
                     <notes>
                         <![CDATA[Leo a diam sollicitudin tempor id. Arcu risus quis varius quam quisque. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PCKC"
@@ -834,20 +621,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     actualEnd="2017-05-23"
                     competencyUnits="4"
                     mentorId="11">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-9" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-7" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PDQC"
@@ -881,20 +654,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     mentorId="12">
                     <notes>
                         <![CDATA[Amet aliquam id diam maecenas ultricies mi eget mauris.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-2" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PJQC"
@@ -928,14 +687,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     actualEnd="2017-08-11"
                     competencyUnits="3"
                     mentorId="13">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-2" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PHTC"
@@ -963,17 +714,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     mentorId="9">
                     <notes>
                         <![CDATA[Proin fermentum leo vel orci porta non pulvinar neque laoreet. Ut enim blandit volutpat maecenas.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-13" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-7" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="BRP1"
@@ -994,11 +734,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     competencyUnits="3"
                     mentorId="9">
                     <notes><![CDATA[Odio euismod lacinia at quis risus sed.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-5" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="HCV1"
@@ -1019,14 +754,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     competencyUnits="3"
                     mentorId="14">
                     <notes><![CDATA[Volutpat commodo sed egestas egestas fringilla.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="0" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-2" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PIBC"
@@ -1054,17 +781,6 @@ Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauri
                     mentorId="15">
                     <notes>
                         <![CDATA[Nisl rhoncus mattis rhoncus urna neque. Proin fermentum leo vel orci porta non pulvinar neque laoreet.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-12" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-4" />
-                        <item
-                            subsequent="false"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="GVC1"
@@ -1120,11 +836,6 @@ In nulla posuere sollicitudin aliquam ultrices sagittis. Amet tellus cras adipis
                     mentorId="17">
                     <notes>
                         <![CDATA[Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-4" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PFJO"
@@ -1180,14 +891,6 @@ Felis bibendum ut tristique et egestas. Eget mauris pharetra et ultrices neque o
                     mentorId="18">
                     <notes><![CDATA[Purus faucibus ornare suspendisse sed nisi. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.
 Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget. Quis hendrerit dolor magna eget est lorem ipsum.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="EWP1"
@@ -1217,17 +920,6 @@ Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagit
                     competencyUnits="4"
                     mentorId="19">
                     <notes><![CDATA[Volutpat commodo sed egestas egestas fringilla.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-1" />
-                        <item
-                            subsequent="false"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="FRV1"
@@ -1249,17 +941,6 @@ Eu feugiat pretium nibh ipsum. Venenatis cras sed felis eget velit aliquet sagit
                     mentorId="19">
                     <notes><![CDATA[Nunc mi ipsum faucibus vitae aliquet.
 Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus sit. Risus feugiat in ante metus dictum at.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-7" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-2" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG7"
@@ -1287,23 +968,6 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                     mentorId="9">
                     <notes>
                         <![CDATA[Enim neque volutpat ac tincidunt. Arcu cursus euismod quis viverra nibh cras pulvinar mattis. Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-8" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-6" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-12" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-2" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="AAO1"
@@ -1333,11 +997,6 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                     mentorId="19">
                     <notes>
                         <![CDATA[Praesent tristique magna sit amet purus gravida quis blandit turpis.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-4" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="GYP1"
@@ -1380,11 +1039,6 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                     mentorId="19">
                     <notes>
                         <![CDATA[Tortor id aliquet lectus proin nibh nisl condimentum. Euismod elementum nisi quis eleifend quam. Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Turpis tincidunt id aliquet risus. Placerat duis ultricies lacus sed turpis. Fermentum posuere urna nec tincidunt. Montes nascetur ridiculus mus mauris vitae ultricies. Libero volutpat sed cras ornare arcu dui vivamus arcu. Viverra vitae congue eu consequat. Lectus urna duis convallis convallis.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-7" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG8"
@@ -1421,17 +1075,6 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                     mentorId="20">
                     <notes>
                         <![CDATA[Quis commodo odio aenean sed adipiscing. Nulla facilisi morbi tempus iaculis urna id volutpat lacus. Turpis egestas integer eget aliquet nibh praesent tristique.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-1" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-12" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-3" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PAG9"
@@ -1457,11 +1100,6 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                     actualEnd="2020-05-08"
                     competencyUnits="6"
                     mentorId="21">
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-5" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="GZP1"
@@ -1483,11 +1121,6 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                     mentorId="21">
                     <notes>
                         <![CDATA[Mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Libero justo laoreet sit amet cursus.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-9" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="PADO"
@@ -1526,14 +1159,6 @@ Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ul
                     mentorId="22">
                     <notes>
                         <![CDATA[Felis bibendum ut tristique et egestas. Eget mauris pharetra et ultrices neque ornare aenean. Risus quis varius quam quisque id diam.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-5" />
-                        <item
-                            subsequent="true"
-                            timeSpec="0" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="GZP1"
@@ -1553,14 +1178,6 @@ Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ul
                     mentorId="23">
                     <notes><![CDATA[Arcu risus quis varius quam quisque.
 Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="true"
-                            timeSpec="-9" />
-                        <item
-                            subsequent="true"
-                            timeSpec="-1" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="ABM1"
@@ -1586,30 +1203,13 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     competencyUnits="4">
                     <notes>
                         <![CDATA[Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis.]]></notes>
-                    <courseAlerts>
-                        <item
-                            subsequent="false"
-                            timeSpec="-11" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-3" />
-                        <item
-                            subsequent="false"
-                            timeSpec="-2" />
-                    </courseAlerts>
                     <assessments>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
                             goalDate="2020-10-15"
                             type="PERFORMANCE_EVALUATION"
-                            name="Task 1">
-                            <assessmentAlerts>
-                                <item
-                                    subsequent="true"
-                                    timeSpec="-4" />
-                            </assessmentAlerts>
-                        </item>
+                            name="Task 1" />
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
