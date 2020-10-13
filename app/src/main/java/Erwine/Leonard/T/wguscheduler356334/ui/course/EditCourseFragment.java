@@ -39,7 +39,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -49,8 +48,6 @@ public class EditCourseFragment extends Fragment {
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final CompositeDisposable compositeDisposable;
     private EditCourseViewModel viewModel;
     private Button termButton;
     private EditText courseCodeEditText;
@@ -65,7 +62,6 @@ public class EditCourseFragment extends Fragment {
     private EditText notesEditText;
 
     public EditCourseFragment() {
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override

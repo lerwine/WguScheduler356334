@@ -35,6 +35,7 @@ public class CourseListFragment extends Fragment {
 
     private static final String LOG_TAG = CourseListFragment.class.getName();
 
+    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
     private final CompositeDisposable subscriptionCompositeDisposable;
     private final List<TermCourseListItem> list;
     private EditTermViewModel editTermViewModel;

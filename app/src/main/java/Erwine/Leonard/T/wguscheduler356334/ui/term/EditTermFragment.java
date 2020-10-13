@@ -31,6 +31,7 @@ public class EditTermFragment extends Fragment {
 
     private static final String LOG_TAG = EditTermFragment.class.getName();
 
+    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
     private final CompositeDisposable subscriptionCompositeDisposable;
     private EditTermViewModel viewModel;
     private EditText termNameEditText;
@@ -72,6 +73,7 @@ public class EditTermFragment extends Fragment {
         if (null == entity) {
             return;
         }
+        subscriptionCompositeDisposable.clear();
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
 
         if (viewModel.isFromInitializedState()) {

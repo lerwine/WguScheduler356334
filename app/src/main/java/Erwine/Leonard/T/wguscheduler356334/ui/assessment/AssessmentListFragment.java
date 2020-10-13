@@ -24,7 +24,6 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -34,8 +33,6 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 public class AssessmentListFragment extends Fragment {
 
     private static final String LOG_TAG = AssessmentListFragment.class.getName();
-    @SuppressWarnings("FieldCanBeLocal")
-    private final CompositeDisposable compositeDisposable;
     private final ArrayList<AssessmentEntity> list;
     private AssessmentListAdapter adapter;
     private EditCourseViewModel editCourseViewModel;
@@ -49,7 +46,6 @@ public class AssessmentListFragment extends Fragment {
      */
     public AssessmentListFragment() {
         Log.d(LOG_TAG, "Constructing AssessmentListFragment");
-        compositeDisposable = new CompositeDisposable();
         list = new ArrayList<>();
     }
 

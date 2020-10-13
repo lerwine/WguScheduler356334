@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.assessment.EditAssessmentFragment">
+
+    <ScrollView
+        android:id="@+id/valuesGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/notesEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:id="@+id/courseLinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:minWidth="200dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/courseButton"
+                    android:text="@string/label_course"
+                    android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+                <Button
+                    android:id="@+id/courseButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/btn_dropdown" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/codeEditText"
+                    android:text="@string/label_code"
+                    android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+                <EditText
+                    android:id="@+id/codeEditText"
+                    style="@style/WGU.Scheduler.TextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:importantForAutofill="no"
+                    android:inputType="textShortMessage|text|textCapCharacters" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/goalDateChip"
+                    android:text="@string/label_goal_date"
+                    android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/goalDateChip"
+                    style="@style/WGU.Scheduler.Chip.Entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checkable="false" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/typeLinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/control_margin"
+                android:layout_weight="50"
+                android:minWidth="200dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/typeButton"
+                    android:text="@string/label_type"
+                    android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+                <Button
+                    android:id="@+id/typeButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/btn_dropdown" />
+
+                <TextView
+                    android:id="@+id/statusLabelTextView"
+                    style="@style/WGU.Scheduler.FieldLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_status" />
+
+                <Button
+                    android:id="@+id/statusButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/btn_dropdown" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/completionDateChip"
+                    android:text="@string/label_completion_date"
+                    android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/completionDateChip"
+                    style="@style/WGU.Scheduler.Chip.Entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checkable="false" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/notesLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/notesEditText"
+        android:text="@string/label_notes"
+        android:textAppearance="@style/WGU.Scheduler.FieldLabel"
+        app:layout_constraintStart_toStartOf="@+id/notesEditText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/notesEditText"
+        style="@style/WGU.Scheduler.TextInputEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notesLabelTextView"
+        app:layout_constraintWidth_min="250dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

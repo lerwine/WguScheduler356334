@@ -25,6 +25,7 @@ public class AddTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddTermActivity.class.getName();
 
+    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
     private final CompositeDisposable subscriptionCompositeDisposable;
     private EditTermViewModel viewModel;
     private AlertDialog waitDialog;
@@ -135,14 +136,12 @@ public class AddTermActivity extends AppCompatActivity {
         OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> {
-                            OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
-                                if (!isValid) {
-                                    return;
-                                }
-                                OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
-                            });
-                        }, null);
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                            if (!isValid) {
+                                return;
+                            }
+                            OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+                        }), null);
             } else {
                 finish();
             }

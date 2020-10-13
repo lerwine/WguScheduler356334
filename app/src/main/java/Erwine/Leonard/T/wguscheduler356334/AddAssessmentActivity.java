@@ -34,6 +34,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
      */
     public AddAssessmentActivity() {
         Log.d(LOG_TAG, "Constructing AddAssessmentActivity");
+        // TODO: Use OneTimeObserver instead
         compositeDisposable = new CompositeDisposable();
     }
 

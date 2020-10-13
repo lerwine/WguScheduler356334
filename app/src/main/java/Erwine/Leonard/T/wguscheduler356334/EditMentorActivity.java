@@ -49,6 +49,7 @@ public class EditMentorActivity extends AppCompatActivity {
     private static final String STATE_KEY_NOTIFIED_SHARING_DISABLED = "EditMentorActivity:notifiedSharingDisabled";
     private static final String STATE_KEY_NOTIFYING_SHARING_DISABLED = "EditMentorActivity:notifyingSharingDisabled";
 
+    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
     private final CompositeDisposable subscriptionCompositeDisposable;
     private EditMentorViewModel viewModel;
     private EditText mentorNameEditText;
@@ -131,6 +132,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onLoadSuccess(MentorEntity entity) {
+        subscriptionCompositeDisposable.clear();
         waitDialog.dismiss();
         if (null == entity) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_mentor_not_found : R.string.message_mentor_not_found, this).showDialog(this::finish);

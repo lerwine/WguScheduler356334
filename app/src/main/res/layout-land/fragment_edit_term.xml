@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="100"
+    tools:context=".ui.term.EditTermFragment"
+    android:baselineAligned="false">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="75">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/termNameLabelTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/termNameEditText"
+                android:text="@string/label_name_of_term" />
+
+            <EditText
+                android:id="@+id/termNameEditText"
+                style="@style/WGU.Scheduler.TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/control_margin"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="textCapWords" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/control_margin"
+                    android:layout_weight="50"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/termStartTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@id/termStartEditView"
+                        android:text="@string/label_start_of_term" />
+
+                    <Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView
+                        android:id="@+id/termStartEditView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/edit_text"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/control_margin"
+                    android:layout_weight="50"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/termEndTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@id/termEndEditView"
+                        android:text="@string/label_end_of_term" />
+
+                    <Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView
+                        android:id="@+id/termEndEditView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/edit_text"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="25"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/termNotesLabelTextView"
+            style="@style/WGU.Scheduler.FieldLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/notesEditText"
+            android:text="@string/label_notes" />
+
+        <EditText
+            android:id="@+id/notesEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="start|top"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine" />
+
+    </LinearLayout>
+</LinearLayout>

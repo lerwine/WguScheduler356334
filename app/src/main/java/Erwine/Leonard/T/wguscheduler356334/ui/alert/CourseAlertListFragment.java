@@ -34,6 +34,7 @@ import io.reactivex.disposables.CompositeDisposable;
 public class CourseAlertListFragment extends Fragment {
 
     private static final String LOG_TAG = CourseAlertListFragment.class.getName();
+    // TODO: Use OneTimeObserver instead
     private final CompositeDisposable compositeDisposable;
     private final List<CourseAlert> items;
     private CourseAlertListViewModel listViewModel;

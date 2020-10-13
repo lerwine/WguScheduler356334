@@ -41,6 +41,7 @@ public class EditAssessmentFragment extends Fragment {
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
     @SuppressWarnings("FieldCanBeLocal")
+    // TODO: Use OneTimeObserver instead
     private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
     private Button courseButton;
