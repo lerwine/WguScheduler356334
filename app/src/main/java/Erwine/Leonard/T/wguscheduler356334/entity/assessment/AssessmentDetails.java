@@ -237,12 +237,12 @@ public final class AssessmentDetails extends AbstractAssessmentEntity<Assessment
 
     @Override
     public void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
-        super.restoreState(bundle, isOriginal);
         CourseEntity c = new CourseEntity();
         if (bundle.containsKey(c.stateKey(Course.COLNAME_ID, isOriginal)) || bundle.containsKey(c.stateKey(Course.COLNAME_STATUS, isOriginal))) {
             c.restoreState(bundle, isOriginal);
             setCourse(c);
         }
+        super.restoreState(bundle, isOriginal);
     }
 
     @Override

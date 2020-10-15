@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -41,9 +42,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
@@ -55,9 +56,11 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 public class EditAssessmentViewModel extends AndroidViewModel {
     private static final String LOG_TAG = EditAssessmentViewModel.class.getName();
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
+    public static final String EXTRA_KEY_ASSESSMENT_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_ID, false);
 
     private final DbLoader dbLoader;
-    private AssessmentDetails assessmentEntity;
+    @NonNull
+    private AssessmentDetails originalValues;
     private TermEntity termEntity;
     private MentorEntity mentorEntity;
     private final MutableLiveData<AssessmentDetails> entityLiveData;
@@ -82,27 +85,28 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private Observer<List<TermCourseListItem>> coursesLoadedObserver;
     private Observer<List<AssessmentEntity>> assessmentsLoadedObserver;
 
-    public static void startAddAssessmentActivity(@NonNull Context context, long courseId, @Nullable LocalDate goalDate) {
-        Intent intent = new Intent(context, AddAssessmentActivity.class);
-        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Term.COLNAME_ID, false), courseId);
+    public static void startAddAssessmentActivity(@NonNull Activity activity, int requestCode, long courseId, @Nullable LocalDate goalDate) {
+        Intent intent = new Intent(activity, AddAssessmentActivity.class);
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false), courseId);
         Long d = LocalDateConverter.fromLocalDate(goalDate);
         if (null != d) {
-            intent.putExtra(AssessmentDetails.COLNAME_GOAL_DATE, d);
+            intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_GOAL_DATE, false), d);
         }
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     public static void startViewAssessmentActivity(@NonNull Context context, long assessmentId) {
         Intent intent = new Intent(context, ViewAssessmentActivity.class);
-        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_ID, false), assessmentId);
+        intent.putExtra(EXTRA_KEY_ASSESSMENT_ID, assessmentId);
         context.startActivity(intent);
     }
 
     public EditAssessmentViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
+        originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
         titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
-        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
+        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(" "));
         currentValues = new CurrentValues();
         entityLiveData = new MutableLiveData<>();
         courseValidLiveData = new MutableLiveData<>(false);
@@ -121,7 +125,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<AssessmentAlert>> getAllAlerts() {
-        long id = assessmentEntity.getId();
+        long id = originalValues.getId();
         if (id != ID_NEW) {
             return dbLoader.getAlertsByAssessmentId(id);
         }
@@ -145,7 +149,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     public long getId() {
-        return currentValues.getId();
+        return originalValues.getId();
     }
 
     public AbstractCourseEntity<?> getSelectedCourse() {
@@ -246,34 +250,35 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     @NonNull
     public Single<List<TermCourseListItem>> loadCourses() {
-        return dbLoader.loadCoursesByTermId(assessmentEntity.getCourse().getTermId());
+        return dbLoader.loadCoursesByTermId(originalValues.getTermId());
     }
 
     public synchronized Single<AssessmentDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
-        assessmentEntity = new AssessmentDetails((AbstractCourseEntity<?>) null);
         viewTitle = null;
         overview = null;
         if (null != state) {
             Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
-            currentValues.restoreState(state, false);
-            long id = currentValues.getId();
-            if (ID_NEW == id || fromInitializedState) {
-                Log.d(LOG_TAG, "Restoring courseEntity from saved state");
-                assessmentEntity.restoreState(state, fromInitializedState);
-            } else {
-                return dbLoader.getAssessmentById(id).doOnSuccess(this::onEntityLoadedFromDb);
+            if (!fromInitializedState) {
+                if (state.containsKey(EXTRA_KEY_ASSESSMENT_ID)) {
+                    return dbLoader.getAssessmentById(state.getLong(EXTRA_KEY_ASSESSMENT_ID)).doOnSuccess(this::onEntityLoadedFromDb);
+                }
+                String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_GOAL_DATE, false);
+                return dbLoader.createAssessmentForCourse(state.getLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false)),
+                        (state.containsKey(key)) ? LocalDateConverter.toLocalDate(state.getLong(key)) : null).doOnSuccess(this::onEntityLoadedFromDb);
             }
+            currentValues.restoreState(state, false);
+            originalValues.restoreState(state, true);
         }
         onEntityLoaded();
-        return Single.just(assessmentEntity).observeOn(AndroidSchedulers.mainThread());
+        return Single.just(originalValues).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void saveViewModelState(Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         currentValues.saveState(outState, false);
-        assessmentEntity.saveState(outState, true);
+        originalValues.saveState(outState, true);
     }
 
     @NonNull
@@ -326,12 +331,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private void onEntityLoaded() {
         titleFactoryLiveData.postValue(this::calculateViewTitle);
         overviewFactoryLiveData.postValue(this::calculateOverview);
-        entityLiveData.postValue(assessmentEntity);
+        entityLiveData.postValue(originalValues);
     }
 
     private void onEntityLoadedFromDb(AssessmentDetails entity) {
         Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
-        assessmentEntity = entity;
+        originalValues = entity;
         setCode(entity.getCode());
         setCompletionDate(entity.getCompletionDate());
         setGoalDate(entity.getGoalDate());
@@ -347,7 +352,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         if (null == selectedCourse) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_course_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
-        AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
+        AssessmentEntity entity = new AssessmentEntity(originalValues);
         entity.setCode(currentValues.getCode());
         entity.setCompletionDate(currentValues.getCompletionDate());
         entity.setCourseId(selectedCourse.getId());
@@ -358,23 +363,23 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         entity.setNotes(currentValues.getNotes());
         return dbLoader.saveAssessment(entity, ignoreWarnings).doOnSuccess(m -> {
             if (m.isSucceeded()) {
-                assessmentEntity.applyChanges(entity, selectedCourse);
+                originalValues.applyChanges(entity, selectedCourse);
             }
         });
     }
 
     public Single<Integer> delete() {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
-        AssessmentEntity entity = new AssessmentEntity(assessmentEntity);
+        AssessmentEntity entity = new AssessmentEntity(originalValues);
         return dbLoader.deleteAssessment(entity).doOnError(throwable -> Log.e(getClass().getName(),
                 "Error deleting course", throwable));
     }
 
     public boolean isChanged() {
-        if (currentValues.getCode().equals(assessmentEntity.getCode()) && Objects.equals(currentValues.getName(), assessmentEntity.getName()) && currentValues.getStatus() == assessmentEntity.getStatus() &&
-                Objects.equals(currentValues.getGoalDate(), assessmentEntity.getGoalDate()) && Objects.equals(currentValues.getCompletionDate(), assessmentEntity.getCompletionDate()) &&
-                currentValues.getType() == assessmentEntity.getType() && Objects.equals(currentValues.getCourseId(), assessmentEntity.getCourseId())) {
-            return !getNormalizedNotes().equals(assessmentEntity.getNotes());
+        if (currentValues.getCode().equals(originalValues.getCode()) && Objects.equals(currentValues.getName(), originalValues.getName()) && currentValues.getStatus() == originalValues.getStatus() &&
+                Objects.equals(currentValues.getGoalDate(), originalValues.getGoalDate()) && Objects.equals(currentValues.getCompletionDate(), originalValues.getCompletionDate()) &&
+                currentValues.getType() == originalValues.getType() && Objects.equals(currentValues.getCourseId(), originalValues.getCourseId())) {
+            return !getNormalizedNotes().equals(originalValues.getNotes());
         }
         return true;
     }
@@ -383,14 +388,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         if (null != termEntity) {
             return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
         }
-        return dbLoader.getTermById(assessmentEntity.getTermId()).doOnSuccess(t -> termEntity = t);
+        return dbLoader.getTermById(originalValues.getTermId()).doOnSuccess(t -> termEntity = t);
     }
 
     public Single<MentorEntity> getCourseMentor() {
         if (null != mentorEntity) {
             return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
         }
-        return dbLoader.getMentorById(assessmentEntity.getMentorId()).doOnSuccess(t -> mentorEntity = t);
+        return dbLoader.getMentorById(originalValues.getMentorId()).doOnSuccess(t -> mentorEntity = t);
     }
 
     public synchronized Long getMentorId() {
@@ -398,7 +403,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     private class CurrentValues implements Assessment {
-        private long id;
         private Long courseId;
         @NonNull
         private String code = "";
@@ -416,15 +420,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
         @Override
         public long getId() {
-            return (null == assessmentEntity) ? id : assessmentEntity.getId();
+            return originalValues.getId();
         }
 
         @Override
         public void setId(long id) {
-            if (null != assessmentEntity) {
-                assessmentEntity.setId(id);
-            }
-            this.id = id;
+            originalValues.setId(id);
         }
 
         @Override

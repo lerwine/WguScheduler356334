@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -109,6 +110,9 @@ public class AddCourseActivity extends AppCompatActivity {
 
     private void onSaveOperationFinished(@NonNull ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
+            Intent intent = new Intent();
+            intent.putExtra(EditCourseViewModel.EXTRA_KEY_COURSE_ID, viewModel.getId());
+            setResult(1, intent);
             finish();
         } else {
             Resources resources = getResources();

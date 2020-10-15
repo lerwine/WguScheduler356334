@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,7 +34,6 @@ import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.SingleObserver;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
@@ -44,7 +44,6 @@ public class ViewTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
 
-    private final CompositeDisposable subscriptionCompositeDisposable;
     @SuppressWarnings("FieldCanBeLocal")
     private ViewTermPagerAdapter adapter;
     private EditTermViewModel viewModel;
@@ -56,7 +55,6 @@ public class ViewTermActivity extends AppCompatActivity {
 
     public ViewTermActivity() {
         Log.d(LOG_TAG, "Constructing ViewTermActivity");
-        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -214,9 +212,20 @@ public class ViewTermActivity extends AppCompatActivity {
                 LocalDate e = viewModel.getEnd();
                 return (null != e && e.compareTo(s) < 0) ? e : s;
             });
-            EditCourseViewModel.startAddCourseActivity(this, viewModel.getId(), nextStart);
+            EditCourseViewModel.startAddCourseActivity(this, NEW_COURSE_REQUEST_CODE, viewModel.getId(), nextStart);
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NEW_COURSE_REQUEST_CODE && null != data && data.hasExtra(EditCourseViewModel.EXTRA_KEY_COURSE_ID)) {
+            long courseId = data.getLongExtra(EditCourseViewModel.EXTRA_KEY_COURSE_ID, 0L);
+            EditCourseViewModel.startViewCourseActivity(this, courseId);
+        }
+    }
+
+    private static final int NEW_COURSE_REQUEST_CODE = 1;
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");

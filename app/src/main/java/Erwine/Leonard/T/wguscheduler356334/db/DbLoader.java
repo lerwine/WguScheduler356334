@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
@@ -533,6 +534,16 @@ public class DbLoader {
     public Single<AssessmentDetails> getAssessmentById(long id) {
         Log.d(LOG_TAG, String.format("Called getAssessmentById(%d)", id));
         return appDb.assessmentDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @NonNull
+    public Single<AssessmentDetails> createAssessmentForCourse(long courseId, @Nullable LocalDate goalDate) {
+        Log.d(LOG_TAG, String.format("Called createAssessmentForCourse(%d)", courseId));
+        return Single.fromCallable(() -> {
+            AssessmentDetails assessmentDetails = new AssessmentDetails(appDb.courseDAO().getByIdSynchronous(courseId));
+            assessmentDetails.setGoalDate(goalDate);
+            return assessmentDetails;
+        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     /**

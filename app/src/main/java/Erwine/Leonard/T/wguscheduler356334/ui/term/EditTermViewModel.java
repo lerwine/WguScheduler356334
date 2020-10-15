@@ -12,6 +12,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -53,16 +54,17 @@ public class EditTermViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditTermViewModel.class.getName();
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
+    public static final String EXTRA_KEY_TERM_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_ID, false);
 
-    public static void startAddTermActivity(Context context, @NonNull LocalDate termStart) {
-        Intent intent = new Intent(context, AddTermActivity.class);
+    public static void startAddTermActivity(Fragment fragment, int requestCode, @NonNull LocalDate termStart) {
+        Intent intent = new Intent(fragment.requireContext(), AddTermActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_START, false), LocalDateConverter.fromLocalDate(termStart));
-        context.startActivity(intent);
+        fragment.startActivityForResult(intent, requestCode);
     }
 
     public static void startViewTermActivity(Context context, long termId) {
         Intent intent = new Intent(context, ViewTermActivity.class);
-        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_ID, false), termId);
+        intent.putExtra(EXTRA_KEY_TERM_ID, termId);
         context.startActivity(intent);
     }
 

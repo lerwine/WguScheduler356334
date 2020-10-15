@@ -41,7 +41,7 @@ public class EditTermFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public EditTermFragment() {
-        Log.d(LOG_TAG, "Constructing TermPropertiesFragment");
+        Log.d(LOG_TAG, "Constructing EditTermFragment");
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +56,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 public class ViewCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewCourseActivity.class.getName();
+    private final int NEW_ASSESSMENT_REQUEST_CODE = 1;
 
     private EditCourseViewModel viewModel;
     @SuppressWarnings("FieldCanBeLocal")
@@ -142,7 +144,16 @@ public class ViewCourseActivity extends AppCompatActivity {
         if (null == d && null == (d = viewModel.getExpectedEnd())) {
             d = LocalDate.now();
         }
-        EditAssessmentViewModel.startAddAssessmentActivity(this, viewModel.getId(), d);
+        EditAssessmentViewModel.startAddAssessmentActivity(this, NEW_ASSESSMENT_REQUEST_CODE, viewModel.getId(), d);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NEW_ASSESSMENT_REQUEST_CODE && null != data && data.hasExtra(EditAssessmentViewModel.EXTRA_KEY_ASSESSMENT_ID)) {
+            long assessmentId = data.getLongExtra(EditAssessmentViewModel.EXTRA_KEY_ASSESSMENT_ID, 0L);
+            EditAssessmentViewModel.startViewAssessmentActivity(this, assessmentId);
+        }
     }
 
     private void onAddAlertFloatingActionButtonClick(View view) {

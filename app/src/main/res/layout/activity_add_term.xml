@@ -8,8 +8,8 @@
     tools:context=".AddTermActivity">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/termPropertiesFragmentContainerView"
-        android:name="Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesFragment"
+        android:id="@+id/editTermFragmentContainerView"
+        android:name="Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

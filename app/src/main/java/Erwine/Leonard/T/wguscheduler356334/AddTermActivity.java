@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -103,6 +104,9 @@ public class AddTermActivity extends AppCompatActivity {
     private void onSaveOperationFinished(@NonNull ResourceMessageResult messages) {
         Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
         if (messages.isSucceeded()) {
+            Intent intent = new Intent();
+            intent.putExtra(EditTermViewModel.EXTRA_KEY_TERM_ID, viewModel.getId());
+            setResult(1, intent);
             finish();
         } else {
             Resources resources = getResources();

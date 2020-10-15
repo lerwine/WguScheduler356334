@@ -1,5 +1,6 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.term;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
 public class TermListFragment extends Fragment {
 
+    private static final int NEW_TERM_REQUEST_CODE = 1;
     private final List<TermListItem> mItems;
     private TermListAdapter mAdapter;
     @SuppressWarnings("FieldCanBeLocal")
@@ -73,9 +75,19 @@ public class TermListFragment extends Fragment {
     private void onAddTermButtonClick(View view) {
         //noinspection ConstantConditions
         EditTermViewModel.startAddTermActivity(
-                requireContext(),
+                this,
+                NEW_TERM_REQUEST_CODE,
                 mItems.stream().map(AbstractTermEntity::getEnd).filter(Objects::nonNull).max(LocalDate::compareTo).map(t -> t.plusDays(1L)).orElseGet(LocalDate::now)
         );
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NEW_TERM_REQUEST_CODE && null != data && data.hasExtra(EditTermViewModel.EXTRA_KEY_TERM_ID)) {
+            long termId = data.getLongExtra(EditTermViewModel.EXTRA_KEY_TERM_ID, 0L);
+            EditTermViewModel.startViewTermActivity(requireContext(), termId);
+        }
     }
 
 }
