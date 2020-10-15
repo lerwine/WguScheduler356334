@@ -69,27 +69,26 @@ public class EditTermViewModel extends AndroidViewModel {
     private final DbLoader dbLoader;
     @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
-    private final MutableLiveData<TermEntity> entity;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<Optional<LocalDate>> startDateSubject;
     private final BehaviorSubject<Optional<ResourceMessageFactory>> startMessageOverride;
     private final BehaviorSubject<Optional<LocalDate>> endDateSubject;
     private final BehaviorSubject<Optional<ResourceMessageFactory>> endMessageOverride;
     private final BehaviorSubject<String> notesSubject;
-    @SuppressWarnings("FieldCanBeLocal")
+    private final PrivateLiveData<TermEntity> entity;
+    private final PrivateLiveData<Function<Resources, String>> titleFactory;
+    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactory;
+    private final PrivateLiveData<Boolean> nameValid;
+    private final PrivateLiveData<Optional<ResourceMessageFactory>> startMessage;
+    private final PrivateLiveData<Optional<ResourceMessageFactory>> endMessage;
+    private final PrivateLiveData<Boolean> canShare;
+    private final PrivateLiveData<Boolean> canSave;
+    private final PrivateLiveData<Boolean> hasChanges;
+    private final PrivateLiveData<Boolean> isValid;
+    @NonNull
     private final CurrentValues currentValues;
-
-    private final MutableLiveData<Function<Resources, String>> titleFactory;
-    private final MutableLiveData<Function<Resources, Spanned>> overviewFactory;
-    private final MutableLiveData<Boolean> nameValid;
-    private final MutableLiveData<Optional<ResourceMessageFactory>> startMessage;
-    private final MutableLiveData<Optional<ResourceMessageFactory>> endMessage;
-    private final MutableLiveData<Boolean> canShare;
-    private final MutableLiveData<Boolean> canSave;
-    private final MutableLiveData<Boolean> hasChanges;
-    private final MutableLiveData<Boolean> isValid;
-
-    private TermEntity termEntity;
+    @NonNull
+    private TermEntity originalValues;
 
     private LiveData<List<TermCourseListItem>> coursesLiveData;
     private boolean fromInitializedState;
@@ -98,100 +97,34 @@ public class EditTermViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        entity = new MutableLiveData<>();
         nameSubject = BehaviorSubject.create();
         startDateSubject = BehaviorSubject.create();
         startMessageOverride = BehaviorSubject.create();
         endDateSubject = BehaviorSubject.create();
         endMessageOverride = BehaviorSubject.create();
         notesSubject = BehaviorSubject.create();
+
+        originalValues = new TermEntity();
         currentValues = new CurrentValues();
+        nameSubject.onNext("");
+        startDateSubject.onNext(Optional.empty());
+        startMessageOverride.onNext(Optional.empty());
+        endDateSubject.onNext(Optional.empty());
+        endMessageOverride.onNext(Optional.empty());
+        notesSubject.onNext("");
 
-        Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
-        Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
-        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
-                normalizedNameObservable.map(n -> !n.equals(termEntity.getName())),
-                startDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getStart())),
-                endDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getEnd())),
-                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(termEntity.getNotes())),
-                (n, p, e, s) -> n || p || e || s
-        );
-        Observable<Optional<ResourceMessageFactory>> startMessageObservable = Observable.combineLatest(startMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
-            if (o.isPresent()) {
-                Log.d(LOG_TAG, "startMessageObservable: startMessageOverride.isPresent()=true");
-                return o;
-            }
-            if (s.isPresent()) {
-                LocalDate sd = s.get();
-                if (e.isPresent()) {
-                    LocalDate ed = e.get();
-                    Log.d(LOG_TAG, "startMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
-                            "; endDateSubject=" + ToStringBuilder.toEscapedString(ed, true) + "; startMessageOverride=EMPTY");
-                    if (sd.compareTo(ed) > 0) {
-                        return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
-                    }
-                } else {
-                    Log.d(LOG_TAG, "startMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
-                            "; endDateSubject=EMPTY; startMessageOverride=EMPTY");
-                }
-                return Optional.empty();
-            }
-            if (e.isPresent()) {
-                Log.d(LOG_TAG, "startMessageObservable: startDateSubject=EMPTY; endDateSubject=" + ToStringBuilder.toEscapedString(e.get(), true) +
-                        "; startMessageOverride=EMPTY");
-                return Optional.of(ResourceMessageFactory.ofError(R.string.message_required));
-            }
-            Log.d(LOG_TAG, "startMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; startMessageOverride=EMPTY");
-            return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
-        });
-        Observable<Optional<ResourceMessageFactory>> endMessageObservable = Observable.combineLatest(endMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
-            if (o.isPresent()) {
-                Log.d(LOG_TAG, "endMessageObservable: endMessageOverride.isPresent()=true");
-                return o;
-            }
-            if (s.isPresent()) {
-                LocalDate sd = s.get();
-                if (e.isPresent()) {
-                    LocalDate ed = e.get();
-                    Log.d(LOG_TAG, "endMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
-                            "; endDateSubject=" + ToStringBuilder.toEscapedString(ed, true) + "; endMessageOverride=EMPTY");
-                    if (sd.compareTo(ed) > 0) {
-                        return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
-                    }
-                    return Optional.empty();
-                } else {
-                    Log.d(LOG_TAG, "endMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
-                            "; endDateSubject=EMPTY; endMessageOverride=EMPTY");
-                }
-            } else if (e.isPresent()) {
-                Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=" + ToStringBuilder.toEscapedString(e.get(), true) +
-                        "; endMessageOverride=EMPTY");
-                return Optional.empty();
-            }
-            Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; endMessageOverride=EMPTY");
-            return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
-        });
-        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n && !(s.isPresent() || e.isPresent()));
-
-        nameValid = new MutableLiveData<>();
-        startMessage = new MutableLiveData<>();
-        endMessage = new MutableLiveData<>();
-        hasChanges = new MutableLiveData<>();
-        canShare = new MutableLiveData<>();
-        canSave = new MutableLiveData<>();
-        isValid = new MutableLiveData<>();
-        titleFactory = new MutableLiveData<>();
-        overviewFactory = new MutableLiveData<>();
+        entity = new PrivateLiveData<>();
+        nameValid = new PrivateLiveData<>(false);
+        startMessage = new PrivateLiveData<>(Optional.empty());
+        endMessage = new PrivateLiveData<>(Optional.empty());
+        hasChanges = new PrivateLiveData<>(false);
+        canShare = new PrivateLiveData<>(false);
+        canSave = new PrivateLiveData<>(false);
+        isValid = new PrivateLiveData<>(false);
+        titleFactory = new PrivateLiveData<>();
+        overviewFactory = new PrivateLiveData<>();
 
         compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(validObservable.subscribe(this::onValidChanged));
-        compositeDisposable.add(nameValidObservable.subscribe(nameValid::postValue));
-        compositeDisposable.add(normalizedNameObservable.subscribe(t -> titleFactory.postValue(getViewTitleFactory(t))));
-        compositeDisposable.add(startDateSubject.subscribe(t -> onStartDateChanged(t.orElse(null))));
-        compositeDisposable.add(endDateSubject.subscribe(t -> onEndDateChanged(t.orElse(null))));
-        compositeDisposable.add(hasChangesObservable.subscribe(this::onHasChangesChanged));
-        compositeDisposable.add(startMessageObservable.subscribe(startMessage::postValue));
-        compositeDisposable.add(endMessageObservable.subscribe(endMessage::postValue));
     }
 
     private void onHasChangesChanged(Boolean hasChanges) {
@@ -260,7 +193,7 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public long getId() {
-        return (null == termEntity) ? ID_NEW : termEntity.getId();
+        return originalValues.getId();
     }
 
     @NonNull
@@ -360,7 +293,7 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<AlertListItem>> getAllAlerts() {
-        long id = termEntity.getId();
+        long id = originalValues.getId();
         if (id != ID_NEW) {
             return dbLoader.getAllAlertsByTermId(id);
         }
@@ -374,15 +307,14 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public synchronized Single<TermEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.restoreState");
+        Log.d(LOG_TAG, "Enter initializeViewModelState");
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
-        termEntity = new TermEntity();
         if (null != state) {
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
             if (ID_NEW == id || fromInitializedState) {
-                termEntity.restoreState(state, fromInitializedState);
+                originalValues.restoreState(state, fromInitializedState);
             } else {
                 return dbLoader.getTermById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
@@ -390,67 +322,162 @@ public class EditTermViewModel extends AndroidViewModel {
             }
         }
         coursesLiveData = new MutableLiveData<>(Collections.emptyList());
-        onEntityLoaded(termEntity);
-        return Single.just(termEntity).observeOn(AndroidSchedulers.mainThread());
+        onEntityLoaded(originalValues);
+        return Single.just(originalValues).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void saveViewModelState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         currentValues.saveState(outState, false);
-        termEntity.saveState(outState, true);
+        originalValues.saveState(outState, true);
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter save(" + ToStringBuilder.toEscapedString(ignoreWarnings) + ")");
         LocalDate newStart = currentValues.start;
         LocalDate newEnd = currentValues.end;
-        String originalName = termEntity.getName();
-        LocalDate originalStart = termEntity.getStart();
-        LocalDate originalEnd = termEntity.getEnd();
-        String originalNotes = termEntity.getNotes();
-        termEntity.setName(currentValues.name);
-        termEntity.setStart(newStart);
-        termEntity.setEnd(newEnd);
-        termEntity.setNotes(currentValues.notes);
-        return dbLoader.saveTerm(termEntity, ignoreWarnings).doOnError(throwable -> {
-            termEntity.setName(originalName);
-            termEntity.setStart(originalStart);
-            termEntity.setEnd(originalEnd);
-            termEntity.setNotes(originalNotes);
+        String originalName = originalValues.getName();
+        LocalDate originalStart = originalValues.getStart();
+        LocalDate originalEnd = originalValues.getEnd();
+        String originalNotes = originalValues.getNotes();
+        originalValues.setName(currentValues.name);
+        originalValues.setStart(newStart);
+        originalValues.setEnd(newEnd);
+        originalValues.setNotes(currentValues.notes);
+        return dbLoader.saveTerm(originalValues, ignoreWarnings).doOnError(throwable -> {
+            originalValues.setName(originalName);
+            originalValues.setStart(originalStart);
+            originalValues.setEnd(originalEnd);
+            originalValues.setNotes(originalNotes);
         }).doOnSuccess(t -> {
             if (t.isError() || !(ignoreWarnings || t.isSucceeded())) {
-                termEntity.setName(originalName);
-                termEntity.setStart(originalStart);
-                termEntity.setEnd(originalEnd);
-                termEntity.setNotes(originalNotes);
+                originalValues.setName(originalName);
+                originalValues.setStart(originalStart);
+                originalValues.setEnd(originalEnd);
+                originalValues.setNotes(originalNotes);
             }
         });
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete(" + ToStringBuilder.toEscapedString(ignoreWarnings) + ")");
-        return dbLoader.deleteTerm(termEntity, ignoreWarnings);
+        return dbLoader.deleteTerm(originalValues, ignoreWarnings);
     }
 
     private void onEntityLoadedFromDb(@NonNull TermEntity entity) {
         Log.d(LOG_TAG, "Enter onEntityLoadedFromDb(" + ToStringBuilder.toEscapedString(entity, true) + ")");
-        termEntity = entity;
+        originalValues = entity;
         setName(entity.getName());
         setStart(entity.getStart());
         setEnd(entity.getEnd());
         setNotes(entity.getNotes());
         coursesLiveData = dbLoader.getCoursesByTermId(entity.getId());
-        onEntityLoaded(termEntity);
+        onEntityLoaded(originalValues);
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
+        compositeDisposable.clear();
+
         entity.postValue(termEntity);
+        Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
+        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
+                normalizedNameObservable.map(n -> !n.equals(termEntity.getName())),
+                startDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getStart())),
+                endDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getEnd())),
+                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(termEntity.getNotes())),
+                (n, p, e, s) -> n || p || e || s
+        );
+        Observable<Optional<ResourceMessageFactory>> startMessageObservable = Observable.combineLatest(startMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
+            if (o.isPresent()) {
+                Log.d(LOG_TAG, "startMessageObservable: startMessageOverride.isPresent()=true");
+                return o;
+            }
+            if (s.isPresent()) {
+                LocalDate sd = s.get();
+                if (e.isPresent()) {
+                    LocalDate ed = e.get();
+                    Log.d(LOG_TAG, "startMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=" + ToStringBuilder.toEscapedString(ed, true) + "; startMessageOverride=EMPTY");
+                    if (sd.compareTo(ed) > 0) {
+                        return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
+                    }
+                } else {
+                    Log.d(LOG_TAG, "startMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=EMPTY; startMessageOverride=EMPTY");
+                }
+                return Optional.empty();
+            }
+            if (e.isPresent()) {
+                Log.d(LOG_TAG, "startMessageObservable: startDateSubject=EMPTY; endDateSubject=" + ToStringBuilder.toEscapedString(e.get(), true) +
+                        "; startMessageOverride=EMPTY");
+                return Optional.of(ResourceMessageFactory.ofError(R.string.message_required));
+            }
+            Log.d(LOG_TAG, "startMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; startMessageOverride=EMPTY");
+            return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
+        });
+        Observable<Optional<ResourceMessageFactory>> endMessageObservable = Observable.combineLatest(endMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
+            if (o.isPresent()) {
+                Log.d(LOG_TAG, "endMessageObservable: endMessageOverride.isPresent()=true");
+                return o;
+            }
+            if (s.isPresent()) {
+                LocalDate sd = s.get();
+                if (e.isPresent()) {
+                    LocalDate ed = e.get();
+                    Log.d(LOG_TAG, "endMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=" + ToStringBuilder.toEscapedString(ed, true) + "; endMessageOverride=EMPTY");
+                    if (sd.compareTo(ed) > 0) {
+                        return Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end));
+                    }
+                    return Optional.empty();
+                } else {
+                    Log.d(LOG_TAG, "endMessageObservable: startDateSubject=" + ToStringBuilder.toEscapedString(sd, true) +
+                            "; endDateSubject=EMPTY; endMessageOverride=EMPTY");
+                }
+            } else if (e.isPresent()) {
+                Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=" + ToStringBuilder.toEscapedString(e.get(), true) +
+                        "; endMessageOverride=EMPTY");
+                return Optional.empty();
+            }
+            Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; endMessageOverride=EMPTY");
+            return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
+        });
+        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n && !(s.isPresent() || e.isPresent()));
+
+        compositeDisposable.add(validObservable.subscribe(this::onValidChanged));
+        compositeDisposable.add(nameValidObservable.subscribe(nameValid::postValue));
+        compositeDisposable.add(normalizedNameObservable.subscribe(t -> titleFactory.postValue(getViewTitleFactory(t))));
+        compositeDisposable.add(startDateSubject.subscribe(t -> onStartDateChanged(t.orElse(null))));
+        compositeDisposable.add(endDateSubject.subscribe(t -> onEndDateChanged(t.orElse(null))));
+        compositeDisposable.add(hasChangesObservable.subscribe(this::onHasChangesChanged));
+        compositeDisposable.add(startMessageObservable.subscribe(startMessage::postValue));
+        compositeDisposable.add(endMessageObservable.subscribe(endMessage::postValue));
+
+    }
+
+    private static class PrivateLiveData<T> extends LiveData<T> {
+        PrivateLiveData(T value) {
+            super(value);
+        }
+
+        PrivateLiveData() {
+        }
+
+        @Override
+        public void postValue(T value) {
+            super.postValue(value);
+        }
+
+        @Override
+        public void setValue(T value) {
+            super.setValue(value);
+        }
     }
 
     private class CurrentValues implements Term {
 
-        private Long id;
         @NonNull
         private String name = "";
         private LocalDate start;
@@ -460,15 +487,12 @@ public class EditTermViewModel extends AndroidViewModel {
 
         @Override
         public long getId() {
-            return (null == termEntity) ? id : termEntity.getId();
+            return originalValues.getId();
         }
 
         @Override
         public void setId(long id) {
-            if (null != termEntity) {
-                termEntity.setId(id);
-            }
-            this.id = id;
+            originalValues.setId(id);
         }
 
         @NonNull

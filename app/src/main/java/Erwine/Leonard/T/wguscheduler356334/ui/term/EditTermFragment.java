@@ -66,23 +66,11 @@ public class EditTermFragment extends Fragment {
     }
 
     private void onLoadSuccess(TermEntity entity) {
-        if (null == entity) {
-            return;
-        }
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
-
-        if (viewModel.isFromInitializedState()) {
-            termNameEditText.setText(viewModel.getName());
-            termStartEditText.setSelectedDate(viewModel.getStart());
-            termEndEditText.setSelectedDate(viewModel.getEnd());
-            notesEditText.setText(viewModel.getNotes());
-        } else {
-            termNameEditText.setText(entity.getName());
-            termStartEditText.setSelectedDate(entity.getStart());
-            termEndEditText.setSelectedDate(entity.getEnd());
-            notesEditText.setText(entity.getNotes());
-        }
-
+        termNameEditText.setText(viewModel.getName());
+        termStartEditText.setSelectedDate(viewModel.getStart());
+        termEndEditText.setSelectedDate(viewModel.getEnd());
+        notesEditText.setText(viewModel.getNotes());
         termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
         termStartEditText.setInitialPickerDateFactory(d -> (null == d) ? termEndEditText.getSelectedDate() : d);

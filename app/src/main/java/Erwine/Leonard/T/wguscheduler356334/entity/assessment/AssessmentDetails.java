@@ -275,7 +275,8 @@ public final class AssessmentDetails extends AbstractAssessmentEntity<Assessment
 
     @Override
     public void setCourseId(long courseId) {
-        throw new UnsupportedOperationException();
+        course.setId(courseId);
+        super.setCourseId(courseId);
     }
 
     @NonNull
