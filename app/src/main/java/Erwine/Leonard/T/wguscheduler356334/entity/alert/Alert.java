@@ -6,8 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalTimeConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
@@ -28,6 +31,16 @@ public interface Alert extends IdIndexedEntity {
      * The name of the {@code "customMessage"} database column.
      */
     String COLNAME_CUSTOM_MESSAGE = "customMessage";
+
+    /**
+     * The name of the {@code "notificationId"} database column.
+     */
+    String COLNAME_NOTIFICATION_ID = "notificationId";
+
+    /**
+     * The name of the {@code "alertTime"} database column.
+     */
+    String COLNAME_ALERT_TIME = "alertTime";
 
     static void validate(@NonNull ResourceMessageBuilder builder, @NonNull AlertEntity entity) {
         Boolean subsequent = entity.isSubsequent();
@@ -69,6 +82,25 @@ public interface Alert extends IdIndexedEntity {
 
     void setCustomMessage(@Nullable String customMessage);
 
+    /**
+     * Gets the private request code for broadcast {@link android.app.PendingIntent PendingIntents}. This value must be unique.
+     *
+     * @return The private request code for broadcast {@link android.app.PendingIntent PendingIntents}. This value must be unique.
+     */
+    int getNotificationId();
+
+    /**
+     * Gets the private request code for broadcast {@link android.app.PendingIntent PendingIntents}.
+     *
+     * @param notificationId The new private request code for broadcast {@link android.app.PendingIntent PendingIntents}.
+     */
+    void setNotificationId(int notificationId);
+
+    @Nullable
+    LocalTime getAlertTime();
+
+    void setAlertTime(@Nullable LocalTime alertTime);
+
     @Override
     default void restoreState(@NonNull Bundle bundle, boolean isOriginal) {
         IdIndexedEntity.super.restoreState(bundle, isOriginal);
@@ -78,13 +110,20 @@ public interface Alert extends IdIndexedEntity {
             setTimeSpec(bundle.getLong(stateKey(COLNAME_TIME_SPEC, isOriginal), 0L));
         } else {
             setSubsequent(null);
-            setTimeSpec(bundle.getLong(stateKey(COLNAME_TIME_SPEC, isOriginal), LocalDate.now().toEpochDay()));
+            setTimeSpec(bundle.getLong(stateKey(COLNAME_TIME_SPEC, isOriginal), LocalDateConverter.fromLocalDate(LocalDate.now())));
         }
         key = stateKey(COLNAME_CUSTOM_MESSAGE, isOriginal);
         if (bundle.containsKey(key)) {
             setCustomMessage(bundle.getString(key));
         } else {
             setCustomMessage(null);
+        }
+        setNotificationId(bundle.getInt(stateKey(COLNAME_NOTIFICATION_ID, isOriginal), 0));
+        key = stateKey(COLNAME_ALERT_TIME, isOriginal);
+        if (bundle.containsKey(key)) {
+            setAlertTime(LocalTimeConverter.toLocalTime(bundle.getInt(key, 0)));
+        } else {
+            setAlertTime(null);
         }
     }
 
@@ -100,12 +139,18 @@ public interface Alert extends IdIndexedEntity {
         if (null != message) {
             bundle.putString(stateKey(COLNAME_CUSTOM_MESSAGE, isOriginal), message);
         }
+        bundle.putInt(stateKey(COLNAME_NOTIFICATION_ID, isOriginal), getNotificationId());
+        Integer minutes = LocalTimeConverter.fromLocalTime(getAlertTime());
+        if (null != minutes) {
+            bundle.putInt(stateKey(COLNAME_ALERT_TIME, isOriginal), minutes);
+        }
     }
 
     @Override
     default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
         IdIndexedEntity.super.appendPropertiesAsStrings(sb);
-        sb.append(COLNAME_SUBSEQUENT, isSubsequent()).append(COLNAME_TIME_SPEC, getTimeSpec()).append(COLNAME_CUSTOM_MESSAGE, getCustomMessage());
+        sb.append(COLNAME_SUBSEQUENT, isSubsequent()).append(COLNAME_TIME_SPEC, getTimeSpec()).append(COLNAME_CUSTOM_MESSAGE, getCustomMessage()).append(COLNAME_NOTIFICATION_ID, getNotificationId())
+                .append(COLNAME_ALERT_TIME, getAlertTime());
     }
 
 }

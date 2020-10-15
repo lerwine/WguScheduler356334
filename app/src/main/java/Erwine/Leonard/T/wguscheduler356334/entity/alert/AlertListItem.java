@@ -10,6 +10,7 @@ import androidx.room.DatabaseView;
 import androidx.room.Ignore;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
@@ -17,6 +18,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentTypeConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.CourseStatusConverter;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
@@ -27,7 +29,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_ALERT_LIST,
-        value = "SELECT assessmentAlerts.alertId AS id, assessmentAlerts.targetId, courses.termId, courses.mentorId, assessmentAlerts.notificationId, assessments.type, assessments.code, assessments.name AS title, assessments.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
+        value = "SELECT assessmentAlerts.alertId AS id, assessmentAlerts.targetId, courses.termId, courses.mentorId, alerts.notificationId, assessments.type, assessments.code, assessments.name AS title, assessments.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
                 "\tCASE\n" +
                 "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
                 "\t\tWHEN alerts.subsequent=1 THEN assessments.completionDate\n" +
@@ -39,10 +41,10 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
                 "\t\t\tCASE WHEN assessments.completionDate IS NULL THEN NULL ELSE assessments.completionDate + alerts.timeSpec END\n" +
                 "\t\tELSE\n" +
                 "\t\t\tCASE WHEN assessments.goalDate IS NULL THEN NULL ELSE assessments.goalDate + alerts.timeSpec END\n" +
-                "\tEND as alertDate, 1 as assessment, assessments.courseId\n" +
+                "\tEND as alertDate, alerts.alertTime, 1 as assessment, assessments.courseId\n" +
                 "\tFROM assessmentAlerts LEFT JOIN alerts on assessmentAlerts.alertId=alerts.id LEFT JOIN assessments on assessmentAlerts.targetId=assessments.id\n" +
                 "\tLEFT JOIN courses on assessments.courseId=courses.id\n" +
-                "UNION SELECT courseAlerts.alertId AS id, courseAlerts.targetId, courses.termId, courses.mentorId, courseAlerts.notificationId, NULL as type, courses.number as code, courses.title, courses.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
+                "UNION SELECT courseAlerts.alertId AS id, courseAlerts.targetId, courses.termId, courses.mentorId, alerts.notificationId, NULL as type, courses.number as code, courses.title, courses.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
                 "\tCASE\n" +
                 "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
                 "\t\tWHEN alerts.subsequent=1 THEN\n" +
@@ -64,7 +66,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
                 "\t\t\t\t\tCASE WHEN courses.expectedStart IS NULL THEN NULL ELSE courses.expectedStart + alerts.timeSpec END\n" +
                 "\t\t\t\tELSE courses.actualStart + alerts.timeSpec\n" +
                 "\t\t\tEND\n" +
-                "\tEND as alertDate, 0 as assessment, courseAlerts.targetId as courseId\n" +
+                "\tEND as alertDate, alerts.alertTime, 0 as assessment, courseAlerts.targetId as courseId\n" +
                 "\tFROM courseAlerts LEFT JOIN alerts ON courseAlerts.alertId=alerts.id LEFT JOIN courses ON courseAlerts.targetId=courses.id"
 )
 public final class AlertListItem extends AlertEntity implements Comparable<AlertListItem> {
@@ -80,7 +82,6 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     static final String COLNAME_COURSE_ID = "courseId";
     static final String COLNAME_TERM_ID = "termId";
     static final String COLNAME_MENTOR_ID = "mentorId";
-    static final String COLNAME_NOTIFICATION_ID = "notificationId";
 
     @ColumnInfo(name = COLNAME_TARGET_ID)
     private long targetId;
@@ -107,8 +108,6 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     @ColumnInfo(name = COLNAME_MENTOR_ID)
     @Nullable
     private Long mentorId;
-    @ColumnInfo(name = COLNAME_NOTIFICATION_ID)
-    private int notificationId;
     @Ignore
     private AssessmentStatus assessmentStatus;
     @Ignore
@@ -120,9 +119,9 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     @StringRes
     private int typeDisplayResourceId;
 
-    public AlertListItem(Boolean subsequent, long timeSpec, String customMessage, boolean assessment, @Nullable LocalDate eventDate, @Nullable LocalDate alertDate, String code, String title, AssessmentType type,
-                         int status, long courseId, long termId, @Nullable Long mentorId, long targetId, int notificationId, long id) {
-        super(IdIndexedEntity.assertNotNewId(id), timeSpec, subsequent, customMessage);
+    public AlertListItem(Boolean subsequent, long timeSpec, String customMessage, boolean assessment, @Nullable LocalDate eventDate, @Nullable LocalDate alertDate, @Nullable LocalTime alertTime, String code,
+                         String title, AssessmentType type, int status, long courseId, long termId, @Nullable Long mentorId, long targetId, int notificationId, long id) {
+        super(IdIndexedEntity.assertNotNewId(id), timeSpec, subsequent, customMessage, notificationId, alertTime);
         this.assessment = assessment;
         this.eventDate = eventDate;
         this.alertDate = alertDate;
@@ -133,7 +132,6 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         this.termId = termId;
         this.mentorId = mentorId;
         this.targetId = targetId;
-        this.notificationId = notificationId;
         if (assessment) {
             assessmentStatus = AssessmentStatusConverter.toAssessmentStatus(status);
             courseStatus = CourseStatusConverter.fromAssessmentStatus(assessmentStatus);
@@ -165,17 +163,19 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     public synchronized void setSubsequent(Boolean subsequent) {
         if (null == isSubsequent()) {
             if (null != subsequent) {
-                super.setTimeSpec((null != alertDate && null != eventDate) ? alertDate.toEpochDay() - eventDate.toEpochDay() : 0L);
+                Long a = LocalDateConverter.fromLocalDate(alertDate);
+                Long e = LocalDateConverter.fromLocalDate(eventDate);
+                super.setTimeSpec((null != a && null != e) ? a - e : 0L);
             }
         } else if (null == subsequent) {
             if (null == eventDate) {
                 if (null == alertDate) {
                     super.setTimeSpec(0L);
                 } else {
-                    super.setTimeSpec((eventDate = alertDate).toEpochDay());
+                    super.setTimeSpec(LocalDateConverter.fromLocalDate(eventDate = alertDate));
                 }
             } else {
-                super.setTimeSpec((alertDate = eventDate).toEpochDay());
+                super.setTimeSpec(LocalDateConverter.fromLocalDate(alertDate = eventDate));
             }
         }
         super.setSubsequent(subsequent);
@@ -198,14 +198,6 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         this.targetId = targetId;
     }
 
-    public int getNotificationId() {
-        return notificationId;
-    }
-
-    public void setNotificationId(int notificationId) {
-        this.notificationId = notificationId;
-    }
-
     @Nullable
     public LocalDate getEventDate() {
         return eventDate;
@@ -213,11 +205,15 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
 
     public synchronized void setEventDate(@Nullable LocalDate eventDate) {
         this.eventDate = eventDate;
+        Long e = LocalDateConverter.fromLocalDate(eventDate);
         if (null == isSubsequent()) {
             this.alertDate = eventDate;
-            super.setTimeSpec(((null != eventDate) ? eventDate : LocalDate.now()).toEpochDay());
-        } else if (null != eventDate && null != alertDate) {
-            super.setTimeSpec(eventDate.toEpochDay() - alertDate.toEpochDay());
+            super.setTimeSpec((null != e) ? e : LocalDateConverter.fromLocalDate(LocalDate.now()));
+        } else {
+            Long a = LocalDateConverter.fromLocalDate(alertDate);
+            if (null != e && null != a) {
+                super.setTimeSpec(e - a);
+            }
         }
     }
 
@@ -228,11 +224,15 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
 
     public synchronized void setAlertDate(@Nullable LocalDate alertDate) {
         this.alertDate = alertDate;
+        Long a = LocalDateConverter.fromLocalDate(alertDate);
         if (null == isSubsequent()) {
             this.eventDate = alertDate;
-            super.setTimeSpec(((null != alertDate) ? alertDate : LocalDate.now()).toEpochDay());
-        } else if (null != alertDate && null != eventDate) {
-            super.setTimeSpec(eventDate.toEpochDay() - alertDate.toEpochDay());
+            super.setTimeSpec((null != a) ? a : LocalDateConverter.fromLocalDate(LocalDate.now()));
+        } else {
+            Long e = LocalDateConverter.fromLocalDate(eventDate);
+            if (null != a && null != e) {
+                super.setTimeSpec(e - a);
+            }
         }
     }
 
@@ -240,7 +240,7 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     public synchronized void setTimeSpec(long days) {
         super.setTimeSpec(days);
         if (null == isSubsequent()) {
-            alertDate = eventDate = LocalDate.ofEpochDay(days);
+            alertDate = eventDate = LocalDateConverter.toLocalDate(days);
         } else if (null != eventDate) {
             alertDate = eventDate.plusDays(days);
         } else if (null != alertDate) {
@@ -402,7 +402,7 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         setAssessment(bundle.getBoolean(stateKey(COLNAME_ASSESSMENT, isOriginal), false));
         key = stateKey(COLNAME_EVENT_DATE, isOriginal);
         if (bundle.containsKey(key)) {
-            setEventDate(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setEventDate(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setEventDate(null);
         }
@@ -425,9 +425,9 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         super.saveState(bundle, isOriginal);
         bundle.putLong(stateKey(COLNAME_COURSE_ID, isOriginal), courseId);
         bundle.putBoolean(stateKey(COLNAME_ASSESSMENT, isOriginal), assessment);
-        LocalDate d = eventDate;
+        Long d = LocalDateConverter.fromLocalDate(eventDate);
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_EVENT_DATE, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_EVENT_DATE, isOriginal), d);
         }
         bundle.putString(stateKey(COLNAME_CODE, isOriginal), code);
         String s = title;

@@ -39,6 +39,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -50,21 +51,23 @@ public class EditMentorViewModel extends AndroidViewModel {
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
 
     private final DbLoader dbLoader;
-    private final BehaviorSubject<MentorEntity> currentEntitySubject;
-    private final Observable<Function<Resources, String>> titleFactory;
-    private final Observable<Function<Resources, Spanned>> overviewFactory;
+    private final MutableLiveData<MentorEntity> currentEntitySubject;
+    private final MutableLiveData<Function<Resources, String>> titleFactory;
+    private final MutableLiveData<Function<Resources, Spanned>> overviewFactory;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<String> phoneNumberSubject;
     private final BehaviorSubject<String> emailAddressSubject;
     private final BehaviorSubject<String> notesSubject;
-    private final Observable<Boolean> canShare;
-    private final Observable<Boolean> canSave;
-    private final Observable<String> normalizedName;
+    private final MutableLiveData<Boolean> canShare;
+    private final MutableLiveData<Boolean> canSave;
+    private final MutableLiveData<String> normalizedName;
     private final CurrentValues currentValues;
-    private final Observable<Boolean> nameValid;
-    private final Observable<Boolean> contactValid;
-    private final Observable<Boolean> isValid;
-    private final Observable<Boolean> hasChanges;
+    private final MutableLiveData<Boolean> nameValid;
+    private final MutableLiveData<Boolean> contactValid;
+    private final MutableLiveData<Boolean> isValid;
+    private final MutableLiveData<Boolean> hasChanges;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final CompositeDisposable compositeDisposable;
     private LiveData<List<MentorCourseListItem>> coursesLiveData;
     private MentorEntity mentorEntity;
     private boolean fromInitializedState;
@@ -73,7 +76,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        currentEntitySubject = BehaviorSubject.create();
+        currentEntitySubject = new MutableLiveData<>();
         nameSubject = BehaviorSubject.create();
         phoneNumberSubject = BehaviorSubject.create();
         emailAddressSubject = BehaviorSubject.create();
@@ -93,15 +96,40 @@ public class EditMentorViewModel extends AndroidViewModel {
                 (n, p, e, s) -> n || p || e || s);
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, contactValidObservable, (n, c) -> n && c);
 
-        canShare = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c).observeOn(AndroidSchedulers.mainThread());
-        canSave = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).observeOn(AndroidSchedulers.mainThread());
-        normalizedName = normalizedNameObservable.observeOn(AndroidSchedulers.mainThread());
-        nameValid = nameValidObservable.observeOn(AndroidSchedulers.mainThread());
-        contactValid = contactValidObservable.observeOn(AndroidSchedulers.mainThread());
-        titleFactory = normalizedName.map(this::getViewTitleFactory).observeOn(AndroidSchedulers.mainThread());
-        overviewFactory = Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable, this::getOverviewFactory).observeOn(AndroidSchedulers.mainThread());
-        isValid = validObservable.observeOn(AndroidSchedulers.mainThread());
-        hasChanges = hasChangesObservable.observeOn(AndroidSchedulers.mainThread());
+        hasChanges = new MutableLiveData<>();
+        canShare = new MutableLiveData<>();
+        canSave = new MutableLiveData<>();
+        isValid = new MutableLiveData<>();
+        nameValid = new MutableLiveData<>();
+        normalizedName = new MutableLiveData<>();
+        contactValid = new MutableLiveData<>();
+        titleFactory = new MutableLiveData<>();
+        overviewFactory = new MutableLiveData<>();
+
+        compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(hasChangesObservable.subscribe(this::onHasChangesChanged));
+        compositeDisposable.add(validObservable.subscribe(this::onValidChanged));
+        compositeDisposable.add(nameValidObservable.subscribe(nameValid::postValue));
+        compositeDisposable.add(normalizedNameObservable.subscribe(normalizedName::postValue));
+        compositeDisposable.add(contactValidObservable.subscribe(contactValid::postValue));
+        compositeDisposable.add(Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable, this::getOverviewFactory)
+                .subscribe(overviewFactory::postValue));
+    }
+
+    private void onHasChangesChanged(Boolean hasChanges) {
+        boolean c = Boolean.TRUE.equals(hasChanges);
+        boolean v = Boolean.TRUE.equals(isValid.getValue());
+        this.hasChanges.postValue(c);
+        canShare.postValue(v && !c);
+        canSave.postValue(v && c);
+    }
+
+    private void onValidChanged(Boolean isValid) {
+        boolean c = Boolean.TRUE.equals(hasChanges.getValue());
+        boolean v = Boolean.TRUE.equals(isValid);
+        this.isValid.postValue(v);
+        canShare.postValue(v && !c);
+        canSave.postValue(v && c);
     }
 
     @NonNull
@@ -182,39 +210,39 @@ public class EditMentorViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
-    public Observable<Boolean> getNameValid() {
+    public LiveData<Boolean> getNameValid() {
         return nameValid;
     }
 
-    public Observable<Boolean> getContactValid() {
+    public LiveData<Boolean> getContactValid() {
         return contactValid;
     }
 
-    public Observable<Function<Resources, String>> getTitleFactory() {
+    public LiveData<Function<Resources, String>> getTitleFactory() {
         return titleFactory;
     }
 
-    public Observable<Function<Resources, Spanned>> getOverviewFactory() {
+    public LiveData<Function<Resources, Spanned>> getOverviewFactory() {
         return overviewFactory;
     }
 
-    public Observable<String> getNormalizedName() {
+    public LiveData<String> getNormalizedName() {
         return normalizedName;
     }
 
-    public Observable<Boolean> getIsValid() {
+    public LiveData<Boolean> getIsValid() {
         return isValid;
     }
 
-    public Observable<Boolean> getCanShare() {
+    public LiveData<Boolean> getCanShare() {
         return canShare;
     }
 
-    public Observable<Boolean> getCanSave() {
+    public LiveData<Boolean> getCanSave() {
         return canSave;
     }
 
-    public Observable<Boolean> getHasChanges() {
+    public LiveData<Boolean> getHasChanges() {
         return hasChanges;
     }
 
@@ -237,7 +265,7 @@ public class EditMentorViewModel extends AndroidViewModel {
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
             }
         }
-        currentEntitySubject.onNext(mentorEntity);
+        currentEntitySubject.postValue(mentorEntity);
         coursesLiveData = new MutableLiveData<>(Collections.emptyList());
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
@@ -275,7 +303,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         setPhoneNumber(entity.getPhoneNumber());
         setEmailAddress(entity.getEmailAddress());
         coursesLiveData = dbLoader.getCoursesByMentorId(entity.getId());
-        currentEntitySubject.onNext(mentorEntity);
+        currentEntitySubject.postValue(mentorEntity);
     }
 
     public void saveState(Bundle outState) {

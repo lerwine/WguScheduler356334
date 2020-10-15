@@ -73,4 +73,7 @@ public interface AlertDAO {
     @Query("SELECT * FROM alertListView WHERE eventDate IS NULL ORDER BY code, title")
     LiveData<List<AlertListItem>> getDatePendingAlerts();
 
+    @Query("SELECT COUNT(id) FROM alerts WHERE  notificationId=:notificationId")
+    int countByNotificationId(int notificationId);
+
 }

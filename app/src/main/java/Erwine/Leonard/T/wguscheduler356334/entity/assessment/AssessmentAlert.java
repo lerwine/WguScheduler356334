@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
@@ -101,7 +102,7 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     public void calculate(AssessmentAlertListViewModel viewModel) {
         Boolean subsequent = alert.isSubsequent();
         if (null == subsequent) {
-            alertDate = LocalDate.ofEpochDay(alert.getTimeSpec());
+            alertDate = LocalDateConverter.toLocalDate(alert.getTimeSpec());
             relativeDays = 0L;
         } else {
             relativeDays = alert.getTimeSpec();

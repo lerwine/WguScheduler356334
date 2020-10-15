@@ -35,6 +35,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
@@ -58,8 +59,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
-import static Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.DATE_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment.NUMBER_FORMATTER;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
@@ -76,7 +77,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         Log.d(LOG_TAG, String.format("Enter startAddCourseActivity(context, %d, %s)", termId, expectedStart));
         Intent intent = new Intent(context, AddCourseActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false), termId);
-        intent.putExtra(CourseDetails.COLNAME_EXPECTED_START, expectedStart.toEpochDay());
+        intent.putExtra(CourseDetails.COLNAME_EXPECTED_START, LocalDateConverter.fromLocalDate(expectedStart));
         context.startActivity(intent);
     }
 
@@ -493,16 +494,16 @@ public class EditCourseViewModel extends AndroidViewModel {
             result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
         } else if (null != (date = currentValues.getExpectedStart())) {
             result.append("Expected Start: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
-                    .append(DATE_FORMATTER.format(date));
+                    .append(LONG_FORMATTER.format(date));
             switch (status) {
                 case IN_PROGRESS:
                 case NOT_PASSED:
                 case PASSED:
-                    result.append(DATE_FORMATTER.format(date)).append(" (actual start date missing)",
+                    result.append(LONG_FORMATTER.format(date)).append(" (actual start date missing)",
                             new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
                     break;
                 default:
-                    result.append(DATE_FORMATTER.format(date));
+                    result.append(LONG_FORMATTER.format(date));
                     break;
             }
         } else {
@@ -529,15 +530,15 @@ public class EditCourseViewModel extends AndroidViewModel {
                 result.append("; ");
             }
             result.append("Expected End: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
-                    .append(DATE_FORMATTER.format(date));
+                    .append(LONG_FORMATTER.format(date));
             switch (status) {
                 case NOT_PASSED:
                 case PASSED:
-                    result.append(DATE_FORMATTER.format(date)).append(" (actual end date missing)",
+                    result.append(LONG_FORMATTER.format(date)).append(" (actual end date missing)",
                             new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
                     break;
                 default:
-                    result.append(DATE_FORMATTER.format(date));
+                    result.append(LONG_FORMATTER.format(date));
                     break;
             }
         } else {

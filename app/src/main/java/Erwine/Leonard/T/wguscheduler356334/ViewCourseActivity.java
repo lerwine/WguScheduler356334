@@ -18,12 +18,14 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
@@ -43,8 +45,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
-import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
 
 /**
  * Views course information in 2 tabs: {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment}.
@@ -164,23 +166,23 @@ public class ViewCourseActivity extends AppCompatActivity {
             String title = sb.toString();
             LocalDate date = viewModel.getActualStart();
             if (null != date) {
-                sb.append("\nStarted: ").append(FORMATTER.format(date));
+                sb.append("\nStarted: ").append(LONG_FORMATTER.format(date));
                 if (null != (date = viewModel.getActualEnd())) {
-                    sb.append("; Ended: ").append(FORMATTER.format(date));
+                    sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
                 } else if (null != (date = viewModel.getExpectedEnd())) {
-                    sb.append("; Expected End: ").append(FORMATTER.format(date));
+                    sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
                 }
             } else if (null != (date = viewModel.getExpectedStart())) {
-                sb.append("\nExpected Start: ").append(FORMATTER.format(date));
+                sb.append("\nExpected Start: ").append(LONG_FORMATTER.format(date));
                 if (null != (date = viewModel.getActualEnd())) {
-                    sb.append("; Ended: ").append(FORMATTER.format(date));
+                    sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
                 } else if (null != (date = viewModel.getExpectedEnd())) {
-                    sb.append("; Expected End: ").append(FORMATTER.format(date));
+                    sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
                 }
             } else if (null != (date = viewModel.getActualEnd())) {
-                sb.append("\nEnded: ").append(FORMATTER.format(date));
+                sb.append("\nEnded: ").append(LONG_FORMATTER.format(date));
             } else if (null != (date = viewModel.getExpectedEnd())) {
-                sb.append("\nExpected End: ").append(FORMATTER.format(date));
+                sb.append("\nExpected End: ").append(LONG_FORMATTER.format(date));
             }
             sb.append("\nStatus:").append(resources.getString(viewModel.getStatus().displayResourceId()));
             AbstractMentorEntity<?> mentorEntity = viewModel.getSelectedMentor();
@@ -203,12 +205,12 @@ public class ViewCourseActivity extends AppCompatActivity {
             sb.append("\n").append((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t);
             date = termEntity.getStart();
             if (null != date) {
-                sb.append("\n\tStart: ").append(FORMATTER.format(date));
+                sb.append("\n\tStart: ").append(LONG_FORMATTER.format(date));
                 if (null != (date = termEntity.getEnd())) {
-                    sb.append("; End: ").append(FORMATTER.format(date));
+                    sb.append("; End: ").append(LONG_FORMATTER.format(date));
                 }
             } else if (null != (date = termEntity.getEnd())) {
-                sb.append("\n\tEnd: ").append(FORMATTER.format(date));
+                sb.append("\n\tEnd: ").append(LONG_FORMATTER.format(date));
             }
             if (!assessments.isEmpty()) {
                 sb.append("\nAssessments:").append(s);
@@ -221,12 +223,12 @@ public class ViewCourseActivity extends AppCompatActivity {
                     }
                     date = a.getCompletionDate();
                     if (null != date) {
-                        sb.append("\n\t\tCompleted: ").append(FORMATTER.format(date));
+                        sb.append("\n\t\tCompleted: ").append(LONG_FORMATTER.format(date));
                         if (null != (date = a.getGoalDate())) {
-                            sb.append("; Goal Date: ").append(FORMATTER.format(date));
+                            sb.append("; Goal Date: ").append(LONG_FORMATTER.format(date));
                         }
                     } else if (null != (date = a.getGoalDate())) {
-                        sb.append("\n\t\tGoal Date: ").append(FORMATTER.format(date));
+                        sb.append("\n\t\tGoal Date: ").append(LONG_FORMATTER.format(date));
                     }
                     sb.append("\n\t\tStatus:").append(resources.getString(a.getStatus().displayResourceId()));
                 }
@@ -291,32 +293,37 @@ public class ViewCourseActivity extends AppCompatActivity {
                     OneTimeObservers.observeOnce(viewModel.getAllCourseAlerts(), alerts -> {
                         CourseAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
                         if (alertsAfterSave.length > 0) {
-                            OneTimeObservers.subscribeOnce(DbLoader.getPreferAlertTime(), localTime -> {
+                            OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> {
                                 if (alertsBeforeSave.length > 0) {
                                     Map<Long, CourseAlert> beforeSaveMap = EntityHelper.mapById(Arrays.stream(alertsBeforeSave), t -> t.getLink().getAlertId());
                                     Map<Long, CourseAlert> afterSaveMap = EntityHelper.mapById(Arrays.stream(alertsAfterSave), t -> t.getLink().getAlertId());
                                     beforeSaveMap.keySet().forEach(k -> {
                                         CourseAlert b = Objects.requireNonNull(beforeSaveMap.get(k));
                                         if (!afterSaveMap.containsKey(k)) {
-                                            CourseAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), ViewCourseActivity.this);
+                                            CourseAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), b.getAlert().getNotificationId(), ViewCourseActivity.this);
                                         }
                                     });
                                     afterSaveMap.keySet().forEach(k -> {
                                         CourseAlert a = Objects.requireNonNull(afterSaveMap.get(k));
-                                        if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()))) {
-                                            CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), localTime), a.getLink(), ViewCourseActivity.this);
+                                        AlertEntity alert = a.getAlert();
+                                        LocalTime alertTime = alert.getAlertTime();
+                                        if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()) &&
+                                                Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlert().getAlertTime(), alertTime))) {
+                                            CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
                                         }
                                     });
                                 } else {
                                     for (CourseAlert a : alertsAfterSave) {
-                                        CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), localTime), a.getLink(), ViewCourseActivity.this);
+                                        AlertEntity alert = a.getAlert();
+                                        LocalTime alertTime = alert.getAlertTime();
+                                        CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
                                     }
                                 }
                                 finish();
                             });
                         } else if (alertsBeforeSave.length > 0) {
                             for (CourseAlert a : alertsBeforeSave) {
-                                CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), ViewCourseActivity.this);
+                                CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewCourseActivity.this);
                             }
                             finish();
                         }

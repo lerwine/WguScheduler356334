@@ -17,8 +17,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +29,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
@@ -44,19 +43,20 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditTermViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditTermViewModel.class.getName();
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
 
     public static void startAddTermActivity(Context context, @NonNull LocalDate termStart) {
         Intent intent = new Intent(context, AddTermActivity.class);
-        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_START, false), termStart.toEpochDay());
+        intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_START, false), LocalDateConverter.fromLocalDate(termStart));
         context.startActivity(intent);
     }
 
@@ -67,7 +67,9 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     private final DbLoader dbLoader;
-    private final BehaviorSubject<TermEntity> entitySubject;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final CompositeDisposable compositeDisposable;
+    private final MutableLiveData<TermEntity> entity;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<Optional<LocalDate>> startDateSubject;
     private final BehaviorSubject<Optional<ResourceMessageFactory>> startMessageOverride;
@@ -77,16 +79,15 @@ public class EditTermViewModel extends AndroidViewModel {
     @SuppressWarnings("FieldCanBeLocal")
     private final CurrentValues currentValues;
 
-    private final Observable<TermEntity> entity;
-    private final Observable<Function<Resources, String>> titleFactory;
-    private final Observable<Function<Resources, Spanned>> overviewFactory;
-    private final Observable<Boolean> nameValid;
-    private final Observable<Optional<ResourceMessageFactory>> startMessage;
-    private final Observable<Optional<ResourceMessageFactory>> endMessage;
-    private final Observable<Boolean> canShare;
-    private final Observable<Boolean> canSave;
-    private final Observable<Boolean> hasChanges;
-    private final Observable<Boolean> isValid;
+    private final MutableLiveData<Function<Resources, String>> titleFactory;
+    private final MutableLiveData<Function<Resources, Spanned>> overviewFactory;
+    private final MutableLiveData<Boolean> nameValid;
+    private final MutableLiveData<Optional<ResourceMessageFactory>> startMessage;
+    private final MutableLiveData<Optional<ResourceMessageFactory>> endMessage;
+    private final MutableLiveData<Boolean> canShare;
+    private final MutableLiveData<Boolean> canSave;
+    private final MutableLiveData<Boolean> hasChanges;
+    private final MutableLiveData<Boolean> isValid;
 
     private TermEntity termEntity;
 
@@ -97,7 +98,7 @@ public class EditTermViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        entitySubject = BehaviorSubject.create();
+        entity = new MutableLiveData<>();
         nameSubject = BehaviorSubject.create();
         startDateSubject = BehaviorSubject.create();
         startMessageOverride = BehaviorSubject.create();
@@ -108,6 +109,13 @@ public class EditTermViewModel extends AndroidViewModel {
 
         Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
+        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
+                normalizedNameObservable.map(n -> !n.equals(termEntity.getName())),
+                startDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getStart())),
+                endDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getEnd())),
+                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(termEntity.getNotes())),
+                (n, p, e, s) -> n || p || e || s
+        );
         Observable<Optional<ResourceMessageFactory>> startMessageObservable = Observable.combineLatest(startMessageOverride, startDateSubject, endDateSubject, (o, s, e) -> {
             if (o.isPresent()) {
                 Log.d(LOG_TAG, "startMessageObservable: startMessageOverride.isPresent()=true");
@@ -163,25 +171,55 @@ public class EditTermViewModel extends AndroidViewModel {
             Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; endMessageOverride=EMPTY");
             return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
         });
-        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
-                normalizedNameObservable.map(n -> !n.equals(termEntity.getName())),
-                startDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getStart())),
-                endDateSubject.map(o -> !Objects.equals(o.orElse(null), termEntity.getEnd())),
-                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(termEntity.getNotes())),
-                (n, p, e, s) -> n || p || e || s
-        );
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n && !(s.isPresent() || e.isPresent()));
 
-        nameValid = nameValidObservable.observeOn(AndroidSchedulers.mainThread());
-        entity = entitySubject.observeOn(AndroidSchedulers.mainThread());
-        startMessage = startMessageObservable.observeOn(AndroidSchedulers.mainThread());
-        endMessage = endMessageObservable.observeOn(AndroidSchedulers.mainThread());
-        hasChanges = hasChangesObservable.observeOn(AndroidSchedulers.mainThread());
-        canShare = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c).observeOn(AndroidSchedulers.mainThread());
-        canSave = Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).observeOn(AndroidSchedulers.mainThread());
-        isValid = validObservable.observeOn(AndroidSchedulers.mainThread());
-        titleFactory = normalizedNameObservable.map(this::getViewTitleFactory).observeOn(AndroidSchedulers.mainThread());
-        overviewFactory = Observable.combineLatest(startDateSubject, endDateSubject, (s, e) -> getOverviewFactory(s.orElse(null), e.orElse(null))).observeOn(AndroidSchedulers.mainThread());
+        nameValid = new MutableLiveData<>();
+        startMessage = new MutableLiveData<>();
+        endMessage = new MutableLiveData<>();
+        hasChanges = new MutableLiveData<>();
+        canShare = new MutableLiveData<>();
+        canSave = new MutableLiveData<>();
+        isValid = new MutableLiveData<>();
+        titleFactory = new MutableLiveData<>();
+        overviewFactory = new MutableLiveData<>();
+
+        compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(validObservable.subscribe(this::onValidChanged));
+        compositeDisposable.add(nameValidObservable.subscribe(nameValid::postValue));
+        compositeDisposable.add(normalizedNameObservable.subscribe(t -> titleFactory.postValue(getViewTitleFactory(t))));
+        compositeDisposable.add(startDateSubject.subscribe(t -> onStartDateChanged(t.orElse(null))));
+        compositeDisposable.add(endDateSubject.subscribe(t -> onEndDateChanged(t.orElse(null))));
+        compositeDisposable.add(hasChangesObservable.subscribe(this::onHasChangesChanged));
+        compositeDisposable.add(startMessageObservable.subscribe(startMessage::postValue));
+        compositeDisposable.add(endMessageObservable.subscribe(endMessage::postValue));
+    }
+
+    private void onHasChangesChanged(Boolean hasChanges) {
+        boolean c = Boolean.TRUE.equals(hasChanges);
+        boolean v = Boolean.TRUE.equals(isValid.getValue());
+        this.hasChanges.postValue(c);
+        canShare.postValue(v && !c);
+        canSave.postValue(v && c);
+    }
+
+    private void onValidChanged(Boolean isValid) {
+        boolean c = Boolean.TRUE.equals(hasChanges.getValue());
+        boolean v = Boolean.TRUE.equals(isValid);
+        this.isValid.postValue(v);
+        canShare.postValue(v && !c);
+        canSave.postValue(v && c);
+    }
+
+    private void onStartDateChanged(@Nullable LocalDate localDate) {
+        onDateRangeChanged(localDate, endDateSubject.getValue().orElse(null));
+    }
+
+    private void onEndDateChanged(@Nullable LocalDate localDate) {
+        onDateRangeChanged(startDateSubject.getValue().orElse(null), localDate);
+    }
+
+    private void onDateRangeChanged(@Nullable LocalDate s, @Nullable LocalDate e) {
+        overviewFactory.postValue(getOverviewFactory(s, e));
     }
 
     @NonNull
@@ -200,12 +238,12 @@ public class EditTermViewModel extends AndroidViewModel {
                     if (null == endDate) {
                         result = Html.fromHtml(resources.getString(R.string.html_no_dates_specified), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
                     } else {
-                        result = new SpannedString(resources.getString(R.string.format_ends_on, FORMATTER.format(endDate)));
+                        result = new SpannedString(resources.getString(R.string.format_ends_on, FULL_FORMATTER.format(endDate)));
                     }
                 } else if (null != endDate) {
-                    result = new SpannedString(resources.getString(R.string.format_range_start_to_end, FORMATTER.format(startDate), FORMATTER.format(endDate)));
+                    result = new SpannedString(resources.getString(R.string.format_range_start_to_end, FULL_FORMATTER.format(startDate), FULL_FORMATTER.format(endDate)));
                 } else {
-                    result = new SpannedString(resources.getString(R.string.format_starts_on, FORMATTER.format(startDate)));
+                    result = new SpannedString(resources.getString(R.string.format_starts_on, FULL_FORMATTER.format(startDate)));
                 }
                 return result;
             }
@@ -277,39 +315,39 @@ public class EditTermViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
-    public Observable<Boolean> getNameValid() {
+    public LiveData<Boolean> getNameValid() {
         return nameValid;
     }
 
-    public Observable<Optional<ResourceMessageFactory>> getStartMessage() {
+    public LiveData<Optional<ResourceMessageFactory>> getStartMessage() {
         return startMessage;
     }
 
-    public Observable<Optional<ResourceMessageFactory>> getEndMessage() {
+    public LiveData<Optional<ResourceMessageFactory>> getEndMessage() {
         return endMessage;
     }
 
-    public Observable<Boolean> getCanSave() {
+    public LiveData<Boolean> getCanSave() {
         return canSave;
     }
 
-    public Observable<Boolean> getCanShare() {
+    public LiveData<Boolean> getCanShare() {
         return canShare;
     }
 
-    public Observable<Boolean> getHasChanges() {
+    public LiveData<Boolean> getHasChanges() {
         return hasChanges;
     }
 
-    public Observable<Function<Resources, String>> getTitleFactory() {
+    public LiveData<Function<Resources, String>> getTitleFactory() {
         return titleFactory;
     }
 
-    public Observable<Function<Resources, Spanned>> getOverviewFactory() {
+    public LiveData<Function<Resources, Spanned>> getOverviewFactory() {
         return overviewFactory;
     }
 
-    public Observable<TermEntity> getEntity() {
+    public LiveData<TermEntity> getEntity() {
         return entity;
     }
 
@@ -331,7 +369,7 @@ public class EditTermViewModel extends AndroidViewModel {
         return result;
     }
 
-    public Observable<Boolean> getIsValid() {
+    public LiveData<Boolean> getIsValid() {
         return isValid;
     }
 
@@ -392,7 +430,7 @@ public class EditTermViewModel extends AndroidViewModel {
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete(" + ToStringBuilder.toEscapedString(ignoreWarnings) + ")");
-        return dbLoader.deleteTerm(entitySubject.getValue(), ignoreWarnings);
+        return dbLoader.deleteTerm(termEntity, ignoreWarnings);
     }
 
     private void onEntityLoadedFromDb(@NonNull TermEntity entity) {
@@ -407,7 +445,7 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
-        entitySubject.onNext(termEntity);
+        entity.postValue(termEntity);
     }
 
     private class CurrentValues implements Term {

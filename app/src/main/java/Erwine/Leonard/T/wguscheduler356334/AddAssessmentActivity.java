@@ -17,13 +17,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class AddAssessmentActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddAssessmentActivity.class.getName();
-    private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
     private AlertDialog waitDialog;
     private FloatingActionButton saveFloatingActionButton;
@@ -34,8 +33,6 @@ public class AddAssessmentActivity extends AppCompatActivity {
      */
     public AddAssessmentActivity() {
         Log.d(LOG_TAG, "Constructing AddAssessmentActivity");
-        // TODO: Use OneTimeObserver instead
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -49,10 +46,10 @@ public class AddAssessmentActivity extends AppCompatActivity {
         }
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditAssessmentViewModel.class);
-        compositeDisposable.clear();
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        compositeDisposable.add(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()).subscribe(this::onAssessmentLoadSuccess, this::onAssessmentLoadFailed));
+        OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()),
+                this::onAssessmentLoadSuccess, this::onAssessmentLoadFailed);
     }
 
     @Override
@@ -81,18 +78,16 @@ public class AddAssessmentActivity extends AppCompatActivity {
 
     private void confirmSave() {
         if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () -> {
-                compositeDisposable.clear();
-                compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
-            }, null);
+            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
+                    .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.save(false),
+                            this::onSaveOperationFinished, this::onSaveFailed), null);
         } else {
             finish();
         }
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.save(false).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+        OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onAssessmentLoadSuccess(AssessmentDetails entity) {
@@ -122,8 +117,8 @@ public class AddAssessmentActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(viewModel.save(true).subscribe(this::onSaveOperationFinished, this::onSaveFailed));
+                            OneTimeObservers.subscribeOnce(viewModel.save(true),
+                                    this::onSaveOperationFinished, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

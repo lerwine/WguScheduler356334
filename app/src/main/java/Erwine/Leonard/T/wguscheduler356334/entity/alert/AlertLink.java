@@ -24,11 +24,6 @@ public interface AlertLink extends ToStringBuildable {
      */
     String COLNAME_TARGET_ID = "targetId";
 
-    /**
-     * The name of the {@code "notificationId"} database column.
-     */
-    String COLNAME_NOTIFICATION_ID = "notificationId";
-
     static void validate(@NonNull ResourceMessageBuilder builder, @NonNull AlertLinkEntity<?> entity) {
         AlertLink link = entity.getLink();
         long id = link.getTargetId();
@@ -49,20 +44,6 @@ public interface AlertLink extends ToStringBuildable {
     long getTargetId();
 
     void setTargetId(long targetId);
-
-    /**
-     * Gets the private request code for broadcast {@link android.app.PendingIntent PendingIntents}. This value must be unique.
-     *
-     * @return The private request code for broadcast {@link android.app.PendingIntent PendingIntents}. This value must be unique.
-     */
-    int getNotificationId();
-
-    /**
-     * Gets the private request code for broadcast {@link android.app.PendingIntent PendingIntents}.
-     *
-     * @param notificationId The new private request code for broadcast {@link android.app.PendingIntent PendingIntents}.
-     */
-    void setNotificationId(int notificationId);
 
     @NonNull
     String dbTableName();
@@ -86,8 +67,7 @@ public interface AlertLink extends ToStringBuildable {
     }
 
     default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
-        sb.append(COLNAME_ALERT_ID, getAlertId())
-                .append(COLNAME_TARGET_ID, getTargetId());
+        sb.append(COLNAME_ALERT_ID, getAlertId()).append(COLNAME_TARGET_ID, getTargetId());
     }
 
 }

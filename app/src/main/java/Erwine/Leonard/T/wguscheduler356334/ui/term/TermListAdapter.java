@@ -10,16 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
+
 public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHolder> {
 
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<TermListItem> entityList;
     private final Context context;
 
@@ -70,12 +69,12 @@ public class TermListAdapter extends RecyclerView.Adapter<TermListAdapter.ViewHo
                 if (null == end) {
                     termRangeTextView.setText(R.string.label_unknown_to_unknown_range);
                 } else {
-                    termRangeTextView.setText(context.getResources().getString(R.string.format_range_unknown_to_end, FORMATTER.format(end)));
+                    termRangeTextView.setText(context.getResources().getString(R.string.format_range_unknown_to_end, FULL_FORMATTER.format(end)));
                 }
             } else if (null == end) {
-                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_to_unknown, FORMATTER.format(start)));
+                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_to_unknown, FULL_FORMATTER.format(start)));
             } else {
-                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_to_end, FORMATTER.format(start), FORMATTER.format(end)));
+                termRangeTextView.setText(context.getResources().getString(R.string.format_range_start_to_end, FULL_FORMATTER.format(start), FULL_FORMATTER.format(end)));
             }
         }
 

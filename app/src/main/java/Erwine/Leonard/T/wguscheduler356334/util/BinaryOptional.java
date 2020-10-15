@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -211,6 +212,11 @@ public abstract class BinaryOptional<T, U> {
         };
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static <T, U> BinaryOptional<T, U> asPrimary(@NonNull Optional<T> value) {
+        return value.map(BinaryOptional::<T, U>ofPrimary).orElse(BinaryOptional.empty());
+    }
+
     public static <T, U> BinaryOptional<T, U> ofPrimaryNullable(@Nullable T value) {
         if (null == value) {
             return empty();
@@ -304,6 +310,11 @@ public abstract class BinaryOptional<T, U> {
         };
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static <T, U> BinaryOptional<T, U> asSecondary(@NonNull Optional<U> value) {
+        return value.map(BinaryOptional::<T, U>ofSecondary).orElse(BinaryOptional.empty());
+    }
+
     public static <T, U> BinaryOptional<T, U> ofSecondaryNullable(@Nullable U value) {
         if (null == value) {
             return empty();
@@ -333,6 +344,14 @@ public abstract class BinaryOptional<T, U> {
     public abstract void ifPresent(@NonNull Consumer<T> ifPrimary, @NonNull Consumer<U> ifSecondary);
 
     public abstract void switchPresence(@NonNull Consumer<T> ifPrimary, @NonNull Consumer<U> ifSecondary, @NonNull Action ifNotPresent);
+
+    public Optional<T> ofPrimary() {
+        return flatMap(Optional::of, s -> Optional.empty(), Optional::empty);
+    }
+
+    public Optional<U> ofSecondary() {
+        return flatMap(s -> Optional.empty(), Optional::of, Optional::empty);
+    }
 
     public abstract <R> BinaryOptional<R, U> mapPrimary(@NonNull Function<T, R> mapper);
 

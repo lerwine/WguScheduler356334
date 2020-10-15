@@ -62,7 +62,7 @@ public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends Aler
                     .setContentTitle(getNotificationTitle(entity, context))
                     .build();
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.notify(entity.getLink().getNotificationId(), n);
+            notificationManager.notify(entity.getAlert().getNotificationId(), n);
         }, throwable -> Log.e(LOG_TAG, "Error loading alert", throwable));
     }
 

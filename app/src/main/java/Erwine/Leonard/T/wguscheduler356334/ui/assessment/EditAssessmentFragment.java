@@ -20,8 +20,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.chip.Chip;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,17 +30,15 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-import io.reactivex.disposables.CompositeDisposable;
+
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 
 public class EditAssessmentFragment extends Fragment {
 
     private static final String LOG_TAG = EditAssessmentFragment.class.getName();
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
 
-    @SuppressWarnings("FieldCanBeLocal")
-    // TODO: Use OneTimeObserver instead
-    private final CompositeDisposable compositeDisposable;
     private EditAssessmentViewModel viewModel;
     private Button courseButton;
     private EditText codeEditText;
@@ -53,7 +49,6 @@ public class EditAssessmentFragment extends Fragment {
     private EditText notesEditText;
 
     public EditAssessmentFragment() {
-        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -108,8 +103,7 @@ public class EditAssessmentFragment extends Fragment {
 
     private void onCourseButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onCourseButtonClick");
-        compositeDisposable.clear();
-        compositeDisposable.add(viewModel.loadCourses().subscribe(this::onCoursesLoadedForPicker, this::onLoadCourseOptionsListError));
+        OneTimeObservers.subscribeOnce(viewModel.loadCourses(), this::onCoursesLoadedForPicker, this::onLoadCourseOptionsListError);
     }
 
     private void onCoursesLoadedForPicker(List<TermCourseListItem> termCourseListItems) {
@@ -236,7 +230,7 @@ public class EditAssessmentFragment extends Fragment {
             completionDateChip.setCloseIconVisible(false);
         } else {
             Log.d(LOG_TAG, String.format("Enter onCompletionDateChanged(%s)", d));
-            completionDateChip.setText(FORMATTER.format(d));
+            completionDateChip.setText(FULL_FORMATTER.format(d));
             completionDateChip.setCloseIconVisible(true);
         }
     }
@@ -249,7 +243,7 @@ public class EditAssessmentFragment extends Fragment {
             goalDateChip.setCloseIconVisible(false);
         } else {
             Log.d(LOG_TAG, String.format("Enter onGoalDateChanged(%s)", d));
-            goalDateChip.setText(FORMATTER.format(d));
+            goalDateChip.setText(FULL_FORMATTER.format(d));
             goalDateChip.setCloseIconVisible(true);
         }
     }

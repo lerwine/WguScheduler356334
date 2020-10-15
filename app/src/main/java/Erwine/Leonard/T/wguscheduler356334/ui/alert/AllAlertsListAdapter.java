@@ -9,17 +9,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 
 public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdapter.ViewHolder> {
 
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<AlertListItem> mValues;
     private final Consumer<AlertListItem> onItemClicked;
 
@@ -76,7 +74,7 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
             if (null == d) {
                 dateTextView.setText(R.string.label_none);
             } else {
-                dateTextView.setText(FORMATTER.format(d));
+                dateTextView.setText(LocalDateConverter.LONG_FORMATTER.format(d));
             }
             typeTextView.setText(alertListItem.getTypeDisplayResourceId());
             codeTextView.setText(alertListItem.getCode());

@@ -25,17 +25,14 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
-import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * A fragment representing a list of Items.
  */
 public class CourseAlertListFragment extends Fragment {
 
-    private static final String LOG_TAG = CourseAlertListFragment.class.getName();
-    // TODO: Use OneTimeObserver instead
-    private final CompositeDisposable compositeDisposable;
     private final List<CourseAlert> items;
     private CourseAlertListViewModel listViewModel;
     private TextView overviewTextView;
@@ -43,7 +40,6 @@ public class CourseAlertListFragment extends Fragment {
     private RecyclerView alertsRecyclerView;
     private CourseAlertListAdapter adapter;
     private EditCourseViewModel courseViewModel;
-    private CourseDetails currentCourse;
     private long editAlertId;
 
     /**
@@ -51,7 +47,6 @@ public class CourseAlertListFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public CourseAlertListFragment() {
-        compositeDisposable = new CompositeDisposable();
         items = new ArrayList<>();
     }
 
@@ -97,7 +92,6 @@ public class CourseAlertListFragment extends Fragment {
 
     private void onCourseLoaded(CourseDetails courseDetails) {
         if (null != courseDetails) {
-            currentCourse = courseDetails;
             listViewModel.setCourse(courseDetails, getViewLifecycleOwner());
             courseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
                     f -> overviewTextView.setText(f.apply(getResources())));
@@ -125,8 +119,8 @@ public class CourseAlertListFragment extends Fragment {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
                     () -> requireActivity().finish(),
                     () -> {
-                        compositeDisposable.clear();
-                        compositeDisposable.add(courseViewModel.save(false).subscribe(this::onSaveForEditAlertFinished, this::onSaveCourseError));
+                        OneTimeObservers.subscribeOnce(courseViewModel.save(false),
+                                this::onSaveForEditAlertFinished, this::onSaveCourseError);
                         requireActivity().finish();
                     }, null);
         } else {
@@ -146,8 +140,8 @@ public class CourseAlertListFragment extends Fragment {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            compositeDisposable.clear();
-                            compositeDisposable.add(courseViewModel.save(true).subscribe(this::onSaveForEditAlertFinished, this::onSaveCourseError));
+                            OneTimeObservers.subscribeOnce(courseViewModel.save(true),
+                                    this::onSaveForEditAlertFinished, this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

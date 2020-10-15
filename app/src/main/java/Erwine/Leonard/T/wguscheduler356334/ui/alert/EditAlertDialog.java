@@ -1,9 +1,12 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +20,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
@@ -46,6 +54,8 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 public class EditAlertDialog extends DialogFragment {
 
     private static final String LOG_TAG = EditAlertDialog.class.getName();
+    private final Observer<Boolean> canSaveObserver = this::onCanSaveChanged;
+    private LiveData<Boolean> canSaveObserved;
     private EditAlertViewModel viewModel;
     private TextView eventDateTextView;
     private EditText daysEditText;
@@ -55,11 +65,15 @@ public class EditAlertDialog extends DialogFragment {
     private RadioButton daysAfterRadioButton;
     private RadioButton startDateRadioButton;
     private RadioButton endDateRadioButton;
+    private TextView alertTimeValueTextView;
+    private RadioButton defaultTimeRadioButton;
+    private RadioButton explicitTimeRadioButton;
     private TextView calculatedDateValueTextView;
     private EditText messageEditText;
     private ImageButton saveImageButton;
     private ImageButton deleteImageButton;
     private ImageButton cancelImageButton;
+    private TextWatcher daysEditTextWatcher;
 
     public EditAlertDialog() {
         Log.d(LOG_TAG, "Constructing EditAlertDialog");
@@ -82,6 +96,9 @@ public class EditAlertDialog extends DialogFragment {
         daysAfterRadioButton = view.findViewById(R.id.daysAfterRadioButton);
         startDateRadioButton = view.findViewById(R.id.startDateRadioButton);
         endDateRadioButton = view.findViewById(R.id.endDateRadioButton);
+        alertTimeValueTextView = view.findViewById(R.id.alertTimeValueTextView);
+        defaultTimeRadioButton = view.findViewById(R.id.defaultTimeRadioButton);
+        explicitTimeRadioButton = view.findViewById(R.id.explicitTimeRadioButton);
         calculatedDateValueTextView = view.findViewById(R.id.calculatedDateValueTextView);
         messageEditText = view.findViewById(R.id.messageEditText);
         saveImageButton = view.findViewById(R.id.saveImageButton);
@@ -92,11 +109,25 @@ public class EditAlertDialog extends DialogFragment {
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getAlertEntityLiveData().observe(viewLifecycleOwner, this::onAlertEntityLoaded);
         viewModel.getInitializationFailureLiveData().observe(viewLifecycleOwner, this::onInitializationFailure);
-        viewModel.getDaysValidationLiveData().observe(viewLifecycleOwner, this::onDaysValidationChanged);
-        viewModel.getSelectedDateValidationLiveData().observe(viewLifecycleOwner, this::onSelectedDateValidationLChanged);
-        viewModel.getCalculatedDateLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
-        viewModel.getEventDateLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
-        viewModel.getValidLiveData().observe(viewLifecycleOwner, this::onValidChanged);
+        viewModel.getDaysValidationMessageLiveData().observe(viewLifecycleOwner, resourceMessageFactory -> {
+            if (resourceMessageFactory.isPresent()) {
+                daysEditText.setError(resourceMessageFactory.get().apply(getResources()), AppCompatResources.getDrawable(requireContext(),
+                        (resourceMessageFactory.get().isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+            } else {
+                daysEditText.setError(null);
+            }
+        });
+        viewModel.getSelectedDateValidationMessageLiveData().observe(viewLifecycleOwner, resourceMessageFactory -> {
+            if (resourceMessageFactory.isPresent()) {
+                ResourceMessageFactory f = resourceMessageFactory.get();
+                specificDateTextView.setError(f.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
+                        (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+            } else {
+                specificDateTextView.setError(null);
+            }
+        });
+        viewModel.getEffectiveAlertDateStringLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
+        viewModel.getEffectiveAlertDateStringLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
     }
 
     private void onAlertEntityLoaded(@NonNull AlertEntity alertEntity) {
@@ -104,11 +135,14 @@ public class EditAlertDialog extends DialogFragment {
         if (ID_NEW == id) {
             deleteImageButton.setEnabled(false);
             deleteImageButton.setVisibility(View.GONE);
+        } else {
+            deleteImageButton.setEnabled(true);
+            deleteImageButton.setVisibility(View.VISIBLE);
         }
         daysEditText.setText(viewModel.getDaysText());
         startDateRadioButton.setText(viewModel.getStartLabelTextResourceId());
         endDateRadioButton.setText(viewModel.getEndLabelTextResourceId());
-        AlertDateOption option = viewModel.getDateSpecOption();
+        AlertDateOption option = viewModel.getAlertDateOption();
         specificDateRadioButton.setChecked(option.isExplicit());
         daysBeforeRadioButton.setChecked(option.isBefore());
         startDateRadioButton.setChecked(option.isStart());
@@ -120,7 +154,7 @@ public class EditAlertDialog extends DialogFragment {
             daysEditText.setClickable(false);
             daysEditText.setEnabled(false);
         } else {
-            if (viewModel.isBeforeEndEnabled() || !option.isBefore()) {
+            if (viewModel.isBeforeEndAllowed() || !option.isBefore()) {
                 endDateRadioButton.setEnabled(true);
                 endDateRadioButton.setChecked(option.isEnd());
             } else {
@@ -131,32 +165,55 @@ public class EditAlertDialog extends DialogFragment {
             daysEditText.setClickable(true);
             daysEditText.setEnabled(true);
         }
-        LocalDate d = viewModel.getSelectedDate();
-        if (null != d) {
-            specificDateTextView.setText(EditAlertViewModel.DATE_FORMATTER.format(d));
+        if (viewModel.isExplicitTime()) {
+            defaultTimeRadioButton.setChecked(false);
+            explicitTimeRadioButton.setChecked(true);
         } else {
-            specificDateTextView.setText("");
+            defaultTimeRadioButton.setChecked(true);
+            explicitTimeRadioButton.setChecked(false);
         }
+        messageEditText.setText(viewModel.getCustomMessage());
 
-        daysEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setDaysText));
-        messageEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setMessage));
-        specificDateTextView.setOnClickListener(this::onSpecificDateTextViewClick);
-        saveImageButton.setOnClickListener(this::onSaveButtonClick);
-        deleteImageButton.setOnClickListener(this::onDeleteButtonClick);
-        cancelImageButton.setOnClickListener(this::onCancelButtonClick);
-        specificDateRadioButton.setOnCheckedChangeListener(this::onSpecificDateRadioButtonCheckedChange);
-        daysBeforeRadioButton.setOnCheckedChangeListener(this::onDaysBeforeRadioButtonCheckedChange);
-        startDateRadioButton.setOnCheckedChangeListener(this::onStartDateRadioButtonCheckedChange);
-        daysAfterRadioButton.setOnCheckedChangeListener(this::onDaysAfterRadioButtonCheckedChange);
-        endDateRadioButton.setOnCheckedChangeListener(this::onEndDateDateRadioButtonCheckedChange);
+        if (null == daysEditTextWatcher) {
+            daysEditTextWatcher = StringHelper.textWatcherForTextChanged(viewModel::setDaysText);
+            daysEditText.addTextChangedListener(daysEditTextWatcher);
+            messageEditText.addTextChangedListener(StringHelper.textWatcherForTextChanged(viewModel::setCustomMessage));
+            specificDateTextView.setOnClickListener(this::onSpecificDateTextViewClick);
+            saveImageButton.setOnClickListener(this::onSaveButtonClick);
+            deleteImageButton.setOnClickListener(this::onDeleteButtonClick);
+            cancelImageButton.setOnClickListener(this::onCancelButtonClick);
+            specificDateRadioButton.setOnCheckedChangeListener(this::onSpecificDateRadioButtonCheckedChange);
+            daysBeforeRadioButton.setOnCheckedChangeListener(this::onDaysBeforeRadioButtonCheckedChange);
+            startDateRadioButton.setOnCheckedChangeListener(this::onStartDateRadioButtonCheckedChange);
+            daysAfterRadioButton.setOnCheckedChangeListener(this::onDaysAfterRadioButtonCheckedChange);
+            endDateRadioButton.setOnCheckedChangeListener(this::onEndDateDateRadioButtonCheckedChange);
+            defaultTimeRadioButton.setOnCheckedChangeListener(this::onDefaultTimeRadioButtonCheckedChange);
+            explicitTimeRadioButton.setOnCheckedChangeListener(this::onExplicitTimeRadioButtonCheckedChange);
+            alertTimeValueTextView.setOnClickListener(this::onAlertTimeValueTextViewClick);
+        } else if (null != canSaveObserved) {
+            canSaveObserved.removeObserver(canSaveObserver);
+        }
+        if (ID_NEW == id) {
+            canSaveObserved = viewModel.getValidLiveData();
+        } else {
+            canSaveObserved = viewModel.getCanSaveLiveData();
+        }
+        viewModel.getCanSaveLiveData().observe(getViewLifecycleOwner(), canSaveObserver);
+    }
+
+    private void onCanSaveChanged(Boolean canSave) {
+        saveImageButton.setEnabled(canSave);
     }
 
     private void onSpecificDateTextViewClick(View view) {
-        LocalDate date = viewModel.getSelectedDate();
-        if (null == date && (null == (date = viewModel.getCalculatedDate()))) {
-            date = LocalDate.now();
-        }
-        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> viewModel.setSelectedDate(LocalDate.of(y, m + 1, d)), date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
+        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
+            LocalDate date = effectiveAlertDateTime.map(LocalDateTime::toLocalDate).orElseGet(() -> {
+                LocalDate d = viewModel.getSelectedDate();
+                return (null == d) ? LocalDate.now() : d;
+            });
+            new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> viewModel.setSelectedDate(LocalDate.of(y, m + 1, d)), date.getYear(),
+                    date.getMonthValue() - 1, date.getDayOfMonth()).show();
+        });
     }
 
     private void onEventDateChanged(String text) {
@@ -197,7 +254,9 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener());
+        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), o -> o.ifPresent(d ->
+                OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(d)))
+        );
     }
 
     private void onDeleteButtonClick(View view) {
@@ -210,24 +269,6 @@ public class EditAlertDialog extends DialogFragment {
         dismiss();
     }
 
-    private void onDaysValidationChanged(ResourceMessageFactory resourceMessageFactory) {
-        if (null == resourceMessageFactory) {
-            daysEditText.setError(null);
-        } else {
-            daysEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
-                    (resourceMessageFactory.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
-        }
-    }
-
-    private void onSelectedDateValidationLChanged(ResourceMessageFactory resourceMessageFactory) {
-        if (null == resourceMessageFactory) {
-            specificDateTextView.setError(null);
-        } else {
-            specificDateTextView.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(requireContext(),
-                    (resourceMessageFactory.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
-        }
-    }
-
     private void onDaysBeforeRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {
             if (specificDateRadioButton.isChecked()) {
@@ -236,16 +277,16 @@ public class EditAlertDialog extends DialogFragment {
                 specificDateTextView.setClickable(false);
                 daysEditText.setClickable(true);
                 daysEditText.setEnabled(true);
-                viewModel.setDateSpecOption(AlertDateOption.BEFORE_START_DATE);
+                viewModel.setAlertDateOption(AlertDateOption.BEFORE_START_DATE);
             } else {
-                if (endDateRadioButton.isChecked() && !viewModel.isBeforeEndEnabled()) {
+                if (endDateRadioButton.isChecked() && !viewModel.isBeforeEndAllowed()) {
                     endDateRadioButton.setChecked(false);
                     startDateRadioButton.setChecked(true);
                 }
-                viewModel.setDateSpecOption((startDateRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.BEFORE_END_DATE);
+                viewModel.setAlertDateOption((startDateRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.BEFORE_END_DATE);
                 daysAfterRadioButton.setChecked(false);
             }
-            endDateRadioButton.setEnabled(viewModel.isBeforeEndEnabled());
+            endDateRadioButton.setEnabled(viewModel.isBeforeEndAllowed());
         }
     }
 
@@ -257,9 +298,9 @@ public class EditAlertDialog extends DialogFragment {
                 specificDateTextView.setClickable(false);
                 daysEditText.setClickable(true);
                 daysEditText.setEnabled(true);
-                viewModel.setDateSpecOption(AlertDateOption.BEFORE_START_DATE);
+                viewModel.setAlertDateOption(AlertDateOption.BEFORE_START_DATE);
             } else {
-                viewModel.setDateSpecOption((daysBeforeRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.AFTER_START_DATE);
+                viewModel.setAlertDateOption((daysBeforeRadioButton.isChecked()) ? AlertDateOption.BEFORE_START_DATE : AlertDateOption.AFTER_START_DATE);
                 endDateRadioButton.setChecked(false);
             }
             endDateRadioButton.setEnabled(true);
@@ -275,11 +316,45 @@ public class EditAlertDialog extends DialogFragment {
                 specificDateTextView.setClickable(false);
                 daysEditText.setClickable(true);
                 daysEditText.setEnabled(true);
-                viewModel.setDateSpecOption(AlertDateOption.AFTER_END_DATE);
+                viewModel.setAlertDateOption(AlertDateOption.AFTER_END_DATE);
             } else {
-                viewModel.setDateSpecOption((endDateRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.AFTER_START_DATE);
+                viewModel.setAlertDateOption((endDateRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.AFTER_START_DATE);
                 daysBeforeRadioButton.setChecked(false);
             }
+        }
+    }
+
+    private void onDefaultTimeRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
+        if (isChecked) {
+            explicitTimeRadioButton.setChecked(false);
+            viewModel.setExplicitTime(false);
+            alertTimeValueTextView.setClickable(false);
+        }
+    }
+
+    private void onExplicitTimeRadioButtonCheckedChange(CompoundButton compoundButton, boolean isChecked) {
+        if (isChecked) {
+            defaultTimeRadioButton.setChecked(false);
+            viewModel.setExplicitTime(true);
+            alertTimeValueTextView.setClickable(true);
+            if (null == viewModel.getSelectedTime()) {
+                onAlertTimeValueTextViewClick(alertTimeValueTextView);
+            }
+        }
+    }
+
+    private void onAlertTimeValueTextViewClick(View view) {
+        LocalTime time = viewModel.getSelectedTime();
+        if (null == time) {
+            OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), t -> {
+                Context context = requireContext();
+                new TimePickerDialog(context, (view1, hourOfDay, minute) -> viewModel.setSelectedTime(LocalTime.of(hourOfDay, minute)),
+                        t.getHour(), t.getMinute(), DateFormat.is24HourFormat(context)).show();
+            });
+        } else {
+            Context context = requireContext();
+            new TimePickerDialog(context, (view1, hourOfDay, minute) -> viewModel.setSelectedTime(LocalTime.of(hourOfDay, minute)),
+                    time.getHour(), time.getMinute(), DateFormat.is24HourFormat(context)).show();
         }
     }
 
@@ -291,9 +366,9 @@ public class EditAlertDialog extends DialogFragment {
                 specificDateTextView.setClickable(false);
                 daysEditText.setClickable(true);
                 daysEditText.setEnabled(true);
-                viewModel.setDateSpecOption(AlertDateOption.AFTER_END_DATE);
+                viewModel.setAlertDateOption(AlertDateOption.AFTER_END_DATE);
             } else {
-                viewModel.setDateSpecOption((daysAfterRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.BEFORE_END_DATE);
+                viewModel.setAlertDateOption((daysAfterRadioButton.isChecked()) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.BEFORE_END_DATE);
                 startDateRadioButton.setChecked(false);
             }
         }
@@ -309,48 +384,45 @@ public class EditAlertDialog extends DialogFragment {
             endDateRadioButton.setChecked(false);
             daysEditText.setClickable(false);
             daysEditText.setEnabled(false);
-            viewModel.setDateSpecOption(AlertDateOption.EXPLICIT);
+            viewModel.setAlertDateOption(AlertDateOption.EXPLICIT);
         }
     }
 
-    private void onValidChanged(Boolean isValid) {
-        Log.d(LOG_TAG, "Valid changed to " + isValid);
-        saveImageButton.setEnabled(null != isValid && isValid);
-    }
-
     private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
-        LocalDate originalDate = viewModel.getCalculatedDate();
+        final LocalDateTime originalDateTime;
+
+        SaveOperationListener(LocalDateTime originalDateTime) {
+            this.originalDateTime = originalDateTime;
+        }
 
         @Override
         public void onSubscribe(Disposable d) {
         }
 
         @Override
-        public void onSuccess(ResourceMessageResult messages) {
+        public void onSuccess(@NonNull ResourceMessageResult messages) {
             Log.d(LOG_TAG, "Enter onSaveOperationFinished");
             if (messages.isSucceeded()) {
-                LocalDate d = viewModel.getCalculatedDate();
-                if (null != d) {
-                    OneTimeObservers.subscribeOnce(DbLoader.getPreferAlertTime(), t -> {
-                        AlertLink link = viewModel.getAlertLink();
-                        if (viewModel.isAssessmentAlert()) {
-                            AssessmentAlertBroadcastReceiver.setPendingAlert(d.atTime(t), (AssessmentAlertLink) link, requireContext());
+                OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
+                    if (effectiveAlertDateTime.isPresent()) {
+                        if (viewModel.isCourseAlert()) {
+                            CourseAlertBroadcastReceiver.setPendingAlert(effectiveAlertDateTime.get(), (CourseAlertLink) viewModel.getAlertLink(), viewModel.getNotificationId(), requireContext());
                         } else {
-                            CourseAlertBroadcastReceiver.setPendingAlert(d.atTime(t), (CourseAlertLink) link, requireContext());
+                            AssessmentAlertBroadcastReceiver.setPendingAlert(effectiveAlertDateTime.get(), (AssessmentAlertLink) viewModel.getAlertLink(), viewModel.getNotificationId(), requireContext());
                         }
                         dismiss();
-                    });
-                } else if (null != originalDate) {
-                    AlertLink link = viewModel.getAlertLink();
-                    if (viewModel.isAssessmentAlert()) {
-                        AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
-                    } else {
-                        CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
+                    } else if (null != originalDateTime) {
+                        AlertLink link = viewModel.getAlertLink();
+                        if (viewModel.isCourseAlert()) {
+                            CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), viewModel.getNotificationId(), requireContext());
+                        } else {
+                            AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), viewModel.getNotificationId(), requireContext());
+                        }
                     }
-                }
+                });
             } else {
                 Resources resources = getResources();
-                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                 if (messages.isWarning()) {
                     builder.setTitle(R.string.title_save_warning)
                             .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
@@ -361,7 +433,7 @@ public class EditAlertDialog extends DialogFragment {
                 } else {
                     builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
                 }
-                androidx.appcompat.app.AlertDialog dlg = builder.setCancelable(true).create();
+                AlertDialog dlg = builder.setCancelable(true).create();
                 dlg.show();
             }
         }
@@ -379,9 +451,11 @@ public class EditAlertDialog extends DialogFragment {
         Integer notificationId;
 
         DeleteOperationListener() {
-            if (null != viewModel.getCalculatedDate()) {
-                notificationId = viewModel.getAlertLink().getNotificationId();
-            }
+            OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
+                if (effectiveAlertDateTime.isPresent()) {
+                    notificationId = viewModel.getNotificationId();
+                }
+            });
         }
 
         @Override
@@ -393,10 +467,10 @@ public class EditAlertDialog extends DialogFragment {
             Log.d(LOG_TAG, "Enter DeleteOperationListener.onComplete");
             if (null != notificationId) {
                 AlertLink link = viewModel.getAlertLink();
-                if (viewModel.isAssessmentAlert()) {
-                    AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
+                if (viewModel.isCourseAlert()) {
+                    CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), viewModel.getNotificationId(), requireContext());
                 } else {
-                    CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), link.getNotificationId(), requireContext());
+                    AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), viewModel.getNotificationId(), requireContext());
                 }
             }
             dismiss();

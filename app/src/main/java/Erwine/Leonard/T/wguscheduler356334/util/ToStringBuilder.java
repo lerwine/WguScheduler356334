@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
@@ -581,6 +582,15 @@ public class ToStringBuilder implements Appendable, CharSequence {
     }
 
     @NonNull
+    public ToStringBuilder append(@Nullable LocalTime obj, boolean omitTypeName) {
+        if (null != obj) {
+            return appendImpl(obj, omitTypeName);
+        }
+        backingBuilder.append(NULL_STRING);
+        return this;
+    }
+
+    @NonNull
     public ToStringBuilder append(@Nullable Object obj, boolean omitTypeName, boolean omitElementType) {
         if (null != obj) {
             return appendImpl(obj, omitTypeName, omitElementType);
@@ -788,6 +798,18 @@ public class ToStringBuilder implements Appendable, CharSequence {
     }
 
     @NonNull
+    public ToStringBuilder append(@NonNull String name, LocalTime obj) {
+        backingBuilder.append(", ").append(name).append("=");
+        return append(obj, false);
+    }
+
+    @NonNull
+    public ToStringBuilder append(@NonNull String name, LocalTime obj, boolean includeTypeName) {
+        backingBuilder.append(", ").append(name).append("=");
+        return append(obj, !includeTypeName);
+    }
+
+    @NonNull
     public ToStringBuilder append(@NonNull String name, Object obj, boolean omitTypeName, boolean omitElementType) {
         backingBuilder.append(", ").append(name).append("=");
         return append(obj, omitTypeName, omitElementType);
@@ -811,6 +833,17 @@ public class ToStringBuilder implements Appendable, CharSequence {
 
     @NonNull
     private ToStringBuilder appendImpl(@NonNull LocalDate obj, boolean omitTypeName) {
+        if (omitTypeName) {
+            backingBuilder.append('{');
+        } else {
+            backingBuilder.append(obj.getClass().getName()).append('{');
+        }
+        backingBuilder.append(obj).append('}');
+        return this;
+    }
+
+    @NonNull
+    private ToStringBuilder appendImpl(@NonNull LocalTime obj, boolean omitTypeName) {
         if (omitTypeName) {
             backingBuilder.append('{');
         } else {

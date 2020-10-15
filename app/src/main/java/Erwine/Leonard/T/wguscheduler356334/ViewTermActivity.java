@@ -36,8 +36,9 @@ import io.reactivex.SingleObserver;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
-import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
+
 
 public class ViewTermActivity extends AppCompatActivity {
 
@@ -76,7 +77,7 @@ public class ViewTermActivity extends AppCompatActivity {
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
-        subscriptionCompositeDisposable.add(viewModel.getTitleFactory().subscribe(f -> setTitle(f.apply(getResources()))));
+        viewModel.getTitleFactory().observe(this, f -> setTitle(f.apply(getResources())));
         OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoaded, this::onEntityLoadFailed);
     }
 
@@ -121,14 +122,14 @@ public class ViewTermActivity extends AppCompatActivity {
             addFloatingActionButton.setOnClickListener(this::onAddFloatingActionButtonClick);
             saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
-            subscriptionCompositeDisposable.add(viewModel.getCanSave().subscribe(b -> {
+            viewModel.getCanSave().observe(this, b -> {
                 Log.d(LOG_TAG, "getCanSaveObservable().subscribe(" + b + ")");
                 saveFloatingActionButton.setEnabled(b);
-            }));
-            subscriptionCompositeDisposable.add(viewModel.getCanShare().subscribe(b -> {
+            });
+            viewModel.getCanShare().observe(this, b -> {
                 Log.d(LOG_TAG, "getCanShareObservable().subscribe(" + b + ")");
                 shareFloatingActionButton.setEnabled(b);
-            }));
+            });
         }
     }
 
@@ -148,12 +149,12 @@ public class ViewTermActivity extends AppCompatActivity {
             String title = sb.toString();
             LocalDate date = viewModel.getStart();
             if (null != date) {
-                sb.append("\n\tStart: ").append(FORMATTER.format(date));
+                sb.append("\n\tStart: ").append(LONG_FORMATTER.format(date));
                 if (null != (date = viewModel.getEnd())) {
-                    sb.append("; End: ").append(FORMATTER.format(date));
+                    sb.append("; End: ").append(LONG_FORMATTER.format(date));
                 }
             } else if (null != (date = viewModel.getEnd())) {
-                sb.append("\n\tEnd: ").append(FORMATTER.format(date));
+                sb.append("\n\tEnd: ").append(LONG_FORMATTER.format(date));
             }
             if (!termCourseListItems.isEmpty()) {
                 sb.append("\nCourses:").append(s);
@@ -161,23 +162,23 @@ public class ViewTermActivity extends AppCompatActivity {
                     sb.append("\n\t").append(c.getNumber()).append(": ").append(c.getTitle());
                     date = c.getActualStart();
                     if (null != date) {
-                        sb.append("\n\t\tStarted: ").append(FORMATTER.format(date));
+                        sb.append("\n\t\tStarted: ").append(LONG_FORMATTER.format(date));
                         if (null != (date = c.getActualEnd())) {
-                            sb.append("; Ended: ").append(FORMATTER.format(date));
+                            sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
                         } else if (null != (date = c.getExpectedEnd())) {
-                            sb.append("; Expected End: ").append(FORMATTER.format(date));
+                            sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
                         }
                     } else if (null != (date = c.getExpectedStart())) {
-                        sb.append("\n\t\tExpected Start: ").append(FORMATTER.format(date));
+                        sb.append("\n\t\tExpected Start: ").append(LONG_FORMATTER.format(date));
                         if (null != (date = c.getActualEnd())) {
-                            sb.append("; Ended: ").append(FORMATTER.format(date));
+                            sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
                         } else if (null != (date = c.getExpectedEnd())) {
-                            sb.append("; Expected End: ").append(FORMATTER.format(date));
+                            sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
                         }
                     } else if (null != (date = c.getActualEnd())) {
-                        sb.append("\n\t\tEnded: ").append(FORMATTER.format(date));
+                        sb.append("\n\t\tEnded: ").append(LONG_FORMATTER.format(date));
                     } else if (null != (date = c.getExpectedEnd())) {
-                        sb.append("\n\t\tExpected End: ").append(FORMATTER.format(date));
+                        sb.append("\n\t\tExpected End: ").append(LONG_FORMATTER.format(date));
                     }
                     sb.append("\n\t\tStatus:").append(resources.getString(c.getStatus().displayResourceId()));
                     s = c.getMentorName();
@@ -229,10 +230,10 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
+        OneTimeObservers.observeOnce(viewModel.getHasChanges(), this, hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.observeOnce(viewModel.getIsValid(), this, isValid -> {
                             if (!isValid) {
                                 return;
                             }

@@ -19,14 +19,11 @@ import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class AddTermActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddTermActivity.class.getName();
 
-    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
-    private final CompositeDisposable subscriptionCompositeDisposable;
     private EditTermViewModel viewModel;
     private AlertDialog waitDialog;
     private FloatingActionButton saveFloatingActionButton;
@@ -36,7 +33,6 @@ public class AddTermActivity extends AppCompatActivity {
      */
     public AddTermActivity() {
         Log.d(LOG_TAG, "Constructing AddTermActivity");
-        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -61,10 +57,10 @@ public class AddTermActivity extends AppCompatActivity {
         if (null != entity) {
             Log.d(LOG_TAG, String.format("Loaded %s", entity));
             saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
-            subscriptionCompositeDisposable.add(viewModel.getIsValid().subscribe(b -> {
+            viewModel.getIsValid().observe(this, b -> {
                 Log.d(LOG_TAG, "getIsValid().subscribe(" + b + ")");
                 saveFloatingActionButton.setEnabled(b);
-            }));
+            });
         } else {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_not_restored, this).showDialog(this::finish);
         }
@@ -133,10 +129,10 @@ public class AddTermActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
+        OneTimeObservers.observeOnce(viewModel.getHasChanges(), this, hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.observeOnce(viewModel.getIsValid(), this, isValid -> {
                             if (!isValid) {
                                 return;
                             }

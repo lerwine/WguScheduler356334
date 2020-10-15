@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
 import java.time.LocalDate;
@@ -50,7 +51,6 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilde
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -68,11 +68,11 @@ public class DbLoader {
     private static final String LOG_TAG = DbLoader.class.getName();
 
     private final BehaviorSubject<Boolean> preferEmailSubject;
-    private final Observable<Boolean> preferEmail;
+    private final MutableLiveData<Boolean> preferEmail;
     private final BehaviorSubject<LocalTime> preferAlertTimeSubject;
-    private final Observable<LocalTime> preferAlertTime;
+    private final MutableLiveData<LocalTime> preferAlertTime;
     private final BehaviorSubject<Integer> preferNextNotificationIdSubject;
-    private final Observable<Integer> preferNextNotificationId;
+    private final MutableLiveData<Integer> preferNextNotificationId;
     private static DbLoader instance;
     private final CompositeDisposable subscriptionCompositeDisposable;
     private final AppDb appDb;
@@ -117,12 +117,13 @@ public class DbLoader {
         preferEmailSubject.onNext(sharedPreferences.getBoolean(preference_prefer_email, false));
         final String preference_next_notification_id = context.getResources().getString(R.string.preference_next_notification_id);
         preferNextNotificationIdSubject.onNext(sharedPreferences.getInt(preference_next_notification_id, 1));
-
-        preferEmail = preferEmailSubject.observeOn(AndroidSchedulers.mainThread());
-        preferAlertTime = preferAlertTimeSubject.observeOn(AndroidSchedulers.mainThread());
-        preferNextNotificationId = preferNextNotificationIdSubject.observeOn(AndroidSchedulers.mainThread());
-
-        subscriptionCompositeDisposable.add(preferNextNotificationId.subscribe(id -> {
+        preferEmail = new MutableLiveData<>();
+        preferAlertTime = new MutableLiveData<>();
+        preferNextNotificationId = new MutableLiveData<>();
+        subscriptionCompositeDisposable.add(preferEmailSubject.subscribe(preferEmail::postValue));
+        subscriptionCompositeDisposable.add(preferAlertTimeSubject.subscribe(preferAlertTime::postValue));
+        subscriptionCompositeDisposable.add(preferNextNotificationIdSubject.subscribe(id -> {
+            preferNextNotificationId.postValue(id);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             try {
                 editor.putInt(preference_next_notification_id, id);
@@ -140,11 +141,11 @@ public class DbLoader {
         });
     }
 
-    public static Observable<Boolean> getPreferEmail() {
+    public static LiveData<Boolean> getPreferEmail() {
         return instance.preferEmail;
     }
 
-    public static Observable<LocalTime> getPreferAlertTime() {
+    public static LiveData<LocalTime> getPreferAlertTime() {
         return instance.preferAlertTime;
     }
 
@@ -681,9 +682,8 @@ public class DbLoader {
 
     private int getNextNotificationId() {
         int id = preferNextNotificationIdSubject.getValue();
-        CourseAlertDAO courseAlertDAO = appDb.courseAlertDAO();
-        AssessmentAlertDAO assessmentAlertDAO = appDb.assessmentAlertDAO();
-        while (courseAlertDAO.countByRequestCodeSynchronous(id) > 0 || assessmentAlertDAO.countByRequestCodeSynchronous(id) > 0) {
+        AlertDAO alertDao = appDb.alertDAO();
+        while (alertDao.countByNotificationId(id) > 0) {
             if (id == Integer.MAX_VALUE) {
                 id = 1;
             } else {
@@ -714,11 +714,13 @@ public class DbLoader {
                     }
                 }
                 if (alert.getId() == ID_NEW) {
+                    if (alert.getNotificationId() == 0) {
+                        alert.setNotificationId(getNextNotificationId());
+                    }
                     long id = appDb.alertDAO().insertSynchronous(alert);
-                    link.setNotificationId(getNextNotificationId());
                     link.setAlertIdAndRun(id, () -> {
                         appDb.courseAlertDAO().insertSynchronous(link);
-                        preferNextNotificationIdSubject.onNext(link.getNotificationId() + 1);
+                        preferNextNotificationIdSubject.onNext(alert.getNotificationId() + 1);
                     });
                     alert.setId(id);
                 } else {
@@ -742,11 +744,13 @@ public class DbLoader {
                 AlertEntity alert = entity.getAlert();
                 AssessmentAlertLink link = entity.getLink();
                 if (alert.getId() == ID_NEW) {
+                    if (alert.getNotificationId() == 0) {
+                        alert.setNotificationId(getNextNotificationId());
+                    }
                     long id = appDb.alertDAO().insertSynchronous(alert);
-                    link.setNotificationId(getNextNotificationId());
                     link.setAlertIdAndRun(id, () -> {
                         appDb.assessmentAlertDAO().insertSynchronous(link);
-                        preferNextNotificationIdSubject.onNext(link.getNotificationId() + 1);
+                        preferNextNotificationIdSubject.onNext(alert.getNotificationId() + 1);
                     });
                     alert.setId(id);
                 } else {

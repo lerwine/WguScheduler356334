@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment;
 import io.reactivex.Single;
 
 public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<AssessmentAlertLink, AssessmentAlertDetails> {
@@ -56,10 +56,10 @@ public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<Ass
         sb.append(resources.getString(assessment.getStatus().displayResourceId()));
         LocalDate d = assessment.getCompletionDate();
         if (null != d) {
-            return sb.append("\nCompleted: ").append(EditAssessmentFragment.FORMATTER.format(d));
+            return sb.append("\nCompleted: ").append(LocalDateConverter.LONG_FORMATTER.format(d));
         }
         if (null != (d = assessment.getGoalDate())) {
-            return sb.append("\nGoal Date: ").append(EditAssessmentFragment.FORMATTER.format(d));
+            return sb.append("\nGoal Date: ").append(LocalDateConverter.LONG_FORMATTER.format(d));
         }
         return sb;
     }
@@ -84,8 +84,8 @@ public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<Ass
         return getAlertIntent(alertId, targetId, notificationId, packageContext, AssessmentAlertBroadcastReceiver.class);
     }
 
-    public static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull AssessmentAlertLink alertLink, @NonNull Context packageContext) {
-        PendingIntent intent = createAlertIntent(alertLink.getAlertId(), alertLink.getTargetId(), alertLink.getNotificationId(), packageContext);
+    public static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull AssessmentAlertLink alertLink, int notificationId, @NonNull Context packageContext) {
+        PendingIntent intent = createAlertIntent(alertLink.getAlertId(), alertLink.getTargetId(), notificationId, packageContext);
         setPendingAlert(dateTime, intent, packageContext);
     }
 
@@ -93,8 +93,8 @@ public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<Ass
         cancelPendingAlert(getAlertIntent(alertId, targetId, notificationId, packageContext), packageContext);
     }
 
-    public static void cancelPendingAlert(@NonNull AssessmentAlertLink alertLink, @NonNull Context packageContext) {
-        cancelPendingAlert(alertLink.getAlertId(), alertLink.getTargetId(), alertLink.getNotificationId(), packageContext);
+    public static void cancelPendingAlert(@NonNull AssessmentAlertLink alertLink, int notificationId, @NonNull Context packageContext) {
+        cancelPendingAlert(alertLink.getAlertId(), alertLink.getTargetId(), notificationId, packageContext);
     }
 
 }

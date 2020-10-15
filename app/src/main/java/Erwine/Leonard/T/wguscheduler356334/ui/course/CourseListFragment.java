@@ -24,7 +24,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
@@ -35,8 +34,6 @@ public class CourseListFragment extends Fragment {
 
     private static final String LOG_TAG = CourseListFragment.class.getName();
 
-    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
-    private final CompositeDisposable subscriptionCompositeDisposable;
     private final List<TermCourseListItem> list;
     private EditTermViewModel editTermViewModel;
     private TermCourseListAdapter adapter;
@@ -50,7 +47,6 @@ public class CourseListFragment extends Fragment {
     public CourseListFragment() {
         Log.d(LOG_TAG, "Constructing CourseListFragment");
         list = new ArrayList<>();
-        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -81,14 +77,14 @@ public class CourseListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        OneTimeObservers.subscribeOnce(editTermViewModel.getEntity(), this::onEntityLoaded);
+        OneTimeObservers.observeOnce(editTermViewModel.getEntity(), this::onEntityLoaded);
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
         long termId = termEntity.getId();
         if (ID_NEW != termId) {
             editTermViewModel.getCoursesLiveData().observe(getViewLifecycleOwner(), this::onCourseListChanged);
-            subscriptionCompositeDisposable.add(editTermViewModel.getOverviewFactory().subscribe(f -> overviewTextView.setText(f.apply(getResources()))));
+            editTermViewModel.getOverviewFactory().observe(getViewLifecycleOwner(), f -> overviewTextView.setText(f.apply(getResources())));
         }
     }
 

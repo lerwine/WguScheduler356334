@@ -23,15 +23,13 @@ import androidx.lifecycle.Observer;
 import java.lang.ref.WeakReference;
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryOptional;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringNormalizationOption;
@@ -43,19 +41,12 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.MEDIUM_FORMATTER;
+
 public class DatePickerEditView extends ConstraintLayout {
 
     private static final String LOG_TAG = DatePickerEditView.class.getName();
     public static final Function<String, String> NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
-    public static final DateTimeFormatter MEDIUM_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
-    private static final DateTimeFormatter[] ALT_FORMATTER = new DateTimeFormatter[]{
-            DateTimeFormatter.ofPattern("M/d/yyyy").withZone(ZoneId.systemDefault()),
-            DateTimeFormatter.ofPattern("M-d-yyyy").withZone(ZoneId.systemDefault()),
-            DateTimeFormatter.ofPattern("M.d.yyyy").withZone(ZoneId.systemDefault()),
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withZone(ZoneId.systemDefault()),
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withZone(ZoneId.systemDefault()),
-            DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault())
-    };
     private final EditText dateEditText;
     private final ImageButton pickerImageButton;
     private final MutableLiveData<BinaryOptional<LocalDate, Throwable>> selectedDateLiveData;
@@ -342,40 +333,23 @@ public class DatePickerEditView extends ConstraintLayout {
         if (t.equals(normalizedText)) {
             return;
         }
-        if ((normalizedText = t).isEmpty()) {
-            if (null != selectedDate || null != parseError) {
-                selectedDate = null;
-                parseError = null;
-                selectedDateLiveData.postValue(BinaryOptional.empty());
+        normalizedText = t;
+        LocalDate date;
+        try {
+            date = LocalDateConverter.fromString(normalizedText);
+        } catch (DateTimeException e0) {
+            Log.d(LOG_TAG, e0.getClass().getName() + " parsing " + ToStringBuilder.toEscapedString(normalizedText) + ": " + e0);
+            selectedDate = null;
+            if (null == parseError || !Objects.equals(parseError.getMessage(), e0.getMessage())) {
+                parseError = e0;
+                selectedDateLiveData.postValue(BinaryOptional.ofSecondary(parseError));
             }
-        } else {
-            LocalDate date;
-            try {
-                date = LocalDate.from(MEDIUM_FORMATTER.parse(normalizedText));
-            } catch (DateTimeException e0) {
-                date = null;
-                for (DateTimeFormatter f : ALT_FORMATTER) {
-                    try {
-                        date = LocalDate.from(f.parse(normalizedText));
-                    } catch (DateTimeException e) {
-                        Log.d(LOG_TAG, e.getClass().getName() + " parsing " + ToStringBuilder.toEscapedString(normalizedText) + ": " + e);
-                    }
-                }
-                if (null == date) {
-                    Log.d(LOG_TAG, e0.getClass().getName() + " parsing " + ToStringBuilder.toEscapedString(normalizedText) + ": " + e0);
-                    selectedDate = null;
-                    if (null == parseError || !Objects.equals(parseError.getMessage(), e0.getMessage())) {
-                        parseError = e0;
-                        selectedDateLiveData.postValue(BinaryOptional.ofSecondary(parseError));
-                    }
-                    return;
-                }
-            }
-            parseError = null;
-            if (!Objects.equals(date, selectedDate)) {
-                selectedDate = date;
-                selectedDateLiveData.postValue(BinaryOptional.ofPrimary(selectedDate));
-            }
+            return;
+        }
+        parseError = null;
+        if (!Objects.equals(date, selectedDate)) {
+            selectedDate = date;
+            selectedDateLiveData.postValue(BinaryOptional.ofPrimaryNullable(selectedDate));
         }
     }
 

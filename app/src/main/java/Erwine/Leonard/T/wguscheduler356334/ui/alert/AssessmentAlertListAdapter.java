@@ -9,19 +9,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 
 public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentAlertListAdapter.ViewHolder> {
 
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<AssessmentAlert> mValues;
     private final Consumer<AssessmentAlert> onItemClick;
 
@@ -73,7 +71,7 @@ public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentA
             AlertEntity alert = alertListItem.getAlert();
             LocalDate d = alertListItem.getAlertDate();
             if (null != d) {
-                dateTextView.setText(FORMATTER.format(d));
+                dateTextView.setText(LocalDateConverter.LONG_FORMATTER.format(d));
             } else {
                 long timeSpec = alert.getTimeSpec();
                 if (Objects.requireNonNull(alert.isSubsequent())) {

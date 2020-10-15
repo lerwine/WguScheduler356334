@@ -22,8 +22,6 @@ import com.google.android.material.chip.Chip;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -40,12 +38,12 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditCourseFragment extends Fragment {
 
     private static final String LOG_TAG = EditCourseFragment.class.getName();
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
 
     private EditCourseViewModel viewModel;
@@ -569,7 +567,7 @@ public class EditCourseFragment extends Fragment {
             expectedStartChip.setCloseIconVisible(false);
         } else {
             Log.d(LOG_TAG, String.format("Enter onExpectedStartChanged(%s)", d));
-            expectedStartChip.setText(DATE_FORMATTER.format(d));
+            expectedStartChip.setText(FULL_FORMATTER.format(d));
             expectedStartChip.setCloseIconVisible(true);
         }
     }
@@ -582,7 +580,7 @@ public class EditCourseFragment extends Fragment {
             actualStartChip.setCloseIconVisible(false);
         } else {
             Log.d(LOG_TAG, String.format("Enter onActualStartChanged(%s)", d));
-            actualStartChip.setText(DATE_FORMATTER.format(d));
+            actualStartChip.setText(FULL_FORMATTER.format(d));
             actualStartChip.setCloseIconVisible(true);
         }
     }
@@ -595,7 +593,7 @@ public class EditCourseFragment extends Fragment {
             expectedEndChip.setCloseIconVisible(false);
         } else {
             Log.d(LOG_TAG, String.format("Enter onExpectedEndChanged(%s)", d));
-            expectedEndChip.setText(DATE_FORMATTER.format(d));
+            expectedEndChip.setText(FULL_FORMATTER.format(d));
             expectedEndChip.setCloseIconVisible(true);
         }
     }
@@ -608,7 +606,7 @@ public class EditCourseFragment extends Fragment {
             actualEndChip.setCloseIconVisible(false);
         } else {
             Log.d(LOG_TAG, String.format("Enter onActualEndChanged(%s)", d));
-            actualEndChip.setText(DATE_FORMATTER.format(d));
+            actualEndChip.setText(FULL_FORMATTER.format(d));
             actualEndChip.setCloseIconVisible(true);
         }
     }

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
@@ -188,14 +189,14 @@ public interface Assessment extends NoteColumnIncludedEntity {
         setStatus((bundle.containsKey(key)) ? AssessmentStatus.valueOf(bundle.getString(key)) : AssessmentStatusConverter.DEFAULT);
         key = stateKey(COLNAME_GOAL_DATE, isOriginal);
         if (bundle.containsKey(key)) {
-            setGoalDate(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setGoalDate(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setGoalDate(null);
         }
         setType((bundle.containsKey(key)) ? AssessmentType.valueOf(bundle.getString(key)) : AssessmentType.OBJECTIVE_ASSESSMENT);
         key = stateKey(COLNAME_COMPLETION_DATE, isOriginal);
         if (bundle.containsKey(key)) {
-            setCompletionDate(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setCompletionDate(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setCompletionDate(null);
         }
@@ -219,14 +220,14 @@ public interface Assessment extends NoteColumnIncludedEntity {
             bundle.putString(stateKey(COLNAME_NAME, isOriginal), s);
         }
         bundle.putString(stateKey(COLNAME_STATUS, isOriginal), getStatus().name());
-        LocalDate d = getGoalDate();
+        Long d = LocalDateConverter.fromLocalDate(getGoalDate());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_GOAL_DATE, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_GOAL_DATE, isOriginal), d);
         }
         bundle.putString(stateKey(COLNAME_TYPE, isOriginal), getType().name());
-        d = getCompletionDate();
+        d = LocalDateConverter.fromLocalDate(getCompletionDate());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_COMPLETION_DATE, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_COMPLETION_DATE, isOriginal), d);
         }
     }
 

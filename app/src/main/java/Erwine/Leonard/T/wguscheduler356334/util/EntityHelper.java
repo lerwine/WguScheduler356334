@@ -67,14 +67,6 @@ public class EntityHelper {
                 .filter(Optional::isPresent).map(Optional::get), LocalDate::compareTo);
     }
 
-    @Nullable
-    public static LocalDate parseDateString(@Nullable String value) {
-        if (null == value || (value = value.trim()).isEmpty()) {
-            return null;
-        }
-        return LocalDate.parse(value);
-    }
-
     private EntityHelper() {
     }
 }

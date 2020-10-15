@@ -26,7 +26,7 @@ public class TimePreferenceDialog extends PreferenceDialogFragmentCompat {
         DialogPreference preference = getPreference();
         if (preference instanceof TimePreference) {
             int minutes = ((TimePreference) preference).getTime();
-            boolean is24hour = DateFormat.is24HourFormat(getContext());
+            boolean is24hour = DateFormat.is24HourFormat(requireContext());
             timePicker.setIs24HourView(is24hour);
             timePicker.setHour(minutes / 60);
             timePicker.setMinute(minutes % 60);

@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
 import io.reactivex.Single;
 
 public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseAlertLink, CourseAlertDetails> {
@@ -46,15 +46,15 @@ public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseA
         sb.append("\nStatus: ").append(resources.getString(course.getStatus().displayResourceId()));
         LocalDate d = course.getActualStart();
         if (null != d) {
-            sb.append("Started: ").append(EditCourseFragment.DATE_FORMATTER.format(d));
+            sb.append("Started: ").append(LocalDateConverter.LONG_FORMATTER.format(d));
         } else if (null != (d = course.getExpectedStart())) {
-            sb.append("Expected Start: ").append(EditCourseFragment.DATE_FORMATTER.format(d));
+            sb.append("Expected Start: ").append(LocalDateConverter.LONG_FORMATTER.format(d));
         }
         if (null != (d = course.getActualEnd())) {
-            return sb.append("Ended: ").append(EditCourseFragment.DATE_FORMATTER.format(d));
+            return sb.append("Ended: ").append(LocalDateConverter.LONG_FORMATTER.format(d));
         }
         if (null != (d = course.getExpectedStart())) {
-            return sb.append("Expected End: ").append(EditCourseFragment.DATE_FORMATTER.format(d));
+            return sb.append("Expected End: ").append(LocalDateConverter.LONG_FORMATTER.format(d));
         }
         return sb;
     }
@@ -79,8 +79,8 @@ public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseA
         return getAlertIntent(alertId, targetId, notificationId, packageContext, CourseAlertBroadcastReceiver.class);
     }
 
-    public static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull CourseAlertLink alertLink, @NonNull Context packageContext) {
-        PendingIntent intent = createAlertIntent(alertLink.getAlertId(), alertLink.getTargetId(), alertLink.getNotificationId(), packageContext);
+    public static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull CourseAlertLink alertLink, int notificationId, @NonNull Context packageContext) {
+        PendingIntent intent = createAlertIntent(alertLink.getAlertId(), alertLink.getTargetId(), notificationId, packageContext);
         setPendingAlert(dateTime, intent, packageContext);
     }
 
@@ -94,8 +94,8 @@ public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseA
         }
     }
 
-    public static void cancelPendingAlert(@NonNull CourseAlertLink alertLink, @NonNull Context packageContext) {
-        cancelPendingAlert(alertLink.getAlertId(), alertLink.getTargetId(), alertLink.getNotificationId(), packageContext);
+    public static void cancelPendingAlert(@NonNull CourseAlertLink alertLink, int notificationId, @NonNull Context packageContext) {
+        cancelPendingAlert(alertLink.getAlertId(), alertLink.getTargetId(), notificationId, packageContext);
     }
 
 }

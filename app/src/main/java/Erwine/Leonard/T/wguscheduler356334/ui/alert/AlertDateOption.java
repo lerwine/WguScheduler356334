@@ -1,5 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
+import androidx.annotation.Nullable;
+
 public enum AlertDateOption {
     EXPLICIT(false, false, true),
     BEFORE_START_DATE(false, false, false),
@@ -15,6 +17,16 @@ public enum AlertDateOption {
         this.end = end;
         this.after = after;
         this.explicit = explicit;
+    }
+
+    public static AlertDateOption of(@Nullable Boolean subsequent, long days) {
+        if (null == subsequent) {
+            return AlertDateOption.EXPLICIT;
+        }
+        if (days < 0) {
+            return (subsequent) ? AlertDateOption.BEFORE_END_DATE : AlertDateOption.BEFORE_START_DATE;
+        }
+        return (subsequent) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.AFTER_START_DATE;
     }
 
     public boolean isStart() {

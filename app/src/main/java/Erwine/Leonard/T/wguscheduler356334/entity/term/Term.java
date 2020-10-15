@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
@@ -100,13 +101,13 @@ public interface Term extends NoteColumnIncludedEntity {
         setName(bundle.getString(stateKey(COLNAME_NAME, isOriginal), ""));
         String key = stateKey(COLNAME_START, isOriginal);
         if (bundle.containsKey(key)) {
-            setStart(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setStart(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setStart(null);
         }
         key = stateKey(COLNAME_END, isOriginal);
         if (bundle.containsKey(key)) {
-            setEnd(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setEnd(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setEnd(null);
         }
@@ -116,13 +117,13 @@ public interface Term extends NoteColumnIncludedEntity {
     default void saveState(@NonNull Bundle bundle, boolean isOriginal) {
         NoteColumnIncludedEntity.super.saveState(bundle, isOriginal);
         bundle.putString(stateKey(COLNAME_NAME, isOriginal), getName());
-        LocalDate d = getStart();
+        Long d = LocalDateConverter.fromLocalDate(getStart());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_START, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_START, isOriginal), d);
         }
-        d = getEnd();
+        d = LocalDateConverter.fromLocalDate(getEnd());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_END, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_END, isOriginal), d);
         }
     }
 

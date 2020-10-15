@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.NoteColumnIncludedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
@@ -282,25 +283,25 @@ public interface Course extends NoteColumnIncludedEntity {
         setStatus((bundle.containsKey(key)) ? CourseStatus.valueOf(bundle.getString(key)) : CourseStatus.UNPLANNED);
         key = stateKey(COLNAME_EXPECTED_START, isOriginal);
         if (bundle.containsKey(key)) {
-            setExpectedStart(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setExpectedStart(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setExpectedStart(null);
         }
         key = stateKey(COLNAME_ACTUAL_START, isOriginal);
         if (bundle.containsKey(key)) {
-            setActualStart(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setActualStart(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setActualStart(null);
         }
         key = stateKey(COLNAME_EXPECTED_END, isOriginal);
         if (bundle.containsKey(key)) {
-            setExpectedEnd(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setExpectedEnd(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setExpectedEnd(null);
         }
         key = stateKey(COLNAME_ACTUAL_END, isOriginal);
         if (bundle.containsKey(key)) {
-            setActualEnd(LocalDate.ofEpochDay(bundle.getLong(key)));
+            setActualEnd(LocalDateConverter.toLocalDate(bundle.getLong(key)));
         } else {
             setActualEnd(null);
         }
@@ -321,21 +322,21 @@ public interface Course extends NoteColumnIncludedEntity {
         bundle.putString(stateKey(COLNAME_NUMBER, isOriginal), getNumber());
         bundle.putString(stateKey(COLNAME_TITLE, isOriginal), getTitle());
         bundle.putString(stateKey(COLNAME_STATUS, isOriginal), getStatus().name());
-        LocalDate d = getExpectedStart();
+        Long d = LocalDateConverter.fromLocalDate(getExpectedStart());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_EXPECTED_START, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_EXPECTED_START, isOriginal), d);
         }
-        d = getActualStart();
+        d = LocalDateConverter.fromLocalDate(getActualStart());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_ACTUAL_START, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_ACTUAL_START, isOriginal), d);
         }
-        d = getExpectedEnd();
+        d = LocalDateConverter.fromLocalDate(getExpectedEnd());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_EXPECTED_END, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_EXPECTED_END, isOriginal), d);
         }
-        d = getActualEnd();
+        d = LocalDateConverter.fromLocalDate(getActualEnd());
         if (null != d) {
-            bundle.putLong(stateKey(COLNAME_ACTUAL_END, isOriginal), d.toEpochDay());
+            bundle.putLong(stateKey(COLNAME_ACTUAL_END, isOriginal), d);
         }
         bundle.putInt(stateKey(COLNAME_COMPETENCY_UNITS, isOriginal), getCompetencyUnits());
     }

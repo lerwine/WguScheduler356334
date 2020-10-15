@@ -199,6 +199,7 @@
     <string name="message_term_has_courses">Term still has one or more courses. This will delete all courses, assessments and alerts for this term as well!</string>
     <string name="format_error">Error: %s</string>
     <string name="format_date_parse_error">Error parsing date: %s</string>
+    <string name="format_days_parse_error">Error parsing number of days: %s</string>
     <string name="message_invalid_date">Invalid date string</string>
     <string name="format_warning">Warning: %s</string>
     <string name="message_mentor_has_courses">Mentor is still associated one or more courses. This will delete all courses, assessments and alerts associated with this mentor as well!</string>
@@ -277,4 +278,8 @@
     <string name="name_channel_course_alert">Course Alerts</string>
     <string name="notification_channel_assessment_alert">WguScheduler356334:AssessmentAlert</string>
     <string name="name_channel_assessment_alert">Assessment Alerts</string>
+    <string name="label_alert_time">Alert Time</string>
+    <string name="label_default">Default</string>
+    <string name="label_explicit">Explicit</string>
+    <string name="label_effective_date">Effective Date</string>
 </resources>

@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Ignore;
 import androidx.room.Relation;
 
-import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
@@ -52,7 +51,6 @@ public class AssessmentAlertDetails extends AssessmentAlert {
     public void saveState(Bundle outState, boolean isOriginal) {
         assessment.saveState(outState, isOriginal);
         getAlert().saveState(outState, isOriginal);
-        outState.putInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENT_ALERTS, AlertLink.COLNAME_NOTIFICATION_ID, isOriginal), getLink().getNotificationId());
     }
 
     public void restoreState(Bundle state, boolean isOriginal) {
@@ -62,9 +60,5 @@ public class AssessmentAlertDetails extends AssessmentAlert {
         AssessmentAlertLink link = getLink();
         link.setAlertId(alert.getId());
         link.setTargetId(assessment.getId());
-        String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENT_ALERTS, AlertLink.COLNAME_NOTIFICATION_ID, isOriginal);
-        if (state.containsKey(key)) {
-            getLink().setNotificationId(state.getInt(key));
-        }
     }
 }

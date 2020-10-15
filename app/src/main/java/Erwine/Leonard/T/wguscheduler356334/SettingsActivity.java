@@ -11,8 +11,8 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+
+import Erwine.Leonard.T.wguscheduler356334.db.LocalTimeConverter;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -85,7 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void setSummary(Preference preference, LocalTime time) {
-            preference.setSummary(getResources().getString(R.string.format_alarm_time_summary, DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).format(time)));
+            preference.setSummary(getResources().getString(R.string.format_alarm_time_summary, LocalTimeConverter.MEDIUM_FORMATTER.format(time)));
         }
 
         @Override

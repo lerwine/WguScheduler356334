@@ -8,17 +8,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
+
 public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T>, U extends AbstractCourseListAdapter<T, U>.AbstractViewHolder> extends RecyclerView.Adapter<U> {
 
     private static final String LOG_TAG = AbstractCourseListAdapter.class.getName();
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
     private final List<T> items;
 
     protected AbstractCourseListAdapter(List<T> items) {
@@ -31,7 +30,7 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
 
     @Override
     public void onBindViewHolder(@NonNull U holder, int position) {
-        ((AbstractCourseListAdapter<T, U>.AbstractViewHolder) holder).setItem(items.get(position));
+        holder.setItem(items.get(position));
     }
 
     @Override
@@ -50,10 +49,10 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
         protected AbstractViewHolder(View view) {
             super(view);
             this.view = view;
-            courseNumberTextView = (TextView) view.findViewById(R.id.typeTextView);
-            titleTextView = (TextView) view.findViewById(R.id.titleTextView);
-            statusTextView = (TextView) view.findViewById(R.id.statusTextView);
-            rangeTextView = (TextView) view.findViewById(R.id.rangeTextView);
+            courseNumberTextView = view.findViewById(R.id.typeTextView);
+            titleTextView = view.findViewById(R.id.titleTextView);
+            statusTextView = view.findViewById(R.id.statusTextView);
+            rangeTextView = view.findViewById(R.id.rangeTextView);
             view.setOnClickListener(this::onViewClick);
         }
 
@@ -96,12 +95,12 @@ public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T
                 if (null == end) {
                     rangeTextView.setText(R.string.label_unknown_to_unknown_range);
                 } else {
-                    rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_unknown_to_end, FORMATTER.format(end)));
+                    rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_unknown_to_end, FULL_FORMATTER.format(end)));
                 }
             } else if (null == end) {
-                rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_start_to_unknown, FORMATTER.format(start)));
+                rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_start_to_unknown, FULL_FORMATTER.format(start)));
             } else {
-                rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_start_to_end, FORMATTER.format(start), FORMATTER.format(end)));
+                rangeTextView.setText(view.getContext().getResources().getString(R.string.format_range_start_to_end, FULL_FORMATTER.format(start), FULL_FORMATTER.format(end)));
             }
         }
     }

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 
 public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAdapter.ViewHolder> {
@@ -94,7 +95,7 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             if (null == date) {
                 dateTextView.setText(R.string.label_none);
             } else {
-                dateTextView.setText(AssessmentListViewModel.FORMATTER.format(date));
+                dateTextView.setText(LocalDateConverter.LONG_FORMATTER.format(date));
             }
         }
     }

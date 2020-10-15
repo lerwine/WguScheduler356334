@@ -12,52 +12,60 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalTimeConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
+import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
+import Erwine.Leonard.T.wguscheduler356334.util.BinaryOptional;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.BehaviorSubject;
 
 public class EditAlertViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditCourseFragment.class.getName();
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
+    @StringRes
+    public static final int TYPE_VALUE_COURSE = R.string.label_course;
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
+
     static final String ARG_KEY_ALERT_ID = "alert_id";
     static final String ARG_KEY_COURSE_ID = "course_id";
     static final String ARG_KEY_ASSESSMENT_ID = "assessment_id";
     private static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
+    private static final String STATE_KEY_TYPE = "type";
     private static final String STATE_KEY_RELATIVITY = "relativity";
     private static final String STATE_KEY_MESSAGE = "message";
     private static final String STATE_KEY_DAYS_TEXT = "days_text";
     private static final String STATE_KEY_SELECTED_DATE = "selected_date";
-    private static final String STATE_KEY_EVENT_START = "event_start";
-    private static final String STATE_KEY_EVENT_END = "event_end";
-    private static final String STATE_KEY_TYPE = "type";
-    @StringRes
-    private static final int TYPE_VALUE_COURSE = R.string.label_course;
+    private static final String STATE_KEY_SELECTED_TIME = "selected_time";
 
     public static EditAlertDialog existingCourseAlertEditor(long alertId, long courseId) {
         Bundle args = new Bundle();
@@ -93,40 +101,187 @@ public class EditAlertViewModel extends AndroidViewModel {
         return dialog;
     }
 
-    private final MutableLiveData<AlertEntity> alertEntityLiveData;
-    private final MutableLiveData<ResourceMessageResult> initializationFailureLiveData;
-    private final MutableLiveData<String> eventDateLiveData;
-    private final MutableLiveData<String> calculatedDateLiveData;
-    private final IsValid validLiveData;
     private final DbLoader dbLoader;
-    private LocalDate calculatedDate;
-    private CourseAlertDetails courseAlertDetails;
-    private AssessmentAlertDetails assessmentAlertDetails;
-    private AlertEntity alertEntity;
-    private int type;
-    private AlertDateOption dateSpecOption = AlertDateOption.EXPLICIT;
+    private final BehaviorSubject<AlertEntity> alertEntitySubject;
+    private final BehaviorSubject<Integer> typeResourceIdSubject;
+    private final BehaviorSubject<Optional<LocalDate>> eventStartSubject;
+    private final BehaviorSubject<Optional<LocalDate>> eventEndSubject;
+    private final BehaviorSubject<Boolean> beforeEndAllowedSubject;
+    private final BehaviorSubject<String> daysTextSubject;
+    private final BehaviorSubject<Optional<LocalDate>> selectedDateSubject;
+    private final BehaviorSubject<AlertDateOption> selectedOptionSubject;
+    private final BehaviorSubject<Boolean> explicitTimeSubject;
+    private final BehaviorSubject<Optional<LocalTime>> selectedTimeSubject;
+    private final BehaviorSubject<String> customMessageTextSubject;
+    @SuppressWarnings("FieldCanBeLocal") // Needs to be a field so it doesn't get garbage-collected
+    private final CompositeDisposable compositeDisposable;
+    private final MutableLiveData<ResourceMessageResult> initializationFailureLiveData;
+    private final MutableLiveData<Boolean> validLiveData;
+    private final MutableLiveData<Boolean> canSaveLiveData;
+    private final MutableLiveData<Boolean> hasChangesLiveData;
+    private final MutableLiveData<String> effectiveAlertDateStringLiveData;
+    private final MutableLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeLiveData;
+    private final MutableLiveData<Optional<ResourceMessageFactory>> daysValidationMessageLiveData;
+    private final MutableLiveData<Optional<ResourceMessageFactory>> selectedDateValidationMessageLiveData;
+    private final MutableLiveData<AlertEntity> alertEntityLiveData;
+    private BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target;
     @StringRes
     private int startLabelTextResourceId;
     @StringRes
     private int endLabelTextResourceId;
-    private boolean beforeEndEnabled;
-    private LocalDate eventStart;
-    private LocalDate eventEnd;
-    @NonNull
-    private String message = "";
-    private Integer daysValue;
-    @NonNull
-    private String daysText = "";
-    private LocalDate selectedDate;
+    @Nullable
+    private Long timeSpec;
 
     public EditAlertViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        eventDateLiveData = new MutableLiveData<>();
-        calculatedDateLiveData = new MutableLiveData<>();
-        validLiveData = new IsValid();
-        alertEntityLiveData = new MutableLiveData<>();
+        alertEntitySubject = BehaviorSubject.create();
+        typeResourceIdSubject = BehaviorSubject.create();
+        eventStartSubject = BehaviorSubject.create();
+        eventEndSubject = BehaviorSubject.create();
+        beforeEndAllowedSubject = BehaviorSubject.create();
+        daysTextSubject = BehaviorSubject.create();
+        selectedDateSubject = BehaviorSubject.create();
+        selectedOptionSubject = BehaviorSubject.create();
+        explicitTimeSubject = BehaviorSubject.create();
+        selectedTimeSubject = BehaviorSubject.create();
+        customMessageTextSubject = BehaviorSubject.create();
+        BehaviorSubject<LocalTime> defaultEventTimeSubject = BehaviorSubject.create();
+
+        typeResourceIdSubject.onNext(TYPE_VALUE_COURSE);
+        eventStartSubject.onNext(Optional.empty());
+        eventEndSubject.onNext(Optional.empty());
+        defaultEventTimeSubject.onNext(LocalTime.MIDNIGHT);
+        OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), defaultEventTimeSubject::onNext);
+        daysTextSubject.onNext("");
+        selectedDateSubject.onNext(Optional.empty());
+        selectedOptionSubject.onNext(AlertDateOption.EXPLICIT);
+        explicitTimeSubject.onNext(false);
+        selectedTimeSubject.onNext(Optional.empty());
+        customMessageTextSubject.onNext("");
+
         initializationFailureLiveData = new MutableLiveData<>();
+        validLiveData = new MutableLiveData<>(false);
+        canSaveLiveData = new MutableLiveData<>(false);
+        hasChangesLiveData = new MutableLiveData<>(false);
+        daysValidationMessageLiveData = new MutableLiveData<>(Optional.empty());
+        selectedDateValidationMessageLiveData = new MutableLiveData<>(Optional.empty());
+        effectiveAlertDateStringLiveData = new MutableLiveData<>("");
+        effectiveAlertDateTimeLiveData = new MutableLiveData<>(Optional.empty());
+        alertEntityLiveData = new MutableLiveData<>();
+
+        Observable<String> normalizedMessageObservable = customMessageTextSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<BinaryOptional<Integer, ResourceMessageFactory>> daysEditTextParseResultObservable = Observable.combineLatest(daysTextSubject, selectedOptionSubject,
+                (text, selectedOption) -> {
+                    if (selectedOption == AlertDateOption.EXPLICIT) {
+                        return BinaryOptional.empty();
+                    }
+                    String d = AbstractEntity.SINGLE_LINE_NORMALIZER.apply(text);
+                    if (d.isEmpty()) {
+                        return BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.message_required));
+                    }
+                    try {
+                        int i = Integer.parseInt(d);
+                        if (i < AlertEntity.MIN_VALUE_RELATIVE_DAYS || i > AlertEntity.MAX_VALUE_RELATIVE_DAYS) {
+                            return BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.message_relative_days_out_of_range));
+                        }
+                        return BinaryOptional.ofPrimary(i);
+                    } catch (NumberFormatException ex) {
+                        return BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.format_days_parse_error, ex.getMessage()));
+                    }
+                });
+        Observable<BinaryOptional<LocalDate, ResourceMessageFactory>> effectiveAlertDateObservable = Observable.combineLatest(daysEditTextParseResultObservable, selectedDateSubject, selectedOptionSubject,
+                (daysEditTextParseResult, selectedDate, selectedOption) -> {
+                    if (selectedOption == AlertDateOption.EXPLICIT) {
+                        return selectedDate.<BinaryOptional<LocalDate, ResourceMessageFactory>>map(BinaryOptional::ofPrimary).orElseGet(() ->
+                                BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.message_required)));
+                    }
+                    if (daysEditTextParseResult.isPrimary()) {
+                        switch (selectedOption) {
+                            case BEFORE_START_DATE:
+                                return BinaryOptional.ofPrimary(eventStartSubject.getValue().orElseThrow(IllegalStateException::new).minusDays(daysEditTextParseResult.getPrimary()));
+                            case AFTER_START_DATE:
+                                return BinaryOptional.ofPrimary(eventStartSubject.getValue().orElseThrow(IllegalStateException::new).plusDays(daysEditTextParseResult.getPrimary()));
+                            case BEFORE_END_DATE:
+                                if (!beforeEndAllowedSubject.getValue()) {
+                                    return BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.format_error, "Illegal option selection"));
+                                }
+                                return BinaryOptional.ofPrimary(eventEndSubject.getValue().orElseThrow(IllegalStateException::new).minusDays(daysEditTextParseResult.getPrimary()));
+                            default:
+                                return BinaryOptional.ofPrimary(eventEndSubject.getValue().orElseThrow(IllegalStateException::new).plusDays(daysEditTextParseResult.getPrimary()));
+                        }
+                    }
+                    return BinaryOptional.empty();
+                });
+        Observable<Optional<LocalTime>> effectiveTimeObservable = Observable.combineLatest(defaultEventTimeSubject, explicitTimeSubject, selectedTimeSubject,
+                (defaultEventTime, isExplicitTime, selectedTime) -> (isExplicitTime) ? selectedTime : Optional.of(defaultEventTime));
+        Observable<Optional<Long>> timeSpecObservable = Observable.combineLatest(selectedOptionSubject, daysEditTextParseResultObservable, selectedDateSubject,
+                (selectedOption, daysEditTextParseResult, selectedDate) -> {
+                    Optional<Long> result = (selectedOption == AlertDateOption.EXPLICIT) ?
+                            selectedDate.map(LocalDateConverter::fromLocalDate) :
+                            daysEditTextParseResult.ofPrimary().map(i -> (selectedOption.isBefore()) ? -(long) i : (long) i);
+                    timeSpec = result.orElse(null);
+                    return result;
+                });
+        Observable<Boolean> changedObservable = Observable.combineLatest(selectedOptionSubject, timeSpecObservable, selectedDateSubject, selectedTimeSubject, normalizedMessageObservable, alertEntitySubject,
+                (option, timeSpec, date, localTime, normalizedMessage, alertEntity) -> {
+                    String customMessage = alertEntity.getCustomMessage();
+                    return ((null == customMessage) ? normalizedMessage.isEmpty() : normalizedMessage.equals(customMessage)) ||
+                            localTime.map(t -> !Objects.equals(t, alertEntity.getAlertTime())).orElse(true) ||
+                            timeSpec.map(t -> alertEntity.getTimeSpec() != t || option != AlertDateOption.of(alertEntity.isSubsequent(), t)).orElse(true);
+                });
+        Observable<Boolean> validObservable = Observable.combineLatest(daysEditTextParseResultObservable, effectiveAlertDateObservable, effectiveTimeObservable,
+                (daysEditTextParseResult, effectiveAlertDate, effectiveAlertTime) ->
+                        !(daysEditTextParseResult.isSecondary() && effectiveAlertDate.isSecondary()) && effectiveAlertTime.isPresent());
+
+        Observable<Boolean> canSaveObservable = Observable.combineLatest(changedObservable, validObservable, (c, v) -> c && v);
+        compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(daysEditTextParseResultObservable.subscribe(daysEditText -> daysEditText.switchPresence(
+                days -> daysValidationMessageLiveData.postValue(Optional.empty()),
+                resourceMessageFactory -> daysValidationMessageLiveData.postValue(Optional.of(resourceMessageFactory)),
+                () -> daysValidationMessageLiveData.postValue(Optional.empty())
+        ), throwable -> daysValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
+        compositeDisposable.add(effectiveAlertDateObservable.subscribe(effectiveAlertDate -> effectiveAlertDate.switchPresence(
+                localDate -> {
+                    selectedDateValidationMessageLiveData.postValue(Optional.empty());
+                    effectiveAlertDateStringLiveData.postValue(LocalDateConverter.MEDIUM_FORMATTER.format(localDate));
+                },
+                resourceMessageFactory -> {
+                    selectedDateValidationMessageLiveData.postValue(Optional.of(resourceMessageFactory));
+                    effectiveAlertDateStringLiveData.postValue("");
+                },
+                () -> {
+                    selectedDateValidationMessageLiveData.postValue(Optional.empty());
+                    effectiveAlertDateStringLiveData.postValue("");
+                }
+        ), throwable -> selectedDateValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
+        compositeDisposable.add(effectiveTimeObservable.subscribe((Optional<LocalTime> localTime) -> {
+
+        }, throwable -> {
+
+        }));
+        compositeDisposable.add(canSaveObservable.subscribe(canSaveLiveData::postValue));
+        compositeDisposable.add(validObservable.subscribe(validLiveData::postValue));
+        compositeDisposable.add(Observable.combineLatest(effectiveAlertDateObservable, effectiveTimeObservable, (effectiveAlertDate, effectiveTime) ->
+                effectiveAlertDate.ofPrimary().flatMap(d -> effectiveTime.map(d::atTime))).subscribe(effectiveAlertDateTimeLiveData::postValue));
+        compositeDisposable.add(alertEntitySubject.subscribe(alertEntity -> {
+            alertEntityLiveData.postValue(alertEntity);
+            timeSpec = alertEntity.getTimeSpec();
+            AlertDateOption alertDateOption = AlertDateOption.of(alertEntity.isSubsequent(), timeSpec);
+            setAlertDateOption(alertDateOption);
+            if (alertDateOption == AlertDateOption.EXPLICIT) {
+                selectedDateSubject.onNext(Optional.ofNullable(LocalDateConverter.toLocalDate(timeSpec)));
+                daysTextSubject.onNext("");
+            } else {
+                daysTextSubject.onNext(NUMBER_FORMATTER.format(Math.abs(timeSpec)));
+                selectedDateSubject.onNext(Optional.empty());
+            }
+            Optional<LocalTime> alertTime = Optional.ofNullable(alertEntity.getAlertTime());
+            selectedTimeSubject.onNext(alertTime);
+            explicitTimeSubject.onNext(alertTime.isPresent());
+            String message = alertEntity.getCustomMessage();
+            customMessageTextSubject.onNext((null == message) ? "" : message);
+        }));
     }
 
     @StringRes
@@ -139,194 +294,119 @@ public class EditAlertViewModel extends AndroidViewModel {
         return endLabelTextResourceId;
     }
 
-    public AlertDateOption getDateSpecOption() {
-        return dateSpecOption;
+    public AlertLink getAlertLink() {
+        return target.flatMap(CourseAlert::getLink, AssessmentAlert::getLink);
     }
 
-    private synchronized void calculateAlertDate() {
-        Log.d(LOG_TAG, "Enter calculateAlertDate");
-        if (dateSpecOption == AlertDateOption.EXPLICIT) {
-            if (null == selectedDate) {
-                Log.d(LOG_TAG, "calculateAlertDate: Posting message_required to selectedDateValidationLiveData");
-                validLiveData.postSelectedDateMessage(R.string.message_required);
-                Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
-                calculatedDateLiveData.postValue(null);
-                calculatedDate = null;
-            } else {
-                Log.d(LOG_TAG, "calculateAlertDate: Posting " + DATE_FORMATTER.format(selectedDate) + " to calculatedDateLiveData");
-                calculatedDate = selectedDate;
-                calculatedDateLiveData.postValue(DATE_FORMATTER.format(selectedDate));
-                Log.d(LOG_TAG, "calculateAlertDate: Posting null to selectedDateValidationLiveData");
-                validLiveData.clearSelectedDateMessage();
-            }
-            Log.d(LOG_TAG, "calculateAlertDate: Posting null to daysValidationLiveData");
-            validLiveData.clearDaysMessage();
-        } else {
-            if (null == daysValue) {
-                Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
-                calculatedDateLiveData.postValue(null);
-                calculatedDate = null;
-                Log.d(LOG_TAG, "calculateAlertDate: Posting " + ((daysText.isEmpty()) ? "message_required" : "message_invalid_number") + " to daysValidationLiveData");
-                validLiveData.postSelectedDateMessage((daysText.isEmpty()) ? R.string.message_required : R.string.message_invalid_number);
-            } else if (daysValue < AlertEntity.MIN_VALUE_RELATIVE_DAYS || daysValue > AlertEntity.MAX_VALUE_RELATIVE_DAYS) {
-                Log.d(LOG_TAG, "calculateAlertDate: Posting null to message_relative_days_out_of_range");
-                validLiveData.postDaysMessage(R.string.message_relative_days_out_of_range);
-                Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
-                calculatedDateLiveData.postValue(null);
-                calculatedDate = null;
-            } else {
-                LocalDate date = (dateSpecOption.isStart()) ? eventStart : eventEnd;
-                if (null != date) {
-                    calculatedDate = (dateSpecOption.isBefore()) ? date.minusDays(daysValue) : date.plusDays(daysValue);
-                    Log.d(LOG_TAG, "calculateAlertDate: Posting " + DATE_FORMATTER.format(date) + " to calculatedDateLiveData");
-                    calculatedDateLiveData.postValue(DATE_FORMATTER.format(date));
-                    Log.d(LOG_TAG, "calculateAlertDate: Posting null to daysValidationLiveData");
-                    validLiveData.clearDaysMessage();
-                } else {
-                    calculatedDate = null;
-                    Log.d(LOG_TAG, "calculateAlertDate: Posting null to calculatedDateLiveData");
-                    calculatedDateLiveData.postValue(null);
-                    if (type == TYPE_VALUE_COURSE) {
-                        Log.d(LOG_TAG, "calculateAlertDate: Posting " + ((dateSpecOption.isStart()) ? "message_course_has_no_start_date" : "message_course_has_no_end_date") + " to daysValidationLiveData");
-                        validLiveData.postDaysMessage((dateSpecOption.isStart()) ? R.string.message_course_has_no_start_date : R.string.message_course_has_no_end_date);
-                    } else {
-                        Log.d(LOG_TAG, "calculateAlertDate: Posting " + ((dateSpecOption.isStart()) ? "message_assessment_has_no_goal_date" : "message_assessment_has_no_completion_date") + " to daysValidationLiveData");
-                        validLiveData.postDaysMessage((dateSpecOption.isStart()) ? R.string.message_assessment_has_no_goal_date : R.string.message_assessment_has_no_completion_date);
-                    }
-                }
-            }
-            Log.d(LOG_TAG, "calculateAlertDate: Posting null to selectedDateValidationLiveData");
-            validLiveData.clearSelectedDateMessage();
-        }
+    public boolean isCourseAlert() {
+        return target.isPrimary();
     }
 
-    public synchronized void setDateSpecOption(AlertDateOption dateSpecOption) {
-        AlertDateOption newValue = (null == dateSpecOption) ? AlertDateOption.EXPLICIT : dateSpecOption;
-        if (this.dateSpecOption != newValue) {
-            Log.d(LOG_TAG, "setDateSpecOption: Changing from " + this.dateSpecOption.name() + " to " + newValue.name());
-            if (newValue == AlertDateOption.BEFORE_END_DATE && !beforeEndEnabled) {
-                throw new IllegalStateException();
-            }
-            AlertDateOption oldValue = this.dateSpecOption;
-            this.dateSpecOption = newValue;
-            if (oldValue == AlertDateOption.EXPLICIT) {
-                parseDaysText();
-            } else {
-                calculateAlertDate();
-            }
-        }
+    public int getNotificationId() {
+        return alertEntitySubject.getValue().getNotificationId();
     }
 
-    public boolean isBeforeEndEnabled() {
-        return beforeEndEnabled;
-    }
 
-    @NonNull
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = AbstractEntity.SINGLE_LINE_NORMALIZER.apply(message);
+    public boolean isBeforeEndAllowed() {
+        return beforeEndAllowedSubject.getValue();
     }
 
     @NonNull
     public String getDaysText() {
-        return daysText;
+        return daysTextSubject.getValue();
     }
 
-    public LocalDate getCalculatedDate() {
-        return calculatedDate;
+    public void setDaysText(String text) {
+        daysTextSubject.onNext((null == text) ? "" : text);
     }
 
-    private void parseDaysText() {
-        if (this.daysText.isEmpty()) {
-            daysValue = null;
-        } else {
-            try {
-                daysValue = Objects.requireNonNull(NUMBER_FORMATTER.parse(this.daysText)).intValue();
-            } catch (ParseException | NullPointerException e) {
-                daysValue = null;
-            }
+    @NonNull
+    public AlertDateOption getAlertDateOption() {
+        return selectedOptionSubject.getValue();
+    }
+
+    void setAlertDateOption(@NonNull AlertDateOption alertDateOption) {
+        selectedOptionSubject.onNext(alertDateOption);
+    }
+
+    @Nullable
+    public Boolean isSubsequent() {
+        AlertDateOption alertDateOption = selectedOptionSubject.getValue();
+        if (alertDateOption.isExplicit()) {
+            return null;
         }
-        calculateAlertDate();
+        return alertDateOption.isAfter();
     }
 
-    public synchronized void setDaysText(String daysText) {
-        String olValue = this.daysText;
-        this.daysText = AbstractEntity.SINGLE_LINE_NORMALIZER.apply(daysText);
-        if (dateSpecOption != AlertDateOption.EXPLICIT && !this.daysText.equals(olValue)) {
-            Log.d(LOG_TAG, "setDaysText: Changing from \"" + olValue + "\" to \"" + this.daysText + "\"");
-            parseDaysText();
-        }
-    }
-
+    @Nullable
     public LocalDate getSelectedDate() {
-        return selectedDate;
+        return (explicitTimeSubject.getValue()) ? null : selectedDateSubject.getValue().orElse(null);
     }
 
-    public synchronized void setSelectedDate(LocalDate selectedDate) {
-        if (Objects.equals(this.selectedDate, selectedDate)) {
-            return;
-        }
-        if (dateSpecOption == AlertDateOption.EXPLICIT) {
-            this.selectedDate = selectedDate;
-            return;
-        }
-        Log.d(LOG_TAG, "setDateSpecOption: Changing from " + this.selectedDate + " to " + selectedDate);
-        this.selectedDate = selectedDate;
-        if (null == selectedDate) {
-            Log.d(LOG_TAG, "setSelectedDate: Posting message_required to selectedDateValidationLiveData");
-            validLiveData.postSelectedDateMessage(R.string.message_required);
-            Log.d(LOG_TAG, "setSelectedDate: Posting null to calculatedDateLiveData");
-            calculatedDateLiveData.postValue(null);
-        } else {
-            Log.d(LOG_TAG, "setSelectedDate: Posting " + DATE_FORMATTER.format(selectedDate) + " to calculatedDateLiveData");
-            calculatedDateLiveData.postValue(DATE_FORMATTER.format(selectedDate));
-            Log.d(LOG_TAG, "setSelectedDate: Posting null to selectedDateValidationLiveData");
-            validLiveData.clearSelectedDateMessage();
-        }
-        Log.d(LOG_TAG, "setSelectedDate: Posting null to daysValidationLiveData");
-        validLiveData.clearDaysMessage();
+    public void setSelectedDate(@Nullable LocalDate date) {
+        selectedDateSubject.onNext(Optional.ofNullable(date));
     }
 
-    public boolean isAssessmentAlert() {
-        return null != assessmentAlertDetails;
+    public boolean isExplicitTime() {
+        return explicitTimeSubject.getValue();
     }
 
-    public AlertLink getAlertLink() {
-        if (null == assessmentAlertDetails) {
-            return courseAlertDetails.getLink();
-        }
-        return assessmentAlertDetails.getLink();
+    public void setExplicitTime(boolean value) {
+        explicitTimeSubject.onNext(value);
+    }
+
+    @Nullable
+    public LocalTime getSelectedTime() {
+        return (explicitTimeSubject.getValue()) ? selectedTimeSubject.getValue().orElse(null) : null;
+    }
+
+    public void setSelectedTime(@Nullable LocalTime alertTime) {
+        selectedTimeSubject.onNext(Optional.ofNullable(alertTime));
+    }
+
+    @NonNull
+    public String getCustomMessage() {
+        return customMessageTextSubject.getValue();
+    }
+
+    public void setCustomMessage(String customMessage) {
+        customMessageTextSubject.onNext((null == customMessage) ? "" : customMessage);
     }
 
     public LiveData<AlertEntity> getAlertEntityLiveData() {
         return alertEntityLiveData;
     }
 
-    public LiveData<String> getCalculatedDateLiveData() {
-        return calculatedDateLiveData;
+    public LiveData<String> getEffectiveAlertDateStringLiveData() {
+        return effectiveAlertDateStringLiveData;
     }
 
-    public LiveData<ResourceMessageResult> getInitializationFailureLiveData() {
-        return initializationFailureLiveData;
+    public LiveData<Optional<LocalDateTime>> getEffectiveAlertDateTimeLiveData() {
+        return effectiveAlertDateTimeLiveData;
     }
 
-    public LiveData<ResourceMessageFactory> getDaysValidationLiveData() {
-        return validLiveData.daysValidationLiveData;
+    public LiveData<Optional<ResourceMessageFactory>> getDaysValidationMessageLiveData() {
+        return daysValidationMessageLiveData;
     }
 
-    public LiveData<ResourceMessageFactory> getSelectedDateValidationLiveData() {
-        return validLiveData.selectedDateValidationLiveData;
+    public LiveData<Optional<ResourceMessageFactory>> getSelectedDateValidationMessageLiveData() {
+        return selectedDateValidationMessageLiveData;
     }
 
-    public LiveData<String> getEventDateLiveData() {
-        return eventDateLiveData;
+    public LiveData<Boolean> getCanSaveLiveData() {
+        return canSaveLiveData;
+    }
+
+    public LiveData<Boolean> getHasChangesLiveData() {
+        return hasChangesLiveData;
     }
 
     public LiveData<Boolean> getValidLiveData() {
         return validLiveData;
+    }
+
+    public LiveData<ResourceMessageResult> getInitializationFailureLiveData() {
+        return initializationFailureLiveData;
     }
 
     public void initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
@@ -371,54 +451,48 @@ public class EditAlertViewModel extends AndroidViewModel {
         OneTimeObservers.subscribeOnce(dbLoader.getAssessmentById(assessmentId), this::onAssessmentLoaded, this::onAssessmentLoadFailed);
     }
 
-    public synchronized void saveViewModelState(Bundle outState) {
+    public synchronized void saveViewModelState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        if (null != eventStart) {
-            outState.putLong(STATE_KEY_EVENT_START, eventStart.toEpochDay());
-        }
-        if (null != eventEnd) {
-            outState.putLong(STATE_KEY_EVENT_END, eventEnd.toEpochDay());
-        }
-        outState.putInt(STATE_KEY_TYPE, type);
-        outState.putInt(STATE_KEY_RELATIVITY, dateSpecOption.ordinal());
-        outState.putString(STATE_KEY_MESSAGE, message);
-        outState.putString(STATE_KEY_DAYS_TEXT, daysText);
-        if (null != selectedDate) {
-            outState.putLong(STATE_KEY_SELECTED_DATE, selectedDate.toEpochDay());
-        }
-        if (null != courseAlertDetails) {
-            courseAlertDetails.saveState(outState, true);
-        } else {
-            assessmentAlertDetails.saveState(outState, true);
-        }
-        alertEntity.saveState(outState, true);
+        outState.putInt(STATE_KEY_RELATIVITY, selectedOptionSubject.getValue().ordinal());
+        outState.putString(STATE_KEY_MESSAGE, customMessageTextSubject.getValue());
+        outState.putString(STATE_KEY_DAYS_TEXT, daysTextSubject.getValue());
+        selectedDateSubject.getValue().map(LocalDateConverter::fromLocalDate).ifPresent(d -> outState.putLong(STATE_KEY_SELECTED_DATE, d));
+        selectedTimeSubject.getValue().map(LocalTimeConverter::fromLocalTime).ifPresent(t -> outState.putInt(STATE_KEY_SELECTED_TIME, t));
+        target.switchPresence(courseAlertDetails -> courseAlertDetails.saveState(outState, true),
+                assessmentAlertDetails -> assessmentAlertDetails.saveState(outState, true));
     }
 
-    private synchronized void restoreViewModelState(Bundle state) {
-        type = state.getInt(STATE_KEY_TYPE, 0);
-        alertEntity = new AlertEntity();
+    private synchronized void restoreViewModelState(@NonNull Bundle state) {
+        int type = state.getInt(STATE_KEY_TYPE, 0);
         if (type == TYPE_VALUE_COURSE) {
-            courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(), new AlertEntity(), new CourseEntity());
+            CourseAlertDetails courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(), new AlertEntity(), new CourseEntity());
             courseAlertDetails.restoreState(state, true);
+            onCourseAlertLoaded(courseAlertDetails);
         } else {
-            assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(), new AlertEntity(), new AssessmentEntity());
+            AssessmentAlertDetails assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(), new AlertEntity(), new AssessmentEntity());
             assessmentAlertDetails.restoreState(state, true);
+            onAssessmentAlertLoaded(assessmentAlertDetails);
         }
-        alertEntity.restoreState(state, true);
-        setDateSpecOption(AlertDateOption.values()[state.getInt(STATE_KEY_RELATIVITY, 0)]);
+        setAlertDateOption(AlertDateOption.values()[state.getInt(STATE_KEY_RELATIVITY, 0)]);
         setDaysText(state.getString(STATE_KEY_DAYS_TEXT, ""));
         if (state.containsKey(STATE_KEY_SELECTED_DATE)) {
-            setSelectedDate(LocalDate.ofEpochDay(state.getLong(STATE_KEY_SELECTED_DATE)));
+            setSelectedDate(LocalDateConverter.toLocalDate(state.getLong(STATE_KEY_SELECTED_DATE)));
         }
-        setMessage(state.getString(STATE_KEY_MESSAGE, ""));
-        alertEntityLiveData.postValue(alertEntity);
+        if (state.containsKey(STATE_KEY_SELECTED_TIME)) {
+            setSelectedTime(LocalTimeConverter.toLocalTime(state.getInt(STATE_KEY_SELECTED_TIME)));
+        }
+        setCustomMessage(state.getString(STATE_KEY_MESSAGE, ""));
     }
 
-    private synchronized void onCourseAlertLoaded(@NonNull CourseAlertDetails courseAlertDetails) {
-        this.courseAlertDetails = courseAlertDetails;
-        assessmentAlertDetails = null;
-        alertEntity = courseAlertDetails.getAlert();
-        initializeCourseAlert();
+
+    /**
+     * Initializes validation for an existing course alert or when restoring from state or course has been saved.
+     *
+     * @param courseAlertDetails The {@link CourseAlertDetails} being edited.
+     */
+    synchronized void onCourseAlertLoaded(@NonNull CourseAlertDetails courseAlertDetails) {
+        initializeAlert(BinaryAlternate.ofPrimary(courseAlertDetails));
+//        alertEntity = courseAlertDetails.getAlert();
     }
 
     private void onCourseAlertLoadFailed(Throwable throwable) {
@@ -426,22 +500,14 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private synchronized void onAssessmentAlertLoaded(@NonNull AssessmentAlertDetails assessmentAlertDetails) {
-        this.assessmentAlertDetails = assessmentAlertDetails;
-        alertEntity = assessmentAlertDetails.getAlert();
-        courseAlertDetails = null;
-        initializeAssessmentAlert();
-    }
-
-    private void onAssessmentAlertLoadFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error loading assessment alert", throwable);
-        initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
-    }
-
-    private void onCourseLoaded(@NonNull CourseDetails courseDetails) {
-        alertEntity = new AlertEntity();
-        courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(alertEntity.getId(), courseDetails.getId()), alertEntity, new CourseEntity(courseDetails));
-        initializeCourseAlert();
+    /**
+     * Initializes validation for a new course alert.
+     *
+     * @param courseDetails The target {@link CourseDetails} object.
+     */
+    synchronized void onCourseLoaded(@NonNull CourseDetails courseDetails) {
+        AlertEntity entity = new AlertEntity();
+        initializeAlert(BinaryAlternate.ofPrimary(new CourseAlertDetails(new CourseAlertLink(entity.getId(), courseDetails.getId()), entity, new CourseEntity(courseDetails))));
     }
 
     private void onCourseLoadFailed(Throwable throwable) {
@@ -449,10 +515,28 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private void onAssessmentLoaded(@NonNull AssessmentDetails assessmentDetails) {
-        alertEntity = new AlertEntity();
-        assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(alertEntity.getId(), assessmentDetails.getId()), alertEntity, new AssessmentEntity(assessmentDetails));
-        initializeAssessmentAlert();
+    /**
+     * Initializes validation for an existing assessment alert or when restoring from state.
+     *
+     * @param assessmentAlertDetails The {@link AssessmentAlertDetails} being edited.
+     */
+    synchronized void onAssessmentAlertLoaded(@NonNull AssessmentAlertDetails assessmentAlertDetails) {
+        initializeAlert(BinaryAlternate.ofSecondary(assessmentAlertDetails));
+    }
+
+    private void onAssessmentAlertLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading assessment alert", throwable);
+        initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
+    }
+
+    /**
+     * Initializes validation for a new course alert.
+     *
+     * @param assessmentDetails The target {@link CourseDetails} object.
+     */
+    synchronized void onAssessmentLoaded(@NonNull AssessmentDetails assessmentDetails) {
+        AlertEntity entity = new AlertEntity();
+        initializeAlert(BinaryAlternate.ofSecondary(new AssessmentAlertDetails(new AssessmentAlertLink(entity.getId(), assessmentDetails.getId()), entity, new AssessmentEntity(assessmentDetails))));
     }
 
     private void onAssessmentLoadFailed(Throwable throwable) {
@@ -460,59 +544,39 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private void initializeCourseAlert() {
-        type = TYPE_VALUE_COURSE;
-        CourseEntity courseEntity = courseAlertDetails.getCourse();
-        eventStart = courseEntity.getActualStart();
-        if (null == eventStart) {
-            eventStart = courseEntity.getExpectedStart();
-            startLabelTextResourceId = R.string.label_expected_start;
-        } else {
-            startLabelTextResourceId = R.string.label_actual_start;
-        }
-        eventEnd = courseEntity.getActualEnd();
-        if (null == eventEnd) {
-            beforeEndEnabled = true;
-            eventEnd = courseEntity.getExpectedEnd();
-            endLabelTextResourceId = R.string.label_expected_end;
-        } else {
-            beforeEndEnabled = false;
-            endLabelTextResourceId = R.string.label_actual_end;
-        }
-        initializeAlert();
-    }
-
-    private void initializeAssessmentAlert() {
-        AssessmentEntity assessmentEntity = assessmentAlertDetails.getAssessment();
-        type = assessmentEntity.getType().displayResourceId();
-        startLabelTextResourceId = R.string.label_goal_date;
-        endLabelTextResourceId = R.string.label_completion_date;
-        beforeEndEnabled = false;
-        eventStart = assessmentEntity.getGoalDate();
-        eventEnd = assessmentEntity.getCompletionDate();
-        initializeAlert();
-    }
-
-    private void initializeAlert() {
-        Boolean b = alertEntity.isSubsequent();
-        long days = alertEntity.getTimeSpec();
-        if (null == b) {
-            setDateSpecOption(AlertDateOption.EXPLICIT);
-            setDaysText("");
-            setSelectedDate(LocalDate.ofEpochDay(days));
-        } else if (days < 0) {
-            setDateSpecOption((b && beforeEndEnabled) ? AlertDateOption.BEFORE_END_DATE : AlertDateOption.BEFORE_START_DATE);
-            setDaysText(NUMBER_FORMATTER.format(Math.abs(days)));
-        } else {
-            setDateSpecOption((b) ? AlertDateOption.AFTER_END_DATE : AlertDateOption.AFTER_START_DATE);
-            setDaysText(NUMBER_FORMATTER.format(days));
-        }
-        setMessage(alertEntity.getCustomMessage());
-        alertEntityLiveData.postValue(alertEntity);
+    private void initializeAlert(@NonNull BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target) {
+        this.target = target;
+        AlertEntity alertEntity = target.flatMap(courseAlertDetails -> {
+            typeResourceIdSubject.onNext(TYPE_VALUE_COURSE);
+            CourseEntity courseEntity = courseAlertDetails.getCourse();
+            Optional<LocalDate> date = Optional.ofNullable(courseEntity.getActualStart());
+            eventStartSubject.onNext((date.isPresent()) ? date : Optional.ofNullable(courseEntity.getExpectedStart()));
+            date = Optional.ofNullable(courseEntity.getActualEnd());
+            if (date.isPresent()) {
+                startLabelTextResourceId = R.string.label_actual_start;
+                eventEndSubject.onNext(date);
+                beforeEndAllowedSubject.onNext(false);
+            } else {
+                startLabelTextResourceId = R.string.label_expected_start;
+                eventEndSubject.onNext(Optional.ofNullable(courseEntity.getExpectedEnd()));
+                beforeEndAllowedSubject.onNext(true);
+            }
+            return courseAlertDetails.getAlert();
+        }, assessmentAlertDetails -> {
+            AssessmentEntity assessmentEntity = assessmentAlertDetails.getAssessment();
+            typeResourceIdSubject.onNext(assessmentEntity.getType().displayResourceId());
+            startLabelTextResourceId = R.string.label_goal_date;
+            endLabelTextResourceId = R.string.label_completion_date;
+            beforeEndAllowedSubject.onNext(false);
+            eventStartSubject.onNext(Optional.ofNullable(assessmentEntity.getGoalDate()));
+            eventEndSubject.onNext(Optional.ofNullable(assessmentEntity.getCompletionDate()));
+            return assessmentAlertDetails.getAlert();
+        });
+        alertEntitySubject.onNext(alertEntity);
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
-        if (null == assessmentAlertDetails) {
+        return target.flatMap(courseAlertDetails -> {
             CourseAlertDetails course = new CourseAlertDetails(courseAlertDetails);
             ResourceMessageResult validationMessage = onSave(course.getAlert());
             if (null != validationMessage) {
@@ -520,79 +584,39 @@ public class EditAlertViewModel extends AndroidViewModel {
             }
             return dbLoader.saveCourseAlert(course, ignoreWarnings).doOnSuccess(m -> {
                 if (m.isSucceeded()) {
-                    courseAlertDetails = course;
+                    onCourseAlertLoaded(course);
                 }
             });
-        }
-        AssessmentAlertDetails assessment = new AssessmentAlertDetails(assessmentAlertDetails);
-        ResourceMessageResult validationMessage = onSave(assessment.getAlert());
-        if (null != validationMessage) {
-            return Single.just(validationMessage);
-        }
-        return dbLoader.saveAssessmentAlert(assessment, ignoreWarnings).doOnSuccess(m -> {
-            if (m.isSucceeded()) {
-                assessmentAlertDetails = assessment;
+        }, assessmentAlertDetails -> {
+            AssessmentAlertDetails assessment = new AssessmentAlertDetails(assessmentAlertDetails);
+            ResourceMessageResult validationMessage = onSave(assessment.getAlert());
+            if (null != validationMessage) {
+                return Single.just(validationMessage);
             }
+            return dbLoader.saveAssessmentAlert(assessment, ignoreWarnings).doOnSuccess(m -> {
+                if (m.isSucceeded()) {
+                    onAssessmentAlertLoaded(assessment);
+                }
+            });
         });
     }
 
     @Nullable
-    private ResourceMessageResult onSave(AlertEntity entity) {
-        if (dateSpecOption.isExplicit()) {
-            entity.setSubsequent(null);
-            if (null == selectedDate) {
-                return ValidationMessage.ofSingleError(R.string.message_alert_date_required);
-            }
-            entity.setTimeSpec(selectedDate.toEpochDay());
-        } else {
-            entity.setSubsequent(dateSpecOption.isEnd());
-            if (null == daysValue) {
-                return ValidationMessage.ofSingleError(R.string.message_alert_days_required);
-            }
-            entity.setTimeSpec(daysValue);
+    private ResourceMessageResult onSave(@NonNull AlertEntity entity) {
+        entity.setSubsequent(isSubsequent());
+        AlertDateOption dateSpecOption = selectedOptionSubject.getValue();
+        if (null == timeSpec) {
+            return ValidationMessage.ofSingleError((dateSpecOption.isExplicit()) ? R.string.message_alert_date_required : R.string.message_alert_days_required);
         }
-        entity.setCustomMessage((message.isEmpty()) ? null : message);
+        entity.setTimeSpec(timeSpec);
+        String customMessageText = customMessageTextSubject.getValue();
+        entity.setCustomMessage((customMessageText.isEmpty()) ? null : customMessageText);
+        entity.setAlertTime(selectedTimeSubject.getValue().orElse(null));
         return null;
     }
 
     public synchronized Completable delete() {
-        if (null == assessmentAlertDetails) {
-            return dbLoader.deleteCourseAlert(courseAlertDetails);
-        }
-        return dbLoader.deleteAssessmentAlert(assessmentAlertDetails);
+        return target.flatMap(dbLoader::deleteCourseAlert, dbLoader::deleteAssessmentAlert);
     }
 
-    private static class IsValid extends LiveData<Boolean> {
-
-        private final MutableLiveData<ResourceMessageFactory> daysValidationLiveData;
-        private final MutableLiveData<ResourceMessageFactory> selectedDateValidationLiveData;
-
-        private IsValid() {
-            super(true);
-            daysValidationLiveData = new MutableLiveData<>();
-            selectedDateValidationLiveData = new MutableLiveData<>();
-        }
-
-        void clearSelectedDateMessage() {
-            selectedDateValidationLiveData.postValue(null);
-            ResourceMessageFactory m = daysValidationLiveData.getValue();
-            postValue(null == m || m.isWarning());
-        }
-
-        void postSelectedDateMessage(@StringRes int id) {
-            selectedDateValidationLiveData.postValue(ResourceMessageFactory.ofError(id));
-            postValue(false);
-        }
-
-        void clearDaysMessage() {
-            daysValidationLiveData.postValue(null);
-            ResourceMessageFactory m = selectedDateValidationLiveData.getValue();
-            postValue(null == m || m.isWarning());
-        }
-
-        public void postDaysMessage(@StringRes int id) {
-            daysValidationLiveData.postValue(ResourceMessageFactory.ofError(id));
-            postValue(false);
-        }
-    }
 }

@@ -36,11 +36,10 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.SingleObserver;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
-import static Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentFragment.FORMATTER;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class EditMentorActivity extends AppCompatActivity {
@@ -49,8 +48,6 @@ public class EditMentorActivity extends AppCompatActivity {
     private static final String STATE_KEY_NOTIFIED_SHARING_DISABLED = "EditMentorActivity:notifiedSharingDisabled";
     private static final String STATE_KEY_NOTIFYING_SHARING_DISABLED = "EditMentorActivity:notifyingSharingDisabled";
 
-    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
-    private final CompositeDisposable subscriptionCompositeDisposable;
     private EditMentorViewModel viewModel;
     private EditText mentorNameEditText;
     private EditText phoneNumberEditText;
@@ -71,7 +68,6 @@ public class EditMentorActivity extends AppCompatActivity {
      */
     public EditMentorActivity() {
         Log.d(LOG_TAG, "Constructing EditMentorActivity");
-        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -132,7 +128,6 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onLoadSuccess(MentorEntity entity) {
-        subscriptionCompositeDisposable.clear();
         waitDialog.dismiss();
         if (null == entity) {
             new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, (viewModel.isFromInitializedState()) ? R.string.message_mentor_not_found : R.string.message_mentor_not_found, this).showDialog(this::finish);
@@ -161,17 +156,17 @@ public class EditMentorActivity extends AppCompatActivity {
             shareFloatingActionButton.setVisibility(View.GONE);
             deleteFloatingActionButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
-            subscriptionCompositeDisposable.add(viewModel.getIsValid().subscribe(b -> saveFloatingActionButton.setEnabled(b)));
+            viewModel.getIsValid().observe(this, b -> saveFloatingActionButton.setEnabled(b));
         } else {
-            subscriptionCompositeDisposable.add(viewModel.getTitleFactory().subscribe(f -> setTitle(f.apply(getResources()))));
+            viewModel.getTitleFactory().observe(this, f -> setTitle(f.apply(getResources())));
             shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
-            subscriptionCompositeDisposable.add(viewModel.getCanSave().subscribe(b -> saveFloatingActionButton.setEnabled(b)));
-            subscriptionCompositeDisposable.add(viewModel.getCanShare().subscribe(b -> shareFloatingActionButton.setEnabled(b)));
+            viewModel.getCanSave().observe(this, b -> saveFloatingActionButton.setEnabled(b));
+            viewModel.getCanShare().observe(this, b -> shareFloatingActionButton.setEnabled(b));
         }
-        subscriptionCompositeDisposable.add(viewModel.getNameValid().subscribe(this::onNameValidChanged));
-        subscriptionCompositeDisposable.add(viewModel.getContactValid().subscribe(this::onContactValidChanged));
-        subscriptionCompositeDisposable.add(viewModel.getNormalizedName().subscribe(this::onNameChanged));
+        viewModel.getNameValid().observe(this, this::onNameValidChanged);
+        viewModel.getContactValid().observe(this, this::onContactValidChanged);
+        viewModel.getNormalizedName().observe(this, this::onNameChanged);
         if (notifyingSharingDisabled) {
             notifyingSharingDisabled = notifiedSharingDisabled = false;
             showSharingDisabledSnackbar();
@@ -217,24 +212,22 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onNameValidChanged(boolean isValid) {
-        Log.d(LOG_TAG, "Enter onNameValidChanged(" + isValid + ")");
         if (isValid) {
             Log.d(LOG_TAG, "Enter onNameValidChanged(true); calling mentorNameEditText.setError(null)");
             mentorNameEditText.setError(null);
         } else {
-            Log.d(LOG_TAG, "Enter onNameValidChanged(" + ToStringBuilder.toEscapedString(isValid) + "); calling mentorNameEditText.setError(R.string.message_required, R.drawable.dialog_error)");
+            Log.d(LOG_TAG, "Enter onNameValidChanged(false); calling mentorNameEditText.setError(R.string.message_required, R.drawable.dialog_error)");
             mentorNameEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
     }
 
     private void onContactValidChanged(boolean isValid) {
-        Log.d(LOG_TAG, "Enter onContactValidChanged(" + isValid + ")");
         if (isValid) {
             Log.d(LOG_TAG, "Enter onContactValidChanged(true); calling setError(null) on phoneNumberEditText and emailAddressEditText");
             phoneNumberEditText.setError(null);
             emailAddressEditText.setError(null);
         } else {
-            Log.d(LOG_TAG, "Enter onContactValidChanged(" + ToStringBuilder.toEscapedString(isValid) + "); calling setError(R.string.message_phone_or_email_required, R.drawable.dialog_error) on phoneNumberEditText and emailAddressEditText");
+            Log.d(LOG_TAG, "Enter onContactValidChanged(false); calling setError(R.string.message_phone_or_email_required, R.drawable.dialog_error) on phoneNumberEditText and emailAddressEditText");
             phoneNumberEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
             emailAddressEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
@@ -262,23 +255,23 @@ public class EditMentorActivity extends AppCompatActivity {
                     sb.append("\n").append(course.getNumber()).append(": ").append(course.getTitle());
                     LocalDate date = course.getActualStart();
                     if (null != date) {
-                        sb.append("\n\tStarted: ").append(FORMATTER.format(date));
+                        sb.append("\n\tStarted: ").append(LONG_FORMATTER.format(date));
                         if (null != (date = course.getActualEnd())) {
-                            sb.append("; Ended: ").append(FORMATTER.format(date));
+                            sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
                         } else if (null != (date = course.getExpectedEnd())) {
-                            sb.append("; Expected End: ").append(FORMATTER.format(date));
+                            sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
                         }
                     } else if (null != (date = course.getExpectedStart())) {
-                        sb.append("\n\tExpected Start: ").append(FORMATTER.format(date));
+                        sb.append("\n\tExpected Start: ").append(LONG_FORMATTER.format(date));
                         if (null != (date = course.getActualEnd())) {
-                            sb.append("; Ended: ").append(FORMATTER.format(date));
+                            sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
                         } else if (null != (date = course.getExpectedEnd())) {
-                            sb.append("; Expected End: ").append(FORMATTER.format(date));
+                            sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
                         }
                     } else if (null != (date = course.getActualEnd())) {
-                        sb.append("\n\tEnded: ").append(FORMATTER.format(date));
+                        sb.append("\n\tEnded: ").append(LONG_FORMATTER.format(date));
                     } else if (null != (date = course.getExpectedEnd())) {
-                        sb.append("\n\tExpected End: ").append(FORMATTER.format(date));
+                        sb.append("\n\tExpected End: ").append(LONG_FORMATTER.format(date));
                     }
                     sb.append("\n\tStatus:").append(resources.getString(course.getStatus().displayResourceId()));
                     s = course.getTermName();
@@ -333,10 +326,10 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void verifySaveChanges() {
-        OneTimeObservers.subscribeOnce(viewModel.getHasChanges(), hasChanges -> {
+        OneTimeObservers.observeOnce(viewModel.getHasChanges(), this, hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.subscribeOnce(viewModel.getIsValid(), isValid -> {
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.observeOnce(viewModel.getIsValid(), this, isValid -> {
                             if (!isValid) {
                                 return;
                             }

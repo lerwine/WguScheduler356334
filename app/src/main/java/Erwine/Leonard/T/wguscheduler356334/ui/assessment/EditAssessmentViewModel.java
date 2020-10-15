@@ -31,6 +31,7 @@ import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentStatusConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.AssessmentTypeConverter;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AbstractAssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.Assessment;
@@ -84,8 +85,9 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     public static void startAddAssessmentActivity(@NonNull Context context, long courseId, @Nullable LocalDate goalDate) {
         Intent intent = new Intent(context, AddAssessmentActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Term.COLNAME_ID, false), courseId);
-        if (null != goalDate) {
-            intent.putExtra(AssessmentDetails.COLNAME_GOAL_DATE, goalDate.toEpochDay());
+        Long d = LocalDateConverter.fromLocalDate(goalDate);
+        if (null != d) {
+            intent.putExtra(AssessmentDetails.COLNAME_GOAL_DATE, d);
         }
         context.startActivity(intent);
     }

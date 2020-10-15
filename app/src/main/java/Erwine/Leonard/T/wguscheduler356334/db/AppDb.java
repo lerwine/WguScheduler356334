@@ -28,7 +28,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
         views = {TermListItem.class, MentorListItem.class, TermCourseListItem.class, MentorCourseListItem.class, CourseDetails.class, AssessmentDetails.class, AlertListItem.class},
         version = 1, exportSchema = false
 )
-@TypeConverters({LocalDateConverter.class, CourseStatusConverter.class, StringModelListConverter.class, AssessmentStatusConverter.class, AssessmentTypeConverter.class})
+@TypeConverters({LocalDateConverter.class, LocalTimeConverter.class, CourseStatusConverter.class, StringModelListConverter.class, AssessmentStatusConverter.class, AssessmentTypeConverter.class})
 public abstract class AppDb extends RoomDatabase {
 
     public static final String DB_NAME = "WguScheduler.db";

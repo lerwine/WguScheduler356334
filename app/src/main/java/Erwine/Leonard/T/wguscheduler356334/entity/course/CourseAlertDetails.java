@@ -7,7 +7,6 @@ import androidx.room.Relation;
 
 import java.util.Objects;
 
-import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
@@ -52,7 +51,6 @@ public class CourseAlertDetails extends CourseAlert {
     public void saveState(Bundle outState, boolean isOriginal) {
         course.saveState(outState, isOriginal);
         getAlert().saveState(outState, isOriginal);
-        outState.putInt(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSE_ALERTS, AlertLink.COLNAME_NOTIFICATION_ID, isOriginal), getLink().getNotificationId());
     }
 
     public void restoreState(Bundle state, boolean isOriginal) {
@@ -62,9 +60,5 @@ public class CourseAlertDetails extends CourseAlert {
         CourseAlertLink link = getLink();
         link.setAlertId(alert.getId());
         link.setTargetId(course.getId());
-        String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSE_ALERTS, AlertLink.COLNAME_NOTIFICATION_ID, isOriginal);
-        if (state.containsKey(key)) {
-            getLink().setNotificationId(state.getInt(key));
-        }
     }
 }

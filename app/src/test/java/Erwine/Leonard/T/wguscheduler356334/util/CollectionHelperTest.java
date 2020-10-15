@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import Erwine.Leonard.T.wguscheduler356334.TestHelper;
+import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,7 +30,7 @@ public class CollectionHelperTest {
 
     private static <T> Stream<T> deviate(Supplier<T> source, Function<Supplier<T>, Stream<T>> mapper) {
         Stream.Builder<T> builder = Stream.builder();
-        mapper.apply(source).forEach(builder::accept);
+        mapper.apply(source).forEach(builder);
         return builder.build();
     }
 
@@ -131,8 +132,8 @@ public class CollectionHelperTest {
 
     private Stream<DescribedData<Function<LocalDate, Long>>> getLocalDateNumberMappers() {
         return Stream.of(
-                new DescribedData<>(t -> (null == t) ? null : t.toEpochDay(), "(null) ? null : epochDay"),
-                new DescribedData<>(t -> (null == t) ? 0 : t.toEpochDay(), "(null) ? 0 : epochDay"),
+                new DescribedData<>(LocalDateConverter::fromLocalDate, "(null) ? null : epochDay"),
+                new DescribedData<>(t -> (null == t) ? 0 : LocalDateConverter.fromLocalDate(t), "(null) ? 0 : epochDay"),
                 new DescribedData<>(t -> null, "null"),
                 new DescribedData<>(t -> -1L, "-1")
         );
@@ -140,8 +141,8 @@ public class CollectionHelperTest {
 
     private Stream<DescribedData<Function<Long, LocalDate>>> getNumberLocalDateMappers() {
         return Stream.of(
-                new DescribedData<>(t -> (null == t) ? null : LocalDate.ofEpochDay(t), "(null) ? null : dayOfYear"),
-                new DescribedData<>(t -> (null == t) ? LocalDate.MAX : LocalDate.ofEpochDay(t), "(null) ? MAX : dayOfYear"),
+                new DescribedData<>(LocalDateConverter::toLocalDate, "(null) ? null : dayOfYear"),
+                new DescribedData<>(t -> (null == t) ? LocalDate.MAX : LocalDateConverter.toLocalDate(t), "(null) ? MAX : dayOfYear"),
                 new DescribedData<>(t -> null, "null"),
                 new DescribedData<>(t -> LocalDate.MIN, "MIN")
         );

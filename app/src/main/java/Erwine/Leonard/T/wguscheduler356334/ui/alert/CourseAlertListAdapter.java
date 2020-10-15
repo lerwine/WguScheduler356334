@@ -10,8 +10,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -20,9 +18,10 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 
+import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
+
 public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertListAdapter.ViewHolder> {
 
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
     private final List<CourseAlert> mValues;
     private final Consumer<CourseAlert> onItemClick;
 
@@ -74,7 +73,7 @@ public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertList
             AlertEntity alert = alertListItem.getAlert();
             LocalDate d = alertListItem.getAlertDate();
             if (null != d) {
-                dateTextView.setText(FORMATTER.format(d));
+                dateTextView.setText(FULL_FORMATTER.format(d));
             } else {
                 long timeSpec = alert.getTimeSpec();
                 if (Objects.requireNonNull(alert.isSubsequent())) {

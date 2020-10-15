@@ -24,15 +24,12 @@ import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import io.reactivex.MaybeObserver;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class EditTermFragment extends Fragment {
 
     private static final String LOG_TAG = EditTermFragment.class.getName();
 
-    // FIXME: This is probably not getting disposed/cleared. Need to move this to view model and clear when restoring from state
-    private final CompositeDisposable subscriptionCompositeDisposable;
     private EditTermViewModel viewModel;
     private EditText termNameEditText;
     private DatePickerEditView termStartEditText;
@@ -45,7 +42,6 @@ public class EditTermFragment extends Fragment {
      */
     public EditTermFragment() {
         Log.d(LOG_TAG, "Constructing TermPropertiesFragment");
-        subscriptionCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -66,14 +62,13 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        OneTimeObservers.subscribeOnce(viewModel.getEntity(), this::onLoadSuccess);
+        OneTimeObservers.observeOnce(viewModel.getEntity(), this::onLoadSuccess);
     }
 
     private void onLoadSuccess(TermEntity entity) {
         if (null == entity) {
             return;
         }
-        subscriptionCompositeDisposable.clear();
         Log.d(LOG_TAG, String.format("Loaded %s", entity));
 
         if (viewModel.isFromInitializedState()) {
@@ -150,15 +145,15 @@ public class EditTermFragment extends Fragment {
             }
         });
 
-        subscriptionCompositeDisposable.add(viewModel.getNameValid().subscribe(isValid -> {
+        viewModel.getNameValid().observe(getViewLifecycleOwner(), isValid -> {
             Log.d(LOG_TAG, "nameValidObservable.onNext(" + isValid + ")");
             if (isValid) {
                 termNameEditText.setError(null);
             } else {
                 termNameEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
             }
-        }));
-        subscriptionCompositeDisposable.add(viewModel.getStartMessage().subscribe(
+        });
+        viewModel.getStartMessage().observe(getViewLifecycleOwner(),
                 o -> {
                     if (o.isPresent()) {
                         ResourceMessageFactory f = o.get();
@@ -169,8 +164,8 @@ public class EditTermFragment extends Fragment {
                         termStartEditText.setError(null);
                     }
                 }
-        ));
-        subscriptionCompositeDisposable.add(viewModel.getEndMessage().subscribe(
+        );
+        viewModel.getEndMessage().observe(getViewLifecycleOwner(),
                 o -> {
                     if (o.isPresent()) {
                         ResourceMessageFactory f = o.get();
@@ -181,7 +176,7 @@ public class EditTermFragment extends Fragment {
                         termEndEditText.setError(null);
                     }
                 }
-        ));
+        );
     }
 
 }
