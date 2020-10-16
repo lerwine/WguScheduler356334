@@ -92,6 +92,8 @@
     <string name="message_name_required">Name cannot be empty</string>
     <string name="message_no_mentor">(no mentor)</string>
     <string name="message_phone_or_email_required">* Phone number or email address required</string>
+    <string name="message_invalid_email_address">Invalid email address</string>
+    <string name="message_invalid_phone_number">Invalid phone number</string>
     <string name="message_required">* Required</string>
     <string name="message_recommended">* Recommended</string>
     <string name="message_reset_db_confirm">Warning! This action cannot be undone!\n\nAre you sure you want to delete all data stored by this app?</string>

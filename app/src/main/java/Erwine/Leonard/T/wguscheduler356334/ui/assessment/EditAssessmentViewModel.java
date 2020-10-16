@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
@@ -63,14 +62,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private AssessmentDetails originalValues;
     private TermEntity termEntity;
     private MentorEntity mentorEntity;
-    private final MutableLiveData<AssessmentDetails> entityLiveData;
-    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
-    private final MutableLiveData<Boolean> courseValidLiveData;
-    private final MutableLiveData<Boolean> codeValidLiveData;
+    private final PrivateLiveData<AssessmentDetails> entityLiveData;
+    private final PrivateLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
+    private final PrivateLiveData<Boolean> courseValidLiveData;
+    private final PrivateLiveData<Boolean> codeValidLiveData;
     private final CurrentValues currentValues;
-    private final MutableLiveData<LocalDate> effectiveStartLiveData;
-    private final MutableLiveData<LocalDate> effectiveEndLiveData;
+    private final PrivateLiveData<LocalDate> effectiveStartLiveData;
+    private final PrivateLiveData<LocalDate> effectiveEndLiveData;
     private String viewTitle;
     private Spanned overview;
     private LiveData<List<AssessmentEntity>> assessmentsForCourse;
@@ -105,14 +104,14 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
-        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
-        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(" "));
+        titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
+        overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(" "));
         currentValues = new CurrentValues();
-        entityLiveData = new MutableLiveData<>();
-        courseValidLiveData = new MutableLiveData<>(false);
-        codeValidLiveData = new MutableLiveData<>(false);
-        effectiveStartLiveData = new MutableLiveData<>();
-        effectiveEndLiveData = new MutableLiveData<>();
+        entityLiveData = new PrivateLiveData<>();
+        courseValidLiveData = new PrivateLiveData<>(false);
+        codeValidLiveData = new PrivateLiveData<>(false);
+        effectiveStartLiveData = new PrivateLiveData<>();
+        effectiveEndLiveData = new PrivateLiveData<>();
     }
 
     @NonNull
@@ -129,12 +128,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         if (id != ID_NEW) {
             return dbLoader.getAlertsByAssessmentId(id);
         }
-        MutableLiveData<List<AssessmentAlert>> result = new MutableLiveData<>();
+        PrivateLiveData<List<AssessmentAlert>> result = new PrivateLiveData<>();
         result.postValue(Collections.emptyList());
         return result;
     }
 
-    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
+    public LiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
         return overviewFactoryLiveData;
     }
 
@@ -400,6 +399,25 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public synchronized Long getMentorId() {
         return (null == selectedCourse) ? null : selectedCourse.getMentorId();
+    }
+
+    private static class PrivateLiveData<T> extends LiveData<T> {
+        PrivateLiveData(T value) {
+            super(value);
+        }
+
+        PrivateLiveData() {
+        }
+
+        @Override
+        public void postValue(T value) {
+            super.postValue(value);
+        }
+
+        @Override
+        public void setValue(T value) {
+            super.setValue(value);
+        }
     }
 
     private class CurrentValues implements Assessment {

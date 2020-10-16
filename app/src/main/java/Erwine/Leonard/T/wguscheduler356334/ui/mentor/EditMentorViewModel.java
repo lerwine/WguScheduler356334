@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -15,13 +16,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
@@ -35,6 +38,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -49,23 +53,26 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditMentorViewModel.class.getName();
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
+    private static final Predicate<String> EMAIL_PREDICATE = Pattern.compile("^[^@]+@[^.]+\\.[^.]+.*$").asPredicate();
+    private static final Predicate<String> PHONE_PREDICATE = Pattern.compile("^([0-9+]|\\(\\d{1,3}\\))[0-9\\-. ]{3,15}").asPredicate();
 
     private final DbLoader dbLoader;
-    private final MutableLiveData<MentorEntity> currentEntitySubject;
-    private final MutableLiveData<Function<Resources, String>> titleFactory;
-    private final MutableLiveData<Function<Resources, Spanned>> overviewFactory;
+    private final PrivateLiveData<MentorEntity> currentEntitySubject;
+    private final PrivateLiveData<Function<Resources, String>> titleFactory;
+    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactory;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<String> phoneNumberSubject;
     private final BehaviorSubject<String> emailAddressSubject;
     private final BehaviorSubject<String> notesSubject;
-    private final MutableLiveData<Boolean> canShare;
-    private final MutableLiveData<Boolean> canSave;
-    private final MutableLiveData<String> normalizedName;
+    private final PrivateLiveData<Boolean> canShareLiveData;
+    private final PrivateLiveData<Boolean> canSaveLiveData;
+    private final PrivateLiveData<String> normalizedNameLiveData;
+    private final PrivateLiveData<Boolean> nameValidLiveData;
+    private final PrivateLiveData<Optional<ResourceMessageFactory>> emailValidationMessageLiveData;
+    private final PrivateLiveData<Optional<ResourceMessageFactory>> phoneValidationMessageLiveData;
+    private final PrivateLiveData<Boolean> isValidLiveData;
+    private final PrivateLiveData<Boolean> hasChangesLiveData;
     private final CurrentValues currentValues;
-    private final MutableLiveData<Boolean> nameValid;
-    private final MutableLiveData<Boolean> contactValid;
-    private final MutableLiveData<Boolean> isValid;
-    private final MutableLiveData<Boolean> hasChanges;
     @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
     private LiveData<List<MentorCourseListItem>> coursesLiveData;
@@ -76,7 +83,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         super(application);
         Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
         dbLoader = DbLoader.getInstance(getApplication());
-        currentEntitySubject = new MutableLiveData<>();
+        currentEntitySubject = new PrivateLiveData<>();
         nameSubject = BehaviorSubject.create();
         phoneNumberSubject = BehaviorSubject.create();
         emailAddressSubject = BehaviorSubject.create();
@@ -87,49 +94,66 @@ public class EditMentorViewModel extends AndroidViewModel {
         Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
         Observable<String> normalizedPhoneObservable = phoneNumberSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<String> normalizedEmailObservable = emailAddressSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
-        Observable<Boolean> contactValidObservable = Observable.combineLatest(normalizedPhoneObservable.map(String::isEmpty), normalizedEmailObservable.map(String::isEmpty), (p, e) -> !(p || e));
+        Observable<Optional<ResourceMessageFactory>> phoneValidationMessageObservable = Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable,
+                (phone, email) -> {
+                    if (phone.isEmpty()) {
+                        return (email.isEmpty()) ? Optional.of(ResourceMessageFactory.ofError(R.string.message_phone_or_email_required)) : Optional.empty();
+                    }
+                    return (PHONE_PREDICATE.test(phone)) ? Optional.empty() : Optional.of(ResourceMessageFactory.ofError(R.string.message_invalid_phone_number));
+                });
+        Observable<Optional<ResourceMessageFactory>> emailValidationMessageObservable = Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable,
+                (phone, email) -> {
+                    if (email.isEmpty()) {
+                        return (phone.isEmpty()) ? Optional.of(ResourceMessageFactory.ofError(R.string.message_phone_or_email_required)) : Optional.empty();
+                    }
+                    return (EMAIL_PREDICATE.test(email)) ? Optional.empty() : Optional.of(ResourceMessageFactory.ofError(R.string.message_invalid_email_address));
+                });
         Observable<Boolean> hasChangesObservable = Observable.combineLatest(
                 normalizedNameObservable.map(n -> !n.equals(mentorEntity.getName())),
                 normalizedPhoneObservable.map(n -> !n.equals(mentorEntity.getPhoneNumber())),
                 normalizedEmailObservable.map(n -> !n.equals(mentorEntity.getEmailAddress())),
                 notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(mentorEntity.getNotes())),
                 (n, p, e, s) -> n || p || e || s);
-        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, contactValidObservable, (n, c) -> n && c);
+        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, phoneValidationMessageObservable, emailValidationMessageObservable,
+                (nameValid, phoneValidationMessage, emailValidationMessage) -> nameValid && phoneValidationMessage.map(ResourceMessageFactory::isWarning).orElse(true) &&
+                        emailValidationMessage.map(ResourceMessageFactory::isWarning).orElse(true));
 
-        hasChanges = new MutableLiveData<>();
-        canShare = new MutableLiveData<>();
-        canSave = new MutableLiveData<>();
-        isValid = new MutableLiveData<>();
-        nameValid = new MutableLiveData<>();
-        normalizedName = new MutableLiveData<>();
-        contactValid = new MutableLiveData<>();
-        titleFactory = new MutableLiveData<>();
-        overviewFactory = new MutableLiveData<>();
+        hasChangesLiveData = new PrivateLiveData<>(false);
+        canShareLiveData = new PrivateLiveData<>(false);
+        canSaveLiveData = new PrivateLiveData<>(false);
+        isValidLiveData = new PrivateLiveData<>(false);
+        nameValidLiveData = new PrivateLiveData<>(false);
+        normalizedNameLiveData = new PrivateLiveData<>("");
+        titleFactory = new PrivateLiveData<>(r -> "");
+        overviewFactory = new PrivateLiveData<>(r -> new SpannableString(" "));
+        emailValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
+        phoneValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
 
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(hasChangesObservable.subscribe(this::onHasChangesChanged));
         compositeDisposable.add(validObservable.subscribe(this::onValidChanged));
-        compositeDisposable.add(nameValidObservable.subscribe(nameValid::postValue));
-        compositeDisposable.add(normalizedNameObservable.subscribe(normalizedName::postValue));
-        compositeDisposable.add(contactValidObservable.subscribe(contactValid::postValue));
+        compositeDisposable.add(nameValidObservable.subscribe(nameValidLiveData::postValue));
+        compositeDisposable.add(normalizedNameObservable.subscribe(normalizedNameLiveData::postValue));
+        compositeDisposable.add(phoneValidationMessageObservable.subscribe(phoneValidationMessageLiveData::postValue));
+        compositeDisposable.add(emailValidationMessageObservable.subscribe(emailValidationMessageLiveData::postValue));
         compositeDisposable.add(Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable, this::getOverviewFactory)
                 .subscribe(overviewFactory::postValue));
     }
 
     private void onHasChangesChanged(Boolean hasChanges) {
         boolean c = Boolean.TRUE.equals(hasChanges);
-        boolean v = Boolean.TRUE.equals(isValid.getValue());
-        this.hasChanges.postValue(c);
-        canShare.postValue(v && !c);
-        canSave.postValue(v && c);
+        boolean v = Boolean.TRUE.equals(isValidLiveData.getValue());
+        this.hasChangesLiveData.postValue(c);
+        canShareLiveData.postValue(v && !c);
+        canSaveLiveData.postValue(v && c);
     }
 
     private void onValidChanged(Boolean isValid) {
-        boolean c = Boolean.TRUE.equals(hasChanges.getValue());
+        boolean c = Boolean.TRUE.equals(hasChangesLiveData.getValue());
         boolean v = Boolean.TRUE.equals(isValid);
-        this.isValid.postValue(v);
-        canShare.postValue(v && !c);
-        canSave.postValue(v && c);
+        this.isValidLiveData.postValue(v);
+        canShareLiveData.postValue(v && !c);
+        canSaveLiveData.postValue(v && c);
     }
 
     @NonNull
@@ -210,12 +234,16 @@ public class EditMentorViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
-    public LiveData<Boolean> getNameValid() {
-        return nameValid;
+    public LiveData<Boolean> getNameValidLiveData() {
+        return nameValidLiveData;
     }
 
-    public LiveData<Boolean> getContactValid() {
-        return contactValid;
+    public LiveData<Optional<ResourceMessageFactory>> getPhoneValidationMessageLiveData() {
+        return phoneValidationMessageLiveData;
+    }
+
+    public LiveData<Optional<ResourceMessageFactory>> getEmailValidationMessageLiveData() {
+        return emailValidationMessageLiveData;
     }
 
     public LiveData<Function<Resources, String>> getTitleFactory() {
@@ -226,24 +254,24 @@ public class EditMentorViewModel extends AndroidViewModel {
         return overviewFactory;
     }
 
-    public LiveData<String> getNormalizedName() {
-        return normalizedName;
+    public LiveData<String> getNormalizedNameLiveData() {
+        return normalizedNameLiveData;
     }
 
-    public LiveData<Boolean> getIsValid() {
-        return isValid;
+    public LiveData<Boolean> getIsValidLiveData() {
+        return isValidLiveData;
     }
 
-    public LiveData<Boolean> getCanShare() {
-        return canShare;
+    public LiveData<Boolean> getCanShareLiveData() {
+        return canShareLiveData;
     }
 
-    public LiveData<Boolean> getCanSave() {
-        return canSave;
+    public LiveData<Boolean> getCanSaveLiveData() {
+        return canSaveLiveData;
     }
 
-    public LiveData<Boolean> getHasChanges() {
-        return hasChanges;
+    public LiveData<Boolean> getHasChangesLiveData() {
+        return hasChangesLiveData;
     }
 
     public boolean isFromInitializedState() {
@@ -266,7 +294,7 @@ public class EditMentorViewModel extends AndroidViewModel {
             }
         }
         currentEntitySubject.postValue(mentorEntity);
-        coursesLiveData = new MutableLiveData<>(Collections.emptyList());
+        coursesLiveData = new PrivateLiveData<>(Collections.emptyList());
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -322,9 +350,24 @@ public class EditMentorViewModel extends AndroidViewModel {
         if (id != ID_NEW) {
             return dbLoader.getAllAlertsByMentorId(id);
         }
-        MutableLiveData<List<AlertListItem>> result = new MutableLiveData<>();
+        PrivateLiveData<List<AlertListItem>> result = new PrivateLiveData<>();
         result.postValue(Collections.emptyList());
         return result;
+    }
+
+    private static class PrivateLiveData<T> extends LiveData<T> {
+        PrivateLiveData(T value) {
+            super(value);
+        }
+
+        PrivateLiveData() {
+        }
+
+        @Override
+        public void postValue(T value) {
+            super.postValue(value);
+        }
+
     }
 
     private class CurrentValues implements Mentor {

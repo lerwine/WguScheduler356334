@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
@@ -34,6 +35,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
@@ -60,7 +62,6 @@ public class EditMentorActivity extends AppCompatActivity {
     private boolean notifiedSharingDisabled = true;
     private boolean notifyingSharingDisabled = true;
     private Snackbar snackBar;
-
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -156,17 +157,34 @@ public class EditMentorActivity extends AppCompatActivity {
             shareFloatingActionButton.setVisibility(View.GONE);
             deleteFloatingActionButton.setVisibility(View.GONE);
             setTitle(R.string.title_activity_new_mentor);
-            viewModel.getIsValid().observe(this, b -> saveFloatingActionButton.setEnabled(b));
+            viewModel.getIsValidLiveData().observe(this, b -> saveFloatingActionButton.setEnabled(b));
         } else {
             viewModel.getTitleFactory().observe(this, f -> setTitle(f.apply(getResources())));
             shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
-            viewModel.getCanSave().observe(this, b -> saveFloatingActionButton.setEnabled(b));
-            viewModel.getCanShare().observe(this, b -> shareFloatingActionButton.setEnabled(b));
+            viewModel.getCanSaveLiveData().observe(this, b -> saveFloatingActionButton.setEnabled(b));
+            viewModel.getCanShareLiveData().observe(this, b -> shareFloatingActionButton.setEnabled(b));
         }
-        viewModel.getNameValid().observe(this, this::onNameValidChanged);
-        viewModel.getContactValid().observe(this, this::onContactValidChanged);
-        viewModel.getNormalizedName().observe(this, this::onNameChanged);
+        viewModel.getNameValidLiveData().observe(this, this::onNameValidChanged);
+        viewModel.getPhoneValidationMessageLiveData().observe(this, (Optional<ResourceMessageFactory> resourceMessageFactory) -> {
+            if (resourceMessageFactory.isPresent()) {
+                ResourceMessageFactory f = resourceMessageFactory.get();
+                phoneNumberEditText.setError(f.apply(getResources()), AppCompatResources.getDrawable(this,
+                        (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+            } else {
+                phoneNumberEditText.setError(null);
+            }
+        });
+        viewModel.getEmailValidationMessageLiveData().observe(this, (Optional<ResourceMessageFactory> resourceMessageFactory) -> {
+            if (resourceMessageFactory.isPresent()) {
+                ResourceMessageFactory f = resourceMessageFactory.get();
+                emailAddressEditText.setError(f.apply(getResources()), AppCompatResources.getDrawable(this,
+                        (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+            } else {
+                emailAddressEditText.setError(null);
+            }
+        });
+        viewModel.getNormalizedNameLiveData().observe(this, this::onNameChanged);
         if (notifyingSharingDisabled) {
             notifyingSharingDisabled = notifiedSharingDisabled = false;
             showSharingDisabledSnackbar();
@@ -218,18 +236,6 @@ public class EditMentorActivity extends AppCompatActivity {
         } else {
             Log.d(LOG_TAG, "Enter onNameValidChanged(false); calling mentorNameEditText.setError(R.string.message_required, R.drawable.dialog_error)");
             mentorNameEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
-        }
-    }
-
-    private void onContactValidChanged(boolean isValid) {
-        if (isValid) {
-            Log.d(LOG_TAG, "Enter onContactValidChanged(true); calling setError(null) on phoneNumberEditText and emailAddressEditText");
-            phoneNumberEditText.setError(null);
-            emailAddressEditText.setError(null);
-        } else {
-            Log.d(LOG_TAG, "Enter onContactValidChanged(false); calling setError(R.string.message_phone_or_email_required, R.drawable.dialog_error) on phoneNumberEditText and emailAddressEditText");
-            phoneNumberEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
-            emailAddressEditText.setError(getResources().getString(R.string.message_phone_or_email_required), AppCompatResources.getDrawable(this, R.drawable.dialog_error));
         }
     }
 
@@ -326,10 +332,10 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void verifySaveChanges() {
-        OneTimeObservers.observeOnce(viewModel.getHasChanges(), this, hasChanges -> {
+        OneTimeObservers.observeOnce(viewModel.getHasChangesLiveData(), this, hasChanges -> {
             if (hasChanges) {
                 new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.observeOnce(viewModel.getIsValid(), this, isValid -> {
+                        .showYesNoCancelDialog(this::finish, () -> OneTimeObservers.observeOnce(viewModel.getIsValidLiveData(), this, isValid -> {
                             if (!isValid) {
                                 return;
                             }

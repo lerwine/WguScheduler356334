@@ -18,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.text.NumberFormat;
@@ -91,23 +90,23 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private final DbLoader dbLoader;
-    private final MutableLiveData<CourseDetails> entityLiveData;
+    private final PrivateLiveData<CourseDetails> entityLiveData;
     private final LiveData<List<TermListItem>> termsLiveData;
     private final LiveData<List<MentorListItem>> mentorsLiveData;
-    private final MutableLiveData<LocalDate> effectiveStartLiveData;
-    private final MutableLiveData<LocalDate> effectiveEndLiveData;
-    private final MutableLiveData<Boolean> termValidLiveData;
-    private final MutableLiveData<Boolean> numberValidLiveData;
-    private final MutableLiveData<Boolean> titleValidLiveData;
-    private final MutableLiveData<Integer> expectedStartErrorMessageLiveData;
-    private final MutableLiveData<Integer> expectedStartWarningMessageLiveData;
-    private final MutableLiveData<Integer> expectedEndMessageLiveData;
-    private final MutableLiveData<Integer> actualStartErrorMessageLiveData;
-    private final MutableLiveData<Integer> actualStartWarningMessageLiveData;
-    private final MutableLiveData<Integer> actualEndMessageLiveData;
-    private final MutableLiveData<Integer> competencyUnitsMessageLiveData;
-    private final MutableLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final MutableLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
+    private final PrivateLiveData<LocalDate> effectiveStartLiveData;
+    private final PrivateLiveData<LocalDate> effectiveEndLiveData;
+    private final PrivateLiveData<Boolean> termValidLiveData;
+    private final PrivateLiveData<Boolean> numberValidLiveData;
+    private final PrivateLiveData<Boolean> titleValidLiveData;
+    private final PrivateLiveData<Integer> expectedStartErrorMessageLiveData;
+    private final PrivateLiveData<Integer> expectedStartWarningMessageLiveData;
+    private final PrivateLiveData<Integer> expectedEndMessageLiveData;
+    private final PrivateLiveData<Integer> actualStartErrorMessageLiveData;
+    private final PrivateLiveData<Integer> actualStartWarningMessageLiveData;
+    private final PrivateLiveData<Integer> actualEndMessageLiveData;
+    private final PrivateLiveData<Integer> competencyUnitsMessageLiveData;
+    private final PrivateLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final CurrentValues currentValues;
     private final ArrayList<TermCourseListItem> coursesForTerm;
     private final Observer<List<TermListItem>> termsLoadedObserver;
@@ -139,21 +138,21 @@ public class EditCourseViewModel extends AndroidViewModel {
         currentValues = new CurrentValues();
         coursesForTerm = new ArrayList<>();
 
-        effectiveStartLiveData = new MutableLiveData<>();
-        effectiveEndLiveData = new MutableLiveData<>();
-        entityLiveData = new MutableLiveData<>();
-        termValidLiveData = new MutableLiveData<>(false);
-        numberValidLiveData = new MutableLiveData<>(false);
-        titleValidLiveData = new MutableLiveData<>(false);
-        expectedStartErrorMessageLiveData = new MutableLiveData<>();
-        expectedStartWarningMessageLiveData = new MutableLiveData<>();
-        expectedEndMessageLiveData = new MutableLiveData<>();
-        actualStartErrorMessageLiveData = new MutableLiveData<>();
-        actualStartWarningMessageLiveData = new MutableLiveData<>();
-        actualEndMessageLiveData = new MutableLiveData<>();
-        competencyUnitsMessageLiveData = new MutableLiveData<>();
-        titleFactoryLiveData = new MutableLiveData<>(c -> c.getString(R.string.title_activity_view_course));
-        overviewFactoryLiveData = new MutableLiveData<>(r -> new SpannableString(""));
+        effectiveStartLiveData = new PrivateLiveData<>();
+        effectiveEndLiveData = new PrivateLiveData<>();
+        entityLiveData = new PrivateLiveData<>();
+        termValidLiveData = new PrivateLiveData<>(false);
+        numberValidLiveData = new PrivateLiveData<>(false);
+        titleValidLiveData = new PrivateLiveData<>(false);
+        expectedStartErrorMessageLiveData = new PrivateLiveData<>();
+        expectedStartWarningMessageLiveData = new PrivateLiveData<>();
+        expectedEndMessageLiveData = new PrivateLiveData<>();
+        actualStartErrorMessageLiveData = new PrivateLiveData<>();
+        actualStartWarningMessageLiveData = new PrivateLiveData<>();
+        actualEndMessageLiveData = new PrivateLiveData<>();
+        competencyUnitsMessageLiveData = new PrivateLiveData<>();
+        titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_course));
+        overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(""));
 
         termsLoadedObserver = this::onTermsLoaded;
         mentorsLoadedObserver = this::onMentorsLoaded;
@@ -332,11 +331,11 @@ public class EditCourseViewModel extends AndroidViewModel {
         return termsLiveData;
     }
 
-    public MutableLiveData<LocalDate> getEffectiveStartLiveData() {
+    public LiveData<LocalDate> getEffectiveStartLiveData() {
         return effectiveStartLiveData;
     }
 
-    public MutableLiveData<LocalDate> getEffectiveEndLiveData() {
+    public LiveData<LocalDate> getEffectiveEndLiveData() {
         return effectiveEndLiveData;
     }
 
@@ -384,7 +383,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         return titleFactoryLiveData;
     }
 
-    public MutableLiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
+    public LiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
         return overviewFactoryLiveData;
     }
 
@@ -400,7 +399,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (id != ID_NEW) {
             return dbLoader.getAllAlertsByCourseId(id);
         }
-        MutableLiveData<List<AlertListItem>> result = new MutableLiveData<>();
+        PrivateLiveData<List<AlertListItem>> result = new PrivateLiveData<>();
         result.postValue(Collections.emptyList());
         return result;
     }
@@ -410,7 +409,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (id != ID_NEW) {
             return dbLoader.getAlertsByCourseId(id);
         }
-        MutableLiveData<List<CourseAlert>> result = new MutableLiveData<>();
+        PrivateLiveData<List<CourseAlert>> result = new PrivateLiveData<>();
         result.postValue(Collections.emptyList());
         return result;
     }
@@ -828,6 +827,25 @@ public class EditCourseViewModel extends AndroidViewModel {
         Optional<MentorListItem> result = EntityHelper.findById(originalValues.getMentorId(), mentorListItems);
         result.ifPresent(t -> originalValues.setMentor(t));
         return result.orElse(null);
+    }
+
+    private static class PrivateLiveData<T> extends LiveData<T> {
+        PrivateLiveData(T value) {
+            super(value);
+        }
+
+        PrivateLiveData() {
+        }
+
+        @Override
+        public void postValue(T value) {
+            super.postValue(value);
+        }
+
+        @Override
+        public void setValue(T value) {
+            super.setValue(value);
+        }
     }
 
     private class CurrentValues implements Course {

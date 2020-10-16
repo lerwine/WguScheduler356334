@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -113,15 +112,15 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final BehaviorSubject<String> customMessageTextSubject;
     @SuppressWarnings("FieldCanBeLocal") // Needs to be a field so it doesn't get garbage-collected
     private final CompositeDisposable compositeDisposable;
-    private final MutableLiveData<ResourceMessageResult> initializationFailureLiveData;
-    private final MutableLiveData<Boolean> validLiveData;
-    private final MutableLiveData<Boolean> canSaveLiveData;
-    private final MutableLiveData<Boolean> hasChangesLiveData;
-    private final MutableLiveData<String> effectiveAlertDateStringLiveData;
-    private final MutableLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeLiveData;
-    private final MutableLiveData<Optional<ResourceMessageFactory>> daysValidationMessageLiveData;
-    private final MutableLiveData<Optional<ResourceMessageFactory>> selectedDateValidationMessageLiveData;
-    private final MutableLiveData<AlertEntity> alertEntityLiveData;
+    private final PrivateLiveData<ResourceMessageResult> initializationFailureLiveData;
+    private final PrivateLiveData<Boolean> validLiveData;
+    private final PrivateLiveData<Boolean> canSaveLiveData;
+    private final PrivateLiveData<Boolean> hasChangesLiveData;
+    private final PrivateLiveData<String> effectiveAlertDateStringLiveData;
+    private final PrivateLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeLiveData;
+    private final PrivateLiveData<Optional<ResourceMessageFactory>> daysValidationMessageLiveData;
+    private final PrivateLiveData<Optional<ResourceMessageFactory>> selectedDateValidationMessageLiveData;
+    private final PrivateLiveData<AlertEntity> alertEntityLiveData;
     private BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target;
     @StringRes
     private volatile int startLabelTextResourceId;
@@ -158,15 +157,15 @@ public class EditAlertViewModel extends AndroidViewModel {
         selectedTimeSubject.onNext(Optional.empty());
         customMessageTextSubject.onNext("");
 
-        initializationFailureLiveData = new MutableLiveData<>();
-        validLiveData = new MutableLiveData<>(false);
-        canSaveLiveData = new MutableLiveData<>(false);
-        hasChangesLiveData = new MutableLiveData<>(false);
-        daysValidationMessageLiveData = new MutableLiveData<>(Optional.empty());
-        selectedDateValidationMessageLiveData = new MutableLiveData<>(Optional.empty());
-        effectiveAlertDateStringLiveData = new MutableLiveData<>("");
-        effectiveAlertDateTimeLiveData = new MutableLiveData<>(Optional.empty());
-        alertEntityLiveData = new MutableLiveData<>();
+        initializationFailureLiveData = new PrivateLiveData<>();
+        validLiveData = new PrivateLiveData<>(false);
+        canSaveLiveData = new PrivateLiveData<>(false);
+        hasChangesLiveData = new PrivateLiveData<>(false);
+        daysValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
+        selectedDateValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
+        effectiveAlertDateStringLiveData = new PrivateLiveData<>("");
+        effectiveAlertDateTimeLiveData = new PrivateLiveData<>(Optional.empty());
+        alertEntityLiveData = new PrivateLiveData<>();
 
         Observable<String> normalizedMessageObservable = customMessageTextSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<BinaryOptional<Integer, ResourceMessageFactory>> daysEditTextParseResultObservable = Observable.combineLatest(daysTextSubject, selectedOptionSubject,
@@ -622,6 +621,25 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     public synchronized Completable delete() {
         return target.flatMap(dbLoader::deleteCourseAlert, dbLoader::deleteAssessmentAlert);
+    }
+
+    private static class PrivateLiveData<T> extends LiveData<T> {
+        PrivateLiveData(T value) {
+            super(value);
+        }
+
+        PrivateLiveData() {
+        }
+
+        @Override
+        public void postValue(T value) {
+            super.postValue(value);
+        }
+
+        @Override
+        public void setValue(T value) {
+            super.setValue(value);
+        }
     }
 
 }
