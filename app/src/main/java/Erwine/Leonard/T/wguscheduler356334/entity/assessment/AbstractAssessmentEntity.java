@@ -3,7 +3,6 @@ package Erwine.Leonard.T.wguscheduler356334.entity.assessment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
-import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 
 import java.time.LocalDate;
@@ -15,7 +14,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 
 public abstract class AbstractAssessmentEntity<T extends AbstractAssessmentEntity<T>> extends AbstractNotedEntity<T> implements Assessment {
 
-    @ForeignKey(entity = CourseEntity.class, parentColumns = {CourseEntity.COLNAME_ID}, childColumns = {COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_COURSE_ID)
     private long courseId;
     @ColumnInfo(name = COLNAME_CODE, collate = ColumnInfo.NOCASE)

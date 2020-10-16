@@ -9,7 +9,6 @@ import android.text.style.StyleSpan;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
-import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 
 import java.time.LocalDate;
@@ -17,8 +16,6 @@ import java.util.Objects;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
@@ -33,11 +30,9 @@ public abstract class AbstractCourseEntity<T extends AbstractCourseEntity<T>> ex
         return builder.append(": ").append(source.getTitle());
     }
 
-    @ForeignKey(entity = TermEntity.class, parentColumns = {TermEntity.COLNAME_ID}, childColumns = {COLNAME_TERM_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_TERM_ID)
     private long termId;
 
-    @ForeignKey(entity = MentorEntity.class, parentColumns = {MentorEntity.COLNAME_ID}, childColumns = {COLNAME_MENTOR_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_MENTOR_ID)
     @Nullable
     private Long mentorId;

@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.entity.assessment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 
@@ -17,10 +18,16 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 /**
  * Represents a row of data from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} database table.
  */
-@Entity(tableName = AppDb.TABLE_NAME_ASSESSMENTS, indices = {
-        @Index(value = AssessmentEntity.COLNAME_COURSE_ID, name = AssessmentEntity.INDEX_COURSE),
-        @Index(value = AssessmentEntity.COLNAME_CODE, name = AssessmentEntity.INDEX_CODE)
-})
+@Entity(
+        tableName = AppDb.TABLE_NAME_ASSESSMENTS,
+        indices = {
+                @Index(value = AssessmentEntity.COLNAME_COURSE_ID, name = AssessmentEntity.INDEX_COURSE),
+                @Index(value = AssessmentEntity.COLNAME_CODE, name = AssessmentEntity.INDEX_CODE)
+        },
+        foreignKeys = {
+                @ForeignKey(entity = CourseEntity.class, parentColumns = {CourseEntity.COLNAME_ID}, childColumns = {Assessment.COLNAME_COURSE_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
+        }
+)
 public final class AssessmentEntity extends AbstractAssessmentEntity<AssessmentEntity> implements Comparable<AssessmentEntity> {
 
     /**

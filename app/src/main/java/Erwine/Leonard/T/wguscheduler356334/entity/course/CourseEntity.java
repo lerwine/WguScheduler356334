@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.entity.course;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 
@@ -10,18 +11,27 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 /**
  * Represents a row of data from the {@link AppDb#TABLE_NAME_COURSES "courses"} database table.
  */
-@Entity(tableName = AppDb.TABLE_NAME_COURSES, indices = {
-        @Index(value = CourseEntity.COLNAME_TERM_ID, name = CourseEntity.INDEX_TERM),
-        @Index(value = CourseEntity.COLNAME_MENTOR_ID, name = CourseEntity.INDEX_MENTOR),
-        @Index(value = {CourseEntity.COLNAME_NUMBER, CourseEntity.COLNAME_TERM_ID}, name = CourseEntity.INDEX_NUMBER, unique = true)
-})
+@Entity(
+        tableName = AppDb.TABLE_NAME_COURSES,
+        indices = {
+                @Index(value = CourseEntity.COLNAME_TERM_ID, name = CourseEntity.INDEX_TERM),
+                @Index(value = CourseEntity.COLNAME_MENTOR_ID, name = CourseEntity.INDEX_MENTOR),
+                @Index(value = {CourseEntity.COLNAME_NUMBER, CourseEntity.COLNAME_TERM_ID}, name = CourseEntity.INDEX_NUMBER, unique = true)
+        },
+        foreignKeys = {
+                @ForeignKey(entity = TermEntity.class, parentColumns = {Term.COLNAME_ID}, childColumns = {Course.COLNAME_TERM_ID}, onDelete = ForeignKey.CASCADE, deferred = true),
+                @ForeignKey(entity = MentorEntity.class, parentColumns = {Mentor.COLNAME_ID}, childColumns = {Course.COLNAME_MENTOR_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
+        }
+)
 public final class CourseEntity extends AbstractCourseEntity<CourseEntity> {
 
     /**

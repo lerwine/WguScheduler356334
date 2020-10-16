@@ -21,6 +21,10 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
         indices = {
                 @Index(value = AlertLink.COLNAME_ALERT_ID, name = CourseAlertLink.INDEX_ALERT, unique = true),
                 @Index(value = AlertLink.COLNAME_TARGET_ID, name = CourseAlertLink.INDEX_LINK)
+        },
+        foreignKeys = {
+                @ForeignKey(entity = AlertEntity.class, parentColumns = {AlertEntity.COLNAME_ID}, childColumns = {AlertLink.COLNAME_ALERT_ID}, onDelete = ForeignKey.CASCADE, deferred = true),
+                @ForeignKey(entity = CourseEntity.class, parentColumns = {CourseEntity.COLNAME_ID}, childColumns = {AlertLink.COLNAME_TARGET_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
         }
 )
 public class CourseAlertLink implements AlertLink {
@@ -35,10 +39,9 @@ public class CourseAlertLink implements AlertLink {
      */
     public static final String INDEX_LINK = "IDX_COURSE_LINK";
 
-    @ForeignKey(entity = AlertEntity.class, parentColumns = {AlertEntity.COLNAME_ID}, childColumns = {COLNAME_ALERT_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
     @ColumnInfo(name = COLNAME_ALERT_ID)
     private long alertId;
-    @ForeignKey(entity = CourseEntity.class, parentColumns = {CourseEntity.COLNAME_ID}, childColumns = {COLNAME_TARGET_ID}, onDelete = ForeignKey.CASCADE, deferred = true)
+
     @ColumnInfo(name = COLNAME_TARGET_ID)
     private long targetId;
 
