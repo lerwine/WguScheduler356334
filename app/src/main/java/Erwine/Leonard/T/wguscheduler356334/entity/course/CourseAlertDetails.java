@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.entity.course;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.room.Ignore;
 import androidx.room.Relation;
 
 import java.util.Objects;
@@ -25,9 +26,22 @@ public class CourseAlertDetails extends CourseAlert {
         this.course = course;
     }
 
+    @Ignore
+    public CourseAlertDetails(@NonNull AlertEntity alert, @NonNull CourseEntity course) {
+        super(new CourseAlertLink(alert.getId(), course.getId()), alert);
+        this.course = course;
+    }
+
+    @Ignore
     public CourseAlertDetails(@NonNull CourseAlertDetails courseAlert) {
         super(courseAlert);
         course = new CourseEntity(courseAlert.course);
+    }
+
+    @Ignore
+    public CourseAlertDetails() {
+        super();
+        course = new CourseEntity();
     }
 
     @NonNull

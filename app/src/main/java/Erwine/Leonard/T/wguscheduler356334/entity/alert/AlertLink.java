@@ -31,7 +31,7 @@ public interface AlertLink extends ToStringBuildable {
             builder.acceptError(R.string.message_alert_has_no_target);
         }
         AlertEntity alert = entity.getAlert();
-        if (alert.getId() != id) {
+        if (alert.getId() != link.getAlertId()) {
             builder.acceptError(R.string.message_alert_mismatch);
         }
         Alert.validate(builder, alert);

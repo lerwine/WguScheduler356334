@@ -43,7 +43,7 @@ public class CourseAlertLink implements AlertLink {
     private long targetId;
 
     public CourseAlertLink(long alertId, long targetId) {
-        this.alertId = IdIndexedEntity.assertNotNewId(alertId);
+        this.alertId = alertId;
         this.targetId = IdIndexedEntity.assertNotNewId(targetId);
     }
 

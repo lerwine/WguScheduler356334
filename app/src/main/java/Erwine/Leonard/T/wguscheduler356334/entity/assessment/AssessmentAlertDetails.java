@@ -25,9 +25,21 @@ public class AssessmentAlertDetails extends AssessmentAlert {
     }
 
     @Ignore
+    public AssessmentAlertDetails(@NonNull AlertEntity alert, @NonNull AssessmentEntity assessment) {
+        super(new AssessmentAlertLink(alert.getId(), assessment.getId()), alert);
+        this.assessment = assessment;
+    }
+
+    @Ignore
     public AssessmentAlertDetails(@NonNull AssessmentAlertDetails source) {
         super(source);
         assessment = new AssessmentEntity(source.assessment);
+    }
+
+    @Ignore
+    public AssessmentAlertDetails() {
+        super();
+        assessment = new AssessmentEntity();
     }
 
     @NonNull

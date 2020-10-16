@@ -39,7 +39,7 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     private String message;
 
     public AssessmentAlert(@NonNull AssessmentAlertLink link, @NonNull AlertEntity alert) {
-        if (IdIndexedEntity.assertNotNewId(alert.getId()) != link.getAlertId()) {
+        if (alert.getId() != link.getAlertId()) {
             throw new IllegalArgumentException();
         }
         this.link = link;
@@ -48,15 +48,18 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
 
     @Ignore
     public AssessmentAlert(@NonNull AssessmentAlert source) {
-        if (IdIndexedEntity.assertNotNewId(alert.getId()) != link.getAlertId()) {
-            throw new IllegalArgumentException();
-        }
         alert = new AlertEntity(source.alert);
         link = new AssessmentAlertLink(source.link);
         alertDate = source.alertDate;
         relativeDays = source.relativeDays;
         messagePresent = source.messagePresent;
         message = source.message;
+    }
+
+    @Ignore
+    public AssessmentAlert() {
+        alert = new AlertEntity();
+        link = new AssessmentAlertLink();
     }
 
     public boolean isMessagePresent() {

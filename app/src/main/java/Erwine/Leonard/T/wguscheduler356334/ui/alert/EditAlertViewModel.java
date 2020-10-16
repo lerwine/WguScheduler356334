@@ -28,12 +28,10 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
@@ -126,11 +124,11 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final MutableLiveData<AlertEntity> alertEntityLiveData;
     private BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target;
     @StringRes
-    private int startLabelTextResourceId;
+    private volatile int startLabelTextResourceId;
     @StringRes
-    private int endLabelTextResourceId;
+    private volatile int endLabelTextResourceId;
     @Nullable
-    private Long timeSpec;
+    private volatile Long timeSpec;
 
     public EditAlertViewModel(@NonNull Application application) {
         super(application);
@@ -266,14 +264,15 @@ public class EditAlertViewModel extends AndroidViewModel {
                 effectiveAlertDate.ofPrimary().flatMap(d -> effectiveTime.map(d::atTime))).subscribe(effectiveAlertDateTimeLiveData::postValue));
         compositeDisposable.add(alertEntitySubject.subscribe(alertEntity -> {
             alertEntityLiveData.postValue(alertEntity);
-            timeSpec = alertEntity.getTimeSpec();
-            AlertDateOption alertDateOption = AlertDateOption.of(alertEntity.isSubsequent(), timeSpec);
+            long t = alertEntity.getTimeSpec();
+            AlertDateOption alertDateOption = AlertDateOption.of(alertEntity.isSubsequent(), t);
             setAlertDateOption(alertDateOption);
             if (alertDateOption == AlertDateOption.EXPLICIT) {
-                selectedDateSubject.onNext(Optional.ofNullable(LocalDateConverter.toLocalDate(timeSpec)));
+                selectedDateSubject.onNext(Optional.ofNullable(LocalDateConverter.toLocalDate(t)));
                 daysTextSubject.onNext("");
             } else {
-                daysTextSubject.onNext(NUMBER_FORMATTER.format(Math.abs(timeSpec)));
+                timeSpec = t;
+                daysTextSubject.onNext(NUMBER_FORMATTER.format(Math.abs(t)));
                 selectedDateSubject.onNext(Optional.empty());
             }
             Optional<LocalTime> alertTime = Optional.ofNullable(alertEntity.getAlertTime());
@@ -465,11 +464,11 @@ public class EditAlertViewModel extends AndroidViewModel {
     private synchronized void restoreViewModelState(@NonNull Bundle state) {
         int type = state.getInt(STATE_KEY_TYPE, 0);
         if (type == TYPE_VALUE_COURSE) {
-            CourseAlertDetails courseAlertDetails = new CourseAlertDetails(new CourseAlertLink(), new AlertEntity(), new CourseEntity());
+            CourseAlertDetails courseAlertDetails = new CourseAlertDetails();
             courseAlertDetails.restoreState(state, true);
             onCourseAlertLoaded(courseAlertDetails);
         } else {
-            AssessmentAlertDetails assessmentAlertDetails = new AssessmentAlertDetails(new AssessmentAlertLink(), new AlertEntity(), new AssessmentEntity());
+            AssessmentAlertDetails assessmentAlertDetails = new AssessmentAlertDetails();
             assessmentAlertDetails.restoreState(state, true);
             onAssessmentAlertLoaded(assessmentAlertDetails);
         }
@@ -492,7 +491,6 @@ public class EditAlertViewModel extends AndroidViewModel {
      */
     synchronized void onCourseAlertLoaded(@NonNull CourseAlertDetails courseAlertDetails) {
         initializeAlert(BinaryAlternate.ofPrimary(courseAlertDetails));
-//        alertEntity = courseAlertDetails.getAlert();
     }
 
     private void onCourseAlertLoadFailed(Throwable throwable) {
@@ -507,7 +505,7 @@ public class EditAlertViewModel extends AndroidViewModel {
      */
     synchronized void onCourseLoaded(@NonNull CourseDetails courseDetails) {
         AlertEntity entity = new AlertEntity();
-        initializeAlert(BinaryAlternate.ofPrimary(new CourseAlertDetails(new CourseAlertLink(entity.getId(), courseDetails.getId()), entity, new CourseEntity(courseDetails))));
+        initializeAlert(BinaryAlternate.ofPrimary(new CourseAlertDetails(entity, new CourseEntity(courseDetails))));
     }
 
     private void onCourseLoadFailed(Throwable throwable) {
@@ -536,7 +534,7 @@ public class EditAlertViewModel extends AndroidViewModel {
      */
     synchronized void onAssessmentLoaded(@NonNull AssessmentDetails assessmentDetails) {
         AlertEntity entity = new AlertEntity();
-        initializeAlert(BinaryAlternate.ofSecondary(new AssessmentAlertDetails(new AssessmentAlertLink(entity.getId(), assessmentDetails.getId()), entity, new AssessmentEntity(assessmentDetails))));
+        initializeAlert(BinaryAlternate.ofSecondary(new AssessmentAlertDetails(entity, new AssessmentEntity(assessmentDetails))));
     }
 
     private void onAssessmentLoadFailed(Throwable throwable) {
@@ -550,14 +548,20 @@ public class EditAlertViewModel extends AndroidViewModel {
             typeResourceIdSubject.onNext(TYPE_VALUE_COURSE);
             CourseEntity courseEntity = courseAlertDetails.getCourse();
             Optional<LocalDate> date = Optional.ofNullable(courseEntity.getActualStart());
-            eventStartSubject.onNext((date.isPresent()) ? date : Optional.ofNullable(courseEntity.getExpectedStart()));
-            date = Optional.ofNullable(courseEntity.getActualEnd());
             if (date.isPresent()) {
                 startLabelTextResourceId = R.string.label_actual_start;
+                eventStartSubject.onNext(date);
+            } else {
+                startLabelTextResourceId = R.string.label_expected_start;
+                eventStartSubject.onNext(Optional.ofNullable(courseEntity.getExpectedStart()));
+            }
+            date = Optional.ofNullable(courseEntity.getActualEnd());
+            if (date.isPresent()) {
+                endLabelTextResourceId = R.string.label_actual_end;
                 eventEndSubject.onNext(date);
                 beforeEndAllowedSubject.onNext(false);
             } else {
-                startLabelTextResourceId = R.string.label_expected_start;
+                endLabelTextResourceId = R.string.label_expected_end;
                 eventEndSubject.onNext(Optional.ofNullable(courseEntity.getExpectedEnd()));
                 beforeEndAllowedSubject.onNext(true);
             }
@@ -605,10 +609,11 @@ public class EditAlertViewModel extends AndroidViewModel {
     private ResourceMessageResult onSave(@NonNull AlertEntity entity) {
         entity.setSubsequent(isSubsequent());
         AlertDateOption dateSpecOption = selectedOptionSubject.getValue();
-        if (null == timeSpec) {
+        Long t = timeSpec;
+        if (null == t) {
             return ValidationMessage.ofSingleError((dateSpecOption.isExplicit()) ? R.string.message_alert_date_required : R.string.message_alert_days_required);
         }
-        entity.setTimeSpec(timeSpec);
+        entity.setTimeSpec(t);
         String customMessageText = customMessageTextSubject.getValue();
         entity.setCustomMessage((customMessageText.isEmpty()) ? null : customMessageText);
         entity.setAlertTime(selectedTimeSubject.getValue().orElse(null));
