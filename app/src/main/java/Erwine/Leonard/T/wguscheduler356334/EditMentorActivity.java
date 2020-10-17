@@ -1,9 +1,9 @@
 package Erwine.Leonard.T.wguscheduler356334;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
@@ -47,8 +47,6 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 public class EditMentorActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ViewTermActivity.class.getName();
-    private static final String STATE_KEY_NOTIFIED_SHARING_DISABLED = "EditMentorActivity:notifiedSharingDisabled";
-    private static final String STATE_KEY_NOTIFYING_SHARING_DISABLED = "EditMentorActivity:notifyingSharingDisabled";
 
     private EditMentorViewModel viewModel;
     private EditText mentorNameEditText;
@@ -59,8 +57,8 @@ public class EditMentorActivity extends AppCompatActivity {
     private FloatingActionButton saveFloatingActionButton;
     private FloatingActionButton deleteFloatingActionButton;
     private AlertDialog waitDialog;
-    private boolean notifiedSharingDisabled = true;
-    private boolean notifyingSharingDisabled = true;
+    //    private boolean notifiedSharingDisabled = true;
+//    private boolean notifyingSharingDisabled = true;
     private Snackbar snackBar;
 
     /**
@@ -80,14 +78,6 @@ public class EditMentorActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
-        }
-        if (null != savedInstanceState && savedInstanceState.containsKey(STATE_KEY_NOTIFIED_SHARING_DISABLED)) {
-            notifyingSharingDisabled = savedInstanceState.getBoolean(STATE_KEY_NOTIFYING_SHARING_DISABLED, false);
-            if (notifyingSharingDisabled)
-                notifiedSharingDisabled = savedInstanceState.getBoolean(STATE_KEY_NOTIFIED_SHARING_DISABLED, false);
-            if (notifyingSharingDisabled) {
-                showSharingDisabledSnackbar();
-            }
         }
         mentorNameEditText = findViewById(R.id.mentorNameEditText);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
@@ -123,8 +113,6 @@ public class EditMentorActivity extends AppCompatActivity {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveState(outState);
-        outState.putBoolean(STATE_KEY_NOTIFIED_SHARING_DISABLED, notifiedSharingDisabled);
-        outState.putBoolean(STATE_KEY_NOTIFYING_SHARING_DISABLED, null != snackBar && snackBar.isShownOrQueued());
         super.onSaveInstanceState(outState);
     }
 
@@ -185,35 +173,45 @@ public class EditMentorActivity extends AppCompatActivity {
             }
         });
         viewModel.getNormalizedNameLiveData().observe(this, this::onNameChanged);
-        if (notifyingSharingDisabled) {
-            notifyingSharingDisabled = notifiedSharingDisabled = false;
-            showSharingDisabledSnackbar();
+        viewModel.getSharingDisabledNotificationVisibleLiveData().observe(this, this::onSharingDisabledNotificationVisibleChanged);
+    }
+
+    private synchronized void onSharingDisabledNotificationVisibleChanged(Boolean showNotification) {
+        Snackbar sb = snackBar;
+        if (showNotification) {
+            if (null == sb) {
+                snackBar = Snackbar.make(shareFloatingActionButton, "Sharing disabled until changes are saved", Snackbar.LENGTH_LONG);
+                Resources resources = getResources();
+                SpannableStringBuilder builder = new SpannableStringBuilder("DISMISS");
+                builder.setSpan(new ForegroundColorSpan(resources.getColor(R.color.color_on_primary, null)), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                snackBar.setAction(builder, v -> snackBar.dismiss())
+                        .setActionTextColor(resources.getColor(R.color.color_on_secondary, null))
+                        .setBackgroundTint(resources.getColor(R.color.color_primary_variant, null))
+                        .addCallback(new BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                            @SuppressLint("SwitchIntDef")
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar, int event) {
+                                super.onDismissed(transientBottomBar, event);
+                                switch (event) {
+                                    case BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION:
+                                    case BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT:
+                                        EditMentorActivity.this.onSharingDisabledSnackbarDismissed();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }).show();
+            }
+        } else if (null != sb) {
+            snackBar = null;
+            sb.dismiss();
         }
     }
 
-    private void showSharingDisabledSnackbar() {
-        if (notifyingSharingDisabled || notifiedSharingDisabled) {
-            return;
-        }
-        notifyingSharingDisabled = notifiedSharingDisabled = true;
-        snackBar = Snackbar.make(shareFloatingActionButton, "Sharing disabled until changes are saved", Snackbar.LENGTH_LONG);
-        Resources resources = getResources();
-        SpannableStringBuilder builder = new SpannableStringBuilder("DISMISS");
-        builder.setSpan(new ForegroundColorSpan(resources.getColor(R.color.color_on_primary, null)), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
-        snackBar
-                .setAction(Html.toHtml(builder, Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE), v -> {
-                    snackBar.dismiss();
-                    snackBar = null;
-                })
-                .setActionTextColor(resources.getColor(R.color.color_on_secondary, null))
-                .setBackgroundTint(resources.getColor(R.color.color_primary_variant, null))
-                .addCallback(new BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                    @Override
-                    public void onDismissed(Snackbar transientBottomBar, int event) {
-                        super.onDismissed(transientBottomBar, event);
-                        notifyingSharingDisabled = false;
-                    }
-                }).show();
+    private synchronized void onSharingDisabledSnackbarDismissed() {
+        snackBar = null;
+        viewModel.setSharingDisabledNotificationDismissed(true);
     }
 
     private void onNameChanged(String s) {

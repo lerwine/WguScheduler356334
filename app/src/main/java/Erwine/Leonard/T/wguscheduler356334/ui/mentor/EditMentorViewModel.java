@@ -53,6 +53,7 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     private static final String LOG_TAG = EditMentorViewModel.class.getName();
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
+    private static final String STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED = "sharing_disabled_notification_dismissed";
     private static final Predicate<String> EMAIL_PREDICATE = Pattern.compile("^[^@]+@[^.]+\\.[^.]+.*$").asPredicate();
     private static final Predicate<String> PHONE_PREDICATE = Pattern.compile("^([0-9+]|\\(\\d{1,3}\\))[0-9\\-. ]{3,15}").asPredicate();
 
@@ -60,12 +61,14 @@ public class EditMentorViewModel extends AndroidViewModel {
     private final PrivateLiveData<MentorEntity> currentEntitySubject;
     private final PrivateLiveData<Function<Resources, String>> titleFactory;
     private final PrivateLiveData<Function<Resources, Spanned>> overviewFactory;
+    private final BehaviorSubject<Boolean> sharingDisabledNotificationDismissedSubject;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<String> phoneNumberSubject;
     private final BehaviorSubject<String> emailAddressSubject;
     private final BehaviorSubject<String> notesSubject;
     private final PrivateLiveData<Boolean> canShareLiveData;
     private final PrivateLiveData<Boolean> canSaveLiveData;
+    private final PrivateLiveData<Boolean> sharingDisabledNotificationVisibleLiveData;
     private final PrivateLiveData<String> normalizedNameLiveData;
     private final PrivateLiveData<Boolean> nameValidLiveData;
     private final PrivateLiveData<Optional<ResourceMessageFactory>> emailValidationMessageLiveData;
@@ -88,6 +91,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         phoneNumberSubject = BehaviorSubject.create();
         emailAddressSubject = BehaviorSubject.create();
         notesSubject = BehaviorSubject.create();
+        sharingDisabledNotificationDismissedSubject = BehaviorSubject.create();
         currentValues = new CurrentValues();
 
         Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
@@ -117,12 +121,12 @@ public class EditMentorViewModel extends AndroidViewModel {
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, phoneValidationMessageObservable, emailValidationMessageObservable,
                 (nameValid, phoneValidationMessage, emailValidationMessage) -> nameValid && phoneValidationMessage.map(ResourceMessageFactory::isWarning).orElse(true) &&
                         emailValidationMessage.map(ResourceMessageFactory::isWarning).orElse(true));
-
         hasChangesLiveData = new PrivateLiveData<>(false);
         canShareLiveData = new PrivateLiveData<>(false);
         canSaveLiveData = new PrivateLiveData<>(false);
         isValidLiveData = new PrivateLiveData<>(false);
         nameValidLiveData = new PrivateLiveData<>(false);
+        sharingDisabledNotificationVisibleLiveData = new PrivateLiveData<>(false);
         normalizedNameLiveData = new PrivateLiveData<>("");
         titleFactory = new PrivateLiveData<>(r -> "");
         overviewFactory = new PrivateLiveData<>(r -> new SpannableString(" "));
@@ -138,6 +142,8 @@ public class EditMentorViewModel extends AndroidViewModel {
         compositeDisposable.add(emailValidationMessageObservable.subscribe(emailValidationMessageLiveData::postValue));
         compositeDisposable.add(Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable, this::getOverviewFactory)
                 .subscribe(overviewFactory::postValue));
+        compositeDisposable.add(Observable.combineLatest(hasChangesObservable, validObservable, sharingDisabledNotificationDismissedSubject, (c, v, d) -> v && c && !d)
+                .subscribe(sharingDisabledNotificationVisibleLiveData::postValue));
     }
 
     private void onHasChangesChanged(Boolean hasChanges) {
@@ -234,6 +240,18 @@ public class EditMentorViewModel extends AndroidViewModel {
         currentValues.setNotes(value);
     }
 
+    public boolean isSharingDisabledNotificationDismissed() {
+        return sharingDisabledNotificationDismissedSubject.getValue();
+    }
+
+    public void setSharingDisabledNotificationDismissed(boolean value) {
+        sharingDisabledNotificationDismissedSubject.onNext(value);
+    }
+
+    public LiveData<Boolean> getSharingDisabledNotificationVisibleLiveData() {
+        return sharingDisabledNotificationVisibleLiveData;
+    }
+
     public LiveData<Boolean> getNameValidLiveData() {
         return nameValidLiveData;
     }
@@ -283,6 +301,7 @@ public class EditMentorViewModel extends AndroidViewModel {
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         mentorEntity = new MentorEntity();
         if (null != state) {
+            sharingDisabledNotificationDismissedSubject.onNext(state.getBoolean(STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED, false));
             currentValues.restoreState(state, false);
             long id = currentValues.getId();
             if (ID_NEW == id || fromInitializedState) {
@@ -337,6 +356,7 @@ public class EditMentorViewModel extends AndroidViewModel {
     public void saveState(Bundle outState) {
         Log.d(LOG_TAG, "Enter saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
+        outState.putBoolean(STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED, sharingDisabledNotificationDismissedSubject.getValue());
         currentValues.saveState(outState, false);
         mentorEntity.saveState(outState, true);
     }
