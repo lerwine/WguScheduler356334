@@ -495,7 +495,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         int position = result.append("\n").length();
         LocalDate date = currentValues.getActualStart();
         if (null != date) {
-            result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+            result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(LONG_FORMATTER.format(date));
         } else if (null != (date = currentValues.getExpectedStart())) {
             result.append("Expected Start: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
                     .append(LONG_FORMATTER.format(date));
@@ -503,11 +503,10 @@ public class EditCourseViewModel extends AndroidViewModel {
                 case IN_PROGRESS:
                 case NOT_PASSED:
                 case PASSED:
-                    result.append(LONG_FORMATTER.format(date)).append(" (actual start date missing)",
+                    result.append(" (actual start date missing)",
                             new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
                     break;
                 default:
-                    result.append(LONG_FORMATTER.format(date));
                     break;
             }
         } else {
@@ -525,12 +524,12 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
         date = currentValues.getActualEnd();
         if (null != date) {
-            if (position > result.length()) {
+            if (position < result.length()) {
                 result.append("; ");
             }
-            result.append("Ended On: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+            result.append("Ended On: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(LONG_FORMATTER.format(date));
         } else if (null != (date = currentValues.getExpectedEnd())) {
-            if (position > result.length()) {
+            if (position < result.length()) {
                 result.append("; ");
             }
             result.append("Expected End: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -538,18 +537,17 @@ public class EditCourseViewModel extends AndroidViewModel {
             switch (status) {
                 case NOT_PASSED:
                 case PASSED:
-                    result.append(LONG_FORMATTER.format(date)).append(" (actual end date missing)",
+                    result.append(" (actual end date missing)",
                             new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
                     break;
                 default:
-                    result.append(LONG_FORMATTER.format(date));
                     break;
             }
         } else {
             switch (status) {
                 case NOT_PASSED:
                 case PASSED:
-                    if (position > result.length()) {
+                    if (position < result.length()) {
                         result.append("; ");
                     }
                     result.append("Ended on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -560,7 +558,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                     break;
             }
         }
-        if (position > result.length()) {
+        if (position < result.length()) {
             result.append("\n");
         }
         if (null != selectedMentor) {

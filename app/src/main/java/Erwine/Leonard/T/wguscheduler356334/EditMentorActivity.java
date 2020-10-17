@@ -57,8 +57,6 @@ public class EditMentorActivity extends AppCompatActivity {
     private FloatingActionButton saveFloatingActionButton;
     private FloatingActionButton deleteFloatingActionButton;
     private AlertDialog waitDialog;
-    //    private boolean notifiedSharingDisabled = true;
-//    private boolean notifyingSharingDisabled = true;
     private Snackbar snackBar;
 
     /**
@@ -354,7 +352,7 @@ public class EditMentorActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
         }
 
         @Override
@@ -386,7 +384,7 @@ public class EditMentorActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error deleting mentor", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), EditMentorActivity.this).showDialog();
         }
