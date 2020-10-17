@@ -126,8 +126,8 @@ public class EditAlertDialog extends DialogFragment {
                 specificDateTextView.setError(null);
             }
         });
+        viewModel.getEventDateStringLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
         viewModel.getEffectiveAlertDateStringLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
-        viewModel.getEffectiveAlertDateStringLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
     }
 
     private void onAlertEntityLoaded(@NonNull AlertEntity alertEntity) {
@@ -396,7 +396,7 @@ public class EditAlertDialog extends DialogFragment {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
         }
 
         @Override
@@ -439,7 +439,7 @@ public class EditAlertDialog extends DialogFragment {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error saving assessment", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, e.getMessage()), requireContext())
                     .showDialog(() -> requireActivity().finish());
@@ -459,7 +459,7 @@ public class EditAlertDialog extends DialogFragment {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
         }
 
         @Override
@@ -477,7 +477,7 @@ public class EditAlertDialog extends DialogFragment {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error deleting alert", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), requireContext()).showDialog();
         }
