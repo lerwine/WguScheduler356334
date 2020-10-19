@@ -75,6 +75,7 @@ public class DbLoader {
     private final BehaviorSubject<Integer> preferNextNotificationIdSubject;
     private final MutableLiveData<Integer> preferNextNotificationId;
     private static DbLoader instance;
+    @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable subscriptionCompositeDisposable;
     private final AppDb appDb;
     private final Scheduler scheduler;

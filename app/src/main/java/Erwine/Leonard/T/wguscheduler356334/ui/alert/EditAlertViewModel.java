@@ -14,6 +14,9 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -36,7 +39,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryOptional;
+import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.Workers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
@@ -53,6 +58,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     @StringRes
     public static final int TYPE_VALUE_COURSE = R.string.label_course;
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG).withZone(ZoneId.systemDefault());
 
     static final String ARG_KEY_ALERT_ID = "alert_id";
     static final String ARG_KEY_COURSE_ID = "course_id";
@@ -118,8 +124,9 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final PrivateLiveData<Boolean> canSaveLiveData;
     private final PrivateLiveData<Boolean> hasChangesLiveData;
     private final PrivateLiveData<String> eventDateStringLiveData;
-    private final PrivateLiveData<String> effectiveAlertDateStringLiveData;
-    private final PrivateLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeLiveData;
+    private final PrivateLiveData<String> effectiveTimeStringLiveData;
+    private final PrivateLiveData<String> effectiveAlertDateTimeStringLiveData;
+    private final PrivateLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeValueLiveData;
     private final PrivateLiveData<Optional<ResourceMessageFactory>> daysValidationMessageLiveData;
     private final PrivateLiveData<Optional<ResourceMessageFactory>> selectedDateValidationMessageLiveData;
     private final PrivateLiveData<AlertEntity> alertEntityLiveData;
@@ -135,25 +142,15 @@ public class EditAlertViewModel extends AndroidViewModel {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         alertEntitySubject = BehaviorSubject.create();
-        typeResourceIdSubject = BehaviorSubject.create();
-        beforeEndAllowedSubject = BehaviorSubject.create();
-        daysTextSubject = BehaviorSubject.create();
-        selectedDateSubject = BehaviorSubject.create();
-        selectedOptionSubject = BehaviorSubject.create();
-        explicitTimeSubject = BehaviorSubject.create();
-        selectedTimeSubject = BehaviorSubject.create();
-        customMessageTextSubject = BehaviorSubject.create();
-        defaultEventTimeSubject = BehaviorSubject.create();
-
-        typeResourceIdSubject.onNext(TYPE_VALUE_COURSE);
-        defaultEventTimeSubject.onNext(LocalTime.MIDNIGHT);
-        OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), defaultEventTimeSubject::onNext);
-        daysTextSubject.onNext("");
-        selectedDateSubject.onNext(Optional.empty());
-        selectedOptionSubject.onNext(AlertDateOption.EXPLICIT);
-        explicitTimeSubject.onNext(false);
-        selectedTimeSubject.onNext(Optional.empty());
-        customMessageTextSubject.onNext("");
+        typeResourceIdSubject = BehaviorSubject.createDefault(TYPE_VALUE_COURSE);
+        beforeEndAllowedSubject = BehaviorSubject.createDefault(true);
+        daysTextSubject = BehaviorSubject.createDefault("");
+        selectedDateSubject = BehaviorSubject.createDefault(Optional.empty());
+        selectedOptionSubject = BehaviorSubject.createDefault(AlertDateOption.EXPLICIT);
+        explicitTimeSubject = BehaviorSubject.createDefault(false);
+        selectedTimeSubject = BehaviorSubject.createDefault(Optional.empty());
+        customMessageTextSubject = BehaviorSubject.createDefault("");
+        defaultEventTimeSubject = BehaviorSubject.createDefault(LocalTime.MIDNIGHT);
 
         initializationFailureLiveData = new PrivateLiveData<>();
         validLiveData = new PrivateLiveData<>(false);
@@ -162,44 +159,71 @@ public class EditAlertViewModel extends AndroidViewModel {
         daysValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         selectedDateValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         eventDateStringLiveData = new PrivateLiveData<>("");
-        effectiveAlertDateStringLiveData = new PrivateLiveData<>("");
-        effectiveAlertDateTimeLiveData = new PrivateLiveData<>(Optional.empty());
+        effectiveTimeStringLiveData = new PrivateLiveData<>("");
+        effectiveAlertDateTimeStringLiveData = new PrivateLiveData<>("");
+        effectiveAlertDateTimeValueLiveData = new PrivateLiveData<>(Optional.empty());
         alertEntityLiveData = new PrivateLiveData<>();
 
-        Observable<String> normalizedMessageObservable = customMessageTextSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
-        Observable<BinaryOptional<Integer, ResourceMessageFactory>> daysEditTextParseResultObservable = Observable.combineLatest(daysTextSubject, selectedOptionSubject,
-                this::calculateDaysEditTextParseResult);
-        Observable<Optional<LocalDate>> eventDateObservable = selectedOptionSubject.map(this::calculateEventDate);
-        Observable<BinaryOptional<LocalDate, ResourceMessageFactory>> effectiveAlertDateObservable = Observable.combineLatest(daysEditTextParseResultObservable,
-                selectedDateSubject, selectedOptionSubject, eventDateObservable, beforeEndAllowedSubject,
-                this::calculateEffectiveAlertDate);
-        Observable<Optional<LocalTime>> effectiveTimeObservable = Observable.combineLatest(defaultEventTimeSubject, explicitTimeSubject, selectedTimeSubject,
-                (defaultEventTime, isExplicitTime, selectedTime) -> (isExplicitTime) ? selectedTime : Optional.of(defaultEventTime));
-        Observable<Optional<Long>> timeSpecObservable = Observable.combineLatest(selectedOptionSubject, daysEditTextParseResultObservable, selectedDateSubject,
-                this::calculateTimeSpec);
-        Observable<Boolean> changedObservable = Observable.combineLatest(selectedOptionSubject, timeSpecObservable, selectedDateSubject, selectedTimeSubject, normalizedMessageObservable, alertEntitySubject,
-                this::calculateChanged);
+        Observable<AlertDateOption> selectedOptionObservable = selectedOptionSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler());
+        Observable<String> normalizedMessageObservable = customMessageTextSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler()).map(Workers.asCached(AbstractEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<BinaryOptional<Integer, ResourceMessageFactory>> daysEditTextParseResultObservable = Observable.combineLatest(
+                daysTextSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler()),
+                selectedOptionObservable,
+                this::calculateDaysEditTextParseResult
+        );
+        Observable<Optional<LocalDate>> eventDateObservable = selectedOptionObservable.map(Workers.asCached(this::calculateEventDate));
+        Observable<Optional<LocalDate>> selectedDateObservable = selectedDateSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler());
+        Observable<Optional<LocalTime>> selectedTimeObservable = selectedTimeSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler());
+        Observable<BinaryOptional<LocalDate, ResourceMessageFactory>> effectiveAlertDateObservable = Observable.combineLatest(
+                daysEditTextParseResultObservable,
+                selectedDateObservable,
+                selectedOptionObservable,
+                eventDateObservable,
+                beforeEndAllowedSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler()),
+                Workers.asCached(this::calculateEffectiveAlertDate)
+        );
+        Observable<Optional<LocalTime>> effectiveTimeObservable = Observable.combineLatest(
+                defaultEventTimeSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler()),
+                explicitTimeSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler()),
+                selectedTimeObservable,
+                Workers.asCached((defaultEventTime, isExplicitTime, selectedTime) -> (isExplicitTime) ? selectedTime : Optional.of(defaultEventTime))
+        );
+        Observable<Optional<Long>> timeSpecObservable = Observable.combineLatest(selectedOptionObservable, daysEditTextParseResultObservable, selectedDateObservable,
+                Workers.asCached(this::calculateTimeSpec));
+        Observable<AlertEntity> alertEntityObservable = alertEntitySubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler());
+        Observable<Boolean> changedObservable = Observable.combineLatest(
+                selectedOptionObservable,
+                timeSpecObservable,
+                selectedDateObservable,
+                selectedTimeObservable,
+                normalizedMessageObservable,
+                alertEntityObservable,
+                Workers.asCached(this::calculateChanged)
+        );
         Observable<Boolean> validObservable = Observable.combineLatest(daysEditTextParseResultObservable, effectiveAlertDateObservable, effectiveTimeObservable,
-                (daysEditTextParseResult, effectiveAlertDate, effectiveAlertTime) ->
-                        !(daysEditTextParseResult.isSecondary() && effectiveAlertDate.isSecondary()) && effectiveAlertTime.isPresent());
+                Workers.asCached((daysEditTextParseResult, effectiveAlertDate, effectiveAlertTime) ->
+                        !(daysEditTextParseResult.isSecondary() && effectiveAlertDate.isSecondary()) && effectiveAlertTime.isPresent()));
 
         Observable<Boolean> canSaveObservable = Observable.combineLatest(changedObservable, validObservable, (c, v) -> c && v);
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(daysEditTextParseResultObservable.subscribe(this::onDaysEditTextChanged, throwable -> daysValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
-        compositeDisposable.add(effectiveAlertDateObservable.subscribe(this::onEffectiveAlertDateChanged, throwable -> selectedDateValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
-//        compositeDisposable.add(effectiveTimeObservable.subscribe((Optional<LocalTime> localTime) -> {
-//            // TODO: Implement effectiveTimeObservable.subscribe;
-//        }, throwable -> {
-//
-//        }));
+        compositeDisposable.add(effectiveAlertDateObservable.subscribe(this::onEffectiveAlertDateChanged,
+                throwable -> selectedDateValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
         compositeDisposable.add(canSaveObservable.subscribe(canSaveLiveData::postValue));
         compositeDisposable.add(eventDateObservable.subscribe(e ->
                 eventDateStringLiveData.postValue(e.map(LocalDateConverter.MEDIUM_FORMATTER::format).orElse(""))
         ));
+        compositeDisposable.add(effectiveTimeObservable.subscribe(t ->
+                effectiveTimeStringLiveData.postValue(t.map(LocalTimeConverter.MEDIUM_FORMATTER::format).orElse(""))));
         compositeDisposable.add(validObservable.subscribe(validLiveData::postValue));
-        compositeDisposable.add(Observable.combineLatest(effectiveAlertDateObservable, effectiveTimeObservable, (effectiveAlertDate, effectiveTime) ->
-                effectiveAlertDate.ofPrimary().flatMap(d -> effectiveTime.map(d::atTime))).subscribe(effectiveAlertDateTimeLiveData::postValue));
-        compositeDisposable.add(alertEntitySubject.subscribe(this::onAlertEntityChanged));
+        compositeDisposable.add(Observable.combineLatest(effectiveAlertDateObservable, effectiveTimeObservable, Workers.asCached((effectiveAlertDate, effectiveTime) ->
+                effectiveAlertDate.ofPrimary().flatMap(d -> effectiveTime.map(d::atTime)))).subscribe(this::onEffectiveAlertDateTimeChanged));
+        compositeDisposable.add(alertEntityObservable.subscribe(this::onAlertEntityChanged));
+    }
+
+    private void onEffectiveAlertDateTimeChanged(Optional<LocalDateTime> localDateTime) {
+        effectiveAlertDateTimeValueLiveData.postValue(localDateTime);
+        effectiveAlertDateTimeStringLiveData.postValue(localDateTime.map(DATE_TIME_FORMATTER::format).orElse(""));
     }
 
     @NonNull
@@ -226,7 +250,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         if (null == target) {
             return Optional.empty();
         }
-        // FIXME: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate.flatMap(java.util.function.Function, java.util.function.Function)' on a null object reference
+
         return target.flatMap(courseAlertDetails -> {
             LocalDate d;
             CourseEntity course;
@@ -308,15 +332,15 @@ public class EditAlertViewModel extends AndroidViewModel {
         effectiveAlertDate.switchPresence(
                 localDate -> {
                     selectedDateValidationMessageLiveData.postValue(Optional.empty());
-                    effectiveAlertDateStringLiveData.postValue(LocalDateConverter.MEDIUM_FORMATTER.format(localDate));
+                    effectiveAlertDateTimeStringLiveData.postValue(LocalDateConverter.MEDIUM_FORMATTER.format(localDate));
                 },
                 resourceMessageFactory -> {
                     selectedDateValidationMessageLiveData.postValue(Optional.of(resourceMessageFactory));
-                    effectiveAlertDateStringLiveData.postValue("");
+                    effectiveAlertDateTimeStringLiveData.postValue("");
                 },
                 () -> {
                     selectedDateValidationMessageLiveData.postValue(Optional.empty());
-                    effectiveAlertDateStringLiveData.postValue("");
+                    effectiveAlertDateTimeStringLiveData.postValue("");
                 }
         );
     }
@@ -360,26 +384,25 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     public int getNotificationId() {
-        return alertEntitySubject.getValue().getNotificationId();
+        return ComparisonHelper.mapNonNullElse(alertEntitySubject.getValue(), AlertEntity::getNotificationId, 0);
     }
 
-
     public boolean isBeforeEndAllowed() {
-        return beforeEndAllowedSubject.getValue();
+        return Boolean.TRUE.equals(beforeEndAllowedSubject.getValue());
     }
 
     @NonNull
     public String getDaysText() {
-        return daysTextSubject.getValue();
+        return ComparisonHelper.requireNonNullElse(daysTextSubject.getValue(), "");
     }
 
     public void setDaysText(String text) {
-        daysTextSubject.onNext((null == text) ? "" : text);
+        daysTextSubject.onNext(ComparisonHelper.requireNonNullElse(text, ""));
     }
 
     @NonNull
     public AlertDateOption getAlertDateOption() {
-        return selectedOptionSubject.getValue();
+        return ComparisonHelper.requireNonNullElse(selectedOptionSubject.getValue(), AlertDateOption.EXPLICIT);
     }
 
     void setAlertDateOption(@NonNull AlertDateOption alertDateOption) {
@@ -389,7 +412,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     @Nullable
     public Boolean isSubsequent() {
         AlertDateOption alertDateOption = selectedOptionSubject.getValue();
-        if (alertDateOption.isExplicit()) {
+        if (null == alertDateOption || alertDateOption.isExplicit()) {
             return null;
         }
         return alertDateOption.isAfter();
@@ -397,7 +420,11 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     @Nullable
     public LocalDate getSelectedDate() {
-        return (explicitTimeSubject.getValue()) ? null : selectedDateSubject.getValue().orElse(null);
+        AlertDateOption alertDateOption = selectedOptionSubject.getValue();
+        if (null == alertDateOption || alertDateOption.isExplicit()) {
+            return ComparisonHelper.requireNonNull(selectedDateSubject.getValue()).orElse(null);
+        }
+        return null;
     }
 
     public void setSelectedDate(@Nullable LocalDate date) {
@@ -405,7 +432,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     }
 
     public boolean isExplicitTime() {
-        return explicitTimeSubject.getValue();
+        return Boolean.TRUE.equals(explicitTimeSubject.getValue());
     }
 
     public void setExplicitTime(boolean value) {
@@ -414,7 +441,10 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     @Nullable
     public LocalTime getSelectedTime() {
-        return (explicitTimeSubject.getValue()) ? selectedTimeSubject.getValue().orElse(null) : null;
+        if (Boolean.FALSE.equals(explicitTimeSubject.getValue())) {
+            return ComparisonHelper.requireNonNull(selectedTimeSubject.getValue()).orElse(null);
+        }
+        return null;
     }
 
     public void setSelectedTime(@Nullable LocalTime alertTime) {
@@ -423,11 +453,11 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     @NonNull
     public String getCustomMessage() {
-        return customMessageTextSubject.getValue();
+        return ComparisonHelper.requireNonNullElse(customMessageTextSubject.getValue(), "");
     }
 
     public void setCustomMessage(String customMessage) {
-        customMessageTextSubject.onNext((null == customMessage) ? "" : customMessage);
+        customMessageTextSubject.onNext(ComparisonHelper.requireNonNullElse(customMessage, ""));
     }
 
     public LiveData<AlertEntity> getAlertEntityLiveData() {
@@ -438,12 +468,16 @@ public class EditAlertViewModel extends AndroidViewModel {
         return eventDateStringLiveData;
     }
 
-    public LiveData<String> getEffectiveAlertDateStringLiveData() {
-        return effectiveAlertDateStringLiveData;
+    public LiveData<String> getEffectiveAlertDateTimeStringLiveData() {
+        return effectiveAlertDateTimeStringLiveData;
     }
 
-    public LiveData<Optional<LocalDateTime>> getEffectiveAlertDateTimeLiveData() {
-        return effectiveAlertDateTimeLiveData;
+    public LiveData<String> getEffectiveTimeStringLiveData() {
+        return effectiveTimeStringLiveData;
+    }
+
+    public LiveData<Optional<LocalDateTime>> getEffectiveAlertDateTimeValueLiveData() {
+        return effectiveAlertDateTimeValueLiveData;
     }
 
     public LiveData<Optional<ResourceMessageFactory>> getDaysValidationMessageLiveData() {
@@ -514,11 +548,11 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     public synchronized void saveViewModelState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        outState.putInt(STATE_KEY_RELATIVITY, selectedOptionSubject.getValue().ordinal());
+        outState.putInt(STATE_KEY_RELATIVITY, ComparisonHelper.mapNonNullElse(selectedOptionSubject.getValue(), AlertDateOption::ordinal, 0));
         outState.putString(STATE_KEY_MESSAGE, customMessageTextSubject.getValue());
         outState.putString(STATE_KEY_DAYS_TEXT, daysTextSubject.getValue());
-        selectedDateSubject.getValue().map(LocalDateConverter::fromLocalDate).ifPresent(d -> outState.putLong(STATE_KEY_SELECTED_DATE, d));
-        selectedTimeSubject.getValue().map(LocalTimeConverter::fromLocalTime).ifPresent(t -> outState.putInt(STATE_KEY_SELECTED_TIME, t));
+        ComparisonHelper.requireNonNull(selectedDateSubject.getValue()).map(LocalDateConverter::fromLocalDate).ifPresent(d -> outState.putLong(STATE_KEY_SELECTED_DATE, d));
+        ComparisonHelper.requireNonNull(selectedTimeSubject.getValue()).map(LocalTimeConverter::fromLocalTime).ifPresent(t -> outState.putInt(STATE_KEY_SELECTED_TIME, t));
         target.switchPresence(courseAlertDetails -> courseAlertDetails.saveState(outState, true),
                 assessmentAlertDetails -> assessmentAlertDetails.saveState(outState, true));
     }
@@ -667,12 +701,12 @@ public class EditAlertViewModel extends AndroidViewModel {
         AlertDateOption dateSpecOption = selectedOptionSubject.getValue();
         Long t = timeSpec;
         if (null == t) {
-            return ValidationMessage.ofSingleError((dateSpecOption.isExplicit()) ? R.string.message_alert_date_required : R.string.message_alert_days_required);
+            return ValidationMessage.ofSingleError((ComparisonHelper.mapNonNullElse(dateSpecOption, AlertDateOption::isExplicit, true)) ? R.string.message_alert_date_required : R.string.message_alert_days_required);
         }
         entity.setTimeSpec(t);
         String customMessageText = customMessageTextSubject.getValue();
-        entity.setCustomMessage((customMessageText.isEmpty()) ? null : customMessageText);
-        entity.setAlertTime(selectedTimeSubject.getValue().orElse(null));
+        entity.setCustomMessage((ComparisonHelper.mapNonNullElse(customMessageText, String::isEmpty, true)) ? null : customMessageText);
+        entity.setAlertTime(ComparisonHelper.requireNonNull(selectedTimeSubject.getValue()).orElse(null));
         return null;
     }
 

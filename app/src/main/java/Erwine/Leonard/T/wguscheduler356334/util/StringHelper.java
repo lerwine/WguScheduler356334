@@ -4,6 +4,8 @@ import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
@@ -53,6 +55,7 @@ public final class StringHelper {
      */
     public static final Pattern PATTERN_CSV_CELL = Pattern.compile("\\G(?:(?:\"((?:\"\"|[^\"]+)+)\")|([^\",\\r\\n]+))?(?:(\\r\\n?|\\n)|(,)|$)");
 
+    @NonNull
     public static ArrayList<ArrayList<String>> parseCsv(String source) throws IllegalFormatException {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         if (null == source) {
@@ -105,20 +108,23 @@ public final class StringHelper {
 
     private static final HashMap<Integer, Function<String, String>> NORMALIZER_MAP = new HashMap<>();
 
-    public static SpannableString createSpannableString(CharSequence source, Object what, int start, int end) {
+    @NonNull
+    public static SpannableString createSpannableString(@NonNull CharSequence source, @NonNull Object what, int start, int end) {
         SpannableString spannableString = new SpannableString(source);
         spannableString.setSpan(what, start, end, SPAN_INCLUSIVE_EXCLUSIVE);
         return spannableString;
     }
 
-    public static SpannableString createSpannableString(CharSequence source, Object what) {
+    @NonNull
+    public static SpannableString createSpannableString(@NonNull CharSequence source, @NonNull Object what) {
         return createSpannableString(source, what, 0, source.length());
     }
 
     private StringHelper() {
     }
 
-    public static TextWatcher createAfterTextChangedListener(Consumer<String> afterTextChanged) {
+    @NonNull
+    public static TextWatcher createAfterTextChangedListener(@NonNull Consumer<String> afterTextChanged) {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

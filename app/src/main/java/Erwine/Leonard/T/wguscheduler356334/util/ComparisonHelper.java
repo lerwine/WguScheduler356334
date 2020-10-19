@@ -1,14 +1,41 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class ComparisonHelper {
+
+    @NonNull
+    public static <T> T requireNonNullElse(@Nullable T obj, @NonNull T defaultObj) {
+        return (obj != null) ? obj : defaultObj;
+    }
+
+    @NonNull
+    public static <T> T requireNonNullElseGet(@Nullable T obj, @NonNull NonNullSupplier<T> defaultObj) {
+        return (obj != null) ? obj : defaultObj.get();
+    }
+
+    public static <T> Optional<T> requireNonNull(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") @Nullable Optional<T> source) {
+        //noinspection OptionalAssignedToNull
+        return (null == source) ? Optional.empty() : source;
+    }
+
+    @NonNull
+    public static <T, R> R mapNonNullElse(@Nullable T obj, @NonNull Function<T, R> mapper, @NonNull R defaultObj) {
+        return (obj != null) ? mapper.apply(obj) : defaultObj;
+    }
+
+    @NonNull
+    public static <T, R> R mapNonNullElseGet(@Nullable T obj, @NonNull Function<T, R> mapper, @NonNull NonNullSupplier<R> defaultObj) {
+        return (obj != null) ? mapper.apply(obj) : defaultObj.get();
+    }
 
     @SafeVarargs
     public static <T> Optional<T> firstNonNull(T... values) {

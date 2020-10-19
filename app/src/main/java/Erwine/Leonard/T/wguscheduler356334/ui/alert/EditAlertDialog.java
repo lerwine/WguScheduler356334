@@ -127,7 +127,8 @@ public class EditAlertDialog extends DialogFragment {
             }
         });
         viewModel.getEventDateStringLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
-        viewModel.getEffectiveAlertDateStringLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
+        viewModel.getEffectiveTimeStringLiveData().observe(viewLifecycleOwner, t -> alertTimeValueTextView.setText(t));
+        viewModel.getEffectiveAlertDateTimeStringLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
     }
 
     private void onAlertEntityLoaded(@NonNull AlertEntity alertEntity) {
@@ -206,7 +207,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSpecificDateTextViewClick(View view) {
-        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
+        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
             LocalDate date = effectiveAlertDateTime.map(LocalDateTime::toLocalDate).orElseGet(() -> {
                 LocalDate d = viewModel.getSelectedDate();
                 return (null == d) ? LocalDate.now() : d;
@@ -254,7 +255,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), o -> o.ifPresent(d ->
+        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), o -> o.ifPresent(d ->
                 OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(d)))
         );
     }
@@ -403,7 +404,7 @@ public class EditAlertDialog extends DialogFragment {
         public void onSuccess(@NonNull ResourceMessageResult messages) {
             Log.d(LOG_TAG, "Enter onSaveOperationFinished");
             if (messages.isSucceeded()) {
-                OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
+                OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
                     if (effectiveAlertDateTime.isPresent()) {
                         if (viewModel.isCourseAlert()) {
                             CourseAlertBroadcastReceiver.setPendingAlert(effectiveAlertDateTime.get(), (CourseAlertLink) viewModel.getAlertLink(), viewModel.getNotificationId(), requireContext());
@@ -451,7 +452,7 @@ public class EditAlertDialog extends DialogFragment {
         Integer notificationId;
 
         DeleteOperationListener() {
-            OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
+            OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
                 if (effectiveAlertDateTime.isPresent()) {
                     notificationId = viewModel.getNotificationId();
                 }
