@@ -164,6 +164,8 @@ public class EditAlertViewModel extends AndroidViewModel {
         effectiveAlertDateTimeValueLiveData = new PrivateLiveData<>(Optional.empty());
         alertEntityLiveData = new PrivateLiveData<>();
 
+        OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), defaultEventTimeSubject::onNext);
+
         Observable<AlertDateOption> selectedOptionObservable = selectedOptionSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler());
         Observable<String> normalizedMessageObservable = customMessageTextSubject.subscribeOn(Workers.getScheduler()).observeOn(Workers.getScheduler()).map(Workers.asCached(AbstractEntity.SINGLE_LINE_NORMALIZER::apply));
         Observable<BinaryOptional<Integer, ResourceMessageFactory>> daysEditTextParseResultObservable = Observable.combineLatest(
