@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -291,7 +292,36 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
+        }
+
+        private void updateAlerts(CourseAlert[] alertsAfterSave, LocalTime defaultAlertTime) {
+            if (alertsBeforeSave.length > 0) {
+                Map<Long, CourseAlert> beforeSaveMap = EntityHelper.mapById(Arrays.stream(alertsBeforeSave), t -> t.getLink().getAlertId());
+                Map<Long, CourseAlert> afterSaveMap = EntityHelper.mapById(Arrays.stream(alertsAfterSave), t -> t.getLink().getAlertId());
+                beforeSaveMap.keySet().forEach(k -> {
+                    CourseAlert b = Objects.requireNonNull(beforeSaveMap.get(k));
+                    if (!afterSaveMap.containsKey(k)) {
+                        CourseAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), b.getAlert().getNotificationId(), ViewCourseActivity.this);
+                    }
+                });
+                afterSaveMap.keySet().forEach(k -> {
+                    CourseAlert a = Objects.requireNonNull(afterSaveMap.get(k));
+                    AlertEntity alert = a.getAlert();
+                    LocalTime alertTime = alert.getAlertTime();
+                    if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()) &&
+                            Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlert().getAlertTime(), alertTime))) {
+                        CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
+                    }
+                });
+            } else {
+                for (CourseAlert a : alertsAfterSave) {
+                    AlertEntity alert = a.getAlert();
+                    LocalTime alertTime = alert.getAlertTime();
+                    CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
+                }
+            }
+            finish();
         }
 
         @Override
@@ -304,37 +334,12 @@ public class ViewCourseActivity extends AppCompatActivity {
                     OneTimeObservers.observeOnce(viewModel.getAllCourseAlerts(), alerts -> {
                         CourseAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
                         if (alertsAfterSave.length > 0) {
-                            OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> {
-                                if (alertsBeforeSave.length > 0) {
-                                    Map<Long, CourseAlert> beforeSaveMap = EntityHelper.mapById(Arrays.stream(alertsBeforeSave), t -> t.getLink().getAlertId());
-                                    Map<Long, CourseAlert> afterSaveMap = EntityHelper.mapById(Arrays.stream(alertsAfterSave), t -> t.getLink().getAlertId());
-                                    beforeSaveMap.keySet().forEach(k -> {
-                                        CourseAlert b = Objects.requireNonNull(beforeSaveMap.get(k));
-                                        if (!afterSaveMap.containsKey(k)) {
-                                            CourseAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), b.getAlert().getNotificationId(), ViewCourseActivity.this);
-                                        }
-                                    });
-                                    afterSaveMap.keySet().forEach(k -> {
-                                        CourseAlert a = Objects.requireNonNull(afterSaveMap.get(k));
-                                        AlertEntity alert = a.getAlert();
-                                        LocalTime alertTime = alert.getAlertTime();
-                                        if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()) &&
-                                                Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlert().getAlertTime(), alertTime))) {
-                                            CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
-                                        }
-                                    });
-                                } else {
-                                    for (CourseAlert a : alertsAfterSave) {
-                                        AlertEntity alert = a.getAlert();
-                                        LocalTime alertTime = alert.getAlertTime();
-                                        CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
-                                    }
+                            OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> updateAlerts(alertsAfterSave, defaultAlertTime));
+                        } else {
+                            if (alertsBeforeSave.length > 0) {
+                                for (CourseAlert a : alertsBeforeSave) {
+                                    CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewCourseActivity.this);
                                 }
-                                finish();
-                            });
-                        } else if (alertsBeforeSave.length > 0) {
-                            for (CourseAlert a : alertsBeforeSave) {
-                                CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewCourseActivity.this);
                             }
                             finish();
                         }
@@ -359,7 +364,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error saving course", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, ViewCourseActivity.this, R.string.format_message_save_error, e.getMessage())
                     .showDialog();
@@ -375,7 +380,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
         }
 
         @Override
@@ -407,7 +412,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error deleting course", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), ViewCourseActivity.this).showDialog();
         }

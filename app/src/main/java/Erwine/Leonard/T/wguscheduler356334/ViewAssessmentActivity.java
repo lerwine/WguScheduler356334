@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -269,7 +270,37 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
+        }
+
+        private void updateAlerts(AssessmentAlert[] alertsAfterSave, LocalTime defaultAlertTime) {
+            if (alertsBeforeSave.length > 0) {
+                Map<Long, AssessmentAlert> beforeSaveMap = EntityHelper.mapById(Arrays.stream(alertsBeforeSave), t -> t.getLink().getAlertId());
+                Map<Long, AssessmentAlert> afterSaveMap = EntityHelper.mapById(Arrays.stream(alertsAfterSave), t -> t.getLink().getAlertId());
+                beforeSaveMap.keySet().forEach(k -> {
+                    AssessmentAlert b = Objects.requireNonNull(beforeSaveMap.get(k));
+                    if (!afterSaveMap.containsKey(k)) {
+                        AssessmentAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), b.getAlert().getNotificationId(), ViewAssessmentActivity.this);
+                    }
+                });
+                afterSaveMap.keySet().forEach(k -> {
+                    AssessmentAlert a = Objects.requireNonNull(afterSaveMap.get(k));
+                    AlertEntity alert = a.getAlert();
+                    LocalTime alertTime = alert.getAlertTime();
+                    if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()) &&
+                            Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlert().getAlertTime(), alertTime))) {
+                        AssessmentAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(),
+                                alert.getNotificationId(), ViewAssessmentActivity.this);
+                    }
+                });
+            } else {
+                for (AssessmentAlert a : alertsAfterSave) {
+                    AlertEntity alert = a.getAlert();
+                    LocalTime alertTime = alert.getAlertTime();
+                    AssessmentAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(),
+                            alert.getNotificationId(), ViewAssessmentActivity.this);
+                }
+            }
         }
 
         @Override
@@ -283,38 +314,14 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                         AssessmentAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
                         if (alertsAfterSave.length > 0) {
                             OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), ViewAssessmentActivity.this, defaultAlertTime -> {
-                                if (alertsBeforeSave.length > 0) {
-                                    Map<Long, AssessmentAlert> beforeSaveMap = EntityHelper.mapById(Arrays.stream(alertsBeforeSave), t -> t.getLink().getAlertId());
-                                    Map<Long, AssessmentAlert> afterSaveMap = EntityHelper.mapById(Arrays.stream(alertsAfterSave), t -> t.getLink().getAlertId());
-                                    beforeSaveMap.keySet().forEach(k -> {
-                                        AssessmentAlert b = Objects.requireNonNull(beforeSaveMap.get(k));
-                                        if (!afterSaveMap.containsKey(k)) {
-                                            AssessmentAlertBroadcastReceiver.cancelPendingAlert(b.getLink(), b.getAlert().getNotificationId(), ViewAssessmentActivity.this);
-                                        }
-                                    });
-                                    afterSaveMap.keySet().forEach(k -> {
-                                        AssessmentAlert a = Objects.requireNonNull(afterSaveMap.get(k));
-                                        AlertEntity alert = a.getAlert();
-                                        LocalTime alertTime = alert.getAlertTime();
-                                        if (!(beforeSaveMap.containsKey(k) && Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlertDate(), a.getAlertDate()) &&
-                                                Objects.equals(Objects.requireNonNull(beforeSaveMap.get(k)).getAlert().getAlertTime(), alertTime))) {
-                                            AssessmentAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(),
-                                                    alert.getNotificationId(), ViewAssessmentActivity.this);
-                                        }
-                                    });
-                                } else {
-                                    for (AssessmentAlert a : alertsAfterSave) {
-                                        AlertEntity alert = a.getAlert();
-                                        LocalTime alertTime = alert.getAlertTime();
-                                        AssessmentAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(),
-                                                alert.getNotificationId(), ViewAssessmentActivity.this);
-                                    }
-                                }
+                                updateAlerts(alertsAfterSave, defaultAlertTime);
                                 finish();
                             });
-                        } else if (alertsBeforeSave.length > 0) {
-                            for (AssessmentAlert a : alertsBeforeSave) {
-                                AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewAssessmentActivity.this);
+                        } else {
+                            if (alertsBeforeSave.length > 0) {
+                                for (AssessmentAlert a : alertsBeforeSave) {
+                                    AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewAssessmentActivity.this);
+                                }
                             }
                             finish();
                         }
@@ -339,7 +346,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error saving course", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, ViewAssessmentActivity.this, R.string.format_message_save_error, e.getMessage())
                     .showDialog();
@@ -355,11 +362,11 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
         }
 
         @Override
-        public void onSuccess(Integer count) {
+        public void onSuccess(@NonNull Integer count) {
             Log.d(LOG_TAG, "Enter DeleteOperationListener.onSuccess");
             if (null == count || count < 1) {
                 new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.message_delete_term_fail), ViewAssessmentActivity.this).showDialog();
@@ -374,7 +381,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error deleting assessment", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), ViewAssessmentActivity.this).showDialog();
         }
