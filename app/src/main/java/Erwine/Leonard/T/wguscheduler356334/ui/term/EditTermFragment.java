@@ -62,7 +62,7 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        OneTimeObservers.observeOnce(viewModel.getEntity(), this::onLoadSuccess);
+        OneTimeObservers.observeOnce(viewModel.getEntityLiveData(), this::onLoadSuccess);
     }
 
     private void onLoadSuccess(TermEntity entity) {
@@ -77,17 +77,17 @@ public class EditTermFragment extends Fragment {
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         termStartEditText.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(@NonNull Disposable d) {
             }
 
             @Override
-            public void onSuccess(LocalDate localDate) {
+            public void onSuccess(@NonNull LocalDate localDate) {
                 Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
                 viewModel.setStart(localDate);
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 String m = e.getMessage();
                 Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
                 if (null == m || m.trim().isEmpty()) {
@@ -106,17 +106,17 @@ public class EditTermFragment extends Fragment {
         termEndEditText.setInitialPickerDateFactory(d -> (null == d) ? termStartEditText.getSelectedDate() : d);
         termEndEditText.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(@NonNull Disposable d) {
             }
 
             @Override
-            public void onSuccess(LocalDate localDate) {
+            public void onSuccess(@NonNull LocalDate localDate) {
                 Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
                 viewModel.setEnd(localDate);
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 String m = e.getMessage();
                 Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
                 if (null == m || m.trim().isEmpty()) {

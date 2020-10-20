@@ -77,7 +77,7 @@ public class CourseListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        OneTimeObservers.observeOnce(editTermViewModel.getEntity(), this::onEntityLoaded);
+        OneTimeObservers.observeOnce(editTermViewModel.getEntityLiveData(), this::onEntityLoaded);
     }
 
     private void onEntityLoaded(TermEntity termEntity) {
