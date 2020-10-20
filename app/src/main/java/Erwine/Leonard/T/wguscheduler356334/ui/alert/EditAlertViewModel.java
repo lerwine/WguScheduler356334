@@ -673,25 +673,25 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         return target.flatMap(courseAlertDetails -> {
-            CourseAlertDetails course = new CourseAlertDetails(courseAlertDetails);
-            ResourceMessageResult validationMessage = onSave(course.getAlert());
+            CourseAlertDetails courseAlert = new CourseAlertDetails(courseAlertDetails);
+            ResourceMessageResult validationMessage = onSave(courseAlert.getAlert());
             if (null != validationMessage) {
                 return Single.just(validationMessage);
             }
-            return dbLoader.saveCourseAlert(course, ignoreWarnings).doOnSuccess(m -> {
+            return dbLoader.saveCourseAlert(courseAlert, ignoreWarnings).doOnSuccess(m -> {
                 if (m.isSucceeded()) {
-                    onCourseAlertLoaded(course);
+                    onCourseAlertSaved(courseAlert);
                 }
             });
         }, assessmentAlertDetails -> {
-            AssessmentAlertDetails assessment = new AssessmentAlertDetails(assessmentAlertDetails);
-            ResourceMessageResult validationMessage = onSave(assessment.getAlert());
+            AssessmentAlertDetails assessmentAlert = new AssessmentAlertDetails(assessmentAlertDetails);
+            ResourceMessageResult validationMessage = onSave(assessmentAlert.getAlert());
             if (null != validationMessage) {
                 return Single.just(validationMessage);
             }
-            return dbLoader.saveAssessmentAlert(assessment, ignoreWarnings).doOnSuccess(m -> {
+            return dbLoader.saveAssessmentAlert(assessmentAlert, ignoreWarnings).doOnSuccess(m -> {
                 if (m.isSucceeded()) {
-                    onAssessmentAlertLoaded(assessment);
+                    onAssessmentAlertSaved(assessmentAlert);
                 }
             });
         });
@@ -710,6 +710,14 @@ public class EditAlertViewModel extends AndroidViewModel {
         entity.setCustomMessage((ComparisonHelper.mapNonNullElse(customMessageText, String::isEmpty, true)) ? null : customMessageText);
         entity.setAlertTime(ComparisonHelper.requireNonNull(selectedTimeSubject.getValue()).orElse(null));
         return null;
+    }
+
+    synchronized void onCourseAlertSaved(@NonNull CourseAlertDetails courseAlert) {
+        // TODO: Create / update alert
+    }
+
+    synchronized void onAssessmentAlertSaved(@NonNull AssessmentAlertDetails assessmentAlert) {
+        // TODO: Create / update alert
     }
 
     public synchronized Completable delete() {
