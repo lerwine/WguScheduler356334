@@ -36,11 +36,11 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryOptional;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.Workers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
@@ -51,10 +51,12 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 
+import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
+
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class EditAlertViewModel extends AndroidViewModel {
 
-    private static final String LOG_TAG = EditCourseFragment.class.getName();
+    private static final String LOG_TAG = EditAlertViewModel.class.getName();
     @StringRes
     public static final int TYPE_VALUE_COURSE = R.string.label_course;
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
@@ -248,6 +250,39 @@ public class EditAlertViewModel extends AndroidViewModel {
         }
     }
 
+    @NonNull
+    Optional<LocalDateTime> getOriginalEventDateTime(@NonNull LocalTime defaultEventTime) {
+        Log.d(LOG_TAG, "Enter getOriginalEventDateTime(defaultEventTime: " + ToStringBuilder.toEscapedString(defaultEventTime, true) + ")");
+        if (null == target) {
+            return Optional.empty();
+        }
+
+        return target.flatMap(courseAlertDetails -> {
+            Log.d(LOG_TAG, "Enter getOriginalEventDateTime#target.flatMap(courseAlertDetails: " + courseAlertDetails.toString() + ")");
+            LocalDate d = courseAlertDetails.getAlertDate();
+            if (null != d) {
+                AlertEntity alert = courseAlertDetails.getAlert();
+                if (alert.getId() != ID_NEW) {
+                    LocalTime t = alert.getAlertTime();
+                    return Optional.of(d.atTime((null == t) ? defaultEventTime : t));
+                }
+            }
+            return Optional.empty();
+        }, assessmentAlertDetails -> {
+            Log.d(LOG_TAG, "Enter getOriginalEventDateTime#target.flatMap(assessmentAlertDetails: " + assessmentAlertDetails.toString() + ")");
+            LocalDate d = assessmentAlertDetails.getAlertDate();
+            if (null != d) {
+                AlertEntity alert = assessmentAlertDetails.getAlert();
+                if (alert.getId() != ID_NEW) {
+                    LocalTime t = alert.getAlertTime();
+                    return Optional.of(d.atTime((null == t) ? defaultEventTime : t));
+                }
+            }
+            return Optional.empty();
+        });
+    }
+
+    @NonNull
     private Optional<LocalDate> calculateEventDate(AlertDateOption selectedOption) {
         if (null == target) {
             return Optional.empty();
@@ -581,7 +616,6 @@ public class EditAlertViewModel extends AndroidViewModel {
         setCustomMessage(state.getString(STATE_KEY_MESSAGE, ""));
     }
 
-
     /**
      * Initializes validation for an existing course alert or when restoring from state or course has been saved.
      *
@@ -680,7 +714,9 @@ public class EditAlertViewModel extends AndroidViewModel {
             }
             return dbLoader.saveCourseAlert(courseAlert, ignoreWarnings).doOnSuccess(m -> {
                 if (m.isSucceeded()) {
-                    onCourseAlertSaved(courseAlert);
+                    AlertEntity alertEntity = courseAlert.getAlert();
+                    courseAlertDetails.setAlert(alertEntity);
+                    alertEntitySubject.onNext(alertEntity);
                 }
             });
         }, assessmentAlertDetails -> {
@@ -691,7 +727,9 @@ public class EditAlertViewModel extends AndroidViewModel {
             }
             return dbLoader.saveAssessmentAlert(assessmentAlert, ignoreWarnings).doOnSuccess(m -> {
                 if (m.isSucceeded()) {
-                    onAssessmentAlertSaved(assessmentAlert);
+                    AlertEntity alertEntity = assessmentAlert.getAlert();
+                    assessmentAlertDetails.setAlert(alertEntity);
+                    alertEntitySubject.onNext(alertEntity);
                 }
             });
         });
@@ -710,14 +748,6 @@ public class EditAlertViewModel extends AndroidViewModel {
         entity.setCustomMessage((ComparisonHelper.mapNonNullElse(customMessageText, String::isEmpty, true)) ? null : customMessageText);
         entity.setAlertTime(ComparisonHelper.requireNonNull(selectedTimeSubject.getValue()).orElse(null));
         return null;
-    }
-
-    synchronized void onCourseAlertSaved(@NonNull CourseAlertDetails courseAlert) {
-        // TODO: Create / update alert
-    }
-
-    synchronized void onAssessmentAlertSaved(@NonNull AssessmentAlertDetails assessmentAlert) {
-        // TODO: Create / update alert
     }
 
     public synchronized Completable delete() {

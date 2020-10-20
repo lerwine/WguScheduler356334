@@ -15,6 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertListViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
     @Embedded
@@ -134,5 +135,11 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
             messagePresent = true;
             message = m;
         }
+    }
+
+    @Override
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
+        sb.append("link", getLink()).append("alert", getAlert()).append("alertDate", alertDate).append("relativeDays", relativeDays)
+                .append("messagePresent", messagePresent).append("message", message);
     }
 }

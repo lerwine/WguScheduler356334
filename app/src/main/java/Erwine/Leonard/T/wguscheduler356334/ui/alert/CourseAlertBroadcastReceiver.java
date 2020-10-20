@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import io.reactivex.Single;
 
 public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseAlertLink, CourseAlertDetails> {
+    private static final String LOG_TAG = CourseAlertBroadcastReceiver.class.getName();
 
     @NonNull
     @Override
@@ -71,20 +73,24 @@ public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseA
 
     @NonNull
     static PendingIntent createAlertIntent(long alertId, long targetId, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter createAlertIntent(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         return createAlertIntent(alertId, targetId, notificationId, packageContext, CourseAlertBroadcastReceiver.class);
     }
 
     @Nullable
     static PendingIntent getAlertIntent(long alertId, long targetId, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter getAlertIntent(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         return getAlertIntent(alertId, targetId, notificationId, packageContext, CourseAlertBroadcastReceiver.class);
     }
 
     public static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull CourseAlertLink alertLink, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter setPendingAlert(dateTime: " + dateTime + ", alertLink: " + alertLink + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         PendingIntent intent = createAlertIntent(alertLink.getAlertId(), alertLink.getTargetId(), notificationId, packageContext);
         setPendingAlert(dateTime, intent, packageContext);
     }
 
     static void cancelPendingAlert(long alertId, long targetId, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter cancelPendingAlert(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         PendingIntent intent = getAlertIntent(alertId, targetId, notificationId, packageContext);
         if (null != intent) {
             AlarmManager alarmManager = (AlarmManager) packageContext.getSystemService(Context.ALARM_SERVICE);

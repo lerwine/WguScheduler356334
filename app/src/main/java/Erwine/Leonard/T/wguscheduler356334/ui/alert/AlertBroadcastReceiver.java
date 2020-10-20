@@ -53,13 +53,15 @@ public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends Aler
     @Override
     public void onReceive(Context context, Intent intent) {
         long alertId = intent.getLongExtra(AlertLink.COLNAME_ALERT_ID, -1);
-        long assessmentId = intent.getLongExtra(AlertLink.COLNAME_TARGET_ID, -1);
+        long targetId = intent.getLongExtra(AlertLink.COLNAME_TARGET_ID, -1);
+        Log.d(LOG_TAG, "Enter onReceive(); alertId = " + alertId + "; targetId = " + targetId + ";");
         createNotificationChannel(context);
-        OneTimeObservers.subscribeOnce(getEntity(DbLoader.getInstance(context.getApplicationContext()), alertId, assessmentId), entity -> {
+        OneTimeObservers.subscribeOnce(getEntity(DbLoader.getInstance(context.getApplicationContext()), alertId, targetId), entity -> {
             Notification n = new NotificationCompat.Builder(context, context.getResources().getString(getChannelId()))
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentText(getNotificationContent(entity, context))
                     .setContentTitle(getNotificationTitle(entity, context))
+                    .setAutoCancel(true)
                     .build();
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
             notificationManager.notify(entity.getAlert().getNotificationId(), n);
@@ -78,7 +80,9 @@ public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends Aler
     }
 
     @NonNull
-    public static <T extends AlertBroadcastReceiver<?, ?>> PendingIntent createAlertIntent(long alertId, long targetId, int notificationId, Context packageContext, Class<T> cls) {
+    public static <T extends AlertBroadcastReceiver<?, ?>> PendingIntent createAlertIntent(long alertId, long targetId, int notificationId, @NonNull Context packageContext, @NonNull Class<T> cls) {
+        Log.d(LOG_TAG, "Enter createAlertIntent(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext +
+                ", cls: " + cls.getName() + ")");
         Intent intent = new Intent(packageContext, cls);
         intent.putExtra(COLNAME_ALERT_ID, alertId);
         intent.putExtra(COLNAME_TARGET_ID, targetId);
@@ -86,21 +90,24 @@ public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends Aler
     }
 
     @Nullable
-    public static <T extends AlertBroadcastReceiver<?, ?>> PendingIntent getAlertIntent(long alertId, long targetId, int notificationId, Context packageContext, Class<T> cls) {
+    public static <T extends AlertBroadcastReceiver<?, ?>> PendingIntent getAlertIntent(long alertId, long targetId, int notificationId, @NonNull Context packageContext, @NonNull Class<T> cls) {
+        Log.d(LOG_TAG, "Enter getAlertIntent(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext +
+                ", cls: " + cls.getName() + ")");
         Intent intent = new Intent(packageContext, cls);
         intent.putExtra(COLNAME_ALERT_ID, alertId);
         intent.putExtra(COLNAME_TARGET_ID, targetId);
         return PendingIntent.getBroadcast(packageContext, notificationId, intent, PendingIntent.FLAG_NO_CREATE);
     }
 
-    protected static void setPendingAlert(@NonNull LocalDateTime dateTime, PendingIntent intent, @NonNull Context packageContext) {
+    protected static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull PendingIntent intent, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter setPendingAlert(dateTime: " + dateTime + ", intent: " + intent + ", packageContext: " + packageContext + ")");
         AlarmManager alarmManager = (AlarmManager) packageContext.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.set(dateTime.getYear(), dateTime.getMonthValue() - 1, dateTime.getDayOfMonth(), dateTime.getHour(), dateTime.getMinute());
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
+        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
     }
 
-    protected static void cancelPendingAlert(PendingIntent intent, Context packageContext) {
+    protected static void cancelPendingAlert(@Nullable PendingIntent intent, @NonNull Context packageContext) {
         if (null != intent) {
             AlarmManager alarmManager = (AlarmManager) packageContext.getSystemService(Context.ALARM_SERVICE);
             if (null != alarmManager) {
@@ -110,6 +117,7 @@ public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends Aler
     }
 
     public static void cancelPendingAlert(@NonNull AlertListItem alert, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter cancelPendingAlert(alert: " + alert + ", packageContext: " + packageContext + ")");
         if (alert.isAssessment()) {
             AssessmentAlertBroadcastReceiver.cancelPendingAlert(alert.getId(), alert.getTargetId(), alert.getNotificationId(), packageContext);
         } else {

@@ -9,6 +9,7 @@ import androidx.room.Relation;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public class AssessmentAlertDetails extends AssessmentAlert {
 
@@ -72,5 +73,11 @@ public class AssessmentAlertDetails extends AssessmentAlert {
         AssessmentAlertLink link = getLink();
         link.setAlertId(alert.getId());
         link.setTargetId(assessment.getId());
+    }
+
+    @Override
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
+        sb.append("assessment", assessment);
+        super.appendPropertiesAsStrings(sb);
     }
 }

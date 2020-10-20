@@ -255,6 +255,14 @@ public class ToStringBuilder implements Appendable, CharSequence {
     }
 
     @NonNull
+    public static String toEscapedString(@Nullable LocalTime obj, boolean omitTypeName) {
+        if (null == obj) {
+            return NULL_STRING;
+        }
+        return new ToStringBuilder().appendImpl(obj, omitTypeName).toString();
+    }
+
+    @NonNull
     public static String toEscapedString(@Nullable Object obj, boolean omitTypeName, boolean omitElementType) {
         if (null == obj) {
             return NULL_STRING;

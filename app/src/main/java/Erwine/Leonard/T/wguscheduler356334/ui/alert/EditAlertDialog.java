@@ -255,8 +255,8 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
-        OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), o -> o.ifPresent(d ->
-                OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(d)))
+        OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), t ->
+                OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
         );
     }
 
@@ -390,9 +390,10 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
+        @Nullable
         final LocalDateTime originalDateTime;
 
-        SaveOperationListener(LocalDateTime originalDateTime) {
+        SaveOperationListener(@Nullable LocalDateTime originalDateTime) {
             this.originalDateTime = originalDateTime;
         }
 
@@ -402,7 +403,7 @@ public class EditAlertDialog extends DialogFragment {
 
         @Override
         public void onSuccess(@NonNull ResourceMessageResult messages) {
-            Log.d(LOG_TAG, "Enter onSaveOperationFinished");
+            Log.d(LOG_TAG, "Enter SaveOperationListener.onSuccess");
             if (messages.isSucceeded()) {
                 OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
                     if (effectiveAlertDateTime.isPresent()) {
@@ -411,7 +412,6 @@ public class EditAlertDialog extends DialogFragment {
                         } else {
                             AssessmentAlertBroadcastReceiver.setPendingAlert(effectiveAlertDateTime.get(), (AssessmentAlertLink) viewModel.getAlertLink(), viewModel.getNotificationId(), requireContext());
                         }
-                        dismiss();
                     } else if (null != originalDateTime) {
                         AlertLink link = viewModel.getAlertLink();
                         if (viewModel.isCourseAlert()) {
@@ -420,6 +420,7 @@ public class EditAlertDialog extends DialogFragment {
                             AssessmentAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), viewModel.getNotificationId(), requireContext());
                         }
                     }
+                    dismiss();
                 });
             } else {
                 Resources resources = getResources();

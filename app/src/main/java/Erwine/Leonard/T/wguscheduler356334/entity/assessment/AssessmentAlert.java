@@ -16,6 +16,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertListViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
 public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
@@ -144,5 +145,11 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         if (null != subsequent && !subsequent && alert.getTimeSpec() < 0L) {
             builder.acceptError(R.string.message_alert_relative_before_completion);
         }
+    }
+
+    @Override
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
+        sb.append("link", getLink()).append("alert", getAlert()).append("alertDate", alertDate).append("relativeDays", relativeDays)
+                .append("messagePresent", messagePresent).append("message", message);
     }
 }

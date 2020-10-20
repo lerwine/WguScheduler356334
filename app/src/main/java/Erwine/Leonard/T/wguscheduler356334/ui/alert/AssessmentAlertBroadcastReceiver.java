@@ -3,6 +3,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import io.reactivex.Single;
 
 public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<AssessmentAlertLink, AssessmentAlertDetails> {
+    private static final String LOG_TAG = AssessmentAlertBroadcastReceiver.class.getName();
 
     @NonNull
     @Override
@@ -76,20 +78,24 @@ public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<Ass
 
     @NonNull
     static PendingIntent createAlertIntent(long alertId, long targetId, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter createAlertIntent(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         return createAlertIntent(alertId, targetId, notificationId, packageContext, AssessmentAlertBroadcastReceiver.class);
     }
 
     @Nullable
     static PendingIntent getAlertIntent(long alertId, long targetId, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter getAlertIntent(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         return getAlertIntent(alertId, targetId, notificationId, packageContext, AssessmentAlertBroadcastReceiver.class);
     }
 
     public static void setPendingAlert(@NonNull LocalDateTime dateTime, @NonNull AssessmentAlertLink alertLink, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter setPendingAlert(dateTime: " + dateTime + ", alertLink: " + alertLink + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         PendingIntent intent = createAlertIntent(alertLink.getAlertId(), alertLink.getTargetId(), notificationId, packageContext);
         setPendingAlert(dateTime, intent, packageContext);
     }
 
     static void cancelPendingAlert(long alertId, long targetId, int notificationId, @NonNull Context packageContext) {
+        Log.d(LOG_TAG, "Enter cancelPendingAlert(alertId: " + alertId + ", targetId: " + targetId + ", notificationId: " + notificationId + ", packageContext: " + packageContext + ")");
         cancelPendingAlert(getAlertIntent(alertId, targetId, notificationId, packageContext), packageContext);
     }
 

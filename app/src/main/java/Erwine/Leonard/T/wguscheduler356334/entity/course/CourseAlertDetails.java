@@ -11,6 +11,7 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public class CourseAlertDetails extends CourseAlert {
 
@@ -74,5 +75,11 @@ public class CourseAlertDetails extends CourseAlert {
         CourseAlertLink link = getLink();
         link.setAlertId(alert.getId());
         link.setTargetId(course.getId());
+    }
+
+    @Override
+    public void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
+        sb.append("course", course);
+        super.appendPropertiesAsStrings(sb);
     }
 }

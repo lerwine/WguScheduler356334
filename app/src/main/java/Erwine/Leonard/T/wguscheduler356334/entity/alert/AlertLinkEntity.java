@@ -2,7 +2,9 @@ package Erwine.Leonard.T.wguscheduler356334.entity.alert;
 
 import androidx.annotation.NonNull;
 
-public interface AlertLinkEntity<T extends AlertLink> {
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuildable;
+
+public interface AlertLinkEntity<T extends AlertLink> extends ToStringBuildable {
     @NonNull
     T getLink();
 

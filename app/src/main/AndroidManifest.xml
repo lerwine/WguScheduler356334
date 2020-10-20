@@ -47,6 +47,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".ui.alert.CourseAlertBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".ui.alert.AssessmentAlertBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>
