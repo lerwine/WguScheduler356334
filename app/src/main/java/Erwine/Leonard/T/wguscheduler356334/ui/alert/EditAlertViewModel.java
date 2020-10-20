@@ -126,6 +126,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final PrivateLiveData<Boolean> canSaveLiveData;
     private final PrivateLiveData<Boolean> hasChangesLiveData;
     private final PrivateLiveData<String> eventDateStringLiveData;
+    private final PrivateLiveData<String> selectedDateStringLiveData;
     private final PrivateLiveData<String> effectiveTimeStringLiveData;
     private final PrivateLiveData<String> effectiveAlertDateTimeStringLiveData;
     private final PrivateLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeValueLiveData;
@@ -161,6 +162,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         daysValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         selectedDateValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         eventDateStringLiveData = new PrivateLiveData<>("");
+        selectedDateStringLiveData = new PrivateLiveData<>("");
         effectiveTimeStringLiveData = new PrivateLiveData<>("");
         effectiveAlertDateTimeStringLiveData = new PrivateLiveData<>("");
         effectiveAlertDateTimeValueLiveData = new PrivateLiveData<>(Optional.empty());
@@ -216,6 +218,9 @@ public class EditAlertViewModel extends AndroidViewModel {
         compositeDisposable.add(canSaveObservable.subscribe(canSaveLiveData::postValue));
         compositeDisposable.add(eventDateObservable.subscribe(e ->
                 eventDateStringLiveData.postValue(e.map(LocalDateConverter.MEDIUM_FORMATTER::format).orElse(""))
+        ));
+        compositeDisposable.add(selectedDateObservable.subscribe(e ->
+                selectedDateStringLiveData.postValue(e.map(LocalDateConverter.SHORT_FORMATTER::format).orElse(""))
         ));
         compositeDisposable.add(effectiveTimeObservable.subscribe(t ->
                 effectiveTimeStringLiveData.postValue(t.map(LocalTimeConverter.MEDIUM_FORMATTER::format).orElse(""))));
@@ -503,6 +508,10 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     public LiveData<String> getEventDateStringLiveData() {
         return eventDateStringLiveData;
+    }
+
+    public LiveData<String> getSelectedDateStringLiveData() {
+        return selectedDateStringLiveData;
     }
 
     public LiveData<String> getEffectiveAlertDateTimeStringLiveData() {

@@ -104,7 +104,7 @@ public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends Aler
         AlarmManager alarmManager = (AlarmManager) packageContext.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.set(dateTime.getYear(), dateTime.getMonthValue() - 1, dateTime.getDayOfMonth(), dateTime.getHour(), dateTime.getMinute());
-        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
     }
 
     protected static void cancelPendingAlert(@Nullable PendingIntent intent, @NonNull Context packageContext) {

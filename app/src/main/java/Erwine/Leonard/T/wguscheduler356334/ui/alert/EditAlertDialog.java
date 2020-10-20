@@ -127,6 +127,7 @@ public class EditAlertDialog extends DialogFragment {
             }
         });
         viewModel.getEventDateStringLiveData().observe(viewLifecycleOwner, this::onEventDateChanged);
+        viewModel.getSelectedDateStringLiveData().observe(viewLifecycleOwner, this::onSelectedDateStringChanged);
         viewModel.getEffectiveTimeStringLiveData().observe(viewLifecycleOwner, t -> alertTimeValueTextView.setText(t));
         viewModel.getEffectiveAlertDateTimeStringLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
     }
@@ -225,6 +226,10 @@ public class EditAlertDialog extends DialogFragment {
         }
     }
 
+    private void onSelectedDateStringChanged(String text) {
+        specificDateTextView.setText((null == text) ? "" : text);
+    }
+
     private void onCalculatedDateChanged(String text) {
         if (null != text) {
             calculatedDateValueTextView.setText(text);
@@ -255,6 +260,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onSaveButtonClick(View view) {
+        Log.d(LOG_TAG, "Enter onSaveButtonClick");
         OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), t ->
                 OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
         );
@@ -262,8 +268,9 @@ public class EditAlertDialog extends DialogFragment {
 
     private void onDeleteButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() ->
-                OneTimeObservers.subscribeOnce(viewModel.delete(), new DeleteOperationListener()), null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() -> OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), t ->
+                OneTimeObservers.subscribeOnce(viewModel.delete(), new DeleteOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
+        ), null);
     }
 
     private void onCancelButtonClick(View view) {
@@ -386,6 +393,9 @@ public class EditAlertDialog extends DialogFragment {
             daysEditText.setClickable(false);
             daysEditText.setEnabled(false);
             viewModel.setAlertDateOption(AlertDateOption.EXPLICIT);
+            if (null == viewModel.getSelectedDate()) {
+                onSpecificDateTextViewClick(specificDateTextView);
+            }
         }
     }
 
@@ -450,14 +460,10 @@ public class EditAlertDialog extends DialogFragment {
 
     private class DeleteOperationListener implements CompletableObserver {
         @Nullable
-        Integer notificationId;
+        private final LocalDateTime originalDateTime;
 
-        DeleteOperationListener() {
-            OneTimeObservers.observeOnce(viewModel.getEffectiveAlertDateTimeValueLiveData(), getViewLifecycleOwner(), effectiveAlertDateTime -> {
-                if (effectiveAlertDateTime.isPresent()) {
-                    notificationId = viewModel.getNotificationId();
-                }
-            });
+        DeleteOperationListener(@Nullable LocalDateTime originalDateTime) {
+            this.originalDateTime = originalDateTime;
         }
 
         @Override
@@ -467,7 +473,7 @@ public class EditAlertDialog extends DialogFragment {
         @Override
         public void onComplete() {
             Log.d(LOG_TAG, "Enter DeleteOperationListener.onComplete");
-            if (null != notificationId) {
+            if (null != originalDateTime) {
                 AlertLink link = viewModel.getAlertLink();
                 if (viewModel.isCourseAlert()) {
                     CourseAlertBroadcastReceiver.cancelPendingAlert(link.getAlertId(), link.getTargetId(), viewModel.getNotificationId(), requireContext());
