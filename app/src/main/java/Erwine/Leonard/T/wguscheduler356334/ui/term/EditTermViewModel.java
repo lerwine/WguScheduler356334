@@ -188,7 +188,8 @@ public class EditTermViewModel extends AndroidViewModel {
             Log.d(LOG_TAG, "endMessageObservable: startDateSubject=EMPTY; endDateSubject=EMPTY; endMessageOverride=EMPTY");
             return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
         });
-        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n && !(s.isPresent() || e.isPresent()));
+        Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n &&
+                s.map(ResourceMessageFactory::isWarning).orElse(true) && e.map(ResourceMessageFactory::isWarning).orElse(true));
 
         compositeDisposable.add(validObservable.subscribe(isValid::postValue));
         compositeDisposable.add(Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).subscribe(canSave::postValue));
