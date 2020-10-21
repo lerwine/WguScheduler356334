@@ -124,7 +124,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     private final PrivateLiveData<ResourceMessageResult> initializationFailureLiveData;
     private final PrivateLiveData<Boolean> validLiveData;
     private final PrivateLiveData<Boolean> canSaveLiveData;
-    private final PrivateLiveData<Boolean> hasChangesLiveData;
+//    private final PrivateLiveData<Boolean> hasChangesLiveData;
     private final PrivateLiveData<String> eventDateStringLiveData;
     private final PrivateLiveData<String> selectedDateStringLiveData;
     private final PrivateLiveData<String> effectiveTimeStringLiveData;
@@ -158,7 +158,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData = new PrivateLiveData<>();
         validLiveData = new PrivateLiveData<>(false);
         canSaveLiveData = new PrivateLiveData<>(false);
-        hasChangesLiveData = new PrivateLiveData<>(false);
+//        hasChangesLiveData = new PrivateLiveData<>(false);
         daysValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         selectedDateValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         eventDateStringLiveData = new PrivateLiveData<>("");
@@ -209,8 +209,8 @@ public class EditAlertViewModel extends AndroidViewModel {
         Observable<Boolean> validObservable = Observable.combineLatest(daysEditTextParseResultObservable, effectiveAlertDateObservable, effectiveTimeObservable,
                 Workers.asCached((daysEditTextParseResult, effectiveAlertDate, effectiveAlertTime) ->
                         !(daysEditTextParseResult.isSecondary() && effectiveAlertDate.isSecondary()) && effectiveAlertTime.isPresent()));
-
         Observable<Boolean> canSaveObservable = Observable.combineLatest(changedObservable, validObservable, (c, v) -> c && v);
+
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(daysEditTextParseResultObservable.subscribe(this::onDaysEditTextChanged, throwable -> daysValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
         compositeDisposable.add(effectiveAlertDateObservable.subscribe(this::onEffectiveAlertDateChanged,
@@ -331,14 +331,14 @@ public class EditAlertViewModel extends AndroidViewModel {
             return selectedDate.<BinaryOptional<LocalDate, ResourceMessageFactory>>map(BinaryOptional::ofPrimary).orElseGet(() ->
                     BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.message_required)));
         }
-        if (daysEditTextParseResult.isPrimary()) {
+        if (daysEditTextParseResult.isPrimary() && eventDate.isPresent()) {
             if (selectedOption.isAfter()) {
-                return BinaryOptional.ofPrimary(eventDate.orElseThrow(IllegalStateException::new).plusDays(daysEditTextParseResult.getPrimary()));
+                return BinaryOptional.ofPrimary(eventDate.get().plusDays(daysEditTextParseResult.getPrimary()));
             }
             if (selectedOption.isEnd() && !beforeEndAllowed) {
                 return BinaryOptional.ofSecondary(ResourceMessageFactory.ofError(R.string.format_error, "Illegal option selection"));
             }
-            return BinaryOptional.ofPrimary(eventDate.orElseThrow(IllegalStateException::new).minusDays(daysEditTextParseResult.getPrimary()));
+            return BinaryOptional.ofPrimary(eventDate.get().minusDays(daysEditTextParseResult.getPrimary()));
         }
         return BinaryOptional.empty();
     }
@@ -538,9 +538,9 @@ public class EditAlertViewModel extends AndroidViewModel {
         return canSaveLiveData;
     }
 
-    public LiveData<Boolean> getHasChangesLiveData() {
-        return hasChangesLiveData;
-    }
+//    public LiveData<Boolean> getHasChangesLiveData() {
+//        return hasChangesLiveData;
+//    }
 
     public LiveData<Boolean> getValidLiveData() {
         return validLiveData;

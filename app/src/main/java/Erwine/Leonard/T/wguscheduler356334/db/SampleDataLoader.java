@@ -265,7 +265,7 @@ public class SampleDataLoader implements Action {
     private void loadSampleCourseAlert(long courseId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         AlertEntity alert = new AlertEntity(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0),
-                xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), null, null);
+                xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), xmlParser.getAttributeValue(null, Alert.COLNAME_CUSTOM_MESSAGE), null);
         long id = dbLoader.getAppDb().alertDAO().insertSynchronous(alert);
         CourseAlertLink courseAlertLink = new CourseAlertLink(id, courseId);
         Log.d(LOG_TAG, String.format("Loaded %s", courseAlertLink));
@@ -305,7 +305,7 @@ public class SampleDataLoader implements Action {
     private void loadSampleAssessmentAlert(long assessmentId) throws IOException, XmlPullParserException {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         AlertEntity alert = new AlertEntity(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0),
-                xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), null, null);
+                xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false), xmlParser.getAttributeValue(null, Alert.COLNAME_CUSTOM_MESSAGE), null);
         long id = dbLoader.getAppDb().alertDAO().insertSynchronous(alert);
         AssessmentAlertLink assessmentAlertLink = new AssessmentAlertLink(id, assessmentId);
         Log.d(LOG_TAG, String.format("Loaded %s", assessmentAlertLink));

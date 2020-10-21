@@ -108,8 +108,8 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
         }
         relativeDays = alert.getTimeSpec();
         LocalDate date = (subsequent) ?
-                viewModel.getEffectiveStartDate() :
-                viewModel.getEffectiveEndDate();
+                viewModel.getEffectiveEndDate() :
+                viewModel.getEffectiveStartDate();
         LocalDate oldValue = alertDate;
         alertDate = (null == date) ? null : date.plusDays(relativeDays);
         return !Objects.equals(oldValue, alertDate);
@@ -123,8 +123,8 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
         } else {
             relativeDays = alert.getTimeSpec();
             LocalDate date = (subsequent) ?
-                    viewModel.getEffectiveStartDate() :
-                    viewModel.getEffectiveEndDate();
+                    viewModel.getEffectiveEndDate() :
+                    viewModel.getEffectiveStartDate();
             alertDate = (null == date) ? null : date.plusDays(relativeDays);
         }
         String m = alert.getCustomMessage();

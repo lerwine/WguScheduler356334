@@ -111,8 +111,8 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         } else {
             relativeDays = alert.getTimeSpec();
             LocalDate date = (subsequent) ?
-                    viewModel.getEffectiveStartDate() :
-                    viewModel.getEffectiveEndDate();
+                    viewModel.getEffectiveEndDate() :
+                    viewModel.getEffectiveStartDate();
             alertDate = (null == date) ? null : date.plusDays(relativeDays);
         }
         String m = alert.getCustomMessage();
@@ -132,8 +132,8 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         }
         relativeDays = alert.getTimeSpec();
         LocalDate date = (subsequent) ?
-                viewModel.getEffectiveStartDate() :
-                viewModel.getEffectiveEndDate();
+                viewModel.getEffectiveEndDate() :
+                viewModel.getEffectiveStartDate();
         LocalDate oldValue = alertDate;
         alertDate = (null == date) ? null : date.plusDays(relativeDays);
         return !Objects.equals(oldValue, alertDate);

@@ -79,6 +79,9 @@
             type="xs:long"
             name="timeSpec"
             use="required" />
+        <xs:attribute
+            type="xs:string"
+            name="customMessage" />
     </xs:complexType>
     <xs:complexType
         name="assessmentAlertItemType"
@@ -91,6 +94,9 @@
             type="xs:long"
             name="timeSpec"
             use="required" />
+        <xs:attribute
+            type="xs:string"
+            name="customMessage" />
     </xs:complexType>
     <xs:complexType
         name="assessmentsItemType"

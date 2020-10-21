@@ -1165,13 +1165,20 @@ Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ul
                             status="PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
-                            completionDate="actualEnd" />
+                            completionDate="actualEnd">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="true"
+                                    timeSpec="1"
+                                    customMessage="Check results" />
+                            </assessmentAlerts>
+                        </item>
                     </assessments>
                 </item>
                 <item
                     number="C196"
                     title="Mobile Application Development"
-                    status="IN_PROGRESS"
+                    status="NOT_PASSED"
                     expectedStart="2020-08-21"
                     expectedEnd="2020-09-30"
                     competencyUnits="3"
@@ -1181,7 +1188,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     <assessments>
                         <item
                             code="ABM1"
-                            status="IN_PROGRESS"
+                            status="NOT_PASSED"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION" />
                     </assessments>
@@ -1195,25 +1202,57 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
             <notes><![CDATA[Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
             <courses>
                 <item
+                    number="C196"
+                    title="Mobile Application Development"
+                    status="IN_PROGRESS"
+                    actualStart="2020-10-01"
+                    expectedEnd="2020-10-22"
+                    competencyUnits="3"
+                    mentorId="23">
+                    <notes>
+                        <![CDATA[Mauris rhoncus aenean vel elit scelerisque mauris pellentesque.
+Libero justo laoreet sit amet cursus.]]></notes>
+                    <assessments>
+                        <item
+                            code="ABM1"
+                            status="IN_PROGRESS"
+                            goalDate="expectedEnd"
+                            type="PERFORMANCE_EVALUATION">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    timeSpec="1"
+                                    customMessage="Submit tomorrow!" />
+                            </assessmentAlerts>
+                        </item>
+                    </assessments>
+                </item>
+                <item
                     number="C769"
                     title="IT Capstone Written Project"
                     status="PLANNED"
-                    expectedStart="2020-10-01"
+                    expectedStart="2020-10-22"
                     expectedEnd="2020-12-31"
                     competencyUnits="4">
                     <notes>
                         <![CDATA[Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis.]]></notes>
+                    <courseAlerts>
+                        <item
+                            subsequent="false"
+                            timeSpec="7"
+                            customMessage="1 week left!" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-10-15"
+                            goalDate="2020-10-20"
                             type="PERFORMANCE_EVALUATION"
                             name="Task 1" />
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-09-20"
+                            goalDate="2020-11-06"
                             type="PERFORMANCE_EVALUATION"
                             name="Task 2" />
                         <item
@@ -1238,7 +1277,6 @@ Suscipit tellus mauris a diam maecenas sed enim ut. Aliquet risus feugiat in ant
                         <item
                             code="ADO1"
                             status="NOT_STARTED"
-                            goalDate="expectedEnd"
                             type="OBJECTIVE_ASSESSMENT" />
                     </assessments>
                 </item>
