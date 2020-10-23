@@ -11,10 +11,10 @@ import java.time.format.FormatStyle;
 
 public class LocalDateConverter {
 
-    public static final DateTimeFormatter FULL_FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, YYYY").withZone(ZoneId.systemDefault());
-    public static final DateTimeFormatter LONG_FORMATTER = DateTimeFormatter.ofPattern("eee M/d/YYYY").withZone(ZoneId.systemDefault());
+    public static final DateTimeFormatter FULL_FORMATTER = DateTimeFormatter.ofPattern("eee, MMM d, yyyy").withZone(ZoneId.systemDefault());
+    public static final DateTimeFormatter LONG_FORMATTER = DateTimeFormatter.ofPattern("eee M/d/yyyy").withZone(ZoneId.systemDefault());
     public static final DateTimeFormatter MEDIUM_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
-    public static final DateTimeFormatter SHORT_FORMATTER = DateTimeFormatter.ofPattern("MM/d/YYYY").withZone(ZoneId.systemDefault());
+    public static final DateTimeFormatter SHORT_FORMATTER = DateTimeFormatter.ofPattern("MM/d/yyyy").withZone(ZoneId.systemDefault());
     private static final DateTimeFormatter[] ALT_FORMATTER = new DateTimeFormatter[]{
             DateTimeFormatter.ofPattern("M/d/yyyy").withZone(ZoneId.systemDefault()),
             DateTimeFormatter.ofPattern("M-d-yyyy").withZone(ZoneId.systemDefault()),
