@@ -16,11 +16,13 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.TimePreference;
 import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
@@ -66,7 +68,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
  */
 public class DbLoader {
 
-    private static final String LOG_TAG = DbLoader.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(DbLoader.class);
 
     private final BehaviorSubject<Boolean> preferEmailSubject;
     private final MutableLiveData<Boolean> preferEmail;
@@ -108,20 +110,17 @@ public class DbLoader {
         dataExecutor = Executors.newSingleThreadExecutor();
         scheduler = Schedulers.from(dataExecutor);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferEmailSubject = BehaviorSubject.create();
-        preferAlertTimeSubject = BehaviorSubject.create();
-        preferNextNotificationIdSubject = BehaviorSubject.create();
-
+        final String preference_prefer_email = context.getResources().getString(R.string.preference_prefer_email);
+        preferEmailSubject = BehaviorSubject.createDefault(sharedPreferences.getBoolean(preference_prefer_email, false));
         final String preference_alert_time = context.getResources().getString(R.string.preference_alert_time);
         int minutes = sharedPreferences.getInt(preference_alert_time, TimePreference.DEFAULT_VALUE);
-        preferAlertTimeSubject.onNext(LocalTime.of(minutes / 60, minutes % 60));
-        final String preference_prefer_email = context.getResources().getString(R.string.preference_prefer_email);
-        preferEmailSubject.onNext(sharedPreferences.getBoolean(preference_prefer_email, false));
+        preferAlertTimeSubject = BehaviorSubject.createDefault(LocalTime.of(minutes / 60, minutes % 60));
         final String preference_next_notification_id = context.getResources().getString(R.string.preference_next_notification_id);
-        preferNextNotificationIdSubject.onNext(sharedPreferences.getInt(preference_next_notification_id, 1));
-        preferEmail = new MutableLiveData<>();
-        preferAlertTime = new MutableLiveData<>();
-        preferNextNotificationId = new MutableLiveData<>();
+        preferNextNotificationIdSubject = BehaviorSubject.createDefault(sharedPreferences.getInt(preference_next_notification_id, 1));
+
+        preferEmail = new MutableLiveData<>(preferEmailSubject.getValue());
+        preferAlertTime = new MutableLiveData<>(preferAlertTimeSubject.getValue());
+        preferNextNotificationId = new MutableLiveData<>(preferNextNotificationIdSubject.getValue());
         subscriptionCompositeDisposable.add(preferEmailSubject.subscribe(preferEmail::postValue));
         subscriptionCompositeDisposable.add(preferAlertTimeSubject.subscribe(preferAlertTime::postValue));
         subscriptionCompositeDisposable.add(preferNextNotificationIdSubject.subscribe(id -> {
@@ -154,17 +153,6 @@ public class DbLoader {
     AppDb getAppDb() {
         return appDb;
     }
-
-//    /**
-//     * Asynchronously gets a {@link TermEntity} from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb} by its {@code ROWID}.
-//     *
-//     * @param rowId The {@code ROWID} of the {@link TermEntity} to retrieve.
-//     * @return The {@link Single} object that can be used to observe the result {@link TermEntity} object.
-//     */
-//    @NonNull
-//    public Single<TermEntity> getTermByRowId(int rowId) {
-//        return appDb.termDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-//    }
 
     /**
      * Asynchronously gets a {@link TermEntity} from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb} by its unique identifier.
@@ -263,17 +251,6 @@ public class DbLoader {
             return ValidationMessage.success();
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
-
-//    /**
-//     * Asynchronously gets a {@link MentorEntity} from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb} by its {@code ROWID}.
-//     *
-//     * @param rowId The {@code ROWID} of the {@link MentorEntity} to retrieve.
-//     * @return The {@link Single} object that can be used to observe the result {@link MentorEntity} object.
-//     */
-//    @NonNull
-//    public Single<MentorEntity> getMentorByRowId(int rowId) {
-//        return appDb.mentorDAO().getByRowId(rowId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-//    }
 
     /**
      * Gets all rows from the {@link AppDb#TABLE_NAME_MENTORS "mentors"} data table within the underlying {@link AppDb}.
@@ -573,31 +550,6 @@ public class DbLoader {
         return appDb.courseDAO().loadByTermId(termId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-//    /**
-//     * Gets all rows from the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
-//     *
-//     * @return A {@link LiveData} object that will contain the list of {@link AssessmentEntity} objects retrieved from the underlying {@link AppDb}.
-//     */
-//    @NonNull
-//    public LiveData<List<AssessmentEntity>> getAllAssessments() {
-//        Log.d(LOG_TAG, "Called getAllAssessments()");
-//        if (null == allAssessments) {
-//            allAssessments = appDb.assessmentDAO().getAll();
-//        }
-//        return allAssessments;
-//    }
-
-//    /**
-//     * Asynchronously gets the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
-//     *
-//     * @return The {@link Single} object that can be used to observe the number of rows in the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table within the underlying {@link AppDb}.
-//     */
-//    @NonNull
-//    public Single<Integer> getAssessmentCount() {
-//        Log.d(LOG_TAG, "Called getAssessmentCount()");
-//        return appDb.assessmentDAO().getCount().subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-//    }
-
     /**
      * Asynchronously save the specified {@link AssessmentEntity} object into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table of the underlying {@link AppDb}.
      * If {@link AssessmentEntity#getId()} is null, then it will be inserted into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table; otherwise, the corresponding table row will be
@@ -650,24 +602,6 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
-//    public Single<ValidationMessage.ResourceMessageResult> updateAlert(AlertEntity entity, boolean ignoreWarnings) {
-//        Log.d(LOG_TAG, String.format("Called saveAlert(%s)", entity));
-//        return Single.fromCallable(() -> {
-//            final ValidationMessage.ResourceMessageBuilder builder = new ValidationMessage.ResourceMessageBuilder();
-//            if (entity.getId() == ID_NEW) {
-//                builder.acceptError(R.string.message_alert_not_inserted);
-//                return builder.build();
-//            }
-//
-//            Alert.validate(builder, entity);
-//            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
-//                return builder.build();
-//            }
-//            appDb.alertDAO().update(entity);
-//            return builder.build();
-//        }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
-//    }
-
     public Completable deleteCourseAlert(CourseAlert entity) {
         Log.d(LOG_TAG, String.format("Called deleteCourseAlert(%s)", entity));
         return Completable.fromAction(() -> appDb.runInTransaction(() -> {
@@ -693,7 +627,7 @@ public class DbLoader {
     }
 
     private int getNextNotificationId() {
-        int id = preferNextNotificationIdSubject.getValue();
+        int id = Objects.requireNonNull(preferNextNotificationIdSubject.getValue());
         AlertDAO alertDao = appDb.alertDAO();
         while (alertDao.countByNotificationId(id) > 0) {
             if (id == Integer.MAX_VALUE) {
@@ -773,18 +707,6 @@ public class DbLoader {
             return builder.build();
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
-
-//    /**
-//     * Asynchronously inserts a {@link List} of @link AssessmentEntity} objects into the {@link AppDb#TABLE_NAME_COURSES "courses"} data table of the underlying {@link AppDb}.
-//     *
-//     * @param list The {@link List} of @link AssessmentEntity} objects to be inserted into the {@link AppDb#TABLE_NAME_ASSESSMENTS "assessments"} data table.
-//     * @return The {@link Completable} that can be observed for DB operation completion status.
-//     */
-//    @NonNull
-//    public Completable insertAllAssessments(List<AssessmentEntity> list) {
-//        return Completable.fromSingle(appDb.assessmentDAO().insertAll(list).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread())
-//                .doAfterSuccess(ids -> applyInsertedIds(ids, list, AbstractEntity::setId)));
-//    }
 
     @NonNull
     public LiveData<List<CourseAlert>> getAlertsByCourseId(long id) {
