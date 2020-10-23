@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
@@ -56,7 +57,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class EditAlertViewModel extends AndroidViewModel {
 
-    private static final String LOG_TAG = EditAlertViewModel.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditAlertViewModel.class);
     @StringRes
     public static final int TYPE_VALUE_COURSE = R.string.label_course;
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
@@ -143,6 +144,7 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     public EditAlertViewModel(@NonNull Application application) {
         super(application);
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         alertEntitySubject = BehaviorSubject.create();
         typeResourceIdSubject = BehaviorSubject.createDefault(TYPE_VALUE_COURSE);
@@ -228,6 +230,13 @@ public class EditAlertViewModel extends AndroidViewModel {
         compositeDisposable.add(Observable.combineLatest(effectiveAlertDateObservable, effectiveTimeObservable, Workers.asCached((effectiveAlertDate, effectiveTime) ->
                 effectiveAlertDate.ofPrimary().flatMap(d -> effectiveTime.map(d::atTime)))).subscribe(this::onEffectiveAlertDateTimeChanged));
         compositeDisposable.add(alertEntityObservable.subscribe(this::onAlertEntityChanged));
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
+        compositeDisposable.dispose();
     }
 
     private void onEffectiveAlertDateTimeChanged(Optional<LocalDateTime> localDateTime) {
@@ -357,7 +366,7 @@ public class EditAlertViewModel extends AndroidViewModel {
     private Boolean calculateChanged(AlertDateOption option, Optional<Long> timeSpec, Optional<LocalDate> date, Optional<LocalTime> localTime, String normalizedMessage,
                                      AlertEntity alertEntity) {
         String customMessage = alertEntity.getCustomMessage();
-        return ((null == customMessage) ? normalizedMessage.isEmpty() : normalizedMessage.equals(customMessage)) ||
+        return !((null == customMessage) ? normalizedMessage.isEmpty() : normalizedMessage.equals(customMessage)) ||
                 localTime.map(t -> !Objects.equals(t, alertEntity.getAlertTime())).orElse(true) ||
                 timeSpec.map(t -> alertEntity.getTimeSpec() != t || option != AlertDateOption.of(alertEntity.isSubsequent(), t)).orElse(true);
     }
@@ -457,7 +466,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         if (null == alertDateOption || alertDateOption.isExplicit()) {
             return null;
         }
-        return alertDateOption.isAfter();
+        return alertDateOption.isEnd();
     }
 
     @Nullable

@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.AddTermActivity;
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewTermActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
@@ -51,7 +52,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditTermViewModel extends AndroidViewModel {
 
-    private static final String LOG_TAG = EditTermViewModel.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditTermViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_TERM_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_ID, false);
 
@@ -68,7 +69,6 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     private final DbLoader dbLoader;
-    @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
     private final BehaviorSubject<TermEntity> entitySubject;
     private final BehaviorSubject<String> nameSubject;
@@ -87,17 +87,13 @@ public class EditTermViewModel extends AndroidViewModel {
     private final PrivateLiveData<Boolean> canSave;
     private final PrivateLiveData<Boolean> hasChanges;
     private final PrivateLiveData<Boolean> isValid;
-//    @NonNull
-//    private final CurrentValues currentValues;
-//    @NonNull
-//    private TermEntity originalValues;
 
     private LiveData<List<TermCourseListItem>> coursesLiveData;
     private boolean fromInitializedState;
 
     public EditTermViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         entitySubject = BehaviorSubject.createDefault(new TermEntity());
         nameSubject = BehaviorSubject.createDefault("");
@@ -117,6 +113,13 @@ public class EditTermViewModel extends AndroidViewModel {
         isValid = new PrivateLiveData<>(false);
         titleFactory = new PrivateLiveData<>();
         overviewFactory = new PrivateLiveData<>();
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
+        compositeDisposable.dispose();
     }
 
     private void initializeObservables(TermEntity entity) {
@@ -401,7 +404,7 @@ public class EditTermViewModel extends AndroidViewModel {
     }
 
     public void saveViewModelState(@NonNull Bundle outState) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.term.TermPropertiesViewModel.saveState");
+        Log.d(LOG_TAG, "Enter saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         entitySubject.getValue().saveState(outState, true);
         outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_NAME, false), nameSubject.getValue());
@@ -468,101 +471,4 @@ public class EditTermViewModel extends AndroidViewModel {
         }
     }
 
-//    private class CurrentValues implements Term {
-//
-//        @NonNull
-//        private String name = "";
-//        private LocalDate start;
-//        private LocalDate end;
-//        @NonNull
-//        private String notes = "";
-//
-//        @Override
-//        public long getId() {
-//            return originalValues.getId();
-//        }
-//
-//        @Override
-//        public void setId(long id) {
-//            originalValues.setId(id);
-//        }
-//
-//        @NonNull
-//        @Override
-//        public String getName() {
-//            return name;
-//        }
-//
-//        @Override
-//        public void setName(String name) {
-//            Log.d(LOG_TAG, "Enter CurrentValues.setNotes(" + ToStringBuilder.toEscapedString(name) + "); oldValue = " + ToStringBuilder.toEscapedString(this.name));
-//            if (null == name || name.isEmpty()) {
-//                if (this.name.isEmpty()) {
-//                    return;
-//                }
-//                nameSubject.onNext("");
-//            } else if (!name.equals(this.name)) {
-//                this.name = name;
-//                nameSubject.onNext(this.name);
-//            }
-//            nameSubject.onNext(this.name);
-//        }
-//
-//        @Nullable
-//        @Override
-//        public LocalDate getStart() {
-//            return start;
-//        }
-//
-//        @Override
-//        public void setStart(@Nullable LocalDate start) {
-//            if (!Objects.equals(this.start, start)) {
-//                Log.d(LOG_TAG, "Enter CurrentValues.setStart(" + ToStringBuilder.toEscapedString(start, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.start, true));
-//                this.start = start;
-//                startDateSubject.onNext(Optional.ofNullable(this.start));
-//            }
-//        }
-//
-//        @Nullable
-//        @Override
-//        public LocalDate getEnd() {
-//            return end;
-//        }
-//
-//        @Override
-//        public void setEnd(@Nullable LocalDate end) {
-//            if (!Objects.equals(this.end, end)) {
-//                Log.d(LOG_TAG, "Enter CurrentValues.setEnd(" + ToStringBuilder.toEscapedString(end, true) + "); oldValue = " + ToStringBuilder.toEscapedString(this.end, true));
-//                this.end = end;
-//                endDateSubject.onNext(Optional.ofNullable(this.end));
-//            }
-//        }
-//
-//        @NonNull
-//        @Override
-//        public String getNotes() {
-//            return notes;
-//        }
-//
-//        @Override
-//        public void setNotes(String notes) {
-//            Log.d(LOG_TAG, "Enter CurrentValues.setNotes(" + ToStringBuilder.toEscapedString(notes) + "); oldValue = " + ToStringBuilder.toEscapedString(EditTermViewModel.this.getNotes()));
-//            if (null == notes || notes.isEmpty()) {
-//                if (this.notes.isEmpty()) {
-//                    return;
-//                }
-//                notesSubject.onNext("");
-//            } else if (!notes.equals(this.notes)) {
-//                this.notes = notes;
-//                notesSubject.onNext(this.notes);
-//            }
-//        }
-//
-//        @NonNull
-//        @Override
-//        public String toString() {
-//            return ToStringBuilder.toEscapedString(this, false);
-//        }
-//
-//    }
 }

@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import Erwine.Leonard.T.wguscheduler356334.EditMentorActivity;
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
@@ -51,7 +52,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class EditMentorViewModel extends AndroidViewModel {
 
-    private static final String LOG_TAG = EditMentorViewModel.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditMentorViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     private static final String STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED = "sharing_disabled_notification_dismissed";
     private static final Predicate<String> EMAIL_PREDICATE = Pattern.compile("^[^@]+@[^.]+\\.[^.]+.*$").asPredicate();
@@ -84,7 +85,7 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing TermPropertiesViewModel");
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         currentEntitySubject = new PrivateLiveData<>();
         nameSubject = BehaviorSubject.create();
@@ -144,6 +145,13 @@ public class EditMentorViewModel extends AndroidViewModel {
                 .subscribe(overviewFactory::postValue));
         compositeDisposable.add(Observable.combineLatest(hasChangesObservable, validObservable, sharingDisabledNotificationDismissedSubject, (c, v, d) -> v && c && !d)
                 .subscribe(sharingDisabledNotificationVisibleLiveData::postValue));
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
+        compositeDisposable.dispose();
     }
 
     private void onHasChangesChanged(Boolean hasChanges) {
@@ -338,12 +346,12 @@ public class EditMentorViewModel extends AndroidViewModel {
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
-        Log.d(LOG_TAG, "Enter delete");
+        Log.d(LOG_TAG, "Enter delete(" + ignoreWarnings + ")");
         return dbLoader.deleteMentor(mentorEntity, ignoreWarnings);
     }
 
     private void onEntityLoadedFromDb(MentorEntity entity) {
-        Log.d(LOG_TAG, "Enter onEntityLoaded");
+        Log.d(LOG_TAG, "Enter onEntityLoadedFromDb(" + entity + ")");
         mentorEntity = entity;
         setNotes(entity.getNotes());
         setName(entity.getName());
@@ -390,6 +398,7 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     }
 
+    // TODO: Discontinue use and use BehaviorSubject fields
     private class CurrentValues implements Mentor {
 
         private long id;
@@ -420,7 +429,7 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setName(String name) {
-            Log.d(LOG_TAG, "Enter setName:  current: " + ToStringBuilder.toEscapedString(this.name) + "; new: " + ToStringBuilder.toEscapedString(name));
+            Log.d(LOG_TAG, "Enter setName(" + ToStringBuilder.toEscapedString(name) + "); this.name = " + ToStringBuilder.toEscapedString(this.name));
             this.name = (null == name) ? "" : name;
             nameSubject.onNext(this.name);
         }
@@ -433,7 +442,7 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setPhoneNumber(String phoneNumber) {
-            Log.d(LOG_TAG, "Enter setPhoneNumber:  current: " + ToStringBuilder.toEscapedString(this.phoneNumber) + "; new: " + ToStringBuilder.toEscapedString(phoneNumber));
+            Log.d(LOG_TAG, "Enter setPhoneNumber(" + ToStringBuilder.toEscapedString(phoneNumber) + "); this.phoneNumber = " + ToStringBuilder.toEscapedString(this.phoneNumber));
             this.phoneNumber = (null == phoneNumber) ? "" : phoneNumber;
             phoneNumberSubject.onNext(this.phoneNumber);
         }
@@ -446,7 +455,8 @@ public class EditMentorViewModel extends AndroidViewModel {
 
         @Override
         public void setEmailAddress(String emailAddress) {
-            Log.d(LOG_TAG, "Enter setEmailAddress:  current: " + ToStringBuilder.toEscapedString(this.emailAddress) + "; new: " + ToStringBuilder.toEscapedString(emailAddress));
+            Log.d(LOG_TAG, "Enter setEmailAddress(" + ToStringBuilder.toEscapedString(emailAddress) + "); this.emailAddress = " + ToStringBuilder.toEscapedString(this.emailAddress));
+
             this.emailAddress = (null == emailAddress) ? "" : emailAddress;
             emailAddressSubject.onNext(this.emailAddress);
         }
