@@ -49,11 +49,9 @@ public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertList
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @SuppressWarnings("FieldCanBeLocal")
         private final View mView;
         private final TextView dateTextView;
         private final TextView messageTextView;
-        @SuppressWarnings("FieldCanBeLocal")
         private CourseAlert alertListItem;
 
         public ViewHolder(View view) {

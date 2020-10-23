@@ -47,11 +47,9 @@ public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentA
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @SuppressWarnings("FieldCanBeLocal")
         private final View mView;
         private final TextView dateTextView;
         private final TextView messageTextView;
-        @SuppressWarnings("FieldCanBeLocal")
         private AssessmentAlert alertListItem;
 
         public ViewHolder(View view) {

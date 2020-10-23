@@ -21,7 +21,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
-@SuppressWarnings("unused")
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_COURSE_DETAIL,
         value = "SELECT courses.*, " +
