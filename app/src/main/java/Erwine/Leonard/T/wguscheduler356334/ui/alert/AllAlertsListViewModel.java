@@ -43,6 +43,7 @@ public class AllAlertsListViewModel extends AndroidViewModel {
 
     public void setPosition(int position, Observer<List<AlertListItem>> observer, LifecycleOwner viewLifecycleOwner) {
         if (position != this.position) {
+            Log.d(LOG_TAG, "Enter setPosition(position: " + position + ", observer, viewLifecycleOwner); this.position = " + this.position);
             this.position = position;
             liveData.removeObservers(viewLifecycleOwner);
             switch (position) {

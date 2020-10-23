@@ -1,5 +1,10 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
+import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +20,8 @@ import java.util.function.Consumer;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
+
+import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdapter.ViewHolder> {
 
@@ -47,19 +54,15 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
     public class ViewHolder extends RecyclerView.ViewHolder {
         @SuppressWarnings("FieldCanBeLocal")
         private final View mView;
-        private final TextView dateTextView;
-        private final TextView typeTextView;
-        private final TextView codeTextView;
-        private final TextView titleTextView;
+        private final TextView dateAndCodeTextView;
+        private final TextView messageTextView;
         private AlertListItem alertListItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            dateTextView = view.findViewById(R.id.dateTextView);
-            typeTextView = view.findViewById(R.id.typeTextView);
-            codeTextView = view.findViewById(R.id.codeTextView);
-            titleTextView = view.findViewById(R.id.titleTextView);
+            dateAndCodeTextView = view.findViewById(R.id.dateAndCodeTextView);
+            messageTextView = view.findViewById(R.id.messageTextView);
             view.setOnClickListener(this::onViewClick);
         }
 
@@ -69,15 +72,58 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
 
         public void setItem(@NonNull AlertListItem alertListItem) {
             this.alertListItem = alertListItem;
-            LocalDate d = alertListItem.getEventDate();
-            if (null == d) {
-                dateTextView.setText(R.string.label_none);
+            LocalDate d = alertListItem.getAlertDate();
+            SpannableStringBuilder builder;
+            Resources resources = mView.getResources();
+            if (null == d && null == (d = alertListItem.getEventDate())) {
+                builder = new SpannableStringBuilder(resources.getString(R.string.label_none));
+                builder.setSpan(new StyleSpan(Typeface.ITALIC), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
             } else {
-                dateTextView.setText(LocalDateConverter.LONG_FORMATTER.format(d));
+                builder = new SpannableStringBuilder(LocalDateConverter.LONG_FORMATTER.format(d));
             }
-            typeTextView.setText(alertListItem.getTypeDisplayResourceId());
-            codeTextView.setText(alertListItem.getCode());
-            titleTextView.setText(alertListItem.getTitle());
+            int start = builder.append(" ").length();
+            String customMessage = alertListItem.getCustomMessage();
+            String title = alertListItem.getTitle();
+            if (null != customMessage) {
+                builder.append(customMessage).setSpan(new StyleSpan(Typeface.BOLD), start, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                dateAndCodeTextView.setText(builder);
+                builder = new SpannableStringBuilder(resources.getString(alertListItem.getTypeDisplayResourceId())).append(" ").append(alertListItem.getCode());
+                if (null != title) {
+                    builder.append(": ").setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    builder.append(title);
+                } else {
+                    builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                if (alertListItem.isAssessment()) {
+                    start = builder.append("\n").length();
+                    builder.append(resources.getString(R.string.label_course)).append(" ").append(alertListItem.getCourseNumber()).append(": ").append(alertListItem.getCourseTitle())
+                            .setSpan(new StyleSpan(Typeface.ITALIC), start, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    builder.setSpan(new RelativeSizeSpan(0.75f), start, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                messageTextView.setText(builder);
+            } else {
+                builder.append(resources.getString(alertListItem.getTypeDisplayResourceId())).append(" ").append(alertListItem.getCode())
+                        .setSpan(new StyleSpan(Typeface.BOLD), start, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                dateAndCodeTextView.setText(builder);
+                if (null != title) {
+                    builder = new SpannableStringBuilder(title);
+                    builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    if (alertListItem.isAssessment()) {
+                        start = builder.append("\n").length();
+                        builder.append(resources.getString(R.string.label_course)).append(" ").append(alertListItem.getCourseNumber()).append(": ").append(alertListItem.getCourseTitle())
+                                .setSpan(new StyleSpan(Typeface.ITALIC), start, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                        builder.setSpan(new RelativeSizeSpan(0.75f), start, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }
+                    messageTextView.setText(builder);
+                } else if (alertListItem.isAssessment()) {
+                    builder = new SpannableStringBuilder(resources.getString(R.string.label_course)).append(" ").append(alertListItem.getCourseNumber()).append(": ").append(alertListItem.getCourseTitle());
+                    builder.setSpan(new StyleSpan(Typeface.ITALIC), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    builder.setSpan(new RelativeSizeSpan(0.75f), 0, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                    messageTextView.setText(builder);
+                } else {
+                    messageTextView.setText("");
+                }
+            }
         }
     }
 }

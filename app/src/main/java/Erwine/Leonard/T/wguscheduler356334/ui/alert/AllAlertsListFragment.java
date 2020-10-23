@@ -88,7 +88,7 @@ public class AllAlertsListFragment extends Fragment {
 
     private class TabSelectedListener implements TabLayout.OnTabSelectedListener, Observer<List<AlertListItem>> {
         @Override
-        public synchronized void onTabSelected(TabLayout.Tab tab) {
+        public synchronized void onTabSelected(@NonNull TabLayout.Tab tab) {
             viewModel.setPosition(tab.getPosition(), this, getViewLifecycleOwner());
         }
 

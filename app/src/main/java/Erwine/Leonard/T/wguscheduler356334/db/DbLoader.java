@@ -50,6 +50,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
@@ -162,7 +163,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<TermEntity> getTermById(long id) {
-        Log.d(LOG_TAG, String.format("Called getTermById(%d)", id));
+        Log.d(LOG_TAG, "Enter getTermById(" + id + ")");
         return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -173,7 +174,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<TermListItem>> getAllTerms() {
-        Log.d(LOG_TAG, "Called getAllTerms()");
+        Log.d(LOG_TAG, "Enter getAllTerms()");
         if (null == allTerms) {
             allTerms = appDb.termDAO().getAll();
         }
@@ -182,7 +183,7 @@ public class DbLoader {
 
     @NonNull
     public Single<ResourceMessageResult> saveTerm(TermEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called saveTerm(%s)", entity));
+        Log.d(LOG_TAG, "Enter saveTerm(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Term.validate(builder, entity);
@@ -236,7 +237,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<ResourceMessageResult> deleteTerm(TermEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called deleteTerm(%s)", entity));
+        Log.d(LOG_TAG, "Enter deleteTerm(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             long id = entity.getId();
             if (ID_NEW == id) {
@@ -259,7 +260,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<MentorListItem>> getAllMentors() {
-        Log.d(LOG_TAG, "Called getAllMentors()");
+        Log.d(LOG_TAG, "Enter getAllMentors()");
         if (null == allMentors) {
             allMentors = appDb.mentorDAO().getAll();
         }
@@ -277,7 +278,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<ResourceMessageResult> saveMentor(MentorEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called saveMentor(%s)", entity));
+        Log.d(LOG_TAG, "Enter saveMentor(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Mentor.validate(builder, entity);
@@ -316,7 +317,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<ResourceMessageResult> deleteMentor(MentorEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called deleteMentor(%s)", entity));
+        Log.d(LOG_TAG, "Enter deleteMentor(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             long id = entity.getId();
             if (ID_NEW == id) {
@@ -340,7 +341,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<MentorEntity> getMentorById(long id) {
-        Log.d(LOG_TAG, String.format("Called getMentorById(%d)", id));
+        Log.d(LOG_TAG, "Enter getMentorById(" + id + ")");
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -352,7 +353,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<ResourceMessageResult> deleteCourse(CourseEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called deleteCourse(%s)", entity));
+        Log.d(LOG_TAG, "Enter deleteCourse(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             long id = entity.getId();
             if (ID_NEW == id) {
@@ -376,7 +377,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<CourseDetails> getCourseById(long id) {
-        Log.d(LOG_TAG, String.format("Called getCourseById(%d)", id));
+        Log.d(LOG_TAG, "Enter getCourseById(" + id + ")");
         return appDb.courseDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -390,7 +391,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<TermCourseListItem>> getCoursesByTermId(long termId) {
-        Log.d(LOG_TAG, String.format("Called getCoursesByTermId(%d)", termId));
+        Log.d(LOG_TAG, "Enter getCoursesByTermId(" + termId + ")");
         return appDb.courseDAO().getLiveDataByTermId(termId);
     }
 
@@ -404,7 +405,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<MentorCourseListItem>> getCoursesByMentorId(long mentorId) {
-        Log.d(LOG_TAG, String.format("Called getCoursesByMentorId(%d)", mentorId));
+        Log.d(LOG_TAG, "Enter getCoursesByMentorId(" + mentorId + ")");
         return appDb.courseDAO().getByMentorId(mentorId);
     }
 
@@ -418,7 +419,7 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<CourseEntity>> getUnterminatedCoursesOnOrBefore(LocalDate date) {
-        Log.d(LOG_TAG, String.format("Called getUnterminatedCoursesOnOrBefore(%s)", date));
+        Log.d(LOG_TAG, "Enter getUnterminatedCoursesOnOrBefore(" + ToStringBuilder.toEscapedString(date, true) + ")");
         return appDb.courseDAO().getUnterminatedOnOrBefore(date);
     }
 
@@ -433,7 +434,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<ResourceMessageResult> saveCourse(CourseEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called saveCourse(%s)", entity));
+        Log.d(LOG_TAG, "Enter saveCourse(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Course.validate(builder, entity);
@@ -498,7 +499,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<Integer> deleteAssessment(AssessmentEntity entity) {
-        Log.d(LOG_TAG, String.format("Called deleteAssessment(%s)", entity));
+        Log.d(LOG_TAG, "Enter deleteAssessment(" + ToStringBuilder.toEscapedString(entity) + ")");
         return appDb.assessmentDAO().delete(entity).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -510,13 +511,13 @@ public class DbLoader {
      */
     @NonNull
     public Single<AssessmentDetails> getAssessmentById(long id) {
-        Log.d(LOG_TAG, String.format("Called getAssessmentById(%d)", id));
+        Log.d(LOG_TAG, "Enter getAssessmentById(" + id + ")");
         return appDb.assessmentDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
     public Single<AssessmentDetails> createAssessmentForCourse(long courseId, @Nullable LocalDate goalDate) {
-        Log.d(LOG_TAG, String.format("Called createAssessmentForCourse(%d)", courseId));
+        Log.d(LOG_TAG, "Enter createAssessmentForCourse(" + courseId + ", " + ToStringBuilder.toEscapedString(goalDate, true) + ")");
         return Single.fromCallable(() -> {
             AssessmentDetails assessmentDetails = new AssessmentDetails(appDb.courseDAO().getByIdSynchronous(courseId));
             assessmentDetails.setGoalDate(goalDate);
@@ -534,19 +535,19 @@ public class DbLoader {
      */
     @NonNull
     public LiveData<List<AssessmentEntity>> getAssessmentsLiveDataByCourseId(long courseId) {
-        Log.d(LOG_TAG, String.format("Called getAssessmentsLiveDataByCourseId(%d)", courseId));
+        Log.d(LOG_TAG, "Enter getAssessmentsLiveDataByCourseId(" + courseId + ")");
         return appDb.assessmentDAO().getLiveDataByCourseId(courseId);
     }
 
     @NonNull
     public Single<List<AssessmentEntity>> loadAssessmentsByCourseId(long courseId) {
-        Log.d(LOG_TAG, String.format("Called loadAssessmentsByCourseId(%d)", courseId));
+        Log.d(LOG_TAG, "Enter loadAssessmentsByCourseId(" + courseId + ")");
         return appDb.assessmentDAO().loadByCourseId(courseId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
     public Single<List<TermCourseListItem>> loadCoursesByTermId(long termId) {
-        Log.d(LOG_TAG, String.format("Called loadCoursesByTermId(%d)", termId));
+        Log.d(LOG_TAG, "Enter loadCoursesByTermId(" + termId + ")");
         return appDb.courseDAO().loadByTermId(termId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -561,7 +562,7 @@ public class DbLoader {
      */
     @NonNull
     public Single<ResourceMessageResult> saveAssessment(AssessmentEntity entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called saveAssessment(%s)", entity));
+        Log.d(LOG_TAG, "Enter saveAssessment(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             Assessment.validate(builder, entity);
@@ -603,7 +604,7 @@ public class DbLoader {
     }
 
     public Completable deleteCourseAlert(CourseAlert entity) {
-        Log.d(LOG_TAG, String.format("Called deleteCourseAlert(%s)", entity));
+        Log.d(LOG_TAG, "Enter deleteCourseAlert(" + ToStringBuilder.toEscapedString(entity) + ")");
         return Completable.fromAction(() -> appDb.runInTransaction(() -> {
             if (appDb.courseAlertDAO().deleteSynchronous(entity.getLink()) < 1) {
                 throw new RuntimeException("Failed to delete associative entry");
@@ -615,7 +616,7 @@ public class DbLoader {
     }
 
     public Completable deleteAssessmentAlert(AssessmentAlert entity) {
-        Log.d(LOG_TAG, String.format("Called deleteAssessmentAlert(%s)", entity));
+        Log.d(LOG_TAG, "Enter deleteAssessmentAlert(" + ToStringBuilder.toEscapedString(entity) + ")");
         return Completable.fromAction(() -> appDb.runInTransaction(() -> {
             if (appDb.assessmentAlertDAO().deleteSynchronous(entity.getLink()) < 1) {
                 throw new RuntimeException("Failed to delete associative entry");
@@ -639,8 +640,24 @@ public class DbLoader {
         return id;
     }
 
+    void insertCourseAlertSynchronous(CourseAlert entity) {
+        appDb.runInTransaction(() -> {
+            AlertEntity alert = entity.getAlert();
+            CourseAlertLink link = entity.getLink();
+            if (alert.getNotificationId() == 0) {
+                alert.setNotificationId(getNextNotificationId());
+            }
+            long id = appDb.alertDAO().insertSynchronous(alert);
+            link.setAlertIdAndRun(id, () -> {
+                appDb.courseAlertDAO().insertSynchronous(link);
+                preferNextNotificationIdSubject.onNext(alert.getNotificationId() + 1);
+            });
+            alert.setId(id);
+        });
+    }
+
     public Single<ResourceMessageResult> saveCourseAlert(CourseAlert entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called insertCourseAlert(%s)", entity));
+        Log.d(LOG_TAG, "Enter saveCourseAlert(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             AlertEntity alert = entity.getAlert();
@@ -678,8 +695,24 @@ public class DbLoader {
         }).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    void insertAssessmentAlertSynchronous(AssessmentAlert entity) {
+        appDb.runInTransaction(() -> {
+            AlertEntity alert = entity.getAlert();
+            AssessmentAlertLink link = entity.getLink();
+            if (alert.getNotificationId() == 0) {
+                alert.setNotificationId(getNextNotificationId());
+            }
+            long id = appDb.alertDAO().insertSynchronous(alert);
+            link.setAlertIdAndRun(id, () -> {
+                appDb.assessmentAlertDAO().insertSynchronous(link);
+                preferNextNotificationIdSubject.onNext(alert.getNotificationId() + 1);
+            });
+            alert.setId(id);
+        });
+    }
+
     public Single<ResourceMessageResult> saveAssessmentAlert(AssessmentAlert entity, boolean ignoreWarnings) {
-        Log.d(LOG_TAG, String.format("Called insertAssessmentAlert(%s)", entity));
+        Log.d(LOG_TAG, "Enter saveAssessmentAlert(" + ToStringBuilder.toEscapedString(entity) + ", " + ignoreWarnings + ")");
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             entity.validate(builder);
@@ -720,16 +753,19 @@ public class DbLoader {
 
     @NonNull
     public LiveData<List<AlertListItem>> getActiveAlertsOnDate(LocalDate date) {
+        Log.d(LOG_TAG, "Enter getActiveAlertsOnDate(position: " + ToStringBuilder.toEscapedString(date, true) + ")");
         return appDb.alertDAO().getActiveOnDate(date);
     }
 
     @NonNull
     public LiveData<List<AlertListItem>> getActiveAlertsAfterDate(LocalDate date) {
+        Log.d(LOG_TAG, "Enter getActiveAlertsAfterDate(position: " + ToStringBuilder.toEscapedString(date, true) + ")");
         return appDb.alertDAO().getActiveAfterDate(date);
     }
 
     @NonNull
     public LiveData<List<AlertListItem>> getActiveAlertsBeforeDate(LocalDate date) {
+        Log.d(LOG_TAG, "Enter getActiveAlertsBeforeDate(position: " + ToStringBuilder.toEscapedString(date, true) + ")");
         return appDb.alertDAO().getActiveBeforeDate(date);
     }
 

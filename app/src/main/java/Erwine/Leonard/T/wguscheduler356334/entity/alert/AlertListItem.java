@@ -29,7 +29,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_ALERT_LIST,
-        value = "SELECT assessmentAlerts.alertId AS id, assessmentAlerts.targetId, courses.termId, courses.mentorId, alerts.notificationId, assessments.type, assessments.code, assessments.name AS title, assessments.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
+        value = "SELECT assessmentAlerts.alertId AS id, assessmentAlerts.targetId, courses.termId, courses.mentorId, alerts.notificationId, assessments.type, assessments.code, assessments.name AS title," +
+                "assessments.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage, courses.number as courseNumber, courses.title as courseTitle,\n" +
                 "\tCASE\n" +
                 "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
                 "\t\tWHEN alerts.subsequent=1 THEN assessments.completionDate\n" +
@@ -44,7 +45,8 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
                 "\tEND as alertDate, alerts.alertTime, 1 as assessment, assessments.courseId\n" +
                 "\tFROM assessmentAlerts LEFT JOIN alerts on assessmentAlerts.alertId=alerts.id LEFT JOIN assessments on assessmentAlerts.targetId=assessments.id\n" +
                 "\tLEFT JOIN courses on assessments.courseId=courses.id\n" +
-                "UNION SELECT courseAlerts.alertId AS id, courseAlerts.targetId, courses.termId, courses.mentorId, alerts.notificationId, NULL as type, courses.number as code, courses.title, courses.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage,\n" +
+                "UNION SELECT courseAlerts.alertId AS id, courseAlerts.targetId, courses.termId, courses.mentorId, alerts.notificationId, NULL as type, courses.number as code, courses.title," +
+                "courses.status, alerts.timeSpec, alerts.subsequent, alerts.customMessage, courses.number as courseNumber, courses.title as courseTitle,\n" +
                 "\tCASE\n" +
                 "\t\tWHEN alerts.subsequent IS NULL THEN alerts.timeSpec\n" +
                 "\t\tWHEN alerts.subsequent=1 THEN\n" +
@@ -76,6 +78,8 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     static final String COLNAME_CODE = "code";
     static final String COLNAME_TITLE = "title";
     static final String COLNAME_STATUS = "status";
+    static final String COLNAME_COURSE_NUMBER = "courseNumber";
+    static final String COLNAME_COURSE_TITLE = "courseTitle";
     static final String COLNAME_EVENT_DATE = "eventDate";
     static final String COLNAME_ALERT_DATE = "alertDate";
     static final String COLNAME_ASSESSMENT = "assessment";
@@ -87,6 +91,12 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     private long targetId;
     @ColumnInfo(name = COLNAME_ASSESSMENT)
     private boolean assessment;
+    @ColumnInfo(name = COLNAME_COURSE_NUMBER)
+    @NonNull
+    private String courseNumber;
+    @ColumnInfo(name = COLNAME_COURSE_TITLE)
+    @NonNull
+    private String courseTitle;
     @ColumnInfo(name = COLNAME_EVENT_DATE)
     @Nullable
     private LocalDate eventDate;
@@ -96,6 +106,7 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     @ColumnInfo(name = COLNAME_CODE)
     private String code;
     @ColumnInfo(name = COLNAME_TITLE)
+    @Nullable
     private String title;
     @ColumnInfo(name = COLNAME_TYPE)
     private AssessmentType type;
@@ -119,14 +130,17 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
     @StringRes
     private int typeDisplayResourceId;
 
-    public AlertListItem(Boolean subsequent, long timeSpec, String customMessage, boolean assessment, @Nullable LocalDate eventDate, @Nullable LocalDate alertDate, @Nullable LocalTime alertTime, String code,
-                         String title, AssessmentType type, int status, long courseId, long termId, @Nullable Long mentorId, long targetId, int notificationId, long id) {
+    public AlertListItem(@Nullable Boolean subsequent, long timeSpec, String customMessage, boolean assessment, @NonNull String courseNumber, @NonNull String courseTitle, @Nullable LocalDate eventDate, @Nullable LocalDate alertDate, @Nullable LocalTime alertTime, String code,
+                         @Nullable String title, AssessmentType type, int status, long courseId, long termId, @Nullable Long mentorId, long targetId, int notificationId, long id) {
         super(IdIndexedEntity.assertNotNewId(id), timeSpec, subsequent, customMessage, notificationId, alertTime);
         this.assessment = assessment;
+        this.courseNumber = courseNumber;
+        this.courseTitle = courseTitle;
         this.eventDate = eventDate;
         this.alertDate = alertDate;
         this.code = SINGLE_LINE_NORMALIZER.apply(code);
-        this.title = SINGLE_LINE_NORMALIZER.apply(title);
+        String s = SINGLE_LINE_NORMALIZER.apply(title);
+        this.title = (s.isEmpty()) ? null : s;
         this.status = status;
         this.courseId = courseId;
         this.termId = termId;
@@ -198,6 +212,24 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         this.targetId = targetId;
     }
 
+    @NonNull
+    public String getCourseNumber() {
+        return courseNumber;
+    }
+
+    public void setCourseNumber(@NonNull String courseNumber) {
+        this.courseNumber = courseNumber;
+    }
+
+    @NonNull
+    public String getCourseTitle() {
+        return courseTitle;
+    }
+
+    public void setCourseTitle(@NonNull String courseTitle) {
+        this.courseTitle = courseTitle;
+    }
+
     @Nullable
     public LocalDate getEventDate() {
         return eventDate;
@@ -257,13 +289,14 @@ public final class AlertListItem extends AlertEntity implements Comparable<Alert
         this.code = SINGLE_LINE_NORMALIZER.apply(code);
     }
 
-    @NonNull
+    @Nullable
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = SINGLE_LINE_NORMALIZER.apply(title);
+    public void setTitle(@Nullable String title) {
+        String s = SINGLE_LINE_NORMALIZER.apply(title);
+        this.title = (s.isEmpty()) ? null : s;
     }
 
     @Nullable

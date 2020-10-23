@@ -1166,12 +1166,12 @@ Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ul
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION"
                             completionDate="actualEnd">
-                            <!--                            <assessmentAlerts>-->
-                            <!--                                <item-->
-                            <!--                                    subsequent="true"-->
-                            <!--                                    timeSpec="1"-->
-                            <!--                                    customMessage="Check results" />-->
-                            <!--                            </assessmentAlerts>-->
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="true"
+                                    timeSpec="1"
+                                    customMessage="Check results" />
+                            </assessmentAlerts>
                         </item>
                     </assessments>
                 </item>
@@ -1218,12 +1218,12 @@ Libero justo laoreet sit amet cursus.]]></notes>
                             status="IN_PROGRESS"
                             goalDate="expectedEnd"
                             type="PERFORMANCE_EVALUATION">
-                            <!--                            <assessmentAlerts>-->
-                            <!--                                <item-->
-                            <!--                                    subsequent="false"-->
-                            <!--                                    timeSpec="1"-->
-                            <!--                                    customMessage="Submit tomorrow!" />-->
-                            <!--                            </assessmentAlerts>-->
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    timeSpec="-1"
+                                    customMessage="Submit tomorrow!" />
+                            </assessmentAlerts>
                         </item>
                     </assessments>
                 </item>
@@ -1236,12 +1236,12 @@ Libero justo laoreet sit amet cursus.]]></notes>
                     competencyUnits="4">
                     <notes>
                         <![CDATA[Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis.]]></notes>
-                    <!--                    <courseAlerts>-->
-                    <!--                        <item-->
-                    <!--                            subsequent="false"-->
-                    <!--                            timeSpec="-7"-->
-                    <!--                            customMessage="1 week left!" />-->
-                    <!--                    </courseAlerts>-->
+                    <courseAlerts>
+                        <item
+                            subsequent="true"
+                            timeSpec="-7"
+                            customMessage="1 week left!" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="ROM2"
