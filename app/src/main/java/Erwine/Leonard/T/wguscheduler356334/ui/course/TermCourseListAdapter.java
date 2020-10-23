@@ -31,7 +31,7 @@ public class TermCourseListAdapter extends AbstractCourseListAdapter<TermCourseL
 
         public ViewHolder(View view) {
             super(view);
-            mentorTextView = (TextView) view.findViewById(R.id.mentorTextView);
+            mentorTextView = view.findViewById(R.id.mentorTextView);
         }
 
         @Override

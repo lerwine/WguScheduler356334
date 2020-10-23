@@ -73,7 +73,7 @@ public enum StringNormalizationOption {
         }
         int result = 0;
         for (StringNormalizationOption o : options) {
-            result = result | o.flag;
+            result |= o.flag;
         }
         if (SINGLE_LINE.isFlaggedIn(result)) {
             // Strip off REMOVE_BLANK_LINES bit
