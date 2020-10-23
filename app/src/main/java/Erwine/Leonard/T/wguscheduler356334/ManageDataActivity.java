@@ -15,7 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.OneTimeObservers;
 
 public class ManageDataActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = ManageDataActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(ManageDataActivity.class);
 
     private final DbLoader dbLoader;
 
@@ -25,6 +25,7 @@ public class ManageDataActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_data);
         ActionBar actionBar = getSupportActionBar();
@@ -35,6 +36,27 @@ public class ManageDataActivity extends AppCompatActivity {
         findViewById(R.id.dbIntegrityCheckButton).setOnClickListener(this::onDbIntegrityCheckButtonClick);
         findViewById(R.id.resetDatabaseButton).setOnClickListener(this::onResetDatabaseButtonClick);
         findViewById(R.id.addSampleDataButton).setOnClickListener(this::onAddSampleDataButtonClick);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onDbIntegrityCheckButtonClick(View view) {
@@ -76,21 +98,6 @@ public class ManageDataActivity extends AppCompatActivity {
                                     .showDialog();
                         }
                 ), null);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 
 }

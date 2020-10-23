@@ -23,7 +23,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 
 public class AddCourseActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = AddCourseActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AddCourseActivity.class);
 
     private EditCourseViewModel viewModel;
     private AlertDialog waitDialog;
@@ -34,7 +34,7 @@ public class AddCourseActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public AddCourseActivity() {
-        Log.d(LOG_TAG, "Constructing AddCourseActivity");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AddCourseActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(LOG_TAG, "Enter onCreate");
+        Log.d(LOG_TAG, "Enter onOptionsItemSelected");
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             confirmSave();
@@ -67,7 +67,7 @@ public class AddCourseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Log.d(LOG_TAG, "Enter onCreate");
+        Log.d(LOG_TAG, "Enter onBackPressed");
         confirmSave();
     }
 
@@ -76,6 +76,12 @@ public class AddCourseActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveViewModelState(outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void confirmSave() {
@@ -104,7 +110,7 @@ public class AddCourseActivity extends AppCompatActivity {
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onSaveImageButtonClick");
+        Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
         OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 

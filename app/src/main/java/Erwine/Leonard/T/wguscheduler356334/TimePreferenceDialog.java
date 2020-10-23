@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334;
 
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 
@@ -9,6 +10,9 @@ import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
 
 public class TimePreferenceDialog extends PreferenceDialogFragmentCompat {
+
+    private static final String LOG_TAG = MainActivity.getLogTag(TimePreferenceDialog.class);
+
     private TimePicker timePicker;
 
     public static TimePreferenceDialog newInstance(String key) {
@@ -21,6 +25,7 @@ public class TimePreferenceDialog extends PreferenceDialogFragmentCompat {
 
     @Override
     protected void onBindDialogView(View view) {
+        Log.d(LOG_TAG, "Enter onBindDialogView");
         super.onBindDialogView(view);
         timePicker = view.findViewById(R.id.prefDialogTime);
         DialogPreference preference = getPreference();
@@ -35,6 +40,7 @@ public class TimePreferenceDialog extends PreferenceDialogFragmentCompat {
 
     @Override
     public void onDialogClosed(boolean positiveResult) {
+        Log.d(LOG_TAG, "Enter onDialogClosed(" + positiveResult + ")");
         if (positiveResult) {
             // generate value to save
             int hours = timePicker.getHour();

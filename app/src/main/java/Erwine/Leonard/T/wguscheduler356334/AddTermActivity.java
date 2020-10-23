@@ -23,7 +23,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 
 public class AddTermActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = AddTermActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AddTermActivity.class);
 
     private EditTermViewModel viewModel;
     private AlertDialog waitDialog;
@@ -33,7 +33,7 @@ public class AddTermActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public AddTermActivity() {
-        Log.d(LOG_TAG, "Constructing AddTermActivity");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
@@ -51,26 +51,6 @@ public class AddTermActivity extends AppCompatActivity {
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
         OneTimeObservers.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onTermLoadSuccess, this::onTermLoadFailed);
-    }
-
-    private void onTermLoadSuccess(TermEntity entity) {
-        waitDialog.dismiss();
-        if (null != entity) {
-            Log.d(LOG_TAG, String.format("Loaded %s", entity));
-            saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
-            viewModel.getIsValid().observe(this, b -> {
-                Log.d(LOG_TAG, "getIsValid().subscribe(" + b + ")");
-                saveFloatingActionButton.setEnabled(b);
-            });
-        } else {
-            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_not_restored, this).showDialog(this::finish);
-        }
-    }
-
-    private void onTermLoadFailed(Throwable throwable) {
-        Log.e(LOG_TAG, "Error loading term", throwable);
-        waitDialog.dismiss();
-        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
     }
 
     @Override
@@ -96,13 +76,39 @@ public class AddTermActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
+    }
+
+    private void onTermLoadSuccess(TermEntity entity) {
+        waitDialog.dismiss();
+        if (null != entity) {
+            Log.d(LOG_TAG, String.format("Loaded %s", entity));
+            saveFloatingActionButton.setOnClickListener(this::onSaveFloatingActionButtonClick);
+            viewModel.getIsValid().observe(this, b -> {
+                Log.d(LOG_TAG, "getIsValid().subscribe(" + b + ")");
+                saveFloatingActionButton.setEnabled(b);
+            });
+        } else {
+            new AlertHelper(R.drawable.dialog_error, R.string.title_not_found, R.string.message_term_not_restored, this).showDialog(this::finish);
+        }
+    }
+
+    private void onTermLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, "Error loading term", throwable);
+        waitDialog.dismiss();
+        new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, this, R.string.format_message_read_error, throwable.getMessage()).showDialog(this::finish);
+    }
+
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
         OneTimeObservers.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onSaveOperationFinished(@NonNull ResourceMessageResult messages) {
-        Log.d(LOG_TAG, "Enter onDbOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onSaveOperationFinished");
         if (messages.isSucceeded()) {
             Intent intent = new Intent();
             intent.putExtra(EditTermViewModel.EXTRA_KEY_TERM_ID, viewModel.getId());

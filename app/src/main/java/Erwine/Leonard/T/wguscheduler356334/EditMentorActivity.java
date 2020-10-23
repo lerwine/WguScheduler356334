@@ -46,7 +46,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class EditMentorActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = ViewTermActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(ViewTermActivity.class);
 
     private EditMentorViewModel viewModel;
     private EditText mentorNameEditText;
@@ -64,12 +64,12 @@ public class EditMentorActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public EditMentorActivity() {
-        Log.d(LOG_TAG, "Constructing EditMentorActivity");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "Enter savedInstanceState");
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_mentor);
         ActionBar actionBar = getSupportActionBar();
@@ -112,6 +112,12 @@ public class EditMentorActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter onSaveInstanceState");
         viewModel.saveState(outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onLoadSuccess(MentorEntity entity) {
@@ -301,7 +307,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onSaveMentorCompleted(@NonNull ResourceMessageResult messages) {
-        Log.d(LOG_TAG, "Enter onSaveOperationSucceeded");
+        Log.d(LOG_TAG, "Enter onSaveMentorCompleted");
         if (messages.isSucceeded()) {
             finish();
         } else {

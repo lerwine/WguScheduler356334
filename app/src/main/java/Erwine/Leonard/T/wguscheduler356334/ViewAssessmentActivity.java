@@ -49,7 +49,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class ViewAssessmentActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = ViewAssessmentActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(ViewAssessmentActivity.class);
 
     private EditAssessmentViewModel viewModel;
     @SuppressWarnings("FieldCanBeLocal")
@@ -65,6 +65,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_assessment);
         ActionBar actionBar = getSupportActionBar();
@@ -96,6 +97,12 @@ public class ViewAssessmentActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void confirmSave() {

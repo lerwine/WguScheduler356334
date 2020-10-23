@@ -42,7 +42,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class ViewTermActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = ViewTermActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(ViewTermActivity.class);
 
     @SuppressWarnings("FieldCanBeLocal")
     private ViewTermPagerAdapter adapter;
@@ -54,7 +54,7 @@ public class ViewTermActivity extends AppCompatActivity {
     private FloatingActionButton deleteFloatingActionButton;
 
     public ViewTermActivity() {
-        Log.d(LOG_TAG, "Constructing ViewTermActivity");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
@@ -98,6 +98,12 @@ public class ViewTermActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onEntityLoaded(TermEntity entity) {
@@ -233,7 +239,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
+        Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, this).showYesNoDialog(() ->
                 OneTimeObservers.observeOnce(viewModel.getAllAlerts(), alerts -> OneTimeObservers.subscribeOnce(viewModel.delete(false), new DeleteOperationListener(alerts))), null);
     }
@@ -255,7 +261,7 @@ public class ViewTermActivity extends AppCompatActivity {
     }
 
     private void onSaveTermComplete(@NonNull ResourceMessageResult messages) {
-        Log.d(LOG_TAG, "Enter onSaveOperationFinished");
+        Log.d(LOG_TAG, "Enter onSaveTermComplete");
         if (messages.isSucceeded()) {
             finish();
         } else {
@@ -292,7 +298,7 @@ public class ViewTermActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
         }
 
         @Override
@@ -325,7 +331,7 @@ public class ViewTermActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             Log.e(LOG_TAG, "Error deleting term", e);
             new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.format_message_delete_error, e.getMessage()), ViewTermActivity.this).showDialog();
         }

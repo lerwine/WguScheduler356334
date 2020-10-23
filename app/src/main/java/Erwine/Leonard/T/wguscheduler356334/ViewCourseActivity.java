@@ -56,7 +56,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
  */
 public class ViewCourseActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = ViewCourseActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(ViewCourseActivity.class);
     private final int NEW_ASSESSMENT_REQUEST_CODE = 1;
 
     private EditCourseViewModel viewModel;
@@ -74,6 +74,7 @@ public class ViewCourseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_course);
         ActionBar actionBar = getSupportActionBar();
@@ -99,13 +100,19 @@ public class ViewCourseActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             confirmSave();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void confirmSave() {
@@ -281,7 +288,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         private final CourseAlert[] alertsBeforeSave;
 
 
-        SaveOperationListener(List<CourseAlert> alertsBeforeSave) {
+        SaveOperationListener(@NonNull List<CourseAlert> alertsBeforeSave) {
             addingNewAlert = false;
             this.alertsBeforeSave = alertsBeforeSave.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
         }
@@ -325,7 +332,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSuccess(ResourceMessageResult messages) {
+        public void onSuccess(@NonNull ResourceMessageResult messages) {
             if (messages.isSucceeded()) {
                 if (addingNewAlert) {
                     EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
@@ -375,7 +382,7 @@ public class ViewCourseActivity extends AppCompatActivity {
 
         private final AlertListItem[] alerts;
 
-        DeleteOperationListener(List<AlertListItem> alerts) {
+        DeleteOperationListener(@NonNull List<AlertListItem> alerts) {
             this.alerts = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AlertListItem[]::new);
         }
 
@@ -384,7 +391,7 @@ public class ViewCourseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSuccess(ResourceMessageResult messages) {
+        public void onSuccess(@NonNull ResourceMessageResult messages) {
             Log.d(LOG_TAG, "Enter DeleteOperationListener.onSuccess");
             if (messages.isSucceeded()) {
                 if (alerts.length > 0) {

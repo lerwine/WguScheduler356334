@@ -23,7 +23,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 
 public class AddAssessmentActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = AddAssessmentActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AddAssessmentActivity.class);
     private EditAssessmentViewModel viewModel;
     private AlertDialog waitDialog;
     private FloatingActionButton saveFloatingActionButton;
@@ -33,11 +33,12 @@ public class AddAssessmentActivity extends AppCompatActivity {
      * fragment (e.g. upon screen orientation changes).
      */
     public AddAssessmentActivity() {
-        Log.d(LOG_TAG, "Constructing AddAssessmentActivity");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_assessment);
         ActionBar actionBar = getSupportActionBar();
@@ -54,6 +55,12 @@ public class AddAssessmentActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Log.d(LOG_TAG, "Enter onCreate");
         int itemId = item.getItemId();
@@ -66,7 +73,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Log.d(LOG_TAG, "Enter onCreate");
+        Log.d(LOG_TAG, "Enter onBackPressed");
         confirmSave();
     }
 

@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
@@ -16,8 +17,11 @@ import Erwine.Leonard.T.wguscheduler356334.db.LocalTimeConverter;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = MainActivity.getLogTag(SettingsActivity.class);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         getSupportFragmentManager()
@@ -45,8 +49,14 @@ public class SettingsActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
+    }
+
     public static class SettingsFragment extends PreferenceFragmentCompat {
-//        private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
+        //        private final Preference.OnPreferenceChangeListener onPreferEmailChangeListener;
         private final Preference.OnPreferenceChangeListener prefAlertTimeChangeListener;
 
         public SettingsFragment() {
