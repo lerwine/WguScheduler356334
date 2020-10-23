@@ -30,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
         return viewModelFactory;
     }
 
+
+    public static String getLogTag(Class<?> c) {
+        String n = c.getName();
+        int l;
+        return (n.startsWith(BuildConfig.APPLICATION_ID) && n.length() > (l = BuildConfig.APPLICATION_ID.length())) ? n.substring(l) : n;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

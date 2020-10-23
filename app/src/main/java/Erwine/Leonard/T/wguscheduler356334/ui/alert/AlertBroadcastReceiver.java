@@ -20,6 +20,7 @@ import androidx.core.app.NotificationCompat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
@@ -33,7 +34,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink.COLNAME
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 public abstract class AlertBroadcastReceiver<T extends AlertLink, U extends AlertLinkEntity<T>> extends BroadcastReceiver {
-    private static final String LOG_TAG = AlertBroadcastReceiver.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AlertBroadcastReceiver.class);
 
     @NonNull
     protected abstract Single<U> getEntity(@NonNull DbLoader dbLoader, long alertId, long targetId);

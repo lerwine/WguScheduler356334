@@ -13,13 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.time.LocalDate;
 import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 
 public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAdapter.ViewHolder> {
 
-    private static final String LOG_TAG = AssessmentListAdapter.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AssessmentListAdapter.class);
     private final List<AssessmentEntity> items;
     private final Context context;
 

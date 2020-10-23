@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.time.LocalDate;
 import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
 
@@ -17,7 +18,7 @@ import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FOR
 
 public abstract class AbstractCourseListAdapter<T extends AbstractCourseEntity<T>, U extends AbstractCourseListAdapter<T, U>.AbstractViewHolder> extends RecyclerView.Adapter<U> {
 
-    private static final String LOG_TAG = AbstractCourseListAdapter.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AbstractCourseListAdapter.class);
     private final List<T> items;
 
     protected AbstractCourseListAdapter(List<T> items) {

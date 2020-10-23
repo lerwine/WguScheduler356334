@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
@@ -21,7 +22,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import io.reactivex.Single;
 
 public class CourseAlertBroadcastReceiver extends AlertBroadcastReceiver<CourseAlertLink, CourseAlertDetails> {
-    private static final String LOG_TAG = CourseAlertBroadcastReceiver.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(CourseAlertBroadcastReceiver.class);
 
     @NonNull
     @Override

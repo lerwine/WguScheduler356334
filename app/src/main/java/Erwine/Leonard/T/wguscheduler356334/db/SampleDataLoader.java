@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
@@ -37,7 +38,7 @@ import io.reactivex.functions.Action;
 
 public class SampleDataLoader implements Action {
 
-    private static final String LOG_TAG = SampleDataLoader.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(SampleDataLoader.class);
 
     private static final String ELEMENT_NAME_SAMPLE_DATA = "SampleData";
     private static final String ELEMENT_NAME_ITEM = "item";
