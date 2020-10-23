@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
@@ -53,7 +54,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditAlertDialog extends DialogFragment {
 
-    private static final String LOG_TAG = EditAlertDialog.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditAlertDialog.class);
     private final Observer<Boolean> canSaveObserver = this::onCanSaveChanged;
     private LiveData<Boolean> canSaveObserved;
     private EditAlertViewModel viewModel;
@@ -76,11 +77,12 @@ public class EditAlertDialog extends DialogFragment {
     private TextWatcher daysEditTextWatcher;
 
     public EditAlertDialog() {
-        Log.d(LOG_TAG, "Constructing EditAlertDialog");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_edit_alert, container, false);
     }
 
@@ -130,6 +132,24 @@ public class EditAlertDialog extends DialogFragment {
         viewModel.getSelectedDateStringLiveData().observe(viewLifecycleOwner, this::onSelectedDateStringChanged);
         viewModel.getEffectiveTimeStringLiveData().observe(viewLifecycleOwner, t -> alertTimeValueTextView.setText(t));
         viewModel.getEffectiveAlertDateTimeStringLiveData().observe(viewLifecycleOwner, this::onCalculatedDateChanged);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Objects.requireNonNull(Objects.requireNonNull(getDialog()).getWindow()).setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        viewModel.saveViewModelState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onAlertEntityLoaded(@NonNull AlertEntity alertEntity) {
@@ -247,18 +267,6 @@ public class EditAlertDialog extends DialogFragment {
         dlg.show();
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        viewModel.saveViewModelState(outState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Objects.requireNonNull(Objects.requireNonNull(getDialog()).getWindow()).setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-    }
-
     private void onSaveButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveButtonClick");
         OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), t ->
@@ -267,7 +275,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onDeleteButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onDeleteImageButtonClick");
+        Log.d(LOG_TAG, "Enter onDeleteButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() -> OneTimeObservers.observeOnce(DbLoader.getPreferAlertTime(), t ->
                 OneTimeObservers.subscribeOnce(viewModel.delete(), new DeleteOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
         ), null);

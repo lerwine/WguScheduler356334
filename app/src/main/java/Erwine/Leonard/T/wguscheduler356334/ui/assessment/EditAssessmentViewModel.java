@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.AddAssessmentActivity;
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewAssessmentActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
@@ -53,7 +54,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditAssessmentViewModel extends AndroidViewModel {
-    private static final String LOG_TAG = EditAssessmentViewModel.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditAssessmentViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_ASSESSMENT_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_ID, false);
 
@@ -102,6 +103,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public EditAssessmentViewModel(@NonNull Application application) {
         super(application);
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
         titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
@@ -112,6 +114,12 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         codeValidLiveData = new PrivateLiveData<>(false);
         effectiveStartLiveData = new PrivateLiveData<>();
         effectiveEndLiveData = new PrivateLiveData<>();
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
     }
 
     @NonNull
@@ -162,11 +170,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
             this.selectedCourse = selectedCourse;
             long id = selectedCourse.getId();
             currentValues.courseId = id;
-            if (ID_NEW != id) {
-                courseValidLiveData.postValue(true);
-            } else {
-                courseValidLiveData.postValue(false);
-            }
+            courseValidLiveData.postValue(ID_NEW != id);
         }
     }
 
@@ -368,7 +372,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     }
 
     public Single<Integer> delete() {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
+        Log.d(LOG_TAG, "Enter delete");
         AssessmentEntity entity = new AssessmentEntity(originalValues);
         return dbLoader.deleteAssessment(entity).doOnError(throwable -> Log.e(getClass().getName(),
                 "Error deleting course", throwable));

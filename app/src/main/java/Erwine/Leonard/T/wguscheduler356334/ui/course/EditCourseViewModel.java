@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import Erwine.Leonard.T.wguscheduler356334.AddCourseActivity;
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
@@ -69,7 +70,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
  * {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link EditCourseFragment}
  */
 public class EditCourseViewModel extends AndroidViewModel {
-    private static final String LOG_TAG = EditCourseViewModel.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditCourseViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_COURSE_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false);
     public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_COMPETENCY_UNITS, false);
@@ -130,7 +131,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing EditCourseViewModel");
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         termsLiveData = dbLoader.getAllTerms();
         mentorsLiveData = dbLoader.getAllMentors();
@@ -157,6 +158,12 @@ public class EditCourseViewModel extends AndroidViewModel {
         termsLoadedObserver = this::onTermsLoaded;
         mentorsLoadedObserver = this::onMentorsLoaded;
 
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
     }
 
     public long getId() {
@@ -794,7 +801,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.delete");
+        Log.d(LOG_TAG, "Enter delete(" + ignoreWarnings + ")");
         return dbLoader.deleteCourse(Objects.requireNonNull(entityLiveData.getValue()).toEntity(), ignoreWarnings);
     }
 
@@ -811,7 +818,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (null == termListItems) {
             return null;
         }
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeTermProperty");
+        Log.d(LOG_TAG, "Enter initializeTermProperty");
         Optional<TermListItem> result = EntityHelper.findById(originalValues.getTermId(), termListItems);
         result.ifPresent(t -> originalValues.setTerm(t));
         return result.orElse(null);
@@ -821,7 +828,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         if (null == mentorListItems) {
             return null;
         }
-        Log.d(LOG_TAG, "Enter Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel.initializeMentorProperty");
+        Log.d(LOG_TAG, "Enter initializeMentorProperty");
         Optional<MentorListItem> result = EntityHelper.findById(originalValues.getMentorId(), mentorListItems);
         result.ifPresent(t -> originalValues.setMentor(t));
         return result.orElse(null);

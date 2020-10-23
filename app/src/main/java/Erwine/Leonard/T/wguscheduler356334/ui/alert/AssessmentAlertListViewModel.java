@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -14,12 +15,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 
 public class AssessmentAlertListViewModel extends AndroidViewModel {
 
+    private static final String LOG_TAG = MainActivity.getLogTag(AssessmentAlertListViewModel.class);
     private final DbLoader dbLoader;
     private final Observer<List<AssessmentAlert>> alertsLoadedObserver;
     private final MutableLiveData<List<AssessmentAlert>> liveData;
@@ -31,9 +34,16 @@ public class AssessmentAlertListViewModel extends AndroidViewModel {
 
     public AssessmentAlertListViewModel(@NonNull Application application) {
         super(application);
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
         liveData = new MutableLiveData<>();
         alertsLoadedObserver = this::onAlertsLoaded;
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
     }
 
     public LiveData<List<AssessmentAlert>> getLiveData() {

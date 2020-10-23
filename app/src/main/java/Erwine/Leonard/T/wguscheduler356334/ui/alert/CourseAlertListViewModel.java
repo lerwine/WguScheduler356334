@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -14,15 +15,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 
 public class CourseAlertListViewModel extends AndroidViewModel {
 
+    private static final String LOG_TAG = MainActivity.getLogTag(CourseAlertListViewModel.class);
     private final DbLoader dbLoader;
     private final Observer<List<CourseAlert>> alertsLoadedObserver;
-    private MutableLiveData<List<CourseAlert>> liveData;
+    private final MutableLiveData<List<CourseAlert>> liveData;
     private LiveData<List<CourseAlert>> observed;
     private CourseDetails course;
     private LocalDate effectiveStartDate;
@@ -31,9 +34,16 @@ public class CourseAlertListViewModel extends AndroidViewModel {
 
     public CourseAlertListViewModel(@NonNull Application application) {
         super(application);
+        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
         liveData = new MutableLiveData<>();
         alertsLoadedObserver = this::onAlertsLoaded;
+    }
+
+    @Override
+    protected void onCleared() {
+        Log.d(LOG_TAG, "Enter onCleared");
+        super.onCleared();
     }
 
     public LiveData<List<CourseAlert>> getLiveData() {
