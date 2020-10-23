@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryOptional;
@@ -45,7 +46,7 @@ import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.MEDIUM_F
 
 public class DatePickerEditView extends ConstraintLayout {
 
-    private static final String LOG_TAG = DatePickerEditView.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(DatePickerEditView.class);
     public static final Function<String, String> NORMALIZER = StringHelper.getNormalizer(StringNormalizationOption.SINGLE_LINE);
     private final EditText dateEditText;
     private final ImageButton pickerImageButton;

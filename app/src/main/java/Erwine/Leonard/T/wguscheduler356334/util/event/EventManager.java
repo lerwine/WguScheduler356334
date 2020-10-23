@@ -10,9 +10,12 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
+
+// TODO: Remove this after ensureing it's not needed
 public abstract class EventManager<T extends EventObject, U extends EventListener> implements AutoCloseable {
 
-    private static final String LOG_TAG = EventManager.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EventManager.class);
 
     private HashMap<String, HashSet<WeakReference<U>>> listenerMap = new HashMap<>();
 
