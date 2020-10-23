@@ -142,7 +142,7 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
     public synchronized void validate(ResourceMessageBuilder builder) {
         AlertLink.validate(builder, this);
         Boolean subsequent = alert.isSubsequent();
-        if (null != subsequent && !subsequent && alert.getTimeSpec() < 0L) {
+        if (null != subsequent && subsequent && alert.getTimeSpec() < 0L) {
             builder.acceptError(R.string.message_alert_relative_before_completion);
         }
     }
