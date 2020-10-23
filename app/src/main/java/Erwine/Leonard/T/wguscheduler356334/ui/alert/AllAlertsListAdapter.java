@@ -28,14 +28,14 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_all_alerts_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.setItem(mValues.get(position));
     }
 
@@ -51,7 +51,6 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
         private final TextView typeTextView;
         private final TextView codeTextView;
         private final TextView titleTextView;
-        @SuppressWarnings("FieldCanBeLocal")
         private AlertListItem alertListItem;
 
         public ViewHolder(View view) {
@@ -68,7 +67,7 @@ public class AllAlertsListAdapter extends RecyclerView.Adapter<AllAlertsListAdap
             onItemClicked.accept(alertListItem);
         }
 
-        public void setItem(AlertListItem alertListItem) {
+        public void setItem(@NonNull AlertListItem alertListItem) {
             this.alertListItem = alertListItem;
             LocalDate d = alertListItem.getEventDate();
             if (null == d) {

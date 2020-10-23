@@ -54,7 +54,7 @@ public class OneTimeObservers {
                 boolean isFirst = true;
 
                 @Override
-                public void onSuccess(T t) {
+                public void onSuccess(@NonNull T t) {
                     if (isFirst) {
                         isFirst = false;
                         if (null == t) {
@@ -83,7 +83,7 @@ public class OneTimeObservers {
     }
 
     public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError, @NonNull Action onComplete) {
-        subscribeOnce(source, onNext, onError, false);
+        subscribeOnce(source, onNext, onError, onComplete, false);
     }
 
     public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull Consumer<T> onNext, @NonNull Consumer<? super Throwable> onError, boolean skipFirstNull) {
@@ -106,7 +106,7 @@ public class OneTimeObservers {
                 boolean isFirst = true;
 
                 @Override
-                public void onNext(T t) {
+                public void onNext(@NonNull T t) {
                     if (isFirst) {
                         isFirst = false;
                         if (null == t) {
@@ -134,17 +134,17 @@ public class OneTimeObservers {
         proxy.subscribeCompletable(source);
     }
 
-    public static <T> void subscribeOnce(@NonNull Completable source, @NonNull Action onComplete) {
+    public static void subscribeOnce(@NonNull Completable source, @NonNull Action onComplete) {
         ActionProxy1 proxy = new ActionProxy1(onComplete);
         proxy.subscribeCompletable(source);
     }
 
-    public static <T> void subscribeOnce(@NonNull Completable source, @NonNull CompletableObserver observer) {
+    public static void subscribeOnce(@NonNull Completable source, @NonNull CompletableObserver observer) {
         source.subscribe(new CompletableObserver() {
             private Disposable disposable;
 
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(@NonNull Disposable d) {
                 disposable = d;
                 observer.onSubscribe(d);
             }
@@ -156,7 +156,7 @@ public class OneTimeObservers {
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 observer.onError(e);
                 disposable.dispose();
             }
@@ -206,7 +206,7 @@ public class OneTimeObservers {
         }
 
         @Override
-        protected Disposable onSubscribeCompletable(Completable target) {
+        protected Disposable onSubscribeCompletable(@NonNull Completable target) {
             return target.subscribe(this::acceptComplete);
         }
     }
@@ -226,7 +226,7 @@ public class OneTimeObservers {
         }
 
         @Override
-        protected Disposable onSubscribeCompletable(Completable target) {
+        protected Disposable onSubscribeCompletable(@NonNull Completable target) {
             return target.subscribe(this::acceptComplete, this::acceptError);
         }
     }
@@ -368,24 +368,24 @@ public class OneTimeObservers {
         private final Observer<T> backingObserver;
         private Disposable disposable;
 
-        ObserverProxy(Observer<T> backingObserver) {
+        ObserverProxy(@NonNull Observer<T> backingObserver) {
             this.backingObserver = backingObserver;
         }
 
         @Override
-        public final void onSubscribe(Disposable d) {
+        public final void onSubscribe(@NonNull Disposable d) {
             disposable = d;
             backingObserver.onSubscribe(d);
         }
 
         @Override
-        public void onNext(T t) {
+        public void onNext(@NonNull T t) {
             backingObserver.onNext(t);
             disposable.dispose();
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             backingObserver.onError(e);
             disposable.dispose();
         }
@@ -417,19 +417,19 @@ public class OneTimeObservers {
         }
 
         @Override
-        public final void onSubscribe(Disposable d) {
+        public final void onSubscribe(@NonNull Disposable d) {
             disposable = d;
             backingObserver.onSubscribe(d);
         }
 
         @Override
-        public void onSuccess(T t) {
+        public void onSuccess(@NonNull T t) {
             backingObserver.onSuccess(t);
             disposable.dispose();
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             backingObserver.onError(e);
             disposable.dispose();
         }

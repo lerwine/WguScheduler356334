@@ -23,7 +23,7 @@ public class StringNormalizerObservables extends ValidatedBehaviorObservables<St
 
     @NonNull
     @Override
-    public Optional<String> mapNext(String s) {
+    public Optional<String> mapNext(@NonNull String s) {
         String n = normalizer.apply(s);
         return (null == n || n.isEmpty()) ? Optional.empty() : Optional.of(n);
     }
