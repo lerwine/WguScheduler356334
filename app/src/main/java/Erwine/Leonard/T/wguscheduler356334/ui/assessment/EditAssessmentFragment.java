@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
@@ -37,7 +38,7 @@ import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FOR
 
 public class EditAssessmentFragment extends Fragment {
 
-    private static final String LOG_TAG = EditAssessmentFragment.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditAssessmentFragment.class);
 
     private EditAssessmentViewModel viewModel;
     private Button courseButton;
@@ -52,8 +53,8 @@ public class EditAssessmentFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_edit_assessment, container, false);
     }
 
@@ -82,6 +83,12 @@ public class EditAssessmentFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onEntityLoaded);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onEntityLoaded(AssessmentDetails assessmentDetails) {
@@ -124,7 +131,7 @@ public class EditAssessmentFragment extends Fragment {
     }
 
     private void onTypeButtonClick(View view) {
-        Log.d(LOG_TAG, "Enter onStatusButtonClick");
+        Log.d(LOG_TAG, "Enter onTypeButtonClick");
         Resources resources = getResources();
         AlertHelper.showSingleSelectDialog(R.string.title_select_type, viewModel.getType(), Arrays.asList(AssessmentType.values()), requireContext(), t -> resources.getString(t.displayResourceId()), t -> {
             if (viewModel.getType() != t) {

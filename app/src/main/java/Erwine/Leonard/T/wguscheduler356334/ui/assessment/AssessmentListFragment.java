@@ -32,7 +32,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
  */
 public class AssessmentListFragment extends Fragment {
 
-    private static final String LOG_TAG = AssessmentListFragment.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AssessmentListFragment.class);
     private final ArrayList<AssessmentEntity> list;
     private AssessmentListAdapter adapter;
     private EditCourseViewModel editCourseViewModel;
@@ -45,12 +45,12 @@ public class AssessmentListFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public AssessmentListFragment() {
-        Log.d(LOG_TAG, "Constructing AssessmentListFragment");
+        Log.d(LOG_TAG, "Constructing");
         list = new ArrayList<>();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_assessment_list, container, false);
     }
@@ -80,7 +80,13 @@ public class AssessmentListFragment extends Fragment {
                 f -> overviewTextView.setText(f.apply(getResources())));
     }
 
-    private void onEntityLoaded(CourseDetails entity) {
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
+    }
+
+    private void onEntityLoaded(@NonNull CourseDetails entity) {
         Log.d(LOG_TAG, "Loaded course details " + entity);
         long courseId = entity.getId();
         if (ID_NEW != courseId) {
@@ -92,7 +98,7 @@ public class AssessmentListFragment extends Fragment {
         }
     }
 
-    private void onAssessmentListChanged(List<AssessmentEntity> assessmentEntities) {
+    private void onAssessmentListChanged(@NonNull List<AssessmentEntity> assessmentEntities) {
         list.clear();
         if (assessmentEntities.isEmpty()) {
             noAssessmentsTextView.setVisibility(View.VISIBLE);

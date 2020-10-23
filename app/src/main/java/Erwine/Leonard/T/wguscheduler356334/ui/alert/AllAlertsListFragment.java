@@ -29,7 +29,7 @@ import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
  */
 public class AllAlertsListFragment extends Fragment {
 
-    private static final String LOG_TAG = AllAlertsListFragment.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(AllAlertsListFragment.class);
     private final List<AlertListItem> items;
     private final TabSelectedListener tabSelectedListener;
     private AllAlertsListViewModel viewModel;
@@ -50,6 +50,7 @@ public class AllAlertsListFragment extends Fragment {
     @NonNull
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_all_alerts_list, container, false);
     }
 
@@ -63,20 +64,26 @@ public class AllAlertsListFragment extends Fragment {
         alertsRecyclerView.setAdapter(adapter);
     }
 
-    private void onItemClicked(AlertListItem item) {
-        if (item.isAssessment()) {
-            EditAssessmentViewModel.startViewAssessmentActivity(requireContext(), item.getTargetId());
-        } else {
-            EditCourseViewModel.startViewCourseActivity(requireContext(), item.getTargetId());
-        }
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AllAlertsListViewModel.class);
         viewModel.setPosition(0, tabSelectedListener, getViewLifecycleOwner());
         listingSelectionTabLayout.addOnTabSelectedListener(tabSelectedListener);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
+    }
+
+    private void onItemClicked(AlertListItem item) {
+        if (item.isAssessment()) {
+            EditAssessmentViewModel.startViewAssessmentActivity(requireContext(), item.getTargetId());
+        } else {
+            EditCourseViewModel.startViewCourseActivity(requireContext(), item.getTargetId());
+        }
     }
 
     private class TabSelectedListener implements TabLayout.OnTabSelectedListener, Observer<List<AlertListItem>> {

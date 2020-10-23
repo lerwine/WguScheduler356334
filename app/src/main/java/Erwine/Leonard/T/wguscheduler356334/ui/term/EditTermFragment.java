@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView;
@@ -28,7 +29,7 @@ import io.reactivex.disposables.Disposable;
 
 public class EditTermFragment extends Fragment {
 
-    private static final String LOG_TAG = EditTermFragment.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditTermFragment.class);
 
     private EditTermViewModel viewModel;
     private EditText termNameEditText;
@@ -41,7 +42,7 @@ public class EditTermFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public EditTermFragment() {
-        Log.d(LOG_TAG, "Constructing EditTermFragment");
+        Log.d(LOG_TAG, "Constructing");
     }
 
     @Override
@@ -63,6 +64,12 @@ public class EditTermFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
         OneTimeObservers.observeOnce(viewModel.getEntityLiveData(), this::onLoadSuccess);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onLoadSuccess(TermEntity entity) {

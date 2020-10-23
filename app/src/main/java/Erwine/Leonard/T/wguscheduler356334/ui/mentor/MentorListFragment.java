@@ -1,10 +1,12 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.mentor;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -26,6 +28,8 @@ import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
  */
 public class MentorListFragment extends Fragment {
 
+    private static final String LOG_TAG = MainActivity.getLogTag(MentorListFragment.class);
+
     private final List<MentorListItem> mItems;
     @SuppressWarnings("FieldCanBeLocal")
     private MentorListViewModel mentorListViewModel;
@@ -36,8 +40,8 @@ public class MentorListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreateView");
         View root = inflater.inflate(R.layout.fragment_mentor_list, container, false);
 
         RecyclerView recyclerView = root.findViewById(R.id.mentorListRecyclerView);
@@ -59,6 +63,12 @@ public class MentorListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mentorListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(MentorListViewModel.class);
         mentorListViewModel.getMentors().observe(getViewLifecycleOwner(), this::onMentorListChanged);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onMentorListChanged(List<MentorListItem> list) {

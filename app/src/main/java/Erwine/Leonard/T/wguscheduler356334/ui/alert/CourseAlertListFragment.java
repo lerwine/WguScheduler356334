@@ -2,6 +2,7 @@ package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
  */
 public class CourseAlertListFragment extends Fragment {
 
+    private static final String LOG_TAG = MainActivity.getLogTag(CourseAlertListFragment.class);
     private final List<CourseAlert> items;
     private CourseAlertListViewModel listViewModel;
     private TextView overviewTextView;
@@ -51,7 +53,8 @@ public class CourseAlertListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_course_alert_list, container, false);
     }
 
@@ -76,6 +79,12 @@ public class CourseAlertListFragment extends Fragment {
         courseViewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onCourseLoaded);
         courseViewModel.getEffectiveStartLiveData().observe(viewLifecycleOwner, this::onEffectiveStartChanged);
         courseViewModel.getEffectiveEndLiveData().observe(viewLifecycleOwner, this::onEffectiveEndChanged);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onEffectiveStartChanged(LocalDate localDate) {
@@ -129,7 +138,7 @@ public class CourseAlertListFragment extends Fragment {
         }
     }
 
-    private void onSaveForEditAlertFinished(ResourceMessageResult messages) {
+    private void onSaveForEditAlertFinished(@NonNull ResourceMessageResult messages) {
         if (messages.isSucceeded()) {
             EditAlertDialog dlg = EditAlertViewModel.existingCourseAlertEditor(editAlertId, courseViewModel.getId());
             dlg.show(getParentFragmentManager(), null);
@@ -152,7 +161,7 @@ public class CourseAlertListFragment extends Fragment {
         }
     }
 
-    private void onSaveCourseError(Throwable throwable) {
+    private void onSaveCourseError(@NonNull Throwable throwable) {
         new AlertHelper(R.drawable.dialog_error, R.string.title_save_error, getString(R.string.format_message_save_error, throwable.getMessage()), requireContext())
                 .showDialog(() -> requireActivity().finish());
     }

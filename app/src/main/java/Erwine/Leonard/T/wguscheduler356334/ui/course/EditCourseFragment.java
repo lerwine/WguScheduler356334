@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
@@ -43,7 +44,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 public class EditCourseFragment extends Fragment {
 
-    private static final String LOG_TAG = EditCourseFragment.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(EditCourseFragment.class);
     public static final NumberFormat NUMBER_FORMATTER = NumberFormat.getIntegerInstance();
 
     private EditCourseViewModel viewModel;
@@ -63,8 +64,8 @@ public class EditCourseFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_edit_course, container, false);
     }
 
@@ -117,6 +118,12 @@ public class EditCourseFragment extends Fragment {
         viewModel.getActualStartWarningMessageLiveData().observe(viewLifecycleOwner, this::onActualStartWarningMessageChanged);
         viewModel.getActualEndMessageLiveData().observe(viewLifecycleOwner, this::onActualEndMessageChanged);
         viewModel.getCompetencyUnitsMessageLiveData().observe(viewLifecycleOwner, this::onCompetencyUnitsMessageChanged);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
     }
 
     private void onTermValidChanged(Boolean isValid) {
@@ -240,10 +247,7 @@ public class EditCourseFragment extends Fragment {
         }
     }
 
-    private void onEntityLoaded(CourseDetails entity) {
-        if (null == entity) {
-            return;
-        }
+    private void onEntityLoaded(@NonNull CourseDetails entity) {
         Log.d(LOG_TAG, String.format("Enter onEntityLoaded(%s)", entity));
         viewModel.initializeTermProperty(viewModel.getTermsLiveData().getValue());
         onTermChanged(viewModel.getSelectedTerm());
@@ -264,7 +268,7 @@ public class EditCourseFragment extends Fragment {
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
     }
 
-    private void onTermsLoaded(List<TermListItem> termListItems) {
+    private void onTermsLoaded(@NonNull List<TermListItem> termListItems) {
         Log.d(LOG_TAG, String.format("Loaded %d terms", termListItems.size()));
         AbstractTermEntity<?> term = viewModel.initializeTermProperty(termListItems);
         if (null != term) {
@@ -272,7 +276,7 @@ public class EditCourseFragment extends Fragment {
         }
     }
 
-    private void onMentorsLoaded(List<MentorListItem> mentorListItems) {
+    private void onMentorsLoaded(@NonNull List<MentorListItem> mentorListItems) {
         Log.d(LOG_TAG, String.format("Loaded %d mentors", mentorListItems.size()));
         AbstractMentorEntity<?> mentor = viewModel.initializeMentorProperty(mentorListItems);
         if (null != mentor) {

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
@@ -32,7 +33,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
  */
 public class CourseListFragment extends Fragment {
 
-    private static final String LOG_TAG = CourseListFragment.class.getName();
+    private static final String LOG_TAG = MainActivity.getLogTag(CourseListFragment.class);
 
     private final List<TermCourseListItem> list;
     private EditTermViewModel editTermViewModel;
@@ -45,12 +46,12 @@ public class CourseListFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public CourseListFragment() {
-        Log.d(LOG_TAG, "Constructing CourseListFragment");
+        Log.d(LOG_TAG, "Constructing");
         list = new ArrayList<>();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Enter onCreateView");
         return inflater.inflate(R.layout.fragment_course_list, container, false);
     }
@@ -80,7 +81,13 @@ public class CourseListFragment extends Fragment {
         OneTimeObservers.observeOnce(editTermViewModel.getEntityLiveData(), this::onEntityLoaded);
     }
 
-    private void onEntityLoaded(TermEntity termEntity) {
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "Enter onDestroy");
+        super.onDestroy();
+    }
+
+    private void onEntityLoaded(@NonNull TermEntity termEntity) {
         long termId = termEntity.getId();
         if (ID_NEW != termId) {
             editTermViewModel.getCoursesLiveData().observe(getViewLifecycleOwner(), this::onCourseListChanged);
@@ -88,7 +95,7 @@ public class CourseListFragment extends Fragment {
         }
     }
 
-    private void onCourseListChanged(List<TermCourseListItem> courseEntities) {
+    private void onCourseListChanged(@NonNull List<TermCourseListItem> courseEntities) {
         Log.d(LOG_TAG, "Enter onCourseListChanged");
         list.clear();
         if (courseEntities.isEmpty()) {
