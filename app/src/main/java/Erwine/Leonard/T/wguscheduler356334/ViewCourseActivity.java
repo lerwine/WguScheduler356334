@@ -54,7 +54,8 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
  * Views course information in 2 tabs: {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseFragment}.
  * This initializes the shared view model {@link EditCourseViewModel}.
  */
-public class ViewCourseActivity extends AppCompatActivity {
+public class
+ViewCourseActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.getLogTag(ViewCourseActivity.class);
     private final int NEW_ASSESSMENT_REQUEST_CODE = 1;
@@ -167,9 +168,18 @@ public class ViewCourseActivity extends AppCompatActivity {
     private void onAddAlertFloatingActionButtonClick(View view) {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                    this::finish,
                     () -> {
-                        OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener());
+                        EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+                        dlg.show(getSupportFragmentManager(), null);
+                    },
+                    () -> {
+                        OneTimeObservers.subscribeOnce(viewModel.save(false), new SaveOperationListener() {
+                            @Override
+                            protected void onSuccessComplete() {
+                                EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+                                dlg.show(getSupportFragmentManager(), null);
+                            }
+                        });
                         finish();
                     }, null);
         } else {
@@ -287,7 +297,6 @@ public class ViewCourseActivity extends AppCompatActivity {
         private final boolean addingNewAlert;
         private final CourseAlert[] alertsBeforeSave;
 
-
         SaveOperationListener(@NonNull List<CourseAlert> alertsBeforeSave) {
             addingNewAlert = false;
             this.alertsBeforeSave = alertsBeforeSave.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
@@ -296,6 +305,10 @@ public class ViewCourseActivity extends AppCompatActivity {
         SaveOperationListener() {
             addingNewAlert = true;
             this.alertsBeforeSave = new CourseAlert[0];
+        }
+
+        protected void onSuccessComplete() {
+            finish();
         }
 
         @Override
@@ -328,7 +341,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                     CourseAlertBroadcastReceiver.setPendingAlert(LocalDateTime.of(a.getAlertDate(), (null == alertTime) ? defaultAlertTime : alertTime), a.getLink(), alert.getNotificationId(), ViewCourseActivity.this);
                 }
             }
-            finish();
+            onSuccessComplete();
         }
 
         @Override
@@ -348,7 +361,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                                     CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewCourseActivity.this);
                                 }
                             }
-                            finish();
+                            onSuccessComplete();
                         }
                     });
                 }
@@ -361,6 +374,7 @@ public class ViewCourseActivity extends AppCompatActivity {
                             .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                                 OneTimeObservers.subscribeOnce(viewModel.save(true), this);
                                 dialog.dismiss();
+                                onSuccessComplete();
                             }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
                 } else {
                     builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
