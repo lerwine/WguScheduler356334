@@ -267,8 +267,12 @@ public class SampleDataLoader implements Action {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         CourseAlert courseAlert = new CourseAlert();
         AlertEntity alert = courseAlert.getAlert();
+        if (null != xmlParser.getAttributeValue(null, Alert.COLNAME_SUBSEQUENT)) {
+            alert.setSubsequent(xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false));
+        } else {
+            alert.setSubsequent(null);
+        }
         alert.setTimeSpec(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0));
-        alert.setSubsequent(xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false));
         alert.setCustomMessage(xmlParser.getAttributeValue(null, Alert.COLNAME_CUSTOM_MESSAGE));
         courseAlert.getLink().setTargetId(courseId);
         dbLoader.insertCourseAlertSynchronous(courseAlert);
@@ -308,8 +312,12 @@ public class SampleDataLoader implements Action {
         xmlParser.require(XmlPullParser.START_TAG, NAMESPACE_SAMPLE_DATA, ELEMENT_NAME_ITEM);
         AssessmentAlert assessmentAlert = new AssessmentAlert();
         AlertEntity alert = assessmentAlert.getAlert();
+        if (null != xmlParser.getAttributeValue(null, Alert.COLNAME_SUBSEQUENT)) {
+            alert.setSubsequent(xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false));
+        } else {
+            alert.setSubsequent(null);
+        }
         alert.setTimeSpec(xmlParser.getAttributeIntValue(null, Alert.COLNAME_TIME_SPEC, 0));
-        alert.setSubsequent(xmlParser.getAttributeBooleanValue(null, Alert.COLNAME_SUBSEQUENT, false));
         alert.setCustomMessage(xmlParser.getAttributeValue(null, Alert.COLNAME_CUSTOM_MESSAGE));
         assessmentAlert.getLink().setTargetId(assessmentId);
         dbLoader.insertAssessmentAlertSynchronous(assessmentAlert);

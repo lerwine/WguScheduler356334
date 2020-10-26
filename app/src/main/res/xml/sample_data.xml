@@ -1127,7 +1127,14 @@ Sit amet dictum sit amet justo donec. Nam libero justo laoreet sit amet cursus s
                             status="NOT_PASSED"
                             goalDate="expectedEnd"
                             type="PRE_ASSESSMENT"
-                            completionDate="2019-10-02" />
+                            completionDate="2019-10-02">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="true"
+                                    timeSpec="1"
+                                    customMessage="Review report" />
+                            </assessmentAlerts>
+                        </item>
                         <item
                             code="ADO1"
                             status="NOT_PASSED"
@@ -1185,6 +1192,11 @@ Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ul
                     mentorId="23">
                     <notes><![CDATA[Arcu risus quis varius quam quisque.
 Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in metus vulputate eu scelerisque felis imperdiet. Quis hendrerit dolor magna eget.]]></notes>
+                    <courseAlerts>
+                        <item
+                            timeSpec="18523"
+                            customMessage="Mentor Review" />
+                    </courseAlerts>
                     <assessments>
                         <item
                             code="ABM1"
@@ -1206,7 +1218,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     title="Mobile Application Development"
                     status="IN_PROGRESS"
                     actualStart="2020-10-01"
-                    expectedEnd="2020-10-22"
+                    expectedEnd="2020-10-27"
                     competencyUnits="3"
                     mentorId="23">
                     <notes>
@@ -1231,7 +1243,7 @@ Libero justo laoreet sit amet cursus.]]></notes>
                     number="C769"
                     title="IT Capstone Written Project"
                     status="PLANNED"
-                    expectedStart="2020-10-22"
+                    expectedStart="2020-10-28"
                     expectedEnd="2020-12-31"
                     competencyUnits="4">
                     <notes>
@@ -1246,13 +1258,20 @@ Libero justo laoreet sit amet cursus.]]></notes>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-10-20"
+                            goalDate="2020-11-14"
                             type="PERFORMANCE_EVALUATION"
-                            name="Task 1" />
+                            name="Task 1">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    timeSpec="-1"
+                                    customMessage="Submit tomorrow!" />
+                            </assessmentAlerts>
+                        </item>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-11-06"
+                            goalDate="2020-11-21"
                             type="PERFORMANCE_EVALUATION"
                             name="Task 2" />
                         <item
