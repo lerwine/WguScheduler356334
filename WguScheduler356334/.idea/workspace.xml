@@ -21,282 +21,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="Added support for static alert dates in sample data">
-      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/Project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/dictionaries/lerwi.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/gradle.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/runConfigurations.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ResetDb.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WguScheduler.db.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/proguard-rules.pro" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/app-release.apk" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/output-metadata.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/androidTest/java/Erwine/Leonard/T/wguscheduler356334/ExampleInstrumentedTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddAssessmentActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddCourseActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddTermActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/EditMentorActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/MainActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ManageDataActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/SettingsActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/TimePreference.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/TimePreferenceDialog.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewAssessmentActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewCourseActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewTermActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AlertDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AppDb.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentAlertDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentStatusConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentTypeConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/CourseAlertDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/CourseDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/CourseStatusConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/DbLoader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/LocalDateConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/LocalTimeConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/MentorDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/SampleDataLoader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/StringModelListConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/TermDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/AbstractEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/AbstractNotedEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/IdIndexedEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/NoteColumnIncludedEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/Alert.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertLink.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertLinkEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertListItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AbstractAssessmentEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/Assessment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentAlert.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentAlertDetails.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentAlertLink.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentDetails.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/AbstractCourseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/Course.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseAlert.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseAlertDetails.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseAlertLink.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseDetails.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/MentorCourseListItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/TermCourseListItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/AbstractMentorEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/Mentor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/MentorEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/MentorListItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/AbstractTermEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/Term.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/TermEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/TermListItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/DatePickerEditView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AlertBroadcastReceiver.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AlertDateOption.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertBroadcastReceiver.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertBroadcastReceiver.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertDialog.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/ViewAssessmentPagerAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/AbstractCourseListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/CourseListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/EditCourseFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/EditCourseViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/TermCourseListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/ViewCoursePagerAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/EditMentorViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListViewModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/ViewTermPagerAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/AlertHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BinaryAlternate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BinaryOptional.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BooleanConsumer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/CharSequenceMap.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/CollectionHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ComparisonHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/EntityHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/IndexedStringItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/IndexedStringList.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/NonNullSupplier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/NormalizingCharSequence.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/OneTimeObservers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/PropertyChangeSupported.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/StringHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/StringLineIterator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/StringNormalizationOption.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ToStringBuildable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ToStringBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/Workers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/event/EventManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/event/ValueConfiguredEvent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/event/ValueConfiguredEventListener.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MappedObservableSource.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MaybeFlattenedObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MaybeSuccessObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MessageValidatedBehaviorObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/StringNormalizerObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/StringParsingObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/StringValidatingObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/ValidatedBehaviorObservables.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ResourceMessageBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ResourceMessageFactory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ResourceMessageResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ValidationMessage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable-v24/ic_launcher_foreground.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_alert_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_alert_fab_disabled.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_assessment_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_assessment_fab_disabled.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_fab_disabled.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_item_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_item_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/alert_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/alerts_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/date_picker_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/delete_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/delete_fab_disabled.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/delete_icon_old.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_busy.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_error.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_success.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_warning.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/disabled_button_bg.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/edit_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/enabled_button_bg.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/fab_bg.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/home_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_launcher_background.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/image_button_selector.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/mentor_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/radio_button_selector.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_fab_disabled.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_fab_selector.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/share_fab.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/share_fab_disabled.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/share_fab_selector.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/star_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/term_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/undo_icon.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/activity_edit_mentor.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/activity_main.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_alert.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_assessment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_course.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_term.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_add_assessment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_add_course.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_add_term.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_edit_mentor.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_main.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_manage_data.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_view_assessment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_view_course.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_view_term.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_all_alerts_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_all_alerts_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_alert_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_alert_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_alert_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_alert_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_alert.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_assessment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_course.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_term.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_mentor_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_mentor_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_term_item.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_term_list.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/pref_dialog_time.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/bottom_nav_menu.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/menu_options.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/menu_term_editor.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-hdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-mdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/navigation/mobile_navigation.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-land/dimens.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-w600dp/dimens.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-w600dp/strings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-w600dp/styles.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/arrays.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/colors.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/dimens.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/strings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/styles.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/root_preferences.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/sample_data.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/sample_data_schema.xsd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/ExampleUnitTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/ObserverHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/TestHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/util/CollectionHelperTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/util/StringHelperTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/util/StringLineIteratorTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../build.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gradle.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SVG/CellPhoneBg.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../SVG/CellPhoneBg.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../StoryBoards.pptx" beforeDir="false" afterPath="$PROJECT_DIR$/../StoryBoards.pptx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_3a_API_30]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -370,7 +105,7 @@
     <property name="project.structure.proportion" value="0.17" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.CommitDialog" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
   </component>
   <component name="PsdUISettings">
     <option name="MODULE_TAB" value="Default Config" />
@@ -921,10 +656,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="682" y="357" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603315385367" />
-    <state x="129" y="129" width="1182" height="544" key="AVDManager" timestamp="1603734469933">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="93" y="93" width="1182" height="544" key="AVDManager" timestamp="1603827295815">
+      <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="93" y="93" width="1182" height="544" key="AVDManager/0.0.1366.728@0.0.1366.728" timestamp="1603499259947" />
+    <state x="93" y="93" width="1182" height="544" key="AVDManager/0.0.1366.728@0.0.1366.728" timestamp="1603827295815" />
     <state x="129" y="129" width="1182" height="544" key="AVDManager/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603734469933" />
     <state x="540" y="275" key="AndroidCreateResourceDirectoryDialog" timestamp="1602547405352">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -1012,10 +747,10 @@
     </state>
     <state x="497" y="133" key="RollbackChangesDialog/0.0.1366.728@0.0.1366.728" timestamp="1603068449872" />
     <state x="698" y="231" key="RollbackChangesDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603758525610" />
-    <state x="328" y="20" width="916" height="708" key="SettingsEditor" timestamp="1603337848434">
+    <state x="328" y="20" width="916" height="708" key="SettingsEditor" timestamp="1603827511710">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="328" y="20" width="916" height="708" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1603337848434" />
+    <state x="328" y="20" width="916" height="708" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1603827511710" />
     <state x="477" y="72" width="1243" height="715" key="SettingsEditor/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603308530676" />
     <state x="387" y="139" key="Vcs.Push.Dialog.v2" timestamp="1603734994649">
       <screen x="0" y="0" width="1920" height="1040" />
