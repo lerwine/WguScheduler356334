@@ -9,7 +9,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   sodipodi:docname="CellPhoneBg.svg"
+   sodipodi:docname="CellPhonePortrait.svg"
    id="svg26"
    version="1.1"
    overflow="hidden"
@@ -34,7 +34,7 @@
      inkscape:window-x="-8"
      inkscape:cy="1441.3604"
      inkscape:cx="-192.71202"
-     inkscape:zoom="0.28262593"
+     inkscape:zoom="0.27515421"
      showgrid="false"
      id="namedview28"
      inkscape:window-height="1017"
@@ -46,7 +46,8 @@
      objecttolerance="10"
      borderopacity="1"
      bordercolor="#666666"
-     pagecolor="#ffffff" />
+     pagecolor="#ffffff"
+     inkscape:document-rotation="0" />
   <defs
      id="defs16">
     <clipPath
@@ -125,7 +126,7 @@
   <path
      inkscape:label="face"
      id="path22-8"
-     style="fill:#1f1f1f;stroke-width:6.88701;fill-opacity:1"
+     style="fill:#2e2e2e;stroke-width:6.88701;fill-opacity:1"
      d="M 109.64258,0 C 49.08823,0 0,54.74226 0,122.26953 V 2437.7305 C 0,2505.2578 49.08823,2560 109.64258,2560 H 1090.3574 C 1150.9118,2560 1200,2505.2578 1200,2437.7305 V 122.26953 C 1200,54.74226 1150.9118,0 1090.3574,0 Z m 49.03711,170 H 1041.3203 C 1126.2215,170 1140,183.66782 1140,276.0293 V 2283.9707 C 1140,2368.804 1123.3402,2390 1041.3203,2390 H 158.67969 C 76.65987,2390 60,2368.8355 60,2283.9707 V 276.0293 C 60,188.64912 76.70487,170 158.67969,170 Z"
      sodipodi:nodetypes="ssssssssssssssssss" />
   <path
