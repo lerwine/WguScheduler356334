@@ -1,0 +1,1098 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_TEST_SOURCES" value="false" />
+  </component>
+  <component name="AndroidLayouts">
+    <shared>
+      <config>
+        <device id="Nexus 5X" />
+        <device id="pixel" />
+        <target>android-30</target>
+      </config>
+    </shared>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="debug" />
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="Added support for static alert dates in sample data">
+      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/Project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/dictionaries/lerwi.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/runConfigurations.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ResetDb.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../WguScheduler.db.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/proguard-rules.pro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/release/app-release.apk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/release/output-metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/androidTest/java/Erwine/Leonard/T/wguscheduler356334/ExampleInstrumentedTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddAssessmentActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddCourseActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddTermActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/EditMentorActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/MainActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ManageDataActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/SettingsActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/TimePreference.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/TimePreferenceDialog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewAssessmentActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewCourseActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewTermActivity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AlertDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AppDb.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentAlertDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentStatusConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/AssessmentTypeConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/CourseAlertDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/CourseDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/CourseStatusConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/DbLoader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/LocalDateConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/LocalTimeConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/MentorDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/SampleDataLoader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/StringModelListConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/db/TermDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/AbstractEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/AbstractNotedEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/IdIndexedEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/NoteColumnIncludedEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/Alert.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertLink.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertLinkEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/alert/AlertListItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AbstractAssessmentEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/Assessment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentAlert.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentAlertDetails.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentAlertLink.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentDetails.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/assessment/AssessmentType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/AbstractCourseEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/Course.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseAlert.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseAlertDetails.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseAlertLink.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseDetails.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/CourseStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/MentorCourseListItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/course/TermCourseListItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/AbstractMentorEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/Mentor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/MentorEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/mentor/MentorListItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/AbstractTermEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/Term.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/TermEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/entity/term/TermListItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/DatePickerEditView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AlertBroadcastReceiver.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AlertDateOption.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertBroadcastReceiver.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertBroadcastReceiver.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertDialog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/ViewAssessmentPagerAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/AbstractCourseListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/CourseListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/EditCourseFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/EditCourseViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/TermCourseListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/ViewCoursePagerAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/EditMentorViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListFragment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListViewModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/ViewTermPagerAdapter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/AlertHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BinaryAlternate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BinaryOptional.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BooleanConsumer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/CharSequenceMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/CollectionHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ComparisonHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/EntityHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/IndexedStringItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/IndexedStringList.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/NonNullSupplier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/NormalizingCharSequence.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/OneTimeObservers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/PropertyChangeSupported.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/StringHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/StringLineIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/StringNormalizationOption.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ToStringBuildable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ToStringBuilder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/Workers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/event/EventManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/event/ValueConfiguredEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/event/ValueConfiguredEventListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MappedObservableSource.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MaybeFlattenedObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MaybeSuccessObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/MessageValidatedBehaviorObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/StringNormalizerObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/StringParsingObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/StringValidatingObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/observables/ValidatedBehaviorObservables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ResourceMessageBuilder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ResourceMessageFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ResourceMessageResult.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/validation/ValidationMessage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable-v24/ic_launcher_foreground.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_alert_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_alert_fab_disabled.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_assessment_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_assessment_fab_disabled.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_fab_disabled.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_item_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/add_item_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/alert_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/alerts_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/date_picker_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/delete_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/delete_fab_disabled.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/delete_icon_old.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_busy.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_error.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_success.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/dialog_warning.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/disabled_button_bg.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/edit_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/enabled_button_bg.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/fab_bg.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/home_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_launcher_background.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/image_button_selector.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/mentor_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/radio_button_selector.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_fab_disabled.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_fab_selector.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/save_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/share_fab.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/share_fab_disabled.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/share_fab_selector.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/star_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/term_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/undo_icon.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/activity_edit_mentor.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/activity_main.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_alert.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_assessment.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_course.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout-land/fragment_edit_term.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_add_assessment.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_add_course.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_add_term.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_edit_mentor.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_main.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_manage_data.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_view_assessment.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_view_course.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/activity_view_term.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_all_alerts_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_all_alerts_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_alert_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_alert_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_assessment_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_alert_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_alert_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_course_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_alert.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_assessment.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_course.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_edit_term.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_mentor_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_mentor_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_term_item.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_term_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/pref_dialog_time.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/bottom_nav_menu.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/menu_options.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/menu_term_editor.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-hdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-mdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/navigation/mobile_navigation.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-land/dimens.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-w600dp/dimens.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-w600dp/strings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-w600dp/styles.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/arrays.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/colors.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/dimens.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/strings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/styles.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/root_preferences.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/sample_data.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/sample_data_schema.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/ExampleUnitTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/ObserverHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/TestHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/util/CollectionHelperTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/util/StringHelperTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/test/java/Erwine/Leonard/T/wguscheduler356334/util/StringLineIteratorTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradle.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../settings.gradle" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="resourceFile" />
+        <option value="layoutResourceFile" />
+        <option value="valueResourceFile" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="GenerateSignedApkSettings">
+    <option name="KEY_STORE_PATH" value="C:\Users\lerwi\AndroidKeyStore\WguScheduler356334" />
+    <option name="KEY_ALIAS" value="key0" />
+    <option name="BUILD_TARGET_KEY" value="apk" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1hwdF35YutntMcFKEWbbxnMc1Fs" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ApkExportedModule" value="app" />
+    <property name="DEBUGGABLE_DEVICE" value="emulator-5554" />
+    <property name="DEBUGGABLE_PROCESS" value="Erwine.Leonard.T.wguscheduler356334" />
+    <property name="DEBUGGER_ID" value="Auto" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="Pixel_4_API_30" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-10-24T00:29:32.869Z" />
+    <property name="ExportApk.ApkPath" value="C:\Users\lerwi\AndroidStudioProjects\WguScheduler356334\app" />
+    <property name="ExportApk.BuildVariants" value="release" />
+    <property name="ExportApk.SignV2" value="true" />
+    <property name="JavaMethodFindUsagesOptions.isImplementingMethods" value="true" />
+    <property name="ResourceManagerPrefKey.FilterParams.Framework" value="true" />
+    <property name="ResourceManagerPrefKey.FilterParams.Libraries" value="true" />
+    <property name="ResourceManagerPrefKey.ResourceType" value="LAYOUT" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHOW_ALL_PROCESSES" value="false" />
+    <property name="android-custom-viewC:/Users/lerwi/.gradle/caches/modules-2/files-2.1/com.google.android.material/material/1.2.1/37d55d5141066b3d118d24232fa7025b65eb3a74/material-1.2.1-sources.jar!/com/google/android/material/tabs/TabLayout.java_SELECTED" value="TabLayout" />
+    <property name="android-custom-viewC:/Users/lerwi/AndroidStudioProjects/WguScheduler356334/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/DatePickerEditView.java_SELECTED" value="DatePickerEditView" />
+    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
+    <property name="extract.method.default.visibility" value="private" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="multi-representation-previewC:/Users/lerwi/.gradle/caches/modules-2/files-2.1/com.google.android.material/material/1.2.1/37d55d5141066b3d118d24232fa7025b65eb3a74/material-1.2.1-sources.jar!/com/google/android/material/tabs/TabLayout.java_selected" value="Custom views" />
+    <property name="multi-representation-previewC:/Users/lerwi/AndroidStudioProjects/WguScheduler356334/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/DatePickerEditView.java_selected" value="Custom views" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.17" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.CommitDialog" />
+  </component>
+  <component name="PsdUISettings">
+    <option name="MODULE_TAB" value="Default Config" />
+    <option name="LAST_EDITED_BUILD_TYPE" value="release" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="Erwine.Leonard.T.wguscheduler356334.util" />
+      <recent name="Erwine.Leonard.T.wguscheduler356334.ui.alert" />
+      <recent name="Erwine.Leonard.T.wguscheduler356334.util.live" />
+      <recent name="Erwine.Leonard.T.wguscheduler356334.entity.alert" />
+      <recent name="Erwine.Leonard.T.wguscheduler356334.db" />
+    </key>
+    <key name="android.template.1122747361">
+      <recent name="Erwine.Leonard.T.wguscheduler356334" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="Erwine.Leonard.T.wguscheduler356334.util" />
+      <recent name="Erwine.Leonard.T.wguscheduler356334.util.validation" />
+    </key>
+    <key name="android.template.-229493362">
+      <recent name="Erwine.Leonard.T.wguscheduler356334" />
+    </key>
+    <key name="android.template.21002727">
+      <recent name="Erwine.Leonard.T.wguscheduler356334" />
+    </key>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value=" " />
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
+      <module name="WguScheduler356334.app" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Hybrid>
+      <Java />
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Sample Java Methods" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR,SHOW_PROPERTIES" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="" />
+      <created>1600925982030</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1600925982030</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Fixes #32">
+      <created>1602087321416</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1602087321417</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Fixes #17">
+      <created>1602140864751</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1602140864751</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Fixes #29">
+      <created>1602211349511</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1602211349511</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Updated validation bindings">
+      <created>1602352648444</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1602352648444</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Added DatePickerEditView">
+      <created>1602397440937</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1602397440937</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Fixed save operation inconsistencies in view models">
+      <created>1602470041898</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1602470041898</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Removed alerts from sample data">
+      <created>1602470965238</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1602470965238</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Added stubs for alerts">
+      <created>1602481879317</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1602481879317</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Fixed db indexes">
+      <created>1602517265690</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1602517265690</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Closes #24">
+      <created>1602534904432</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1602534904432</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Added layouts for rotated views">
+      <created>1602560234786</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1602560234787</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Incorporated optional explicit alert time.&#10;&#10;Fixes #37&#10;&#10;Fixes #25">
+      <created>1602730536827</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1602730536827</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Closes #35">
+      <created>1602732006037</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1602732006037</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Fixed initialization bugs">
+      <created>1602781245427</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1602781245427</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Closes #31">
+      <created>1602796614724</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1602796614725</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Fixes #41">
+      <created>1602807722515</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1602807722515</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Fixes #42">
+      <created>1602812320023</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1602812320023</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Fixes #39">
+      <created>1602891266063</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1602891266063</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Fixes #38">
+      <created>1602895756890</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1602895756890</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Fixes #40">
+      <created>1602897708650</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1602897708650</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Fixes #43">
+      <created>1602904606224</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1602904606224</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Fixed date/time string bindings">
+      <created>1603143211760</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1603143211760</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Fixes #45">
+      <created>1603146360250</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1603146360250</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Fixes #46">
+      <created>1603149135581</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1603149135582</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Fixes #44">
+      <created>1603153958754</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1603153958755</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Fixed validation algorithm">
+      <created>1603156709907</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1603156709907</updated>
+    </task>
+    <task id="LOCAL-00050" summary="Created alert create/update stubs">
+      <created>1603156729670</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1603156729672</updated>
+    </task>
+    <task id="LOCAL-00051" summary="Fixes #47">
+      <created>1603233104665</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1603233104666</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Fixes #48">
+      <created>1603238001437</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1603238001437</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Fixes #49">
+      <created>1603303695149</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1603303695150</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Applied upgrades">
+      <created>1603412640236</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1603412640236</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Fixed observable field initialization">
+      <created>1603412846769</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1603412846769</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Fixed year format">
+      <created>1603412885054</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1603412885054</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Shortened LOG_TAG">
+      <created>1603413123637</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1603413123637</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Shortened LOG_TAG">
+      <created>1603413183933</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1603413183933</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Fixed validation bug">
+      <created>1603413251472</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1603413251472</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Removed unnecessary annotations">
+      <created>1603413384731</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1603413384731</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Added missing annotations">
+      <created>1603413880347</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1603413880347</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Added onCreateView and onDestroy logging">
+      <created>1603414236532</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414236532</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Added onCreate and onDestroy logging">
+      <created>1603414400654</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414400654</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Added construction and onCleared logging">
+      <created>1603414507273</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414507273</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Added construction and onCleared logging">
+      <created>1603414557322</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414557322</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Added code to detach observers in onCleared method">
+      <created>1603414667531</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414667531</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Removed dead/unnecessary code">
+      <created>1603414748994</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414748994</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Shortened LOG_TAG">
+      <created>1603414798362</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414798362</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Removed alerts from sample data">
+      <created>1603414826161</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1603414826161</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Closes #50">
+      <created>1603426759392</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1603426759393</updated>
+    </task>
+    <task id="LOCAL-00071" summary="Fixes #51">
+      <created>1603502930704</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1603502930705</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Added support for static alert dates in sample data">
+      <created>1603734992576</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1603734992577</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="Fixed date/time string bindings" />
+    <MESSAGE value="Fixes #45" />
+    <MESSAGE value="Fixes #46" />
+    <MESSAGE value="Fixes #44" />
+    <MESSAGE value="Fixed validation algorithm" />
+    <MESSAGE value="Created alert create/update stubs" />
+    <MESSAGE value="Fixes #47" />
+    <MESSAGE value="Fixes #48" />
+    <MESSAGE value="Fixes #49" />
+    <MESSAGE value="Fixed observable field initialization" />
+    <MESSAGE value="Fixed year format" />
+    <MESSAGE value="Applied upgrades" />
+    <MESSAGE value="Fixed validation bug" />
+    <MESSAGE value="Removed unnecessary annotations" />
+    <MESSAGE value="Added missing annotations" />
+    <MESSAGE value="Added onCreateView and onDestroy logging" />
+    <MESSAGE value="Added onCreate and onDestroy logging" />
+    <MESSAGE value="Added construction and onCleared logging" />
+    <MESSAGE value="Added code to detach observers in onCleared method" />
+    <MESSAGE value="Removed dead/unnecessary code" />
+    <MESSAGE value="Shortened LOG_TAG" />
+    <MESSAGE value="Removed alerts from sample data" />
+    <MESSAGE value="Closes #50" />
+    <MESSAGE value="Fixes #51" />
+    <MESSAGE value="Added support for static alert dates in sample data" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added support for static alert dates in sample data" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="552" y="178" key="#Inspections" timestamp="1602730371661">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="178" key="#Inspections/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602730371661" />
+    <state x="339" y="176" key="#PSD" timestamp="1603336752019">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="339" y="176" key="#PSD/0.0.1366.728@0.0.1366.728" timestamp="1603336752019" />
+    <state x="477" y="252" key="#PSD/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1601150660201" />
+    <state x="193" y="27" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1602732539099">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="137" y="19" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1366.728@0.0.1366.728" timestamp="1600926397256" />
+    <state x="193" y="27" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602732539099" />
+    <state x="544" y="141" key="#com.intellij.ide.util.MemberChooser" timestamp="1603219584959">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="544" y="141" key="#com.intellij.ide.util.MemberChooser/0.0.1366.728@0.0.1366.728" timestamp="1603219584959" />
+    <state x="765" y="229" key="#com.intellij.ide.util.MemberChooser/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602530974047" />
+    <state x="412" y="148" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1600926386382">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="412" y="148" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1366.728@0.0.1366.728" timestamp="1600926386382" />
+    <state x="363" y="100" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1602588341708">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="363" y="100" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1366.728@0.0.1366.728" timestamp="1602588341708" />
+    <state x="550" y="312" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1602948095001">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="550" y="312" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1366.728@0.0.1366.728" timestamp="1602948095001" />
+    <state x="773" y="445" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602281961951" />
+    <state x="707" y="379" width="509" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1602800624947">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="707" y="379" width="509" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602800624947" />
+    <state x="536" y="249" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog" timestamp="1602948114799">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="536" y="249" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog/0.0.1366.728@0.0.1366.728" timestamp="1602948114799" />
+    <state x="753" y="356" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602281963518" />
+    <state x="294" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1602461898518">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="209" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728@0.0.1366.728" timestamp="1601713545471" />
+    <state x="294" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602461898518" />
+    <state x="580" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1603411423837">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="413" y="111" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1366.728@0.0.1366.728" timestamp="1602942777420" />
+    <state x="580" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603411423837" />
+    <state x="509" y="134" key="#xdebugger.evaluate" timestamp="1603231671179">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="509" y="134" key="#xdebugger.evaluate/0.0.1366.728@0.0.1366.728" timestamp="1603231671179" />
+    <state x="715" y="223" key="#xdebugger.evaluate/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1601268155093" />
+    <state x="682" y="357" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1603315385367">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="682" y="357" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603315385367" />
+    <state x="129" y="129" width="1182" height="544" key="AVDManager" timestamp="1603734469933">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="93" y="93" width="1182" height="544" key="AVDManager/0.0.1366.728@0.0.1366.728" timestamp="1603499259947" />
+    <state x="129" y="129" width="1182" height="544" key="AVDManager/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603734469933" />
+    <state x="540" y="275" key="AndroidCreateResourceDirectoryDialog" timestamp="1602547405352">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="540" y="275" key="AndroidCreateResourceDirectoryDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602547405352" />
+    <state x="540" y="275" key="AndroidCreateResourceFileDialog" timestamp="1602538421951">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="384" y="193" key="AndroidCreateResourceFileDialog/0.0.1366.728@0.0.1366.728" timestamp="1602356086139" />
+    <state x="540" y="275" key="AndroidCreateResourceFileDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602538421951" />
+    <state x="1104" y="304" key="AndroidCreateXmlResourceDialog" timestamp="1602608754810">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="785" y="213" key="AndroidCreateXmlResourceDialog/0.0.1366.728@0.0.1366.728" timestamp="1602445617484" />
+    <state x="1104" y="304" key="AndroidCreateXmlResourceDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602608754810" />
+    <state x="580" y="200" key="AndroidProcessChooserDialog" timestamp="1603334052588">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="580" y="200" key="AndroidProcessChooserDialog/0.0.1366.728@0.0.1366.728" timestamp="1603334052588" />
+    <state x="815" y="285" key="AndroidProcessChooserDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602389622716" />
+    <state x="384" y="0" width="1232" height="1013" key="CommitChangelistDialog2" timestamp="1603758769811">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="273" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1603502929664" />
+    <state x="384" y="0" width="1232" height="1013" key="CommitChangelistDialog2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603758769811" />
+    <state width="396" height="466" key="DebuggerActiveHint" timestamp="1603333601929">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="396" height="466" key="DebuggerActiveHint/0.0.1366.728@0.0.1366.728" timestamp="1603333601929" />
+    <state x="92" y="92" width="1236" height="600" key="DiffContextDialog" timestamp="1603420286788">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="65" y="64" width="1236" height="600" key="DiffContextDialog/0.0.1366.728@0.0.1366.728" timestamp="1603068475032" />
+    <state x="92" y="92" width="1736" height="856" key="DiffContextDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603420286788" />
+    <state x="1235" y="267" key="FileChooserDialogImpl" timestamp="1602802054229">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1235" y="267" key="FileChooserDialogImpl/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602802054229" />
+    <state width="1323" height="314" key="GridCell.Tab.0.bottom" timestamp="1603503041754">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1323" height="314" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1603503041754" />
+    <state width="1877" height="492" key="GridCell.Tab.0.bottom/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
+    <state width="1323" height="314" key="GridCell.Tab.0.center" timestamp="1603503041754">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1323" height="314" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1603503041754" />
+    <state width="1877" height="492" key="GridCell.Tab.0.center/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
+    <state width="1323" height="314" key="GridCell.Tab.0.left" timestamp="1603503041754">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1323" height="314" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1603503041754" />
+    <state width="1877" height="492" key="GridCell.Tab.0.left/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
+    <state width="1323" height="314" key="GridCell.Tab.0.right" timestamp="1603503041754">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1323" height="314" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1603503041754" />
+    <state width="1877" height="492" key="GridCell.Tab.0.right/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
+    <state width="1877" height="516" key="GridCell.Tab.1.bottom" timestamp="1603426777383">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1323" height="331" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1603335600040" />
+    <state width="1877" height="516" key="GridCell.Tab.1.bottom/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603426777383" />
+    <state width="1877" height="516" key="GridCell.Tab.1.center" timestamp="1603426777382">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1323" height="331" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1603335600033" />
+    <state width="1877" height="516" key="GridCell.Tab.1.center/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603426777382" />
+    <state width="1877" height="516" key="GridCell.Tab.1.left" timestamp="1603426777382">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1323" height="331" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1603335600032" />
+    <state width="1877" height="516" key="GridCell.Tab.1.left/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603426777382" />
+    <state width="1877" height="516" key="GridCell.Tab.1.right" timestamp="1603426777382">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1323" height="331" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1603335600037" />
+    <state width="1877" height="516" key="GridCell.Tab.1.right/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603426777382" />
+    <state x="540" y="263" key="IDE.errors.dialog" timestamp="1602729928542">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="540" y="263" key="IDE.errors.dialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602729928542" />
+    <state x="698" y="231" key="RollbackChangesDialog" timestamp="1603758525610">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="497" y="133" key="RollbackChangesDialog/0.0.1366.728@0.0.1366.728" timestamp="1603068449872" />
+    <state x="698" y="231" key="RollbackChangesDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603758525610" />
+    <state x="328" y="20" width="916" height="708" key="SettingsEditor" timestamp="1603337848434">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="328" y="20" width="916" height="708" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1603337848434" />
+    <state x="477" y="72" width="1243" height="715" key="SettingsEditor/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603308530676" />
+    <state x="387" y="139" key="Vcs.Push.Dialog.v2" timestamp="1603734994649">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1603502947750" />
+    <state x="387" y="139" key="Vcs.Push.Dialog.v2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603734994649" />
+    <state x="568" y="183" key="chooseDestDirectoryDialog" timestamp="1602948114782">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="568" y="183" key="chooseDestDirectoryDialog/0.0.1366.728@0.0.1366.728" timestamp="1602948114782" />
+    <state x="-7" y="0" width="1378" height="735" key="com.android.tools.idea.avdmanager.AvdListDialog" timestamp="1602888007149">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="-7" y="0" width="1378" height="735" key="com.android.tools.idea.avdmanager.AvdListDialog/0.0.1366.728@0.0.1366.728" timestamp="1602888007149" />
+    <state x="-7" y="0" width="1378" height="735" key="com.android.tools.idea.avdmanager.AvdListDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602807895205" />
+    <state x="593" y="269" key="com.intellij.ide.util.TipDialog" timestamp="1601504480484">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="422" y="188" key="com.intellij.ide.util.TipDialog/0.0.1366.728@0.0.1366.728" timestamp="1600925988117" />
+    <state x="593" y="269" key="com.intellij.ide.util.TipDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1601504480484" />
+    <state x="428" y="0" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1602950693111">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="428" y="0" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1366.728@0.0.1366.728" timestamp="1602950693111" />
+    <state x="602" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602023409619" />
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1602278956102">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602278956102" />
+    <state x="311" y="133" width="923" height="629" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1603415953469">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="221" y="93" width="923" height="629" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1366.728@0.0.1366.728" timestamp="1603332668542" />
+    <state x="311" y="133" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603415953469" />
+    <state x="1156" y="375" width="540" height="468" key="extract.method.dialog" timestamp="1603748402669">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="413" y="133" key="extract.method.dialog/0.0.1366.728@0.0.1366.728" timestamp="1601704598124" />
+    <state x="1156" y="375" width="540" height="468" key="extract.method.dialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603748402669" />
+    <state x="1039" y="138" width="737" height="804" key="find.popup" timestamp="1603419478608">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="454" y="108" width="737" height="740" key="find.popup/0.0.1328.956@0.0.1328.956" timestamp="1601652164012" />
+    <state x="739" y="97" width="607" height="563" key="find.popup/0.0.1366.728@0.0.1366.728" timestamp="1603334706639" />
+    <state x="1039" y="138" width="737" height="804" key="find.popup/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603419478608" />
+    <state x="712" y="419" key="git4idea.ui.GitStashDialog" timestamp="1603314479446">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="712" y="419" key="git4idea.ui.GitStashDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603314479446" />
+    <state x="712" y="366" key="git4idea.ui.GitUnstashDialog" timestamp="1603325289906">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="712" y="366" key="git4idea.ui.GitUnstashDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603325289906" />
+    <state x="443" y="174" key="psd.add.library.dependency.panel.dimension" timestamp="1603336527753">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="443" y="174" key="psd.add.library.dependency.panel.dimension/0.0.1366.728@0.0.1366.728" timestamp="1603336527753" />
+    <state x="389" y="0" key="refactoring.ChangeSignatureDialog" timestamp="1601772100906">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="389" y="0" key="refactoring.ChangeSignatureDialog/0.0.1366.728@0.0.1366.728" timestamp="1601772100906" />
+    <state x="476" y="231" width="672" height="677" key="run.anything.popup" timestamp="1603753085698">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="339" y="162" width="672" height="677" key="run.anything.popup/0.0.1366.728@0.0.1366.728" timestamp="1603236320223" />
+    <state x="476" y="231" width="672" height="677" key="run.anything.popup/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603753085698" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1603752075811">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="443" y="158" width="672" height="475" key="search.everywhere.popup/0.0.1366.728@0.0.1366.728" timestamp="1603502397009" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603752075811" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="app">
+        <watch expression="DateTimeFormatter.ofPattern(&quot;M/d/yyyy&quot;).parse(&quot;01/02/2000&quot;)" language="JAVA" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

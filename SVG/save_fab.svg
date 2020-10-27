@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="56" height="56" version="1.1" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient id="linearGradient2572" x1="8" x2="48" y1="8" y2="48" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#efb890" offset="0"/>
+   <stop stop-color="#6c2f00" offset=".5"/>
+   <stop stop-color="#190d04" offset="1"/>
+  </linearGradient>
+  <filter id="filter2582" x="-1.08e-5" y="-1.08e-5" width="1" height="1" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="0.00024881212"/>
+  </filter>
+  <linearGradient id="linearGradient2677" x1="10" x2="46" y1="10" y2="46" gradientTransform="matrix(1.0572 0 0 1.0572 -1.6013 -1.6013)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#190d04" offset="0"/>
+   <stop stop-color="#6c2f00" offset=".5"/>
+   <stop stop-color="#efb890" offset="1"/>
+  </linearGradient>
+ </defs>
+ <circle id="outerCircle" transform="matrix(1.0128 0 0 1.0128 -.35814 -.35813)" cx="28" cy="28" r="27.646" fill="url(#linearGradient2572)" filter="url(#filter2582)" stroke="#6c2f00" stroke-width=".5"/>
+ <g>
+  <circle id="innerCircle" cx="28" cy="28" r="25.207" fill="#6c2f00" stroke="url(#linearGradient2677)" stroke-width="1.5"/>
+  <path id="bgIcon" d="m16.211 16.211v23.579h23.579v-18.813l-4.7663-4.7663zm11.789 21.895c-2.7958 0-5.0526-2.2568-5.0526-5.0526 0-2.7958 2.2568-5.0526 5.0526-5.0526 2.7958 0 5.0526 2.2568 5.0526 5.0526 0 2.7958-2.2568 5.0526-5.0526 5.0526zm5.0526-13.474h-15.158v-6.7368h15.158z" fill="#032f07" fill-opacity=".3" stroke="#ffffff"/>
+  <path id="fgIcon" d="m36.421 12.842h-20.211c-1.8695 0-3.3684 1.5158-3.3684 3.3684v23.579c0 1.8526 1.4989 3.3684 3.3684 3.3684h23.579c1.8526 0 3.3684-1.5158 3.3684-3.3684v-20.211zm3.3684 26.947h-23.579v-23.579h18.813l4.7663 4.7663zm-11.789-11.789c-2.7958 0-5.0526 2.2568-5.0526 5.0526 0 2.7958 2.2568 5.0526 5.0526 5.0526 2.7958 0 5.0526-2.2568 5.0526-5.0526 0-2.7958-2.2568-5.0526-5.0526-5.0526zm-10.105-10.105h15.158v6.7368h-15.158z" fill="#032f07" stroke="#ffffff"/>
+ </g>
+</svg>
