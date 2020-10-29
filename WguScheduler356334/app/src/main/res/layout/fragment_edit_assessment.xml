@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/control_margin"
         android:orientation="vertical">
 
         <TextView
@@ -26,7 +27,6 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:stretchColumns="1"
             android:weightSum="100">
 
             <TableRow
@@ -60,13 +60,12 @@
 
                 <EditText
                     android:id="@+id/codeEditText"
+                    style="@style/WGU.Scheduler.TextInputEditText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="65"
-                    android:ems="10"
-                    style="@style/WGU.Scheduler.TextInputEditText"
-                    android:inputType="textShortMessage|text|textCapCharacters"
-                    android:importantForAutofill="no" />
+                    android:importantForAutofill="no"
+                    android:inputType="textShortMessage|text|textCapCharacters" />
 
                 <Button
                     android:id="@+id/typeButton"
@@ -79,16 +78,32 @@
         </TableLayout>
 
         <TextView
+            android:id="@+id/textView12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_status" />
+            android:labelFor="@+id/nameEditText"
+            android:text="@string/label_html_name_optional"
+            android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
+
+        <EditText
+            android:id="@+id/nameEditText"
+            style="@style/WGU.Scheduler.TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no"
+            android:inputType="textShortMessage|text|textCapCharacters" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_status"
+            android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
         <Button
             android:id="@+id/statusButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/btn_dropdown"
-            android:text="@string/label_status" />
+            android:background="@android:drawable/btn_dropdown" />
 
         <TableLayout
             android:layout_width="match_parent"
@@ -160,7 +175,7 @@
             android:layout_height="match_parent"
             android:ems="10"
             android:gravity="start|top"
-            android:inputType="textMultiLine"
-            android:importantForAutofill="no" />
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine" />
     </LinearLayout>
 </ScrollView>

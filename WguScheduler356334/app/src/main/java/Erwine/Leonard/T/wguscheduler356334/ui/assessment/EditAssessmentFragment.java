@@ -43,6 +43,7 @@ public class EditAssessmentFragment extends Fragment {
     private EditAssessmentViewModel viewModel;
     private Button courseButton;
     private EditText codeEditText;
+    private EditText nameEditText;
     private Button typeButton;
     private Button statusButton;
     private Chip goalDateChip;
@@ -63,6 +64,7 @@ public class EditAssessmentFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         courseButton = view.findViewById(R.id.courseButton);
         codeEditText = view.findViewById(R.id.codeEditText);
+        nameEditText = view.findViewById(R.id.nameEditText);
         typeButton = view.findViewById(R.id.typeButton);
         statusButton = view.findViewById(R.id.statusButton);
         goalDateChip = view.findViewById(R.id.goalDateChip);
@@ -97,6 +99,7 @@ public class EditAssessmentFragment extends Fragment {
         }
         Log.d(LOG_TAG, String.format("Enter onEntityLoaded(%s)", assessmentDetails));
         codeEditText.setText(viewModel.getCode());
+        nameEditText.setText(viewModel.getName());
         notesEditText.setText(viewModel.getNotes());
         viewModel.setSelectedCourse(assessmentDetails.getCourse());
         onCourseChanged(viewModel.getSelectedCourse());
@@ -105,6 +108,7 @@ public class EditAssessmentFragment extends Fragment {
         onGoalDateChanged();
         onCompletionDateChanged();
         codeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCode));
+        nameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
     }
 

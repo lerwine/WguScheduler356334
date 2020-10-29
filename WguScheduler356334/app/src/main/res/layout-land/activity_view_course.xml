@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ViewCourseActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_Layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:title="@string/title_activity_view_course" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/courseListTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_Layout" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addAssessmentFloatingActionButton"
+        style="@style/WGU.Scheduler.AddAssessmentFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/title_add_assessment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/addAlertFloatingActionButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addAlertFloatingActionButton"
+        style="@style/WGU.Scheduler.AddAlertFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/title_add_alert"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/shareFloatingActionButton"
+        style="@style/WGU.Scheduler.ShareFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/label_share_assessment"
+        app:layout_constraintBottom_toTopOf="@+id/addAssessmentFloatingActionButton"
+        app:layout_constraintEnd_toStartOf="@+id/saveFloatingActionButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveFloatingActionButton"
+        style="@style/WGU.Scheduler.SaveFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/command_save_changes"
+        app:layout_constraintBottom_toTopOf="@+id/addAssessmentFloatingActionButton"
+        app:layout_constraintEnd_toStartOf="@+id/deleteFloatingActionButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/deleteFloatingActionButton"
+        style="@style/WGU.Scheduler.DeleteFabButtonStyle"
+        android:clickable="true"
+        android:contentDescription="@string/title_delete_course"
+        app:layout_constraintBottom_toTopOf="@+id/addAlertFloatingActionButton"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

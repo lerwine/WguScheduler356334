@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
@@ -78,6 +79,8 @@ ViewCourseActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_course);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -89,7 +92,8 @@ ViewCourseActivity extends AppCompatActivity {
         saveFloatingActionButton = findViewById(R.id.saveFloatingActionButton);
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
-        viewModel.getTitleFactoryLiveData().observe(this, f -> setTitle(f.apply(getResources())));
+        viewModel.getTitleFactoryLiveData().observe(this, f -> toolbar.setTitle(f.apply(getResources())));
+        viewModel.getSubTitleLiveData().observe(this, toolbar::setSubtitle);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
         ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);

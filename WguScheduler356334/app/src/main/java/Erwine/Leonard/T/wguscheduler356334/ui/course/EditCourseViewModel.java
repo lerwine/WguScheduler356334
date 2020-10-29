@@ -107,6 +107,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final PrivateLiveData<Integer> actualEndMessageLiveData;
     private final PrivateLiveData<Integer> competencyUnitsMessageLiveData;
     private final PrivateLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final PrivateLiveData<String> subTitleLiveData;
     private final PrivateLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final CurrentValues currentValues;
     private final ArrayList<TermCourseListItem> coursesForTerm;
@@ -153,6 +154,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         actualEndMessageLiveData = new PrivateLiveData<>();
         competencyUnitsMessageLiveData = new PrivateLiveData<>();
         titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_course));
+        subTitleLiveData = new PrivateLiveData<>("");
         overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(""));
 
         termsLoadedObserver = this::onTermsLoaded;
@@ -390,6 +392,10 @@ public class EditCourseViewModel extends AndroidViewModel {
         return titleFactoryLiveData;
     }
 
+    public LiveData<String> getSubTitleLiveData() {
+        return subTitleLiveData;
+    }
+
     public LiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
         return overviewFactoryLiveData;
     }
@@ -588,13 +594,14 @@ public class EditCourseViewModel extends AndroidViewModel {
     @NonNull
     public synchronized String calculateViewTitle(Resources resources) {
         if (null == viewTitle) {
-            viewTitle = resources.getString(R.string.format_course, normalizedNumber, normalizedTitle);
+            viewTitle = resources.getString(R.string.format_course, normalizedNumber);
         }
         return viewTitle;
     }
 
     private void onEntityLoaded() {
         titleFactoryLiveData.postValue(this::calculateViewTitle);
+        subTitleLiveData.postValue(originalValues.getTitle());
         overviewFactoryLiveData.postValue(this::calculateOverview);
         entityLiveData.postValue(originalValues);
         termsLiveData.observeForever(termsLoadedObserver);
@@ -953,8 +960,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 }
             }
             if (!oldValue.equals(normalizedTitle)) {
-                viewTitle = null;
-                titleFactoryLiveData.postValue(EditCourseViewModel.this::calculateViewTitle);
+                subTitleLiveData.postValue(normalizedTitle);
             }
             Log.d(LOG_TAG, "Title change complete");
         }

@@ -65,6 +65,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private MentorEntity mentorEntity;
     private final PrivateLiveData<AssessmentDetails> entityLiveData;
     private final PrivateLiveData<Function<Resources, String>> titleFactoryLiveData;
+    private final PrivateLiveData<String> subTitleLiveData;
     private final PrivateLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final PrivateLiveData<Boolean> courseValidLiveData;
     private final PrivateLiveData<Boolean> codeValidLiveData;
@@ -107,6 +108,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         dbLoader = DbLoader.getInstance(getApplication());
         originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
         titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
+        subTitleLiveData = new PrivateLiveData<>("");
         overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(" "));
         currentValues = new CurrentValues();
         entityLiveData = new PrivateLiveData<>();
@@ -129,6 +131,10 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
         return titleFactoryLiveData;
+    }
+
+    public LiveData<String> getSubTitleLiveData() {
+        return subTitleLiveData;
     }
 
     public LiveData<List<AssessmentAlert>> getAllAlerts() {
@@ -321,18 +327,15 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     @NonNull
     public synchronized String calculateViewTitle(Resources resources) {
         if (null == viewTitle) {
-            String n = currentValues.name;
-            if (null == n) {
-                viewTitle = resources.getString(R.string.format_assessment, resources.getString(currentValues.type.displayResourceId()), currentValues.code);
-            } else {
-                viewTitle = resources.getString(R.string.format_assessment_name, resources.getString(currentValues.type.displayResourceId()), currentValues.code, n);
-            }
+            viewTitle = resources.getString(R.string.format_assessment, resources.getString(currentValues.type.displayResourceId()), currentValues.code);
         }
         return viewTitle;
     }
 
     private void onEntityLoaded() {
         titleFactoryLiveData.postValue(this::calculateViewTitle);
+        String n = originalValues.getName();
+        subTitleLiveData.postValue((null == n) ? "" : n);
         overviewFactoryLiveData.postValue(this::calculateOverview);
         entityLiveData.postValue(originalValues);
     }
@@ -499,7 +502,7 @@ public class EditAssessmentViewModel extends AndroidViewModel {
                 this.name = name;
             }
             if (!normalizedName.equals(oldValue)) {
-                titleFactoryLiveData.postValue(EditAssessmentViewModel.this::calculateViewTitle);
+                subTitleLiveData.postValue(normalizedName);
             }
         }
 

@@ -16,6 +16,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -72,6 +73,8 @@ public class EditMentorActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_mentor);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -148,10 +151,10 @@ public class EditMentorActivity extends AppCompatActivity {
         if (ID_NEW == entity.getId()) {
             shareFloatingActionButton.setVisibility(View.GONE);
             deleteFloatingActionButton.setVisibility(View.GONE);
-            setTitle(R.string.title_activity_new_mentor);
+            ((Toolbar) findViewById(R.id.toolbar)).setTitle(R.string.title_activity_new_mentor);
             viewModel.getIsValidLiveData().observe(this, b -> saveFloatingActionButton.setEnabled(b));
         } else {
-            viewModel.getTitleFactory().observe(this, f -> setTitle(f.apply(getResources())));
+            viewModel.getTitleFactory().observe(this, f -> ((Toolbar) findViewById(R.id.toolbar)).setTitle(f.apply(getResources())));
             shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
             viewModel.getCanSaveLiveData().observe(this, b -> saveFloatingActionButton.setEnabled(b));
@@ -222,7 +225,7 @@ public class EditMentorActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Enter onNameChanged(" + ToStringBuilder.toEscapedString(s) + ")");
         String v = getResources().getString(R.string.format_mentor, s);
         int i = v.indexOf(':');
-        setTitle((i > 0 && s.startsWith(v.substring(0, i))) ? s : v);
+        ((Toolbar) findViewById(R.id.toolbar)).setTitle((i > 0 && s.startsWith(v.substring(0, i))) ? s : v);
     }
 
     private void onLoadFailed(Throwable throwable) {

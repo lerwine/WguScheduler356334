@@ -29,6 +29,7 @@
     <string name="label_in_progress">In Progress</string>
     <string name="label_mentor">Mentor</string>
     <string name="label_mentor_name">Mentor Name</string>
+    <string name="label_html_name_optional">Name <i>(optional)</i></string>
     <string name="label_name_of_term">Name of Term</string>
     <string name="label_none">(none)</string>
     <string name="label_not_passed">Not Passed</string>
@@ -42,7 +43,8 @@
     <string name="label_pre_assessment">Pre-assessment</string>
     <string name="label_start">Start</string>
     <string name="label_start_of_term">Start of Term</string>
-    <string name="label_status">Status:</string>
+    <string name="label_status">Status</string>
+    <string name="label_status_colon">Status:</string>
     <string name="label_term">Term</string>
     <string name="label_title">Title</string>
     <string name="label_to_lc">to</string>
@@ -120,10 +122,11 @@
     <string name="title_activity_mentor_detail">Mentor Details</string>
     <string name="title_activity_new_mentor">Add New Mentor</string>
     <string name="title_activity_new_term">Add New Term</string>
+    <string name="title_activity_new_course">Add New Course</string>
+    <string name="title_activity_new_assessment">Add New Assessment</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="format_course">Course %s: %s</string>
-    <string name="format_assessment">%s %s</string>
-    <string name="format_assessment_name">%s %s: %s</string>
+    <string name="format_course">Course: %s</string>
+    <string name="format_assessment">%s: %s</string>
     <string name="label_term_colon">&termColon;</string>
     <string name="format_term">&termColon; %s</string>
     <string name="title_actual">Actual:</string>
