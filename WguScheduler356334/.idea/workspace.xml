@@ -20,8 +20,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListFragment.java" afterDir="false" />
+    <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="Fixes #57">
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewAssessmentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewAssessmentActivity.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -216,13 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1600925982030</updated>
-    </task>
-    <task id="LOCAL-00028" summary="Added DatePickerEditView">
-      <created>1602397440937</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1602397440937</updated>
     </task>
     <task id="LOCAL-00029" summary="Fixed save operation inconsistencies in view models">
       <created>1602470041898</created>
@@ -560,12 +553,18 @@
       <option name="project" value="LOCAL" />
       <updated>1603956840302</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="Fixes #56">
+      <created>1603957155465</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1603957155465</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Fixed validation algorithm" />
     <MESSAGE value="Created alert create/update stubs" />
     <MESSAGE value="Fixes #47" />
     <MESSAGE value="Fixes #48" />
@@ -589,6 +588,7 @@
     <MESSAGE value="Fixes #52" />
     <MESSAGE value="Fixes #54" />
     <MESSAGE value="Fixes #55" />
+    <MESSAGE value="Fixes #56" />
     <MESSAGE value="Fixes #57" />
     <option name="LAST_COMMIT_MESSAGE" value="Fixes #57" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
@@ -679,10 +679,10 @@
     </state>
     <state x="580" y="200" key="AndroidProcessChooserDialog/0.0.1366.728@0.0.1366.728" timestamp="1603334052588" />
     <state x="815" y="285" key="AndroidProcessChooserDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602389622716" />
-    <state x="139" y="0" width="1232" height="1013" key="CommitChangelistDialog2" timestamp="1603956839231">
+    <state x="139" y="0" width="1232" height="1013" key="CommitChangelistDialog2" timestamp="1603957412750">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="139" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1603956839231" />
+    <state x="139" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1603957412750" />
     <state x="384" y="0" width="1232" height="1013" key="CommitChangelistDialog2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603758769811" />
     <state width="396" height="466" key="DebuggerActiveHint" timestamp="1603333601929">
       <screen x="0" y="0" width="1366" height="728" />
@@ -752,10 +752,10 @@
     </state>
     <state x="328" y="20" width="916" height="708" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1603920571425" />
     <state x="477" y="72" width="1243" height="715" key="SettingsEditor/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603308530676" />
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1603956842255">
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1603957157795">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1603956842255" />
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1603957157795" />
     <state x="387" y="139" key="Vcs.Push.Dialog.v2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603734994649" />
     <state x="568" y="183" key="chooseDestDirectoryDialog" timestamp="1602948114782">
       <screen x="0" y="0" width="1366" height="728" />
@@ -812,10 +812,10 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="389" y="0" key="refactoring.ChangeSignatureDialog/0.0.1366.728@0.0.1366.728" timestamp="1601772100906" />
-    <state x="339" y="162" width="672" height="677" key="run.anything.popup" timestamp="1603927437780">
+    <state x="339" y="162" width="672" height="677" key="run.anything.popup" timestamp="1603957364426">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="339" y="162" width="672" height="677" key="run.anything.popup/0.0.1366.728@0.0.1366.728" timestamp="1603927437780" />
+    <state x="339" y="162" width="672" height="677" key="run.anything.popup/0.0.1366.728@0.0.1366.728" timestamp="1603957364426" />
     <state x="476" y="231" width="672" height="677" key="run.anything.popup/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603753085698" />
     <state x="443" y="158" width="672" height="475" key="search.everywhere.popup" timestamp="1603933996496">
       <screen x="0" y="0" width="1366" height="728" />

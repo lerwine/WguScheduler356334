@@ -141,17 +141,26 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         }
     }
 
+    private void doAddAlert() {
+        EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
+        dlg.show(getSupportFragmentManager(), null);
+    }
+
     private void onAddFloatingActionButtonClick(View view) {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                    this::finish,
-                    () -> {
-                        ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener());
-                        finish();
-                    }, null);
+                    this::doAddAlert,
+                    () -> ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener() {
+                        @Override
+                        public void onSuccess(ResourceMessageResult messages) {
+                            super.onSuccess(messages);
+                            if (!messages.isError()) {
+                                doAddAlert();
+                            }
+                        }
+                    }), null);
         } else {
-            EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
-            dlg.show(getSupportFragmentManager(), null);
+            doAddAlert();
         }
     }
 
@@ -380,7 +389,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         @Override
         public void onSuccess(@NonNull Integer count) {
             Log.d(LOG_TAG, "Enter DeleteOperationListener.onSuccess");
-            if (null == count || count < 1) {
+            if (count < 1) {
                 new AlertHelper(R.drawable.dialog_error, R.string.title_delete_error, getString(R.string.message_delete_term_fail), ViewAssessmentActivity.this).showDialog();
             } else {
                 if (alerts.length > 0) {
