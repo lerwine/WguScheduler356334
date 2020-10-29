@@ -561,46 +561,48 @@ public class EditAlertViewModel extends AndroidViewModel {
         return initializationFailureLiveData;
     }
 
-    public void initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
+    public synchronized Single<AlertEntity> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         boolean fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         if (null == state) {
             throw new IllegalStateException();
         }
         if (fromInitializedState) {
-            restoreViewModelState(state);
-        } else if (state.containsKey(ARG_KEY_ALERT_ID)) {
+            return Single.just(restoreViewModelState(state));
+        }
+        if (state.containsKey(ARG_KEY_ALERT_ID)) {
             long alertId = state.getLong(ARG_KEY_ALERT_ID);
             if (state.containsKey(ARG_KEY_COURSE_ID)) {
-                loadCourseAlert(alertId, state.getLong(ARG_KEY_COURSE_ID));
-            } else if (state.containsKey(ARG_KEY_ASSESSMENT_ID)) {
-                loadAssessmentAlert(alertId, state.getLong(ARG_KEY_ASSESSMENT_ID));
-            } else {
-                throw new IllegalStateException("Missing ID of entity related to event");
+                return loadCourseAlert(alertId, state.getLong(ARG_KEY_COURSE_ID));
             }
-        } else if (state.containsKey(ARG_KEY_COURSE_ID)) {
-            initializeNewCourseAlert(state.getLong(ARG_KEY_COURSE_ID));
-        } else if (state.containsKey(ARG_KEY_ASSESSMENT_ID)) {
-            initializeNewAssessmentAlert(state.getLong(ARG_KEY_ASSESSMENT_ID));
-        } else {
+            if (state.containsKey(ARG_KEY_ASSESSMENT_ID)) {
+                return loadAssessmentAlert(alertId, state.getLong(ARG_KEY_ASSESSMENT_ID));
+            }
             throw new IllegalStateException("Missing ID of entity related to event");
         }
+        if (state.containsKey(ARG_KEY_COURSE_ID)) {
+            return initializeNewCourseAlert(state.getLong(ARG_KEY_COURSE_ID));
+        }
+        if (state.containsKey(ARG_KEY_ASSESSMENT_ID)) {
+            return initializeNewAssessmentAlert(state.getLong(ARG_KEY_ASSESSMENT_ID));
+        }
+        throw new IllegalStateException("Missing ID of entity related to event");
     }
 
-    private void loadCourseAlert(long alertId, long courseId) {
-        ObserverHelper.subscribeOnce(dbLoader.getCourseAlertDetailsById(alertId, courseId), this::onCourseAlertLoaded, this::onCourseAlertLoadFailed);
+    private Single<AlertEntity> loadCourseAlert(long alertId, long courseId) {
+        return dbLoader.getCourseAlertDetailsById(alertId, courseId).map(this::onCourseAlertLoaded).doOnError(this::onCourseAlertLoadFailed);
     }
 
-    private void loadAssessmentAlert(long alertId, long assessmentId) {
-        ObserverHelper.subscribeOnce(dbLoader.getAssessmentAlertDetailsById(alertId, assessmentId), this::onAssessmentAlertLoaded, this::onAssessmentAlertLoadFailed);
+    private Single<AlertEntity> loadAssessmentAlert(long alertId, long assessmentId) {
+        return dbLoader.getAssessmentAlertDetailsById(alertId, assessmentId).map(this::onAssessmentAlertLoaded).doOnError(this::onAssessmentAlertLoadFailed);
     }
 
-    private void initializeNewCourseAlert(long courseId) {
-        ObserverHelper.subscribeOnce(dbLoader.getCourseById(courseId), this::onCourseLoaded, this::onCourseLoadFailed);
+    private Single<AlertEntity> initializeNewCourseAlert(long courseId) {
+        return dbLoader.getCourseById(courseId).map(this::onCourseLoaded).doOnError(this::onCourseLoadFailed);
     }
 
-    private void initializeNewAssessmentAlert(long assessmentId) {
-        ObserverHelper.subscribeOnce(dbLoader.getAssessmentById(assessmentId), this::onAssessmentLoaded, this::onAssessmentLoadFailed);
+    private Single<AlertEntity> initializeNewAssessmentAlert(long assessmentId) {
+        return dbLoader.getAssessmentById(assessmentId).map(this::onAssessmentLoaded).doOnError(this::onAssessmentLoadFailed);
     }
 
     public synchronized void saveViewModelState(@NonNull Bundle outState) {
@@ -614,16 +616,17 @@ public class EditAlertViewModel extends AndroidViewModel {
                 assessmentAlertDetails -> assessmentAlertDetails.saveState(outState, true));
     }
 
-    private synchronized void restoreViewModelState(@NonNull Bundle state) {
+    private synchronized AlertEntity restoreViewModelState(@NonNull Bundle state) {
         int type = state.getInt(STATE_KEY_TYPE, 0);
+        AlertEntity entity;
         if (type == TYPE_VALUE_COURSE) {
             CourseAlertDetails courseAlertDetails = new CourseAlertDetails();
             courseAlertDetails.restoreState(state, true);
-            onCourseAlertLoaded(courseAlertDetails);
+            entity = onCourseAlertLoaded(courseAlertDetails);
         } else {
             AssessmentAlertDetails assessmentAlertDetails = new AssessmentAlertDetails();
             assessmentAlertDetails.restoreState(state, true);
-            onAssessmentAlertLoaded(assessmentAlertDetails);
+            entity = onAssessmentAlertLoaded(assessmentAlertDetails);
         }
         setAlertDateOption(AlertDateOption.values()[state.getInt(STATE_KEY_RELATIVITY, 0)]);
         setDaysText(state.getString(STATE_KEY_DAYS_TEXT, ""));
@@ -634,6 +637,7 @@ public class EditAlertViewModel extends AndroidViewModel {
             setSelectedTime(LocalTimeConverter.toLocalTime(state.getInt(STATE_KEY_SELECTED_TIME)));
         }
         setCustomMessage(state.getString(STATE_KEY_MESSAGE, ""));
+        return entity;
     }
 
     /**
@@ -641,8 +645,8 @@ public class EditAlertViewModel extends AndroidViewModel {
      *
      * @param courseAlertDetails The {@link CourseAlertDetails} being edited.
      */
-    synchronized void onCourseAlertLoaded(@NonNull CourseAlertDetails courseAlertDetails) {
-        initializeAlert(BinaryAlternate.ofPrimary(courseAlertDetails));
+    synchronized AlertEntity onCourseAlertLoaded(@NonNull CourseAlertDetails courseAlertDetails) {
+        return initializeAlert(BinaryAlternate.ofPrimary(courseAlertDetails));
     }
 
     private void onCourseAlertLoadFailed(Throwable throwable) {
@@ -655,9 +659,9 @@ public class EditAlertViewModel extends AndroidViewModel {
      *
      * @param courseDetails The target {@link CourseDetails} object.
      */
-    synchronized void onCourseLoaded(@NonNull CourseDetails courseDetails) {
+    synchronized AlertEntity onCourseLoaded(@NonNull CourseDetails courseDetails) {
         AlertEntity entity = new AlertEntity();
-        initializeAlert(BinaryAlternate.ofPrimary(new CourseAlertDetails(entity, new CourseEntity(courseDetails))));
+        return initializeAlert(BinaryAlternate.ofPrimary(new CourseAlertDetails(entity, new CourseEntity(courseDetails))));
     }
 
     private void onCourseLoadFailed(Throwable throwable) {
@@ -670,8 +674,8 @@ public class EditAlertViewModel extends AndroidViewModel {
      *
      * @param assessmentAlertDetails The {@link AssessmentAlertDetails} being edited.
      */
-    synchronized void onAssessmentAlertLoaded(@NonNull AssessmentAlertDetails assessmentAlertDetails) {
-        initializeAlert(BinaryAlternate.ofSecondary(assessmentAlertDetails));
+    synchronized AlertEntity onAssessmentAlertLoaded(@NonNull AssessmentAlertDetails assessmentAlertDetails) {
+        return initializeAlert(BinaryAlternate.ofSecondary(assessmentAlertDetails));
     }
 
     private void onAssessmentAlertLoadFailed(Throwable throwable) {
@@ -684,9 +688,9 @@ public class EditAlertViewModel extends AndroidViewModel {
      *
      * @param assessmentDetails The target {@link CourseDetails} object.
      */
-    synchronized void onAssessmentLoaded(@NonNull AssessmentDetails assessmentDetails) {
+    synchronized AlertEntity onAssessmentLoaded(@NonNull AssessmentDetails assessmentDetails) {
         AlertEntity entity = new AlertEntity();
-        initializeAlert(BinaryAlternate.ofSecondary(new AssessmentAlertDetails(entity, new AssessmentEntity(assessmentDetails))));
+        return initializeAlert(BinaryAlternate.ofSecondary(new AssessmentAlertDetails(entity, new AssessmentEntity(assessmentDetails))));
     }
 
     private void onAssessmentLoadFailed(Throwable throwable) {
@@ -694,7 +698,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         initializationFailureLiveData.postValue(ValidationMessage.ofSingleError(R.string.format_message_read_error, throwable.toString()));
     }
 
-    private void initializeAlert(@NonNull BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target) {
+    private AlertEntity initializeAlert(@NonNull BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target) {
         this.target = target;
         AlertEntity alertEntity = target.flatMap(courseAlertDetails -> {
             typeResourceIdSubject.onNext(TYPE_VALUE_COURSE);
@@ -723,6 +727,7 @@ public class EditAlertViewModel extends AndroidViewModel {
             return assessmentAlertDetails.getAlert();
         });
         alertEntitySubject.onNext(alertEntity);
+        return alertEntity;
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {

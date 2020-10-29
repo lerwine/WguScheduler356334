@@ -25,7 +25,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -55,8 +54,7 @@ import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 public class EditAlertDialog extends DialogFragment {
 
     private static final String LOG_TAG = MainActivity.getLogTag(EditAlertDialog.class);
-    private final Observer<Boolean> canSaveObserver = this::onCanSaveChanged;
-    private LiveData<Boolean> canSaveObserved;
+    private final Observer<? super ResourceMessageResult> initializationFailureObserver;
     private EditAlertViewModel viewModel;
     private TextView eventDateTextView;
     private EditText daysEditText;
@@ -78,6 +76,7 @@ public class EditAlertDialog extends DialogFragment {
 
     public EditAlertDialog() {
         Log.d(LOG_TAG, "Constructing");
+        initializationFailureObserver = this::onInitializationFailure;
     }
 
     @Override
@@ -107,10 +106,9 @@ public class EditAlertDialog extends DialogFragment {
         deleteImageButton = view.findViewById(R.id.deleteImageButton);
         cancelImageButton = view.findViewById(R.id.cancelImageButton);
         viewModel = new ViewModelProvider(requireActivity()).get(EditAlertViewModel.class);
-        viewModel.initializeViewModelState(savedInstanceState, this::getArguments);
+        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, this::getArguments), this::onAlertEntityLoaded);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        viewModel.getAlertEntityLiveData().observe(viewLifecycleOwner, this::onAlertEntityLoaded);
-        viewModel.getInitializationFailureLiveData().observe(viewLifecycleOwner, this::onInitializationFailure);
+        viewModel.getInitializationFailureLiveData().observe(viewLifecycleOwner, initializationFailureObserver);
         viewModel.getDaysValidationMessageLiveData().observe(viewLifecycleOwner, resourceMessageFactory -> {
             if (resourceMessageFactory.isPresent()) {
                 daysEditText.setError(resourceMessageFactory.get().apply(getResources()), AppCompatResources.getDrawable(requireContext(),
@@ -153,6 +151,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onAlertEntityLoaded(@NonNull AlertEntity alertEntity) {
+        viewModel.getInitializationFailureLiveData().removeObserver(initializationFailureObserver);
         long id = alertEntity.getId();
         if (ID_NEW == id) {
             deleteImageButton.setEnabled(false);
@@ -212,15 +211,12 @@ public class EditAlertDialog extends DialogFragment {
             defaultTimeRadioButton.setOnCheckedChangeListener(this::onDefaultTimeRadioButtonCheckedChange);
             explicitTimeRadioButton.setOnCheckedChangeListener(this::onExplicitTimeRadioButtonCheckedChange);
             alertTimeValueTextView.setOnClickListener(this::onAlertTimeValueTextViewClick);
-        } else if (null != canSaveObserved) {
-            canSaveObserved.removeObserver(canSaveObserver);
         }
         if (ID_NEW == id) {
-            canSaveObserved = viewModel.getValidLiveData();
+            viewModel.getValidLiveData().observe(getViewLifecycleOwner(), this::onCanSaveChanged);
         } else {
-            canSaveObserved = viewModel.getCanSaveLiveData();
+            viewModel.getCanSaveLiveData().observe(getViewLifecycleOwner(), this::onCanSaveChanged);
         }
-        viewModel.getCanSaveLiveData().observe(getViewLifecycleOwner(), canSaveObserver);
     }
 
     private void onCanSaveChanged(Boolean canSave) {
@@ -259,6 +255,7 @@ public class EditAlertDialog extends DialogFragment {
     }
 
     private void onInitializationFailure(@NonNull ResourceMessageResult messages) {
+        viewModel.getInitializationFailureLiveData().removeObserver(initializationFailureObserver);
         FragmentActivity activity = requireActivity();
         requireDialog().dismiss();
         AlertDialog dlg = new AlertDialog.Builder(activity).setTitle(R.string.title_read_error)
