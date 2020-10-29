@@ -76,25 +76,6 @@ public class WguSchedulerViewModel extends AndroidViewModel {
         super.onCleared();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        if (!completableSubject.hasComplete() || completableSubject.hasThrowable()) {
-            try {
-                subscribed.forEach(t -> {
-                    try {
-                        t.disposable.dispose();
-                    } finally {
-                        t.onDisposed();
-                    }
-                });
-            } finally {
-                subscribed.clear();
-            }
-            Log.d(LOG_TAG, getClass().getName() + " finalized");
-        }
-        super.finalize();
-    }
-
     private Disposable subscribe(@NonNull Action onComplete) {
         DisposableProxy disposable = new DisposableProxy(onComplete);
         subscribed.add(disposable.proxy);
@@ -145,6 +126,7 @@ public class WguSchedulerViewModel extends AndroidViewModel {
         target.disposable.dispose();
         subscribed.remove(target);
         target.onDisposed();
+        target.owner.clear();
     }
 
     private abstract class Subscription<T> implements Disposable {
@@ -243,6 +225,7 @@ public class WguSchedulerViewModel extends AndroidViewModel {
         public synchronized void onDisposed() {
             if (null != disposable && !disposable.isDisposed()) {
                 disposable.dispose();
+                disposable = null;
             }
         }
 
@@ -268,6 +251,7 @@ public class WguSchedulerViewModel extends AndroidViewModel {
         public void onDisposed() {
             if (null != lifecycle) {
                 lifecycle.removeObserver(this);
+                lifecycle = null;
             }
         }
 

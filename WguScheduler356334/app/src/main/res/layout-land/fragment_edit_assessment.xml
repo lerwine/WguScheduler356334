@@ -8,7 +8,7 @@
     tools:context=".ui.assessment.EditAssessmentFragment">
 
     <ScrollView
-        android:id="@+id/valuesGroup"
+        android:id="@+id/valuesScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="start|top"
@@ -219,7 +219,7 @@
         android:inputType="textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/valuesGroup"
+        app:layout_constraintStart_toEndOf="@+id/valuesScrollView"
         app:layout_constraintTop_toBottomOf="@+id/notesLabelTextView"
         app:layout_constraintWidth_min="250dp" />
 

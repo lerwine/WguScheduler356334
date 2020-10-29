@@ -21,7 +21,7 @@
         app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     <LinearLayout
-        android:id="@+id/valuesGroup"
+        android:id="@+id/valuesLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="vertical"
@@ -132,7 +132,7 @@
         android:inputType="textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/valuesGroup"
+        app:layout_constraintStart_toEndOf="@+id/valuesLinearLayout"
         app:layout_constraintTop_toBottomOf="@+id/mentorNotesLabelTextView"
         app:layout_constraintWidth_min="250dp" />
 
