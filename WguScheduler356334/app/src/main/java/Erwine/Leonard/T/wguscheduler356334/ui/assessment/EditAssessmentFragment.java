@@ -114,7 +114,7 @@ public class EditAssessmentFragment extends Fragment {
 
     private void onCourseButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onCourseButtonClick");
-        ObserverHelper.subscribeOnce(viewModel.loadCourses(), this::onCoursesLoadedForPicker, this::onLoadCourseOptionsListError);
+        ObserverHelper.subscribeOnce(viewModel.loadCourses(), getViewLifecycleOwner(), this::onCoursesLoadedForPicker, this::onLoadCourseOptionsListError);
     }
 
     private void onCoursesLoadedForPicker(List<TermCourseListItem> termCourseListItems) {

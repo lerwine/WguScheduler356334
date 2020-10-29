@@ -90,7 +90,7 @@ public class EditMentorActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditMentorViewModel.class);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        ObserverHelper.subscribeOnce(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()), this::onLoadSuccess, this::onLoadFailed);
+        ObserverHelper.subscribeOnce(viewModel.restoreState(savedInstanceState, () -> getIntent().getExtras()), this, this::onLoadSuccess, this::onLoadFailed);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class EditMentorActivity extends AppCompatActivity {
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
-        ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
+        ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveMentorCompleted, this::onSaveMentorError);
     }
 
     private void onShareFloatingActionButtonClick(View view) {
@@ -306,7 +306,8 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onDeleteFloatingActionButtonClick(View view) {
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.observeOnce(viewModel.getAllAlerts(), alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), new DeleteOperationListener(alerts))), null);
+                ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                        alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), this, new DeleteOperationListener(alerts))), null);
     }
 
     private void onSaveMentorCompleted(@NonNull ResourceMessageResult messages) {
@@ -320,7 +321,7 @@ public class EditMentorActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            ObserverHelper.subscribeOnce(viewModel.save(true), this::onSaveMentorCompleted, this::onSaveMentorError);
+                            ObserverHelper.subscribeOnce(viewModel.save(true), this, this::onSaveMentorCompleted, this::onSaveMentorError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -344,7 +345,7 @@ public class EditMentorActivity extends AppCompatActivity {
                             if (!isValid) {
                                 return;
                             }
-                            ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveMentorCompleted, this::onSaveMentorError);
+                            ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveMentorCompleted, this::onSaveMentorError);
                         }), null);
             } else {
                 finish();
@@ -381,7 +382,7 @@ public class EditMentorActivity extends AppCompatActivity {
                     builder.setTitle(R.string.title_delete_warning)
                             .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                             .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                                ObserverHelper.subscribeOnce(viewModel.delete(true), this);
+                                ObserverHelper.subscribeOnce(viewModel.delete(true), EditMentorActivity.this, this);
                                 dialog.dismiss();
                             }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
                 } else {

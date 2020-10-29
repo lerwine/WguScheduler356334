@@ -63,7 +63,7 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        ObserverHelper.observeOnce(viewModel.getEntityLiveData(), this::onLoadSuccess);
+        ObserverHelper.observeOnce(viewModel.getEntityLiveData(), getViewLifecycleOwner(), this::onLoadSuccess);
     }
 
     @Override

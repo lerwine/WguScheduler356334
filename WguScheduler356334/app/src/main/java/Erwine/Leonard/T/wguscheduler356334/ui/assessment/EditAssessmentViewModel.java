@@ -13,7 +13,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.time.LocalDate;
@@ -45,6 +44,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Single;
@@ -52,7 +52,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
-public class EditAssessmentViewModel extends AndroidViewModel {
+public class EditAssessmentViewModel extends WguSchedulerViewModel {
     private static final String LOG_TAG = MainActivity.getLogTag(EditAssessmentViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_ASSESSMENT_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_ID, false);
@@ -99,7 +99,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
 
     public EditAssessmentViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
         titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_assessment));
@@ -111,12 +110,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
         codeValidLiveData = new PrivateLiveData<>(false);
         effectiveStartLiveData = new PrivateLiveData<>();
         effectiveEndLiveData = new PrivateLiveData<>();
-    }
-
-    @Override
-    protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
-        super.onCleared();
     }
 
     @NonNull

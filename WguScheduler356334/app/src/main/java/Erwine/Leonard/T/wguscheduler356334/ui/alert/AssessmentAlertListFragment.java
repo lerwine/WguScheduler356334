@@ -131,7 +131,7 @@ public class AssessmentAlertListFragment extends Fragment {
         if (assessmentViewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
                     () -> doEditAlert(editAlertId),
-                    () -> ObserverHelper.subscribeOnce(assessmentViewModel.save(false),
+                    () -> ObserverHelper.subscribeOnce(assessmentViewModel.save(false), getViewLifecycleOwner(),
                             m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed),
                     null);
         } else {
@@ -150,7 +150,7 @@ public class AssessmentAlertListFragment extends Fragment {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            ObserverHelper.subscribeOnce(assessmentViewModel.save(true),
+                            ObserverHelper.subscribeOnce(assessmentViewModel.save(true), getViewLifecycleOwner(),
                                     m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());

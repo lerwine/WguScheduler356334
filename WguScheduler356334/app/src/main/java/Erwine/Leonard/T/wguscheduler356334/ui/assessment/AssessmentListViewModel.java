@@ -1,10 +1,8 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.assessment;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
@@ -12,8 +10,9 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 
-public final class AssessmentListViewModel extends AndroidViewModel {
+public final class AssessmentListViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(AssessmentListViewModel.class);
     private final DbLoader dbLoader;
@@ -22,14 +21,7 @@ public final class AssessmentListViewModel extends AndroidViewModel {
 
     public AssessmentListViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
-    }
-
-    @Override
-    protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
-        super.onCleared();
     }
 
     /**

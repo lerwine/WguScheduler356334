@@ -14,7 +14,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.util.Collections;
@@ -39,6 +38,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.Observable;
@@ -50,7 +50,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
-public class EditMentorViewModel extends AndroidViewModel {
+public class EditMentorViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(EditMentorViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
@@ -85,7 +85,6 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         currentEntitySubject = new PrivateLiveData<>();
         nameSubject = BehaviorSubject.create();
@@ -149,9 +148,8 @@ public class EditMentorViewModel extends AndroidViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
-        super.onCleared();
         compositeDisposable.dispose();
+        super.onCleared();
     }
 
     private void onHasChangesChanged(Boolean hasChanges) {

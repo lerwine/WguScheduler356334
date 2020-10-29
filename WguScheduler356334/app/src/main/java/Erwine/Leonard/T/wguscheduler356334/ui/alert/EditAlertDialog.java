@@ -106,7 +106,7 @@ public class EditAlertDialog extends DialogFragment {
         deleteImageButton = view.findViewById(R.id.deleteImageButton);
         cancelImageButton = view.findViewById(R.id.cancelImageButton);
         viewModel = new ViewModelProvider(requireActivity()).get(EditAlertViewModel.class);
-        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, this::getArguments), this::onAlertEntityLoaded);
+        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, this::getArguments), getViewLifecycleOwner(), this::onAlertEntityLoaded);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         viewModel.getInitializationFailureLiveData().observe(viewLifecycleOwner, initializationFailureObserver);
         viewModel.getDaysValidationMessageLiveData().observe(viewLifecycleOwner, resourceMessageFactory -> {
@@ -266,16 +266,17 @@ public class EditAlertDialog extends DialogFragment {
 
     private void onSaveButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveButtonClick");
-        ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), t ->
-                ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
+        ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), getViewLifecycleOwner(), t ->
+                ObserverHelper.subscribeOnce(viewModel.save(false), getViewLifecycleOwner(), new SaveOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
         );
     }
 
     private void onDeleteButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteButtonClick");
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() -> ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), t ->
-                ObserverHelper.subscribeOnce(viewModel.delete(), new DeleteOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
-        ), null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_alert, R.string.message_delete_alert_confirm, requireContext()).showYesNoDialog(() ->
+                ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), getViewLifecycleOwner(), t ->
+                        ObserverHelper.subscribeOnce(viewModel.delete(), this, new DeleteOperationListener(viewModel.getOriginalEventDateTime(t).orElse(null)))
+                ), null);
     }
 
     private void onCancelButtonClick(View view) {
@@ -359,7 +360,7 @@ public class EditAlertDialog extends DialogFragment {
     private void onAlertTimeValueTextViewClick(View view) {
         LocalTime time = viewModel.getSelectedTime();
         if (null == time) {
-            ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), t -> {
+            ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), getViewLifecycleOwner(), t -> {
                 Context context = requireContext();
                 new TimePickerDialog(context, (view1, hourOfDay, minute) -> viewModel.setSelectedTime(LocalTime.of(hourOfDay, minute)),
                         t.getHour(), t.getMinute(), DateFormat.is24HourFormat(context)).show();
@@ -445,7 +446,7 @@ public class EditAlertDialog extends DialogFragment {
                             .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                             .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                                 dialog.dismiss();
-                                ObserverHelper.subscribeOnce(viewModel.save(true), this);
+                                ObserverHelper.subscribeOnce(viewModel.save(true), EditAlertDialog.this.getViewLifecycleOwner(), this);
                             }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
                 } else {
                     builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);

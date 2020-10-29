@@ -79,7 +79,7 @@ public class ViewTermActivity extends AppCompatActivity {
         deleteFloatingActionButton = findViewById(R.id.deleteFloatingActionButton);
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
         viewModel.getTitleFactory().observe(this, f -> toolbar.setTitle(f.apply(getResources())));
-        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoaded, this::onEntityLoadFailed);
+        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this, this::onEntityLoaded, this::onEntityLoadFailed);
     }
 
     @Override
@@ -238,13 +238,14 @@ public class ViewTermActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
+        ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveTermComplete, this::onSaveTermError);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.observeOnce(viewModel.getAllAlerts(), alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), new DeleteOperationListener(alerts))), null);
+                ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                        alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), this, new DeleteOperationListener(alerts))), null);
     }
 
     private void confirmSave() {
@@ -255,7 +256,7 @@ public class ViewTermActivity extends AppCompatActivity {
                             if (!isValid) {
                                 return;
                             }
-                            ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveTermComplete, this::onSaveTermError);
+                            ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveTermComplete, this::onSaveTermError);
                         }), null);
             } else {
                 finish();
@@ -275,7 +276,7 @@ public class ViewTermActivity extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources))).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            ObserverHelper.subscribeOnce(viewModel.save(true), this::onSaveTermComplete, this::onSaveTermError);
+                            ObserverHelper.subscribeOnce(viewModel.save(true), this, this::onSaveTermComplete, this::onSaveTermError);
                         })
                         .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -322,7 +323,7 @@ public class ViewTermActivity extends AppCompatActivity {
                             .setMessage(resources.getString(R.string.format_message_delete_warning, messages.join("\n", resources)))
                             .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                                 dialog.dismiss();
-                                ObserverHelper.subscribeOnce(viewModel.delete(true), this);
+                                ObserverHelper.subscribeOnce(viewModel.delete(true), ViewTermActivity.this, this);
                             })
                             .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
                 } else {

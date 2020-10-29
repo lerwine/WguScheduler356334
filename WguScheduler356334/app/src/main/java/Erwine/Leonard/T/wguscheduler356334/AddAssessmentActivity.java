@@ -53,7 +53,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditAssessmentViewModel.class);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()),
+        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this,
                 this::onAssessmentLoadSuccess, this::onAssessmentLoadFailed);
     }
 
@@ -90,7 +90,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
     private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this)
-                    .showYesNoCancelDialog(this::finish, () -> ObserverHelper.subscribeOnce(viewModel.save(false),
+                    .showYesNoCancelDialog(this::finish, () -> ObserverHelper.subscribeOnce(viewModel.save(false), this,
                             this::onSaveOperationFinished, this::onSaveFailed), null);
         } else {
             finish();
@@ -98,7 +98,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
-        ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+        ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onAssessmentLoadSuccess(AssessmentDetails entity) {
@@ -131,7 +131,7 @@ public class AddAssessmentActivity extends AppCompatActivity {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            ObserverHelper.subscribeOnce(viewModel.save(true),
+                            ObserverHelper.subscribeOnce(viewModel.save(true), this,
                                     this::onSaveOperationFinished, this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());

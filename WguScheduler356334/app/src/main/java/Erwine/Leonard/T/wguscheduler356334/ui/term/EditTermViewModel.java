@@ -13,7 +13,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -39,6 +38,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import io.reactivex.Observable;
@@ -50,7 +50,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
-public class EditTermViewModel extends AndroidViewModel {
+public class EditTermViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(EditTermViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
@@ -93,7 +93,6 @@ public class EditTermViewModel extends AndroidViewModel {
 
     public EditTermViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         entitySubject = BehaviorSubject.createDefault(new TermEntity());
         nameSubject = BehaviorSubject.createDefault("");
@@ -117,7 +116,6 @@ public class EditTermViewModel extends AndroidViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
         super.onCleared();
         compositeDisposable.dispose();
     }

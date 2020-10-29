@@ -96,7 +96,7 @@ ViewCourseActivity extends AppCompatActivity {
         viewModel.getSubTitleLiveData().observe(this, toolbar::setSubtitle);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onEntityLoadSucceeded, this::onEntityLoadFailed);
+        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this, this::onEntityLoadSucceeded, this::onEntityLoadFailed);
     }
 
     @Override
@@ -123,7 +123,8 @@ ViewCourseActivity extends AppCompatActivity {
     private void confirmSave() {
         if (viewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener(alerts))), null);
+                    ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), this,
+                            alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts))), null);
         } else {
             finish();
         }
@@ -176,7 +177,7 @@ ViewCourseActivity extends AppCompatActivity {
                         EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                         dlg.show(getSupportFragmentManager(), null);
                     },
-                    () -> ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener() {
+                    () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
                         @Override
                         protected void onSuccessComplete() {
                             EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
@@ -278,12 +279,15 @@ ViewCourseActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener(alerts)));
+        ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), this, alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts)));
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
-        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() -> ObserverHelper.observeOnce(viewModel.getAllAlerts(), alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), new DeleteOperationListener(alerts))), null);
+        new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() ->
+                ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                        alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), this,
+                                new DeleteOperationListener(alerts))), null);
     }
 
     private void onEntityLoadFailed(Throwable throwable) {
@@ -352,7 +356,7 @@ ViewCourseActivity extends AppCompatActivity {
                     EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                     dlg.show(getSupportFragmentManager(), null);
                 } else {
-                    ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), alerts -> {
+                    ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), ViewCourseActivity.this, alerts -> {
                         CourseAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
                         if (alertsAfterSave.length > 0) {
                             ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> updateAlerts(alertsAfterSave, defaultAlertTime));
@@ -373,7 +377,7 @@ ViewCourseActivity extends AppCompatActivity {
                     builder.setTitle(R.string.title_save_warning)
                             .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                             .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                                ObserverHelper.subscribeOnce(viewModel.save(true), this);
+                                ObserverHelper.subscribeOnce(viewModel.save(true), ViewCourseActivity.this, this);
                                 dialog.dismiss();
                                 onSuccessComplete();
                             }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
@@ -422,7 +426,7 @@ ViewCourseActivity extends AppCompatActivity {
                     builder.setTitle(R.string.title_delete_warning).setIcon(R.drawable.dialog_warning)
                             .setMessage(messages.join("\n", resources))
                             .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                                ObserverHelper.subscribeOnce(viewModel.delete(true), this);
+                                ObserverHelper.subscribeOnce(viewModel.delete(true), ViewCourseActivity.this, this);
                                 dialog.dismiss();
                             }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
                 } else {

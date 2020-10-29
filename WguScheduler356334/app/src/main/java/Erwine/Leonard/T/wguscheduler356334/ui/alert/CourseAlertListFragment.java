@@ -131,7 +131,7 @@ public class CourseAlertListFragment extends Fragment {
         if (courseViewModel.isChanged()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
                     () -> doEditAlert(editAlertId),
-                    () -> ObserverHelper.subscribeOnce(courseViewModel.save(false),
+                    () -> ObserverHelper.subscribeOnce(courseViewModel.save(false), getViewLifecycleOwner(),
                             m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError), null);
         } else {
             doEditAlert(editAlertId);
@@ -148,7 +148,7 @@ public class CourseAlertListFragment extends Fragment {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            ObserverHelper.subscribeOnce(courseViewModel.save(true),
+                            ObserverHelper.subscribeOnce(courseViewModel.save(true), getViewLifecycleOwner(),
                                     m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());

@@ -21,7 +21,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/WguSchedulerViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddAssessmentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddAssessmentActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddCourseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddCourseActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddTermActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddTermActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/EditMentorActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/EditMentorActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ManageDataActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ManageDataActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewAssessmentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewAssessmentActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewCourseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewCourseActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewTermActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ViewTermActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AllAlertsListViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/AssessmentAlertListViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/CourseAlertListViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/alert/EditAlertViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/AssessmentListViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/assessment/EditAssessmentViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/CourseListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/CourseListFragment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/EditCourseViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/course/EditCourseViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/EditMentorViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/EditMentorViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/mentor/MentorListViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/EditTermViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/ui/term/TermListViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ObserverHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ObserverHelper.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,6 +110,9 @@
     <property name="ExportApk.ApkPath" value="C:\Users\lerwi\AndroidStudioProjects\WguScheduler356334\app" />
     <property name="ExportApk.BuildVariants" value="release" />
     <property name="ExportApk.SignV2" value="true" />
+    <property name="JavaClassFindUsagesOptions.isDerivedClasses" value="true" />
+    <property name="JavaClassFindUsagesOptions.isSearchForTextOccurrences" value="false" />
+    <property name="JavaClassFindUsagesOptions.isUsages" value="false" />
     <property name="JavaMethodFindUsagesOptions.isImplementingMethods" value="true" />
     <property name="ResourceManagerPrefKey.FilterParams.Framework" value="true" />
     <property name="ResourceManagerPrefKey.FilterParams.Libraries" value="true" />
@@ -216,13 +246,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1600925982030</updated>
-    </task>
-    <task id="LOCAL-00030" summary="Removed alerts from sample data">
-      <created>1602470965238</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1602470965238</updated>
     </task>
     <task id="LOCAL-00031" summary="Added stubs for alerts">
       <created>1602481879317</created>
@@ -560,12 +583,18 @@
       <option name="project" value="LOCAL" />
       <updated>1603957459209</updated>
     </task>
-    <option name="localTasksCounter" value="79" />
+    <task id="LOCAL-00079" summary="Fixes #59">
+      <created>1603958023685</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1603958023685</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Created alert create/update stubs" />
     <MESSAGE value="Fixes #47" />
     <MESSAGE value="Fixes #48" />
     <MESSAGE value="Fixes #49" />
@@ -590,7 +619,8 @@
     <MESSAGE value="Fixes #55" />
     <MESSAGE value="Fixes #56" />
     <MESSAGE value="Fixes #57" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixes #57" />
+    <MESSAGE value="Fixes #59" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixes #59" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -609,10 +639,10 @@
     </state>
     <state x="137" y="19" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1366.728@0.0.1366.728" timestamp="1600926397256" />
     <state x="193" y="27" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602732539099" />
-    <state x="544" y="141" key="#com.intellij.ide.util.MemberChooser" timestamp="1603219584959">
+    <state x="544" y="141" key="#com.intellij.ide.util.MemberChooser" timestamp="1604003638791">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="544" y="141" key="#com.intellij.ide.util.MemberChooser/0.0.1366.728@0.0.1366.728" timestamp="1603219584959" />
+    <state x="544" y="141" key="#com.intellij.ide.util.MemberChooser/0.0.1366.728@0.0.1366.728" timestamp="1604003638791" />
     <state x="765" y="229" key="#com.intellij.ide.util.MemberChooser/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602530974047" />
     <state x="412" y="148" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1600926386382">
       <screen x="0" y="0" width="1366" height="728" />
@@ -636,10 +666,10 @@
     </state>
     <state x="536" y="249" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog/0.0.1366.728@0.0.1366.728" timestamp="1602948114799" />
     <state x="753" y="356" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602281963518" />
-    <state x="294" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1602461898518">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1603995882430">
+      <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="209" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728@0.0.1366.728" timestamp="1601713545471" />
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728@0.0.1366.728" timestamp="1603995882430" />
     <state x="294" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602461898518" />
     <state x="580" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1603411423837">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -679,10 +709,10 @@
     </state>
     <state x="580" y="200" key="AndroidProcessChooserDialog/0.0.1366.728@0.0.1366.728" timestamp="1603334052588" />
     <state x="815" y="285" key="AndroidProcessChooserDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602389622716" />
-    <state x="139" y="0" width="1232" height="1013" key="CommitChangelistDialog2" timestamp="1603957458107">
+    <state x="139" y="0" width="1232" height="1013" key="CommitChangelistDialog2" timestamp="1603958022345">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="139" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1603957458107" />
+    <state x="139" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1603958022345" />
     <state x="384" y="0" width="1232" height="1013" key="CommitChangelistDialog2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603758769811" />
     <state width="396" height="466" key="DebuggerActiveHint" timestamp="1603333601929">
       <screen x="0" y="0" width="1366" height="728" />
@@ -752,10 +782,10 @@
     </state>
     <state x="328" y="20" width="916" height="708" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1603920571425" />
     <state x="477" y="72" width="1243" height="715" key="SettingsEditor/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603308530676" />
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1603957462190">
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1603958025707">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1603957462190" />
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1603958025707" />
     <state x="387" y="139" key="Vcs.Push.Dialog.v2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603734994649" />
     <state x="568" y="183" key="chooseDestDirectoryDialog" timestamp="1602948114782">
       <screen x="0" y="0" width="1366" height="728" />
@@ -808,19 +838,19 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="443" y="174" key="psd.add.library.dependency.panel.dimension/0.0.1366.728@0.0.1366.728" timestamp="1603336527753" />
-    <state x="389" y="0" key="refactoring.ChangeSignatureDialog" timestamp="1601772100906">
+    <state x="389" y="0" key="refactoring.ChangeSignatureDialog" timestamp="1603993372110">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="389" y="0" key="refactoring.ChangeSignatureDialog/0.0.1366.728@0.0.1366.728" timestamp="1601772100906" />
-    <state x="339" y="162" width="672" height="677" key="run.anything.popup" timestamp="1603957364426">
+    <state x="389" y="0" key="refactoring.ChangeSignatureDialog/0.0.1366.728@0.0.1366.728" timestamp="1603993372110" />
+    <state x="339" y="162" width="672" height="677" key="run.anything.popup" timestamp="1603994380252">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="339" y="162" width="672" height="677" key="run.anything.popup/0.0.1366.728@0.0.1366.728" timestamp="1603957364426" />
+    <state x="339" y="162" width="672" height="677" key="run.anything.popup/0.0.1366.728@0.0.1366.728" timestamp="1603994380252" />
     <state x="476" y="231" width="672" height="677" key="run.anything.popup/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603753085698" />
-    <state x="443" y="158" width="672" height="475" key="search.everywhere.popup" timestamp="1603933996496">
+    <state x="443" y="158" width="672" height="475" key="search.everywhere.popup" timestamp="1603997897422">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="443" y="158" width="672" height="475" key="search.everywhere.popup/0.0.1366.728@0.0.1366.728" timestamp="1603933996496" />
+    <state x="443" y="158" width="672" height="475" key="search.everywhere.popup/0.0.1366.728@0.0.1366.728" timestamp="1603997897422" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603752075811" />
   </component>
   <component name="XDebuggerManager">

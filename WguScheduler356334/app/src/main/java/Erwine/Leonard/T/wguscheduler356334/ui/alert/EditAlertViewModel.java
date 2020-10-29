@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.text.NumberFormat;
@@ -42,6 +41,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.BinaryOptional;
 import Erwine.Leonard.T.wguscheduler356334.util.ComparisonHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.Workers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
@@ -56,7 +56,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class EditAlertViewModel extends AndroidViewModel {
+public class EditAlertViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(EditAlertViewModel.class);
     @StringRes
@@ -145,7 +145,6 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     public EditAlertViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
         alertEntitySubject = BehaviorSubject.create();
         typeResourceIdSubject = BehaviorSubject.createDefault(TYPE_VALUE_COURSE);
@@ -171,7 +170,7 @@ public class EditAlertViewModel extends AndroidViewModel {
         effectiveAlertDateTimeValueLiveData = new PrivateLiveData<>(Optional.empty());
         alertEntityLiveData = new PrivateLiveData<>();
 
-        ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), defaultEventTimeSubject::onNext);
+        ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), this, defaultEventTimeSubject::onNext);
 
         Scheduler workerScheduler = Workers.getScheduler();
         Observable<AlertDateOption> selectedOptionObservable = selectedOptionSubject.subscribeOn(workerScheduler).observeOn(workerScheduler);
@@ -236,9 +235,8 @@ public class EditAlertViewModel extends AndroidViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
-        super.onCleared();
         compositeDisposable.dispose();
+        super.onCleared();
     }
 
     private void onEffectiveAlertDateTimeChanged(Optional<LocalDateTime> localDateTime) {

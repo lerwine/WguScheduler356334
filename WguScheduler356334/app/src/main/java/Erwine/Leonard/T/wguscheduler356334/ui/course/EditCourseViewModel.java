@@ -16,7 +16,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
@@ -54,11 +53,14 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -69,7 +71,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
  * View model shared by {@link Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity}, {@link Erwine.Leonard.T.wguscheduler356334.AddCourseActivity},
  * {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.AssessmentListFragment} and {@link EditCourseFragment}
  */
-public class EditCourseViewModel extends AndroidViewModel {
+public class EditCourseViewModel extends WguSchedulerViewModel {
     private static final String LOG_TAG = MainActivity.getLogTag(EditCourseViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_COURSE_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false);
@@ -91,6 +93,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     private final DbLoader dbLoader;
+    private final CompositeDisposable compositeDisposable;
     private final PrivateLiveData<CourseDetails> entityLiveData;
     private final LiveData<List<TermListItem>> termsLiveData;
     private final LiveData<List<MentorListItem>> mentorsLiveData;
@@ -111,8 +114,6 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final PrivateLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
     private final CurrentValues currentValues;
     private final ArrayList<TermCourseListItem> coursesForTerm;
-    private final Observer<List<TermListItem>> termsLoadedObserver;
-    private final Observer<List<MentorListItem>> mentorsLoadedObserver;
     @NonNull
     private CourseDetails originalValues;
     private LiveData<List<TermCourseListItem>> coursesLiveData;
@@ -132,8 +133,8 @@ public class EditCourseViewModel extends AndroidViewModel {
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(getApplication());
+        compositeDisposable = new CompositeDisposable();
         termsLiveData = dbLoader.getAllTerms();
         mentorsLiveData = dbLoader.getAllMentors();
         originalValues = new CourseDetails(null);
@@ -156,16 +157,12 @@ public class EditCourseViewModel extends AndroidViewModel {
         titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_course));
         subTitleLiveData = new PrivateLiveData<>("");
         overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(""));
-        termsLoadedObserver = this::onTermsLoaded;
-        mentorsLoadedObserver = this::onMentorsLoaded;
     }
 
     @Override
     protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
-        termsLiveData.removeObserver(termsLoadedObserver);
-        mentorsLiveData.removeObserver(mentorsLoadedObserver);
         super.onCleared();
+        compositeDisposable.dispose();
     }
 
     public long getId() {
@@ -604,8 +601,8 @@ public class EditCourseViewModel extends AndroidViewModel {
         subTitleLiveData.postValue(originalValues.getTitle());
         overviewFactoryLiveData.postValue(this::calculateOverview);
         entityLiveData.postValue(originalValues);
-        termsLiveData.observeForever(termsLoadedObserver);
-        mentorsLiveData.observeForever(mentorsLoadedObserver);
+        ObserverHelper.observe(termsLiveData, this, this::onTermsLoaded);
+        ObserverHelper.observe(mentorsLiveData, this, this::onMentorsLoaded);
     }
 
     public void saveViewModelState(@NonNull Bundle outState) {

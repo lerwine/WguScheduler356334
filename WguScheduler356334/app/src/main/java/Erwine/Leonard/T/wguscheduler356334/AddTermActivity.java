@@ -53,7 +53,7 @@ public class AddTermActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditTermViewModel.class);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
-        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this::onTermLoadSuccess, this::onTermLoadFailed);
+        ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this, this::onTermLoadSuccess, this::onTermLoadFailed);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class AddTermActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+        ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveOperationFinished, this::onSaveFailed);
     }
 
     private void onSaveOperationFinished(@NonNull ResourceMessageResult messages) {
@@ -125,7 +125,7 @@ public class AddTermActivity extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources)))
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            ObserverHelper.subscribeOnce(viewModel.save(true), this::onSaveOperationFinished, this::onSaveFailed);
+                            ObserverHelper.subscribeOnce(viewModel.save(true), this, this::onSaveOperationFinished, this::onSaveFailed);
                         })
                         .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
@@ -149,7 +149,7 @@ public class AddTermActivity extends AppCompatActivity {
                             if (!isValid) {
                                 return;
                             }
-                            ObserverHelper.subscribeOnce(viewModel.save(false), this::onSaveOperationFinished, this::onSaveFailed);
+                            ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveOperationFinished, this::onSaveFailed);
                         }), null);
             } else {
                 finish();

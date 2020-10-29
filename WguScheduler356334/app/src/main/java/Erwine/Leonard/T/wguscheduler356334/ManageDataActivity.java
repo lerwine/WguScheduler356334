@@ -68,7 +68,7 @@ public class ManageDataActivity extends AppCompatActivity {
                 .setMessage(R.string.message_in_progress)
                 .setCancelable(false).create();
         dialog.show();
-        ObserverHelper.subscribeOnce(dbLoader.checkDbIntegrity(), (s) -> {
+        ObserverHelper.subscribeOnce(dbLoader.checkDbIntegrity(), this, (s) -> {
             dialog.dismiss();
             if (null == s || s.trim().isEmpty()) {
                 new AlertHelper(R.drawable.dialog_success, R.string.title_database_integrity_check, R.string.validation_succeeded, this).showDialog();
@@ -85,7 +85,7 @@ public class ManageDataActivity extends AppCompatActivity {
 
     private void onResetDatabaseButtonClick(View view) {
         new AlertHelper(R.drawable.dialog_warning, R.string.command_reset_database, R.string.message_reset_db_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.subscribeOnce(dbLoader.resetDatabase(), this::finish, (throwable) -> {
+                ObserverHelper.subscribeOnce(dbLoader.resetDatabase(), this, this::finish, (throwable) -> {
                             Log.e(LOG_TAG, "Error on dbLoader.resetDatabase()", throwable);
                             new AlertHelper(R.drawable.dialog_error, R.string.title_reset_db_error, getString(R.string.format_message_reset_db_error, throwable.getMessage()), this)
                                     .showDialog();
@@ -95,7 +95,7 @@ public class ManageDataActivity extends AppCompatActivity {
 
     private void onAddSampleDataButtonClick(View view) {
         new AlertHelper(R.drawable.dialog_warning, R.string.command_reset_with_sample_data, R.string.message_add_sample_data_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.subscribeOnce(dbLoader.populateSampleData(getResources()), this::finish, (throwable) -> {
+                ObserverHelper.subscribeOnce(dbLoader.populateSampleData(getResources()), this, this::finish, (throwable) -> {
                             Log.e(LOG_TAG, "Error on dbLoader.populateSampleData()", throwable);
                             new AlertHelper(R.drawable.dialog_error, R.string.title_add_sample_data_error, getString(R.string.format_message_add_sample_data_error, throwable.getMessage()), this)
                                     .showDialog();

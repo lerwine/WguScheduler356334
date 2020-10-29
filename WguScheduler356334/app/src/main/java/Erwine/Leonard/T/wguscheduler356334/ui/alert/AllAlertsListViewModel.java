@@ -4,7 +4,6 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,8 +15,9 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 
-public class AllAlertsListViewModel extends AndroidViewModel {
+public class AllAlertsListViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(AllAlertsListViewModel.class);
     private final DbLoader dbLoader;
@@ -26,15 +26,8 @@ public class AllAlertsListViewModel extends AndroidViewModel {
 
     public AllAlertsListViewModel(@NonNull Application application) {
         super(application);
-        Log.d(LOG_TAG, "Constructing");
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
         liveData = new MutableLiveData<>();
-    }
-
-    @Override
-    protected void onCleared() {
-        Log.d(LOG_TAG, "Enter onCleared");
-        super.onCleared();
     }
 
     public int getPosition() {
