@@ -156,15 +156,15 @@ public class EditCourseViewModel extends AndroidViewModel {
         titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_course));
         subTitleLiveData = new PrivateLiveData<>("");
         overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(""));
-
         termsLoadedObserver = this::onTermsLoaded;
         mentorsLoadedObserver = this::onMentorsLoaded;
-
     }
 
     @Override
     protected void onCleared() {
         Log.d(LOG_TAG, "Enter onCleared");
+        termsLiveData.removeObserver(termsLoadedObserver);
+        mentorsLiveData.removeObserver(mentorsLoadedObserver);
         super.onCleared();
     }
 
@@ -608,7 +608,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         mentorsLiveData.observeForever(mentorsLoadedObserver);
     }
 
-    public void saveViewModelState(Bundle outState) {
+    public void saveViewModelState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
         currentValues.saveState(outState, false);
         originalValues.saveState(outState, true);
@@ -619,7 +619,6 @@ public class EditCourseViewModel extends AndroidViewModel {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %d terms from database", termListItems.size()));
-        termsLiveData.removeObserver(termsLoadedObserver);
         EntityHelper.findById(originalValues.getTermId(), termListItems).ifPresent(t -> {
             originalValues.setTerm(t);
             setSelectedTerm(t);
@@ -631,7 +630,6 @@ public class EditCourseViewModel extends AndroidViewModel {
             return;
         }
         Log.d(LOG_TAG, String.format("Loaded %d mentors from database", mentorListItems.size()));
-        mentorsLiveData.removeObserver(mentorsLoadedObserver);
         EntityHelper.findById(originalValues.getMentorId(), mentorListItems).ifPresent(t -> {
             originalValues.setMentor(t);
             setSelectedMentor(t);

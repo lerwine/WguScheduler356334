@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -74,8 +73,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     private final PrivateLiveData<LocalDate> effectiveEndLiveData;
     private String viewTitle;
     private Spanned overview;
-    private LiveData<List<AssessmentEntity>> assessmentsForCourse;
-    private LiveData<List<TermCourseListItem>> coursesForTerm;
     private AbstractCourseEntity<?> selectedCourse;
     private boolean fromInitializedState;
     @NonNull
@@ -83,8 +80,6 @@ public class EditAssessmentViewModel extends AndroidViewModel {
     @NonNull
     private String normalizedCode = "";
     private String normalizedNotes = "";
-    private Observer<List<TermCourseListItem>> coursesLoadedObserver;
-    private Observer<List<AssessmentEntity>> assessmentsLoadedObserver;
 
     public static void startAddAssessmentActivity(@NonNull Activity activity, int requestCode, long courseId, @Nullable LocalDate goalDate) {
         Intent intent = new Intent(activity, AddAssessmentActivity.class);
