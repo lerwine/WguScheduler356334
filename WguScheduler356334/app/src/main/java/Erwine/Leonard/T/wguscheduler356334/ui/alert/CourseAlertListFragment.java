@@ -42,7 +42,6 @@ public class CourseAlertListFragment extends Fragment {
     private RecyclerView alertsRecyclerView;
     private CourseAlertListAdapter adapter;
     private EditCourseViewModel courseViewModel;
-    private long editAlertId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -122,26 +121,26 @@ public class CourseAlertListFragment extends Fragment {
         }
     }
 
+    private void doEditAlert(long editAlertId) {
+        EditAlertDialog dlg = EditAlertViewModel.existingCourseAlertEditor(editAlertId, courseViewModel.getId());
+        dlg.show(getParentFragmentManager(), null);
+    }
+
     private void onEditAlert(CourseAlert courseAlert) {
+        long editAlertId = courseAlert.getAlert().getId();
         if (courseViewModel.isChanged()) {
-            editAlertId = courseAlert.getAlert().getId();
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                    () -> requireActivity().finish(),
-                    () -> {
-                        ObserverHelper.subscribeOnce(courseViewModel.save(false),
-                                this::onSaveForEditAlertFinished, this::onSaveCourseError);
-                        requireActivity().finish();
-                    }, null);
+                    () -> doEditAlert(editAlertId),
+                    () -> ObserverHelper.subscribeOnce(courseViewModel.save(false),
+                            m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError), null);
         } else {
-            EditAlertDialog dlg = EditAlertViewModel.existingCourseAlertEditor(courseAlert.getAlert().getId(), courseViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
+            doEditAlert(editAlertId);
         }
     }
 
-    private void onSaveForEditAlertFinished(@NonNull ResourceMessageResult messages) {
+    private void onSaveForEditAlertFinished(@NonNull ResourceMessageResult messages, long editAlertId) {
         if (messages.isSucceeded()) {
-            EditAlertDialog dlg = EditAlertViewModel.existingCourseAlertEditor(editAlertId, courseViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
+            doEditAlert(editAlertId);
         } else {
             Resources resources = getResources();
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -150,7 +149,7 @@ public class CourseAlertListFragment extends Fragment {
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             ObserverHelper.subscribeOnce(courseViewModel.save(true),
-                                    this::onSaveForEditAlertFinished, this::onSaveCourseError);
+                                    m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
