@@ -42,7 +42,6 @@ public class AssessmentAlertListFragment extends Fragment {
     private TextView noAlertsTextView;
     private RecyclerView alertsRecyclerView;
     private EditAssessmentViewModel assessmentViewModel;
-    private long editAlertId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -122,22 +121,25 @@ public class AssessmentAlertListFragment extends Fragment {
         }
     }
 
+    private void doEditAlert(long editAlertId) {
+        EditAlertDialog dlg = EditAlertViewModel.existingAssessmentAlertEditor(editAlertId, assessmentViewModel.getId());
+        dlg.show(getParentFragmentManager(), null);
+    }
+
     private void onEditAlert(AssessmentAlert assessmentAlert) {
+        long editAlertId = assessmentAlert.getAlert().getId();
         if (assessmentViewModel.isChanged()) {
-            editAlertId = assessmentAlert.getAlert().getId();
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                    () -> requireActivity().finish(),
-                    () -> {
-                        ObserverHelper.subscribeOnce(assessmentViewModel.save(false), this::onSaveForEditAlertFinished, this::onSaveFailed);
-                        requireActivity().finish();
-                    }, null);
+                    () -> doEditAlert(editAlertId),
+                    () -> ObserverHelper.subscribeOnce(assessmentViewModel.save(false),
+                            m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed),
+                    null);
         } else {
-            EditAlertDialog dlg = EditAlertViewModel.existingAssessmentAlertEditor(assessmentAlert.getAlert().getId(), assessmentViewModel.getId());
-            dlg.show(getParentFragmentManager(), null);
+            doEditAlert(editAlertId);
         }
     }
 
-    private void onSaveForEditAlertFinished(ResourceMessageResult messages) {
+    private void onSaveForEditAlertFinished(ResourceMessageResult messages, long editAlertId) {
         if (messages.isSucceeded()) {
             EditAlertDialog dlg = EditAlertViewModel.existingAssessmentAlertEditor(editAlertId, assessmentViewModel.getId());
             dlg.show(getParentFragmentManager(), null);
@@ -148,7 +150,8 @@ public class AssessmentAlertListFragment extends Fragment {
                 builder.setTitle(R.string.title_save_warning)
                         .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                            ObserverHelper.subscribeOnce(assessmentViewModel.save(true), this::onSaveForEditAlertFinished, this::onSaveFailed);
+                            ObserverHelper.subscribeOnce(assessmentViewModel.save(true),
+                                    m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed);
                             dialog.dismiss();
                         }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {
