@@ -176,16 +176,13 @@ ViewCourseActivity extends AppCompatActivity {
                         EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                         dlg.show(getSupportFragmentManager(), null);
                     },
-                    () -> {
-                        ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener() {
-                            @Override
-                            protected void onSuccessComplete() {
-                                EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
-                                dlg.show(getSupportFragmentManager(), null);
-                            }
-                        });
-                        finish();
-                    }, null);
+                    () -> ObserverHelper.subscribeOnce(viewModel.save(false), new SaveOperationListener() {
+                        @Override
+                        protected void onSuccessComplete() {
+                            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+                            dlg.show(getSupportFragmentManager(), null);
+                        }
+                    }), null);
         } else {
             EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
             dlg.show(getSupportFragmentManager(), null);
