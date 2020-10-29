@@ -36,7 +36,6 @@ public class AssessmentListFragment extends Fragment {
     private final ArrayList<AssessmentEntity> list;
     private AssessmentListAdapter adapter;
     private EditCourseViewModel editCourseViewModel;
-    private AssessmentListViewModel assessmentListViewModel;
     private TextView overviewTextView;
     private TextView noAssessmentsTextView;
 
@@ -90,11 +89,8 @@ public class AssessmentListFragment extends Fragment {
         Log.d(LOG_TAG, "Loaded course details " + entity);
         long courseId = entity.getId();
         if (ID_NEW != courseId) {
-            assessmentListViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentListViewModel.class);
-            assessmentListViewModel.setId(courseId);
-            assessmentListViewModel.getAssessments().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);
-            editCourseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
-                    f -> overviewTextView.setText(f.apply(getResources())));
+            editCourseViewModel.getAssessments().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);
+            editCourseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(), f -> overviewTextView.setText(f.apply(getResources())));
         }
     }
 
