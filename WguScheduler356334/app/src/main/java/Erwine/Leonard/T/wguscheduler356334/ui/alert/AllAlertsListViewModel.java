@@ -1,9 +1,11 @@
 package Erwine.Leonard.T.wguscheduler356334.ui.alert;
 
 import android.app.Application;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -20,6 +22,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 public class AllAlertsListViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(AllAlertsListViewModel.class);
+    private static final String STATE_KEY_STATE_POSITION = "state_position";
     private final DbLoader dbLoader;
     private LiveData<List<AlertListItem>> liveData;
     private int position = -1;
@@ -28,6 +31,16 @@ public class AllAlertsListViewModel extends WguSchedulerViewModel {
         super(application);
         dbLoader = DbLoader.getInstance(application.getApplicationContext());
         liveData = new MutableLiveData<>();
+    }
+
+    synchronized void initializeViewModelState(@Nullable Bundle savedInstanceState, Observer<List<AlertListItem>> observer, LifecycleOwner viewLifecycleOwner) {
+        if (null != savedInstanceState) {
+            setPosition(savedInstanceState.getInt(STATE_KEY_STATE_POSITION, 0), observer, viewLifecycleOwner);
+        }
+    }
+
+    synchronized void saveViewModelState(@NonNull Bundle outState) {
+        outState.putInt(STATE_KEY_STATE_POSITION, position);
     }
 
     public int getPosition() {

@@ -68,8 +68,15 @@ public class AllAlertsListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AllAlertsListViewModel.class);
-        viewModel.setPosition(0, tabSelectedListener, getViewLifecycleOwner());
+        viewModel.initializeViewModelState(savedInstanceState, tabSelectedListener, getViewLifecycleOwner());
+        listingSelectionTabLayout.selectTab(listingSelectionTabLayout.getTabAt(viewModel.getPosition()));
         listingSelectionTabLayout.addOnTabSelectedListener(tabSelectedListener);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        viewModel.saveViewModelState(outState);
     }
 
     @Override
