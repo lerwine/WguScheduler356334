@@ -55,6 +55,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilde
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -438,9 +439,15 @@ public class DbLoader {
      * specific {@link TermEntity}.
      */
     @NonNull
-    public LiveData<List<TermCourseListItem>> getCoursesByTermId(long termId) {
+    public LiveData<List<TermCourseListItem>> getCoursesLiveDataByTermId(long termId) {
         Log.d(LOG_TAG, "Enter getCoursesByTermId(" + termId + ")");
         return appDb.courseDAO().getLiveDataByTermId(termId);
+    }
+
+    @NonNull
+    public Observable<List<TermCourseListItem>> getCoursesObservableByTermId(long termId) {
+        Log.d(LOG_TAG, "Enter getCoursesByTermId(" + termId + ")");
+        return appDb.courseDAO().getObservableByTermId(termId).subscribeOn(scheduler);
     }
 
     /**
@@ -844,8 +851,13 @@ public class DbLoader {
     }
 
     @NonNull
-    public LiveData<List<CourseAlert>> getAlertsByCourseId(long id) {
-        return appDb.courseAlertDAO().getByCourseId(id);
+    public LiveData<List<CourseAlert>> getAlertsLiveDataByCourseId(long id) {
+        return appDb.courseAlertDAO().getLiveDataByCourseId(id);
+    }
+
+    @NonNull
+    public Observable<List<CourseAlert>> getAlertsObservableByCourseId(long id) {
+        return appDb.courseAlertDAO().getObservableByCourseId(id);
     }
 
     @NonNull

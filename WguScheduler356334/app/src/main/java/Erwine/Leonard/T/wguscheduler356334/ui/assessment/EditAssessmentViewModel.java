@@ -104,7 +104,6 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     private final PrivateLiveData<Boolean> showCompletionDateCloseIconLiveData;
     private boolean fromInitializedState;
 
-
     public static void startAddAssessmentActivity(@NonNull Activity activity, int requestCode, long courseId, @Nullable LocalDate goalDate) {
         Intent intent = new Intent(activity, AddAssessmentActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false), courseId);

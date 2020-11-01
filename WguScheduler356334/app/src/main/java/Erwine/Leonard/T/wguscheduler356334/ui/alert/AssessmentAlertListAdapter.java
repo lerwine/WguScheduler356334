@@ -64,7 +64,7 @@ public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentA
             onItemClick.accept(alertListItem);
         }
 
-        public void setItem(AssessmentAlert alertListItem) {
+        public void setItem(@NonNull AssessmentAlert alertListItem) {
             this.alertListItem = alertListItem;
             LocalDate d = alertListItem.getAlertDate();
             if (null != d) {

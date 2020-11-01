@@ -207,6 +207,8 @@
     <string name="format_error">Error: %s</string>
     <string name="format_date_parse_error">Error parsing date: %s</string>
     <string name="format_days_parse_error">Error parsing number of days: %s</string>
+    <string name="format_number_parse_error">Error parsing number: %s</string>
+    <string name="message_number_parse_error">Error parsing number</string>
     <string name="message_invalid_date">Invalid date string</string>
     <string name="format_warning">Warning: %s</string>
     <string name="format_info">Info: %s</string>

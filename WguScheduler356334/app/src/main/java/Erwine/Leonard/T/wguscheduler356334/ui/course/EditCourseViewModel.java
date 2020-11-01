@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -17,11 +15,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -36,8 +32,11 @@ import Erwine.Leonard.T.wguscheduler356334.ViewCourseActivity;
 import Erwine.Leonard.T.wguscheduler356334.db.AppDb;
 import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.AbstractNotedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
+import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AbstractAssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.Course;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
@@ -46,21 +45,33 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.AbstractMentorEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
-import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
-import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
+import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
+import Erwine.Leonard.T.wguscheduler356334.util.LiveDataWrapper;
+import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.Workers;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.MessageLevel;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.CompletableSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -76,6 +87,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_COURSE_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false);
     public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_COMPETENCY_UNITS, false);
+    private final SubscribingLiveDataWrapper<CourseDetails> originalValuesLiveData;
 
     public static void startAddCourseActivity(@NonNull Activity activity, int requestCode, long termId, @NonNull LocalDate expectedStart) {
         Log.d(LOG_TAG, String.format("Enter startAddCourseActivity(context, %d, %s)", termId, expectedStart));
@@ -94,69 +106,405 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     private final DbLoader dbLoader;
     private final CompositeDisposable compositeDisposable;
-    private final PrivateLiveData<CourseDetails> entityLiveData;
-    private final LiveData<List<TermListItem>> termsLiveData;
-    private final LiveData<List<MentorListItem>> mentorsLiveData;
-    private final PrivateLiveData<LocalDate> effectiveStartLiveData;
-    private final PrivateLiveData<LocalDate> effectiveEndLiveData;
-    private final PrivateLiveData<Boolean> termValidLiveData;
-    private final PrivateLiveData<Boolean> numberValidLiveData;
-    private final PrivateLiveData<Boolean> titleValidLiveData;
-    private final PrivateLiveData<Integer> expectedStartErrorMessageLiveData;
-    private final PrivateLiveData<Integer> expectedStartWarningMessageLiveData;
-    private final PrivateLiveData<Integer> expectedEndMessageLiveData;
-    private final PrivateLiveData<Integer> actualStartErrorMessageLiveData;
-    private final PrivateLiveData<Integer> actualStartWarningMessageLiveData;
-    private final PrivateLiveData<Integer> actualEndMessageLiveData;
-    private final PrivateLiveData<Integer> competencyUnitsMessageLiveData;
-    private final PrivateLiveData<Function<Resources, String>> titleFactoryLiveData;
-    private final PrivateLiveData<String> subTitleLiveData;
-    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactoryLiveData;
-    private final CurrentValues currentValues;
-    private final ArrayList<TermCourseListItem> coursesForTerm;
-    @NonNull
-    private CourseDetails originalValues;
-    private LiveData<List<TermCourseListItem>> coursesLiveData;
-    private String viewTitle;
-    private Spanned overview;
-    private Observer<List<TermCourseListItem>> coursesLoadedObserver;
+    private final BehaviorSubject<String> numberSubject;
+    private final BehaviorSubject<String> titleSubject;
+    private final BehaviorSubject<CourseStatus> statusSubject;
+    private final BehaviorSubject<String> competencyUnitsTextSubject;
+    private final BehaviorSubject<Optional<LocalDate>> expectedStartSubject;
+    private final BehaviorSubject<Optional<LocalDate>> actualStartSubject;
+    private final BehaviorSubject<Optional<LocalDate>> expectedEndSubject;
+    private final BehaviorSubject<Optional<LocalDate>> actualEndSubject;
+    private final BehaviorSubject<Optional<AbstractMentorEntity<?>>> selectedMentorSubject;
+    private final BehaviorSubject<Optional<AbstractTermEntity<?>>> selectedTermSubject;
+    private final BehaviorSubject<String> notesSubject;
+    private final BehaviorSubject<CourseDetails> originalValuesSubject;
+    private final BehaviorSubject<List<TermCourseListItem>> coursesForTermSubject;
+    private final CompletableSubject initializedSubject;
+    private final Completable initializedCompletable;
+
+    private final LiveData<List<TermListItem>> termOptionsLiveData;
+    private final LiveData<List<MentorListItem>> mentorOptionsLiveData;
+    private LiveData<List<AssessmentEntity>> assessmentsLiveData;
+    private final LiveDataWrapper<List<CourseAlert>> alertsLiveData;
+    private final SubscribingLiveDataWrapper<LocalDate> effectiveStartLiveData;
+    private final SubscribingLiveDataWrapper<LocalDate> effectiveEndLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> termValidLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> numberValidLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> titleValidLiveData;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> expectedStartValidationMessageLiveData;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> expectedEndValidationMessageLiveData;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> actualStartValidationMessageLiveData;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> actualEndValidationMessageLiveData;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> competencyUnitsValidationMessageLiveData;
+    private final SubscribingLiveDataWrapper<Optional<Integer>> competencyUnitsValueLiveData;
+    private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactoryLiveData;
+    private final SubscribingLiveDataWrapper<String> subTitleLiveData;
+    private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> overviewFactoryLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> canSaveLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> canShareLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> hasChangesLiveData;
+    private final SubscribingLiveDataWrapper<Boolean> isValidLiveData;
+    //    private Observable<List<TermCourseListItem>> coursesForTermObservable;
+    private Disposable coursesForTermObserving;
+    //    private Observable<List<CourseAlert>> alertsObservable;
+    private Disposable alertsObserving;
     private boolean fromInitializedState;
-    private AbstractTermEntity<?> selectedTerm;
-    private AbstractMentorEntity<?> selectedMentor;
-    @NonNull
-    private String normalizedNumber = "";
-    @NonNull
-    private String normalizedTitle = "";
-    private String normalizedNotes = "";
-    private String competencyUnitsText = "";
-    private LiveData<List<AssessmentEntity>> assessments;
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
         compositeDisposable = new CompositeDisposable();
-        termsLiveData = dbLoader.getAllTerms();
-        mentorsLiveData = dbLoader.getAllMentors();
-        originalValues = new CourseDetails(null);
-        currentValues = new CurrentValues();
-        coursesForTerm = new ArrayList<>();
+        numberSubject = BehaviorSubject.createDefault("");
+        titleSubject = BehaviorSubject.createDefault("");
+        statusSubject = BehaviorSubject.createDefault(CourseStatus.UNPLANNED);
+        competencyUnitsTextSubject = BehaviorSubject.createDefault("");
+        expectedStartSubject = BehaviorSubject.createDefault(Optional.empty());
+        actualStartSubject = BehaviorSubject.createDefault(Optional.empty());
+        expectedEndSubject = BehaviorSubject.createDefault(Optional.empty());
+        actualEndSubject = BehaviorSubject.createDefault(Optional.empty());
+        selectedMentorSubject = BehaviorSubject.createDefault(Optional.empty());
+        selectedTermSubject = BehaviorSubject.createDefault(Optional.empty());
+        notesSubject = BehaviorSubject.createDefault("");
+        originalValuesSubject = BehaviorSubject.createDefault(new CourseDetails(null));
+        coursesForTermSubject = BehaviorSubject.createDefault(Collections.emptyList());
+        initializedSubject = CompletableSubject.create();
+        termOptionsLiveData = dbLoader.getAllTerms();
+        mentorOptionsLiveData = dbLoader.getAllMentors();
 
-        effectiveStartLiveData = new PrivateLiveData<>();
-        effectiveEndLiveData = new PrivateLiveData<>();
-        entityLiveData = new PrivateLiveData<>();
-        termValidLiveData = new PrivateLiveData<>(false);
-        numberValidLiveData = new PrivateLiveData<>(false);
-        titleValidLiveData = new PrivateLiveData<>(false);
-        expectedStartErrorMessageLiveData = new PrivateLiveData<>();
-        expectedStartWarningMessageLiveData = new PrivateLiveData<>();
-        expectedEndMessageLiveData = new PrivateLiveData<>();
-        actualStartErrorMessageLiveData = new PrivateLiveData<>();
-        actualStartWarningMessageLiveData = new PrivateLiveData<>();
-        actualEndMessageLiveData = new PrivateLiveData<>();
-        competencyUnitsMessageLiveData = new PrivateLiveData<>();
-        titleFactoryLiveData = new PrivateLiveData<>(c -> c.getString(R.string.title_activity_view_course));
-        subTitleLiveData = new PrivateLiveData<>("");
-        overviewFactoryLiveData = new PrivateLiveData<>(r -> new SpannableString(""));
+        Scheduler computationScheduler = Schedulers.computation();
+        initializedCompletable = initializedSubject.observeOn(computationScheduler);
+        Observable<String> numberObservable = numberSubject.observeOn(computationScheduler).map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<String> titleObservable = titleSubject.observeOn(computationScheduler).map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<BinaryAlternate<Integer, ResourceMessageFactory>> competencyUnitsParsedObservable = competencyUnitsTextSubject.observeOn(computationScheduler)
+                .map(Workers.asCached(EditCourseViewModel::parseCompetencyUnits));
+        Observable<String> notesObservable = notesSubject.observeOn(computationScheduler).map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply));
+        Observable<CourseStatus> statusObservable = statusSubject.observeOn(computationScheduler);
+        Observable<Optional<LocalDate>> expectedStartValueObservable = expectedStartSubject.observeOn(computationScheduler);
+        Observable<Optional<LocalDate>> actualStartValueObservable = actualStartSubject.observeOn(computationScheduler);
+        Observable<Optional<LocalDate>> expectedEndValueObservable = expectedEndSubject.observeOn(computationScheduler);
+        Observable<Optional<LocalDate>> actualEndValueObservable = actualEndSubject.observeOn(computationScheduler);
+        Observable<Optional<AbstractTermEntity<?>>> selectedTermObservable = selectedTermSubject.observeOn(computationScheduler);
+        Observable<Optional<Long>> selectedTermIdObservable = selectedTermObservable.map(t -> t.map(AbstractEntity::getId).filter(i -> ID_NEW != i));
+        Observable<Optional<AbstractMentorEntity<?>>> selectedMentorObservable = selectedMentorSubject.observeOn(computationScheduler);
+        Observable<Optional<ResourceMessageFactory>> expectedStartMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
+                expectedEndValueObservable, selectedTermObservable, EditCourseViewModel::validateExpectedStart);
+        Observable<Optional<ResourceMessageFactory>> expectedEndMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
+                expectedEndValueObservable, selectedTermObservable, EditCourseViewModel::validateExpectedEnd);
+        Observable<Optional<ResourceMessageFactory>> actualStartMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
+                expectedEndValueObservable, EditCourseViewModel::validateActualStart);
+        Observable<Optional<ResourceMessageFactory>> actualEndMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
+                expectedEndValueObservable, EditCourseViewModel::validateActualEnd);
+        Observable<Optional<LocalDate>> effectiveStartObservable = Observable.combineLatest(expectedStartValueObservable, actualStartValueObservable,
+                (e, a) -> (a.isPresent()) ? a : e);
+        Observable<Optional<LocalDate>> effectiveEndObservable = Observable.combineLatest(expectedEndValueObservable, actualEndValueObservable,
+                (e, a) -> (a.isPresent()) ? a : e);
+        Observable<CourseDetails> originalValuesObservable = originalValuesSubject.observeOn(computationScheduler);
+        Observable<Optional<Integer>> competencyUnitsObservable = competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary);
+        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
+                originalValuesObservable,
+                numberObservable,
+                titleObservable,
+                statusObservable,
+                competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary),
+                selectedMentorObservable.map(o -> o.map(AbstractEntity::getId)),
+                selectedTermIdObservable,
+                notesObservable,
+                Observable.combineLatest(originalValuesObservable, expectedStartValueObservable, expectedEndValueObservable, actualStartValueObservable, actualEndValueObservable,
+                        (course, expectedStart, expectedEnd, actualStart, actualEnd) -> Objects.equals(expectedStart.orElse(null), course.getExpectedStart()) &&
+                                Objects.equals(expectedEnd.orElse(null), course.getExpectedEnd()) &&
+                                Objects.equals(actualStart.orElse(null), course.getExpectedStart()) &&
+                                Objects.equals(actualEnd.orElse(null), course.getActualEnd())),
+                (course, number, title, status, competencyUnits, selectedMentorId, selectedTermId, notes, datesUnchanged) ->
+                        !(number.equals(course.getNumber()) && title.equals(course.getTitle()) && status == course.getStatus() &&
+                                competencyUnits.map(i -> i == course.getCompetencyUnits()).orElse(false) &&
+                                selectedMentorId.map(m -> Objects.equals(m, course.getMentorId())).orElseGet(() -> null == course.getMentorId()) &&
+                                selectedTermId.map(m -> Objects.equals(m, course.getTermId())).orElse(false) &&
+                                notes.equals(course.getNotes()) && datesUnchanged)
+        );
+        Observable<Boolean> termValidObservable = selectedTermIdObservable.map(Optional::isPresent);
+        Observable<Boolean> numberValidObservable = numberObservable.map(s -> !s.isEmpty());
+        Observable<Boolean> titleValidObservable = titleObservable.map(s -> !s.isEmpty());
+        Observable<Optional<ResourceMessageFactory>> competencyUnitsMessage = competencyUnitsParsedObservable.map(BinaryAlternate::extractSecondary);
+
+        Observable<Boolean> validObservable = Observable.combineLatest(termValidObservable, numberValidObservable, titleValidObservable,
+                expectedStartMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
+                expectedEndMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
+                actualStartMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
+                actualEndMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
+                (termValid, numberValid, titleValid, expectedStartValid, expectedEndValid, actualStartValid, actualEndValid) ->
+                        termValid && numberValid && titleValid && expectedStartValid && expectedEndValid && actualStartValid && actualEndValid);
+
+        effectiveStartLiveData = SubscribingLiveDataWrapper.ofOptional(effectiveStartObservable);
+        effectiveEndLiveData = SubscribingLiveDataWrapper.ofOptional(effectiveEndObservable);
+        alertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
+        termValidLiveData = SubscribingLiveDataWrapper.of(false, termValidObservable);
+        numberValidLiveData = SubscribingLiveDataWrapper.of(false, numberValidObservable);
+        titleValidLiveData = SubscribingLiveDataWrapper.of(false, titleValidObservable);
+        expectedStartValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), expectedStartMessage);
+        expectedEndValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), expectedEndMessage);
+        actualStartValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), actualStartMessage);
+        actualEndValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), actualEndMessage);
+        originalValuesLiveData = SubscribingLiveDataWrapper.of(originalValuesObservable);
+        competencyUnitsValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), competencyUnitsMessage);
+        competencyUnitsValueLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), competencyUnitsObservable);
+        titleFactoryLiveData = SubscribingLiveDataWrapper.of(c -> c.getString(R.string.title_activity_view_course), numberObservable.map(EditCourseViewModel::calculateViewTitleFactory));
+        subTitleLiveData = SubscribingLiveDataWrapper.of("", titleObservable);
+        overviewFactoryLiveData = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(statusObservable, competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary), expectedStartValueObservable,
+                expectedEndValueObservable, actualStartValueObservable, actualEndValueObservable, selectedTermObservable, selectedMentorObservable,
+                EditCourseViewModel::calculateOverviewFactory));
+        canSaveLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c));
+        canShareLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c));
+        hasChangesLiveData = SubscribingLiveDataWrapper.of(false, hasChangesObservable);
+        isValidLiveData = SubscribingLiveDataWrapper.of(false, validObservable);
+        compositeDisposable.addAll(effectiveStartLiveData, effectiveEndLiveData, termValidLiveData, numberValidLiveData, titleValidLiveData,
+                expectedStartValidationMessageLiveData, expectedEndValidationMessageLiveData, actualStartValidationMessageLiveData, actualEndValidationMessageLiveData,
+                competencyUnitsValidationMessageLiveData, titleFactoryLiveData, subTitleLiveData, overviewFactoryLiveData, hasChangesLiveData, isValidLiveData,
+                canSaveLiveData, canShareLiveData);
+        compositeDisposable.add(originalValuesObservable.subscribe(originalValues -> {
+            try {
+                if (null != alertsObserving) {
+                    compositeDisposable.remove(alertsObserving);
+                    alertsObserving = null;
+                }
+            } finally {
+                long id = originalValues.getId();
+                if (ID_NEW != id) {
+                    alertsObserving = dbLoader.getAlertsObservableByCourseId(id).observeOn(computationScheduler).subscribe(alertsLiveData::postValue);
+                    compositeDisposable.add(alertsObserving);
+                } else {
+                    coursesForTermSubject.onNext(Collections.emptyList());
+                    alertsObserving = null;
+                }
+            }
+        }));
+        compositeDisposable.add(selectedTermIdObservable.subscribe(selectedTermId -> {
+            try {
+                if (null != coursesForTermObserving) {
+                    compositeDisposable.remove(coursesForTermObserving);
+                    coursesForTermObserving = null;
+                }
+            } finally {
+                if (selectedTermId.isPresent()) {
+                    coursesForTermObserving = dbLoader.getCoursesObservableByTermId(selectedTermId.get()).observeOn(computationScheduler)
+                            .subscribe(list -> coursesForTermSubject.onNext((null == list) ? Collections.emptyList() : list));
+                    compositeDisposable.add(coursesForTermObserving);
+                } else {
+                    coursesForTermSubject.onNext(Collections.emptyList());
+                    coursesForTermObserving = null;
+                }
+            }
+        }));
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @NonNull
+    public static Function<Resources, CharSequence> calculateOverviewFactory(@NonNull CourseStatus status, Optional<Integer> competencyUnits,
+                                                                             Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
+                                                                             Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd,
+                                                                             Optional<AbstractTermEntity<?>> selectedTerm, Optional<AbstractMentorEntity<?>> selectedMentor) {
+        return resources -> {
+            SpannableStringBuilder result = new SpannableStringBuilder("Status: ");
+            result.setSpan(new StyleSpan(Typeface.BOLD), 0, result.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+            result.append(resources.getString(status.displayResourceId())).append("; ")
+                    .append("Competency Units: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (competencyUnits.isPresent()) {
+                int v = competencyUnits.get();
+                if (v < 0) {
+                    result.append(resources.getString(R.string.message_invalid_number),
+                            new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                } else {
+                    result.append(NUMBER_FORMATTER.format(v));
+                }
+            } else {
+                result.append(resources.getString(R.string.message_invalid_number),
+                        new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            int position = result.append("\n").length();
+            if (actualStart.isPresent()) {
+                result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(LONG_FORMATTER.format(actualStart.get()));
+            } else if (expectedStart.isPresent()) {
+                result.append("Expected Start: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                        .append(LONG_FORMATTER.format(expectedStart.get()));
+                switch (status) {
+                    case IN_PROGRESS:
+                    case NOT_PASSED:
+                    case PASSED:
+                        result.append(" (actual start date missing)",
+                                new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (status) {
+                    case IN_PROGRESS:
+                    case NOT_PASSED:
+                    case PASSED:
+                        result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                                .append(resources.getString(R.string.message_required),
+                                        new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (actualEnd.isPresent()) {
+                if (position < result.length()) {
+                    result.append("; ");
+                }
+                result.append("Ended On: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(LONG_FORMATTER.format(actualEnd.get()));
+            } else if (expectedEnd.isPresent()) {
+                if (position < result.length()) {
+                    result.append("; ");
+                }
+                result.append("Expected End: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                        .append(LONG_FORMATTER.format(expectedEnd.get()));
+                switch (status) {
+                    case NOT_PASSED:
+                    case PASSED:
+                        result.append(" (actual end date missing)",
+                                new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (status) {
+                    case NOT_PASSED:
+                    case PASSED:
+                        if (position < result.length()) {
+                            result.append("; ");
+                        }
+                        result.append("Ended on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
+                                .append(resources.getString(R.string.message_required),
+                                        new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (position < result.length()) {
+                result.append("\n");
+            }
+            selectedMentor.ifPresent(m -> result.append("Mentor: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(m.getName()).append("; "));
+            result.append("Term: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (selectedTerm.isPresent()) {
+                String n = selectedTerm.get().getName();
+                String t = resources.getString(R.string.format_term, n);
+                int i = t.indexOf(':');
+                result.append((i > 0 && n.startsWith(t.substring(0, i))) ? n.substring(i).trim() : n);
+            } else {
+                result.append(resources.getString(R.string.message_required),
+                        new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            return result;
+        };
+    }
+
+    @NonNull
+    public static Function<Resources, CharSequence> calculateViewTitleFactory(@NonNull String number) {
+        if (number.isEmpty()) {
+            return r -> r.getString(R.string.label_course);
+        }
+        return r -> r.getString(R.string.format_course, number);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @NonNull
+    private static Optional<ResourceMessageFactory> validateExpectedStart(@NonNull CourseStatus status, Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
+                                                                          Optional<AbstractTermEntity<?>> selectedTerm) {
+        return expectedStart.map(s ->
+                expectedEnd.flatMap(e ->
+                        (s.compareTo(e) > 0) ?
+                                Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end)) :
+                                selectedTerm.flatMap(t -> {
+                                    LocalDate d = t.getStart();
+                                    return (null != d && s.compareTo(d) < 0) ?
+                                            Optional.of(ResourceMessageFactory.ofWarning(R.string.message_before_term_start)) :
+                                            Optional.empty();
+                                })
+                )
+        ).orElseGet(() ->
+                (status == CourseStatus.PLANNED) ? Optional.of(ResourceMessageFactory.ofError(R.string.message_required)) : Optional.empty()
+        );
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @NonNull
+    private static Optional<ResourceMessageFactory> validateExpectedEnd(@NonNull CourseStatus status, Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
+                                                                        Optional<AbstractTermEntity<?>> selectedTerm) {
+        return expectedEnd.map(e ->
+                expectedStart.flatMap(s ->
+                        (s.compareTo(e) > 0) ?
+                                Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end)) :
+                                selectedTerm.flatMap(t -> {
+                                    LocalDate d = t.getStart();
+                                    return (null != d && e.compareTo(d) > 0) ?
+                                            Optional.of(ResourceMessageFactory.ofWarning(R.string.message_after_term_end)) :
+                                            Optional.empty();
+                                })
+                )
+        ).orElseGet(() ->
+                (status == CourseStatus.IN_PROGRESS) ? Optional.of(ResourceMessageFactory.ofError(R.string.message_required)) : Optional.empty()
+        );
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @NonNull
+    private static Optional<ResourceMessageFactory> validateActualStart(@NonNull CourseStatus status, Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd) {
+        return actualStart.map(s ->
+                actualEnd.flatMap(e ->
+                        (s.compareTo(e) > 0) ?
+                                Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end)) : Optional.empty()
+                )
+        ).orElseGet(() -> {
+            switch (status) {
+                case IN_PROGRESS:
+                case PASSED:
+                case NOT_PASSED:
+                    return Optional.of(ResourceMessageFactory.ofError(R.string.message_required));
+                default:
+                    return Optional.empty();
+            }
+        });
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @NonNull
+    private static Optional<ResourceMessageFactory> validateActualEnd(@NonNull CourseStatus status, Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd) {
+        return actualEnd.map(e ->
+                actualStart.flatMap(s ->
+                        (s.compareTo(e) > 0) ?
+                                Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end)) : Optional.empty()
+                )
+        ).orElseGet(() -> {
+            switch (status) {
+                case PASSED:
+                case NOT_PASSED:
+                    return Optional.of(ResourceMessageFactory.ofError(R.string.message_required));
+                default:
+                    return Optional.empty();
+            }
+        });
+    }
+
+    @NonNull
+    private static BinaryAlternate<Integer, ResourceMessageFactory> parseCompetencyUnits(String text) {
+        if (null == text || (text = text.trim()).isEmpty()) {
+            return BinaryAlternate.ofSecondary(ResourceMessageFactory.ofError(R.string.message_required));
+        }
+        double value;
+        try {
+            value = Double.parseDouble(text);
+        } catch (NumberFormatException ex) {
+            String m = ex.getMessage();
+            return BinaryAlternate.ofSecondary((null == m || (m = m.trim()).isEmpty()) ? ResourceMessageFactory.ofError(R.string.message_number_parse_error) :
+                    ResourceMessageFactory.ofError(R.string.format_days_parse_error, m));
+        }
+        if (value < 0.0 || value > (double) Integer.MAX_VALUE || Math.floor(value) != value) {
+            return BinaryAlternate.ofSecondary(ResourceMessageFactory.ofError(R.string.message_invalid_number));
+        }
+        return BinaryAlternate.ofPrimary((int) value);
     }
 
     @Override
@@ -166,262 +514,210 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     }
 
     public long getId() {
-        return originalValues.getId();
+        return originalValuesSubject.getValue().getId();
     }
 
+    @Nullable
     public AbstractTermEntity<?> getSelectedTerm() {
-        return selectedTerm;
+        return selectedTermSubject.getValue().orElse(null);
     }
 
-    public synchronized void setSelectedTerm(AbstractTermEntity<?> selectedTerm) {
-        if (!Objects.equals(this.selectedTerm, selectedTerm)) {
-            Log.d(LOG_TAG, String.format("selectedTerm changing from:\n\t%s\n\tto\n\t%s", this.selectedTerm, selectedTerm));
-            this.selectedTerm = selectedTerm;
-            coursesForTerm.clear();
-            if (null != coursesLiveData) {
-                coursesLiveData.removeObserver(coursesLoadedObserver);
-                coursesLiveData = null;
-            }
-            if (null == selectedTerm) {
-                currentValues.termId = ID_NEW;
-                termValidLiveData.postValue(false);
-            } else {
-                long id = selectedTerm.getId();
-                currentValues.termId = id;
-                if (ID_NEW != id) {
-                    coursesLiveData = dbLoader.getCoursesByTermId(id);
-                    coursesLoadedObserver = this::onAllCoursesLoaded;
-                    coursesLiveData.observeForever(coursesLoadedObserver);
-                    termValidLiveData.postValue(true);
-                } else {
-                    termValidLiveData.postValue(false);
-                }
-            }
-            expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
-            actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
-            expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
-            actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
-            resetOverview();
-            overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-        }
+    public void setSelectedTerm(AbstractTermEntity<?> selectedTerm) {
+        selectedTermSubject.onNext(Optional.ofNullable(selectedTerm));
     }
 
+    @Nullable
     public AbstractMentorEntity<?> getSelectedMentor() {
-        return selectedMentor;
+        return selectedMentorSubject.getValue().orElse(null);
     }
 
-    public synchronized void setSelectedMentor(@Nullable AbstractMentorEntity<?> selectedMentor) {
-        if (!Objects.equals(this.selectedMentor, selectedMentor)) {
-            Log.d(LOG_TAG, String.format("selectedMentor changing from:\n\t%s\n\tto\n\t%s", this.selectedMentor, selectedMentor));
-            this.selectedMentor = selectedMentor;
-            currentValues.mentorId = (null == selectedMentor) ? null : selectedMentor.getId();
-            resetOverview();
-            overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-        }
+    public void setSelectedMentor(@Nullable AbstractMentorEntity<?> selectedMentor) {
+        selectedMentorSubject.onNext(Optional.ofNullable(selectedMentor));
     }
 
+    @NonNull
     public String getNumber() {
-        return currentValues.getNumber();
+        return numberSubject.getValue();
     }
 
-    public synchronized void setNumber(String value) {
-        currentValues.setNumber(value);
+    public void setNumber(String value) {
+        numberSubject.onNext((null == value) ? "" : value);
     }
 
+    @NonNull
     public String getTitle() {
-        return currentValues.getTitle();
+        return titleSubject.getValue();
     }
 
-    public synchronized void setTitle(String value) {
-        currentValues.setTitle(value);
+    public void setTitle(String value) {
+        titleSubject.onNext((null == value) ? "" : value);
     }
 
+    @Nullable
     public LocalDate getExpectedStart() {
-        return currentValues.getExpectedStart();
+        return expectedStartSubject.getValue().orElse(null);
     }
 
-    public synchronized void setExpectedStart(LocalDate value) {
-        currentValues.setExpectedStart(value);
+    public void setExpectedStart(LocalDate value) {
+        expectedStartSubject.onNext(Optional.ofNullable(value));
     }
 
+    @Nullable
     public LocalDate getActualStart() {
-        return currentValues.getActualStart();
+        return actualStartSubject.getValue().orElse(null);
     }
 
-    public synchronized void setActualStart(LocalDate value) {
-        currentValues.setActualStart(value);
+    public void setActualStart(LocalDate value) {
+        actualStartSubject.onNext(Optional.ofNullable(value));
     }
 
+    @Nullable
     public LocalDate getExpectedEnd() {
-        return currentValues.getExpectedEnd();
+        return expectedEndSubject.getValue().orElse(null);
     }
 
-    public synchronized void setExpectedEnd(LocalDate value) {
-        currentValues.setExpectedEnd(value);
+    public void setExpectedEnd(LocalDate value) {
+        expectedEndSubject.onNext(Optional.ofNullable(value));
     }
 
+    @Nullable
     public LocalDate getActualEnd() {
-        return currentValues.getActualEnd();
+        return actualEndSubject.getValue().orElse(null);
     }
 
-    public synchronized void setActualEnd(LocalDate value) {
-        currentValues.setActualEnd(value);
+    public void setActualEnd(LocalDate value) {
+        actualEndSubject.onNext(Optional.ofNullable(value));
     }
 
+    @NonNull
     public String getCompetencyUnitsText() {
-        return competencyUnitsText;
+        return competencyUnitsTextSubject.getValue();
     }
 
-    public synchronized void setCompetencyUnitsText(String value) {
-        if (null == value) {
-            if (competencyUnitsText.isEmpty()) {
-                return;
-            }
-            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"\"", ToStringBuilder.toEscapedString(this.competencyUnitsText)));
-            competencyUnitsText = "";
-            currentValues.competencyUnits = null;
-        } else {
-            if (competencyUnitsText.equals(value)) {
-                return;
-            }
-            Log.d(LOG_TAG, String.format("competencyUnitsText changing from:\n\t\"%s\"\n\tto\n\t\"%s\"", ToStringBuilder.toEscapedString(this.competencyUnitsText), ToStringBuilder.toEscapedString(competencyUnitsText)));
-            competencyUnitsText = value;
-            try {
-                currentValues.setCompetencyUnits(Integer.parseInt(competencyUnitsText.trim()));
-            } catch (NumberFormatException ex) {
-                currentValues.competencyUnits = null;
-            }
-        }
-        competencyUnitsMessageLiveData.postValue(validateCompetencyUnits(false).orElse(null));
+    public void setCompetencyUnitsText(String value) {
+        competencyUnitsTextSubject.onNext((null == value) ? "" : value);
     }
 
+    @NonNull
     public CourseStatus getStatus() {
-        return currentValues.getStatus();
+        return statusSubject.getValue();
     }
 
     public synchronized void setStatus(CourseStatus status) {
-        currentValues.setStatus(status);
+        statusSubject.onNext((null == status) ? CourseStatus.UNPLANNED : status);
     }
 
+    @NonNull
     public String getNotes() {
-        return currentValues.getNotes();
+        return notesSubject.getValue();
     }
 
     public synchronized void setNotes(String value) {
-        currentValues.setNotes(value);
+        notesSubject.onNext((null == value) ? "" : value);
     }
 
-    public String getNormalizedNotes() {
-        if (null == normalizedNotes) {
-            normalizedNotes = MentorEntity.MULTI_LINE_NORMALIZER.apply(currentValues.notes);
-            if (normalizedNotes.equals(currentValues.notes)) {
-                currentValues.notes = null;
-            }
-        }
-        return normalizedNotes;
+    public List<TermCourseListItem> getCoursesForTerm() {
+        return coursesForTermSubject.getValue();
     }
 
-    public ArrayList<TermCourseListItem> getCoursesForTerm() {
-        return coursesForTerm;
-    }
-
-    public LiveData<CourseDetails> getEntityLiveData() {
-        return entityLiveData;
-    }
-
-    public LiveData<List<MentorListItem>> getMentorsLiveData() {
-        return mentorsLiveData;
-    }
-
-    public LiveData<List<TermListItem>> getTermsLiveData() {
-        return termsLiveData;
+    public Completable getInitializedCompletable() {
+        return initializedCompletable;
     }
 
     public LiveData<LocalDate> getEffectiveStartLiveData() {
-        return effectiveStartLiveData;
+        return effectiveStartLiveData.getLiveData();
     }
 
     public LiveData<LocalDate> getEffectiveEndLiveData() {
-        return effectiveEndLiveData;
+        return effectiveEndLiveData.getLiveData();
     }
 
     public LiveData<Boolean> getTermValidLiveData() {
-        return termValidLiveData;
+        return termValidLiveData.getLiveData();
     }
 
     public LiveData<Boolean> getNumberValidLiveData() {
-        return numberValidLiveData;
+        return numberValidLiveData.getLiveData();
     }
 
     public LiveData<Boolean> getTitleValidLiveData() {
-        return titleValidLiveData;
+        return titleValidLiveData.getLiveData();
     }
 
-    public LiveData<Integer> getExpectedStartErrorMessageLiveData() {
-        return expectedStartErrorMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<List<TermListItem>> getTermOptionsLiveData() {
+        return termOptionsLiveData;
     }
 
-    public LiveData<Integer> getExpectedStartWarningMessageLiveData() {
-        return expectedStartWarningMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<List<MentorListItem>> getMentorOptionsLiveData() {
+        return mentorOptionsLiveData;
     }
 
-    public LiveData<Integer> getExpectedEndMessageLiveData() {
-        return expectedEndMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<List<AssessmentEntity>> getAssessmentsLiveData() {
+        return assessmentsLiveData;
     }
 
-    public LiveData<Integer> getActualStartErrorMessageLiveData() {
-        return actualStartErrorMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<Optional<ResourceMessageFactory>> getExpectedStartValidationMessageLiveData() {
+        return expectedStartValidationMessageLiveData.getLiveData();
     }
 
-    public LiveData<Integer> getActualStartWarningMessageLiveData() {
-        return actualStartWarningMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<Optional<ResourceMessageFactory>> getExpectedEndValidationMessageLiveData() {
+        return expectedEndValidationMessageLiveData.getLiveData();
     }
 
-    public LiveData<Integer> getActualEndMessageLiveData() {
-        return actualEndMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<Optional<ResourceMessageFactory>> getActualStartValidationMessageLiveData() {
+        return actualStartValidationMessageLiveData.getLiveData();
     }
 
-    public LiveData<Integer> getCompetencyUnitsMessageLiveData() {
-        return competencyUnitsMessageLiveData;
+    // TODO: Bind to this
+    public LiveData<Optional<ResourceMessageFactory>> getActualEndValidationMessageLiveData() {
+        return actualEndValidationMessageLiveData.getLiveData();
     }
 
-    public LiveData<Function<Resources, String>> getTitleFactoryLiveData() {
-        return titleFactoryLiveData;
+    // TODO: Bind to this
+    public LiveData<Optional<ResourceMessageFactory>> getCompetencyUnitsValidationMessageLiveData() {
+        return competencyUnitsValidationMessageLiveData.getLiveData();
+    }
+
+    // TODO: Bind to this
+    public LiveData<Boolean> getCanSaveLiveData() {
+        return canSaveLiveData.getLiveData();
+    }
+
+    // TODO: Bind to this
+    public LiveData<Boolean> getCanShareLiveData() {
+        return canShareLiveData.getLiveData();
+    }
+
+    // TODO: Bind to this
+    public LiveData<Boolean> getHasChangesLiveData() {
+        return hasChangesLiveData.getLiveData();
+    }
+
+    // TODO: Bind to this
+    public LiveData<Boolean> getIsValidLiveData() {
+        return isValidLiveData.getLiveData();
+    }
+
+    public LiveData<Function<Resources, CharSequence>> getTitleFactoryLiveData() {
+        return titleFactoryLiveData.getLiveData();
     }
 
     public LiveData<String> getSubTitleLiveData() {
-        return subTitleLiveData;
+        return subTitleLiveData.getLiveData();
     }
 
-    public LiveData<Function<Resources, Spanned>> getOverviewFactoryLiveData() {
-        return overviewFactoryLiveData;
+    public LiveData<Function<Resources, CharSequence>> getOverviewFactoryLiveData() {
+        return overviewFactoryLiveData.getLiveData();
     }
 
-    public synchronized LiveData<List<AssessmentEntity>> getAssessments() {
-        if (null == assessments) {
-            assessments = dbLoader.getAssessmentsLiveDataByCourseId(originalValues.getId());
-        }
-        return assessments;
-    }
-
-    public synchronized LiveData<List<AlertListItem>> getAllAlerts() {
-        long id = originalValues.getId();
-        if (id != ID_NEW) {
-            return dbLoader.getAllAlertsByCourseId(id);
-        }
-        PrivateLiveData<List<AlertListItem>> result = new PrivateLiveData<>();
-        result.postValue(Collections.emptyList());
-        return result;
-    }
-
-    public synchronized LiveData<List<CourseAlert>> getAllCourseAlerts() {
-        long id = originalValues.getId();
-        if (id != ID_NEW) {
-            return dbLoader.getAlertsByCourseId(id);
-        }
-        PrivateLiveData<List<CourseAlert>> result = new PrivateLiveData<>();
-        result.postValue(Collections.emptyList());
-        return result;
+    public LiveData<CourseDetails> getOriginalValuesLiveData() {
+        return originalValuesLiveData.getLiveData();
     }
 
     public boolean isFromInitializedState() {
@@ -431,732 +727,159 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     public synchronized Single<CourseDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
-        viewTitle = null;
-        resetOverview();
+        CourseDetails entity = new CourseDetails(null);
         if (null != state) {
             Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
-            currentValues.restoreState(state, false);
-            long id = currentValues.getId();
+            entity.restoreState(state, true);
+            long id = entity.getId();
             if (ID_NEW == id || fromInitializedState) {
                 Log.d(LOG_TAG, "Restoring courseEntity from saved state");
-                originalValues.restoreState(state, fromInitializedState);
+                String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false);
+                if (state.containsKey(key)) {
+                    TermEntity term = new TermEntity();
+                    term.restoreState(state, false);
+                    selectedTermSubject.onNext(Optional.of(term));
+                } else {
+                    selectedTermSubject.onNext(Optional.empty());
+                }
+                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, false);
+                if (state.containsKey(key)) {
+                    MentorEntity mentor = new MentorEntity();
+                    mentor.restoreState(state, false);
+                    selectedMentorSubject.onNext(Optional.of(mentor));
+                } else {
+                    selectedMentorSubject.onNext(Optional.empty());
+                }
+                numberSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), ""));
+                titleSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), ""));
+                notesSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), ""));
+                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false);
+                statusSubject.onNext((state.containsKey(key)) ? CourseStatus.valueOf(state.getString(key)) : CourseStatus.UNPLANNED);
+                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false);
+                if (state.containsKey(key)) {
+                    expectedStartSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                } else {
+                    expectedStartSubject.onNext(Optional.empty());
+                }
+                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_START, false);
+                if (state.containsKey(key)) {
+                    actualStartSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                } else {
+                    actualStartSubject.onNext(Optional.empty());
+                }
+                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_END, false);
+                if (state.containsKey(key)) {
+                    expectedEndSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                } else {
+                    expectedEndSubject.onNext(Optional.empty());
+                }
+                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_END, false);
+                if (state.containsKey(key)) {
+                    actualEndSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                } else {
+                    actualEndSubject.onNext(Optional.empty());
+                }
+                competencyUnitsTextSubject.onNext(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
             } else {
                 Log.d(LOG_TAG, "Loading courseEntity from database");
-                competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
-                return dbLoader.getCourseById(id)
-                        .doOnSuccess(this::onEntityLoadedFromDb);
-            }
-            if (fromInitializedState) {
-                Log.d(LOG_TAG, "Restoring competencyUnitsText from saved state");
-                setCompetencyUnitsText(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
-            } else {
-                Log.d(LOG_TAG, "Initializing competencyUnitsText from currentValues");
-                competencyUnitsText = (null == currentValues.competencyUnits) ? "" : NumberFormat.getIntegerInstance().format(currentValues.competencyUnits);
+                return dbLoader.getCourseById(id).doOnSuccess(this::onEntityLoadedFromDb);
             }
         } else {
             Log.d(LOG_TAG, "No saved state or arguments");
-            competencyUnitsText = "";
+            competencyUnitsTextSubject.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
         }
-        onEntityLoaded();
-        return Single.just(originalValues).observeOn(AndroidSchedulers.mainThread());
+        originalValuesSubject.onNext(entity);
+        initializedSubject.onComplete();
+        return Single.just(entity).observeOn(AndroidSchedulers.mainThread());
     }
 
     private void onEntityLoadedFromDb(CourseDetails entity) {
         Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
-        originalValues = entity;
-        setSelectedTerm(entity.getTerm());
-        setSelectedMentor(entity.getMentor());
-        setNumber(entity.getNumber());
-        setTitle(entity.getTitle());
-        setStatus(entity.getStatus());
-        setExpectedStart(entity.getExpectedStart());
-        setExpectedEnd(entity.getExpectedEnd());
-        setActualStart(entity.getActualStart());
-        setActualEnd(entity.getActualEnd());
-        setCompetencyUnitsText(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
-        setNotes(entity.getNotes());
-        onEntityLoaded();
-    }
-
-    private synchronized void resetOverview() {
-        overview = null;
-    }
-
-    @NonNull
-    public synchronized Spanned calculateOverview(Resources resources) {
-        if (null != overview) {
-            return overview;
-        }
-        CourseStatus status = currentValues.status;
-        SpannableStringBuilder result = new SpannableStringBuilder("Status: ");
-        result.setSpan(new StyleSpan(Typeface.BOLD), 0, result.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
-        result.append(resources.getString(status.displayResourceId())).append("; ")
-                .append("Competency Units: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
-        Integer v = currentValues.competencyUnits;
-        if (null == v) {
-            result.append(resources.getString((competencyUnitsText.trim().isEmpty()) ? R.string.message_required : R.string.message_invalid_number),
-                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else if (v < 0) {
-            result.append(resources.getString(R.string.message_invalid_number),
-                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else {
-            result.append(NUMBER_FORMATTER.format(v));
-        }
-        int position = result.append("\n").length();
-        LocalDate date = currentValues.getActualStart();
-        if (null != date) {
-            result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(LONG_FORMATTER.format(date));
-        } else if (null != (date = currentValues.getExpectedStart())) {
-            result.append("Expected Start: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
-                    .append(LONG_FORMATTER.format(date));
-            switch (status) {
-                case IN_PROGRESS:
-                case NOT_PASSED:
-                case PASSED:
-                    result.append(" (actual start date missing)",
-                            new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            switch (status) {
-                case IN_PROGRESS:
-                case NOT_PASSED:
-                case PASSED:
-                    result.append("Started on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
-                            .append(resources.getString(R.string.message_required),
-                                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-                    break;
-                default:
-                    break;
-            }
-        }
-        date = currentValues.getActualEnd();
-        if (null != date) {
-            if (position < result.length()) {
-                result.append("; ");
-            }
-            result.append("Ended On: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(LONG_FORMATTER.format(date));
-        } else if (null != (date = currentValues.getExpectedEnd())) {
-            if (position < result.length()) {
-                result.append("; ");
-            }
-            result.append("Expected End: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
-                    .append(LONG_FORMATTER.format(date));
-            switch (status) {
-                case NOT_PASSED:
-                case PASSED:
-                    result.append(" (actual end date missing)",
-                            new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            switch (status) {
-                case NOT_PASSED:
-                case PASSED:
-                    if (position < result.length()) {
-                        result.append("; ");
-                    }
-                    result.append("Ended on: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE)
-                            .append(resources.getString(R.string.message_required),
-                                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (position < result.length()) {
-            result.append("\n");
-        }
-        if (null != selectedMentor) {
-            result.append("Mentor: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE).append(selectedMentor.getName()).append("; ");
-        }
-        result.append("Term: ", new StyleSpan(Typeface.BOLD), SPAN_EXCLUSIVE_EXCLUSIVE);
-        if (null == selectedTerm) {
-            result.append(resources.getString(R.string.message_required),
-                    new ForegroundColorSpan(resources.getColor(R.color.color_error, null)), SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else {
-            String n = selectedTerm.getName();
-            String t = resources.getString(R.string.format_term, n);
-            int i = t.indexOf(':');
-            result.append((i > 0 && n.startsWith(t.substring(0, i))) ? n.substring(i).trim() : n);
-        }
-        overview = result;
-        return result;
-    }
-
-    @NonNull
-    public synchronized String calculateViewTitle(Resources resources) {
-        if (null == viewTitle) {
-            viewTitle = resources.getString(R.string.format_course, normalizedNumber);
-        }
-        return viewTitle;
-    }
-
-    private void onEntityLoaded() {
-        titleFactoryLiveData.postValue(this::calculateViewTitle);
-        subTitleLiveData.postValue(originalValues.getTitle());
-        overviewFactoryLiveData.postValue(this::calculateOverview);
-        entityLiveData.postValue(originalValues);
-        ObserverHelper.observe(termsLiveData, this, this::onTermsLoaded);
-        ObserverHelper.observe(mentorsLiveData, this, this::onMentorsLoaded);
+        selectedTermSubject.onNext(Optional.ofNullable(entity.getTerm()));
+        selectedMentorSubject.onNext(Optional.ofNullable(entity.getMentor()));
+        numberSubject.onNext(entity.getNumber());
+        titleSubject.onNext(entity.getTitle());
+        statusSubject.onNext(entity.getStatus());
+        expectedStartSubject.onNext(Optional.ofNullable(entity.getExpectedStart()));
+        expectedEndSubject.onNext(Optional.ofNullable(entity.getExpectedEnd()));
+        actualStartSubject.onNext(Optional.ofNullable(entity.getActualStart()));
+        actualEndSubject.onNext(Optional.ofNullable(entity.getActualEnd()));
+        competencyUnitsTextSubject.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
+        notesSubject.onNext(entity.getNotes());
+        originalValuesSubject.onNext(entity);
+        initializedSubject.onComplete();
     }
 
     public void saveViewModelState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        currentValues.saveState(outState, false);
-        originalValues.saveState(outState, true);
-    }
-
-    private void onTermsLoaded(List<TermListItem> termListItems) {
-        if (null == termListItems) {
-            return;
+        originalValuesSubject.getValue().saveState(outState, true);
+        selectedTermSubject.getValue().ifPresent(t -> t.saveState(outState, false));
+        selectedMentorSubject.getValue().ifPresent(m -> m.saveState(outState, false));
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), numberSubject.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false), statusSubject.getValue().name());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), titleSubject.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), notesSubject.getValue());
+        Long d = LocalDateConverter.fromLocalDate(getExpectedStart());
+        if (null != d) {
+            outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false), d);
         }
-        Log.d(LOG_TAG, String.format("Loaded %d terms from database", termListItems.size()));
-        EntityHelper.findById(originalValues.getTermId(), termListItems).ifPresent(t -> {
-            originalValues.setTerm(t);
-            setSelectedTerm(t);
-        });
-    }
-
-    private void onMentorsLoaded(List<MentorListItem> mentorListItems) {
-        if (null == mentorListItems) {
-            return;
+        d = LocalDateConverter.fromLocalDate(getActualStart());
+        if (null != d) {
+            outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_START, false), d);
         }
-        Log.d(LOG_TAG, String.format("Loaded %d mentors from database", mentorListItems.size()));
-        EntityHelper.findById(originalValues.getMentorId(), mentorListItems).ifPresent(t -> {
-            originalValues.setMentor(t);
-            setSelectedMentor(t);
-        });
-    }
-
-    private synchronized void onAllCoursesLoaded(List<TermCourseListItem> termCourseListItems) {
-        if (null != termCourseListItems) {
-            Log.d(LOG_TAG, String.format("Loaded %d courses from database", termCourseListItems.size()));
-            coursesLiveData.removeObserver(coursesLoadedObserver);
-            coursesLiveData = null;
-            coursesForTerm.clear();
-            coursesForTerm.addAll(termCourseListItems);
+        d = LocalDateConverter.fromLocalDate(getExpectedEnd());
+        if (null != d) {
+            outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_END, false), d);
         }
-    }
-
-    private synchronized Optional<Integer> validateExpectedStart() {
-        if (null == currentValues.expectedStart) {
-            Log.d(LOG_TAG, String.format("Validating expectedStart(null); status=%s", currentValues.status.name()));
-            if (currentValues.status == CourseStatus.PLANNED) {
-                Log.d(LOG_TAG, "Returning R.string.message_required");
-                return Optional.of(R.string.message_required);
-            }
-        } else {
-            Log.d(LOG_TAG, String.format("Validating expectedStart(%s); status=%s", currentValues.expectedStart, currentValues.status.name()));
-            switch (currentValues.status) {
-                case PLANNED:
-                case PASSED:
-                case NOT_PASSED:
-                    if (null != currentValues.expectedEnd && currentValues.expectedStart.compareTo(currentValues.expectedEnd) > 0) {
-                        Log.d(LOG_TAG, "Returning R.string.message_start_after_end");
-                        return Optional.of(R.string.message_start_after_end);
-                    }
-                    break;
-                default:
-                    break;
-            }
+        d = LocalDateConverter.fromLocalDate(getActualEnd());
+        if (null != d) {
+            outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_END, false), d);
         }
-        Log.d(LOG_TAG, "validateExpectedStart: Returning empty");
-        return Optional.empty();
-    }
-
-    private synchronized Optional<Integer> validateExpectedEnd() {
-        if (null == currentValues.expectedEnd && null != currentValues.expectedStart && currentValues.status == CourseStatus.IN_PROGRESS) {
-            Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_required");
-            return Optional.of(R.string.message_required);
-        }
-        if (null != selectedTerm) {
-            if (null != currentValues.expectedEnd) {
-                Log.d(LOG_TAG, String.format("Validating expectedEnd(%s); status=%s; selectedTerm=%s", currentValues.expectedStart, currentValues.status.name(), selectedTerm));
-                LocalDate d = selectedTerm.getStart();
-                if (null != d && d.compareTo(currentValues.expectedEnd) > 0) {
-                    Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_before_term_start");
-                    return Optional.of(R.string.message_before_term_start);
-                }
-                d = selectedTerm.getEnd();
-                if (null != d && d.compareTo(currentValues.expectedEnd) < 0) {
-                    Log.d(LOG_TAG, "validateExpectedEnd: Returning R.string.message_after_term_end");
-                    return Optional.of(R.string.message_after_term_end);
-                }
-            } else {
-                Log.d(LOG_TAG, String.format("Validating expectedEnd(null); status=%s; selectedTerm=%s", currentValues.status.name(), selectedTerm));
-            }
-        } else {
-            Log.d(LOG_TAG, (null == currentValues.expectedEnd) ? String.format("Validating expectedEnd(null); status=%s; selectedTerm=null", currentValues.status.name()) :
-                    String.format("Validating expectedEnd(%s); status=%s; selectedTerm=null", currentValues.expectedEnd, currentValues.status.name()));
-        }
-        Log.d(LOG_TAG, "validateExpectedEnd: Returning empty");
-        return Optional.empty();
-    }
-
-    private synchronized Optional<Integer> validateActualStart() {
-        if (null == currentValues.actualStart) {
-            Log.d(LOG_TAG, String.format("Validating actualStart(null); status=%s", currentValues.status.name()));
-            switch (currentValues.status) {
-                case IN_PROGRESS:
-                case PASSED:
-                case NOT_PASSED:
-                    Log.d(LOG_TAG, "Returning R.string.message_required");
-                    return Optional.of(R.string.message_required);
-                default:
-                    break;
-            }
-        } else {
-            Log.d(LOG_TAG, String.format("Validating actualStart(%s); status=%s", currentValues.actualStart, currentValues.status.name()));
-            switch (currentValues.status) {
-                case PASSED:
-                case NOT_PASSED:
-                    if (null != currentValues.actualEnd && currentValues.actualStart.compareTo(currentValues.actualEnd) > 0) {
-                        Log.d(LOG_TAG, "Returning R.string.message_start_after_end");
-                        return Optional.of(R.string.message_start_after_end);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        Log.d(LOG_TAG, "validateActualStart: Returning empty");
-        return Optional.empty();
-    }
-
-    private synchronized Optional<Integer> validateActualEnd() {
-        if (null == currentValues.actualEnd) {
-            switch (currentValues.status) {
-                case PASSED:
-                case NOT_PASSED:
-                    Log.d(LOG_TAG, "validateActualEnd: Returning R.string.message_required");
-                    return Optional.of(R.string.message_required);
-                default:
-                    break;
-            }
-        } else if (null != selectedTerm) {
-            Log.d(LOG_TAG, String.format("Validating actualEnd(%s); status=%s; selectedTerm=%s", currentValues.actualEnd, currentValues.status.name(), selectedTerm));
-            LocalDate d = selectedTerm.getStart();
-            if (null != d && d.compareTo(currentValues.actualEnd) > 0) {
-                Log.d(LOG_TAG, "validateActualEnd: Returning R.string.message_before_term_start");
-                return Optional.of(R.string.message_before_term_start);
-            }
-            d = selectedTerm.getEnd();
-            if (null != d && d.compareTo(currentValues.actualEnd) < 0) {
-                Log.d(LOG_TAG, "validateActualEnd: Returning R.string.message_after_term_end");
-                return Optional.of(R.string.message_after_term_end);
-            }
-        } else {
-            Log.d(LOG_TAG, String.format("Validating actualEnd(null); status=%s; selectedTerm=%s", currentValues.status.name(), selectedTerm));
-        }
-
-        Log.d(LOG_TAG, "validateActualEnd: Returning empty");
-        return Optional.empty();
-    }
-
-    private synchronized Optional<Integer> validateCompetencyUnits(boolean saveMode) {
-        Log.d(LOG_TAG, (null == currentValues.competencyUnits) ? String.format("Validating competencyUnits(null); text=%s", ToStringBuilder.toEscapedString(competencyUnitsText)) :
-                String.format("Validating competencyUnits(%d); text=%s", currentValues.competencyUnits, ToStringBuilder.toEscapedString(competencyUnitsText)));
-        if (competencyUnitsText.trim().isEmpty()) {
-            Log.d(LOG_TAG, (saveMode) ? "validateCompetencyUnits: Returning R.string.message_competency_units_required" : "validateCompetencyUnits: Returning R.string.message_required");
-            return Optional.of((saveMode) ? R.string.message_competency_units_required : R.string.message_required);
-        }
-        if (null == currentValues.competencyUnits || currentValues.competencyUnits < 0) {
-            Log.d(LOG_TAG, (saveMode) ? "validateCompetencyUnits: Returning R.string.message_invalid_competency_units_value" : "validateCompetencyUnits: Returning R.string.message_invalid_number");
-            Optional.of((saveMode) ? R.string.message_invalid_competency_units_value : R.string.message_invalid_number);
-        }
-        Log.d(LOG_TAG, "validateCompetencyUnits: Returning empty");
-        return Optional.empty();
+        outState.putString(STATE_KEY_COMPETENCY_UNITS_TEXT, competencyUnitsTextSubject.getValue());
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
+        AbstractTermEntity<?> selectedTerm = selectedTermSubject.getValue().orElse(null);
         if (null == selectedTerm) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_term_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
-        Integer id = validateCompetencyUnits(true).orElse(null);
-        if (null != id) {
-            return Single.just(ValidationMessage.ofSingleError(id)).observeOn(AndroidSchedulers.mainThread());
+        Integer cu = competencyUnitsValueLiveData.getLiveData().getValue().orElse(null);
+        if (null == cu) {
+            return Single.just(ValidationMessage.ofSingleError(R.string.message_required)).observeOn(AndroidSchedulers.mainThread());
         }
+        CourseDetails originalValues = originalValuesSubject.getValue();
         CourseEntity entity = originalValues.toEntity();
         entity.setTermId(Objects.requireNonNull(selectedTerm).getId());
-        entity.setMentorId((null == selectedMentor) ? null : selectedMentor.getId());
-        Log.d(LOG_TAG, String.format("Setting number from %s to %s", ToStringBuilder.toEscapedString(entity.getNumber()), ToStringBuilder.toEscapedString(normalizedNumber)));
-        entity.setNumber(normalizedNumber);
-        entity.setTitle(normalizedTitle);
-        entity.setStatus(currentValues.getStatus());
-        entity.setExpectedStart(currentValues.getExpectedStart());
-        entity.setExpectedEnd(currentValues.getExpectedEnd());
-        entity.setActualStart(currentValues.getActualStart());
-        entity.setActualEnd(currentValues.getActualEnd());
-        entity.setCompetencyUnits(currentValues.getCompetencyUnits());
-        entity.setNotes(currentValues.getNotes());
+        entity.setMentorId(selectedMentorSubject.getValue().map(AbstractEntity::getId).orElse(null));
+        entity.setNumber(numberSubject.getValue());
+        entity.setTitle(titleSubject.getValue());
+        entity.setStatus(statusSubject.getValue());
+        entity.setExpectedStart(expectedStartSubject.getValue().orElse(null));
+        entity.setExpectedEnd(expectedEndSubject.getValue().orElse(null));
+        entity.setActualStart(actualStartSubject.getValue().orElse(null));
+        entity.setActualEnd(actualEndSubject.getValue().orElse(null));
+        entity.setCompetencyUnits(cu);
+        entity.setNotes(notesSubject.getValue());
         Log.d(LOG_TAG, String.format("Saving %s to database", entity));
         return dbLoader.saveCourse(entity, ignoreWarnings).doOnSuccess(m -> {
             if (m.isSucceeded()) {
-                originalValues.applyEntity(entity, Collections.singletonList(selectedTerm), Collections.singletonList(selectedMentor));
+                originalValuesSubject.onNext(new CourseDetails(entity, selectedTerm, selectedMentorSubject.getValue().orElse(null)));
             }
         });
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete(" + ignoreWarnings + ")");
-        return dbLoader.deleteCourse(Objects.requireNonNull(entityLiveData.getValue()).toEntity(), ignoreWarnings);
+        return dbLoader.deleteCourse(Objects.requireNonNull(originalValuesSubject.getValue()).toEntity(), ignoreWarnings);
     }
 
-    public boolean isChanged() {
-        if (ID_NEW != originalValues.getId() && normalizedNumber.equals(originalValues.getNumber()) && normalizedTitle.equals(originalValues.getTitle()) && Objects.equals(getExpectedStart(), originalValues.getExpectedStart()) &&
-                Objects.equals(getExpectedEnd(), originalValues.getExpectedEnd()) && Objects.equals(getActualStart(), originalValues.getActualStart()) && Objects.equals(getActualEnd(), originalValues.getActualEnd()) &&
-                currentValues.status == originalValues.getStatus() && null != currentValues.competencyUnits && currentValues.competencyUnits == originalValues.getCompetencyUnits()) {
-            return !getNormalizedNotes().equals(originalValues.getNotes());
-        }
-        return true;
+    public LiveData<List<CourseAlert>> getAllCourseAlerts() {
+        // TODO: Implement this
+        throw new UnsupportedOperationException();
     }
 
-    public AbstractTermEntity<?> initializeTermProperty(List<TermListItem> termListItems) {
-        if (null == termListItems) {
-            return null;
-        }
-        Log.d(LOG_TAG, "Enter initializeTermProperty");
-        Optional<TermListItem> result = EntityHelper.findById(originalValues.getTermId(), termListItems);
-        result.ifPresent(t -> originalValues.setTerm(t));
-        return result.orElse(null);
-    }
-
-    public AbstractMentorEntity<?> initializeMentorProperty(List<MentorListItem> mentorListItems) {
-        if (null == mentorListItems) {
-            return null;
-        }
-        Log.d(LOG_TAG, "Enter initializeMentorProperty");
-        Optional<MentorListItem> result = EntityHelper.findById(originalValues.getMentorId(), mentorListItems);
-        result.ifPresent(t -> originalValues.setMentor(t));
-        return result.orElse(null);
-    }
-
-    private static class PrivateLiveData<T> extends LiveData<T> {
-        PrivateLiveData(T value) {
-            super(value);
-        }
-
-        PrivateLiveData() {
-        }
-
-        @Override
-        public void postValue(T value) {
-            super.postValue(value);
-        }
-
-        @Override
-        public void setValue(T value) {
-            super.setValue(value);
-        }
-    }
-
-    private class CurrentValues implements Course {
-
-        @NonNull
-        private String number = "";
-        private long termId;
-        private Long mentorId;
-        @NonNull
-        private String title = "";
-        private LocalDate expectedStart;
-        private LocalDate actualStart;
-        private LocalDate expectedEnd;
-        private LocalDate actualEnd;
-        private CourseStatus status = CourseStatus.UNPLANNED;
-        private Integer competencyUnits;
-        private String notes = "";
-
-        @Override
-        public long getId() {
-            return originalValues.getId();
-        }
-
-        @Override
-        public synchronized void setId(long id) {
-            Log.d(LOG_TAG, String.format("Setting id to %d", id));
-            originalValues.setId(id);
-        }
-
-        @NonNull
-        @Override
-        public String getNumber() {
-            return number;
-        }
-
-        @Override
-        public synchronized void setNumber(String number) {
-            Log.d(LOG_TAG, String.format("Number changing from %s to %s", ToStringBuilder.toEscapedString(this.number), ToStringBuilder.toEscapedString(number)));
-            this.number = (null == number) ? "" : number;
-            String oldValue = normalizedNumber;
-            normalizedNumber = TermEntity.SINGLE_LINE_NORMALIZER.apply(number);
-            if (normalizedNumber.isEmpty()) {
-                if (!oldValue.isEmpty()) {
-                    Log.d(LOG_TAG, "Setting numberValidLiveData to false");
-                    numberValidLiveData.postValue(false);
-                }
-            } else if (oldValue.isEmpty()) {
-                Log.d(LOG_TAG, "Setting numberValidLiveData to true");
-                numberValidLiveData.postValue(true);
-            }
-            if (!oldValue.equals(normalizedNumber)) {
-                viewTitle = null;
-                titleFactoryLiveData.postValue(EditCourseViewModel.this::calculateViewTitle);
-            }
-            Log.d(LOG_TAG, "Number change complete");
-        }
-
-        @Override
-        public long getTermId() {
-            return termId;
-        }
-
-        @Override
-        public void setTermId(long termId) {
-            this.termId = termId;
-        }
-
-        @Nullable
-        @Override
-        public Long getMentorId() {
-            return mentorId;
-        }
-
-        @Override
-        public void setMentorId(Long mentorId) {
-            this.mentorId = mentorId;
-        }
-
-        @NonNull
-        @Override
-        public String getTitle() {
-            return title;
-        }
-
-        @Override
-        public synchronized void setTitle(String title) {
-            Log.d(LOG_TAG, String.format("Title changing from %s to %s", ToStringBuilder.toEscapedString(this.title), ToStringBuilder.toEscapedString(title)));
-            this.title = (null == title) ? "" : title;
-            String oldValue = normalizedTitle;
-            normalizedTitle = TermEntity.SINGLE_LINE_NORMALIZER.apply(title);
-            if (normalizedTitle.isEmpty()) {
-                if (!oldValue.isEmpty()) {
-                    Log.d(LOG_TAG, "Setting titleValidLiveData to false");
-                    titleValidLiveData.postValue(false);
-                }
-            } else {
-                if (oldValue.isEmpty()) {
-                    Log.d(LOG_TAG, "Setting titleValidLiveData to true");
-                    titleValidLiveData.postValue(true);
-                }
-            }
-            if (!oldValue.equals(normalizedTitle)) {
-                subTitleLiveData.postValue(normalizedTitle);
-            }
-            Log.d(LOG_TAG, "Title change complete");
-        }
-
-        public synchronized LocalDate getEffectiveStart() {
-            switch (status) {
-                case UNPLANNED:
-                    return null;
-                case PLANNED:
-                    return expectedStart;
-                default:
-                    return actualStart;
-            }
-        }
-
-        @Nullable
-        @Override
-        public synchronized LocalDate getExpectedStart() {
-            if (status == CourseStatus.UNPLANNED) {
-                return null;
-            }
-            return expectedStart;
-        }
-
-        @Override
-        public synchronized void setExpectedStart(LocalDate expectedStart) {
-            if (!Objects.equals(this.expectedStart, expectedStart)) {
-                LocalDate oldStart = getEffectiveStart();
-                this.expectedStart = expectedStart;
-                expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
-                expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
-                LocalDate newStart = getEffectiveStart();
-                if (!Objects.equals(oldStart, newStart)) {
-                    resetOverview();
-                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-                    effectiveStartLiveData.postValue(newStart);
-                }
-            }
-        }
-
-        @Nullable
-        @Override
-        public synchronized LocalDate getActualStart() {
-            switch (status) {
-                case UNPLANNED:
-                case PLANNED:
-                    return null;
-                default:
-                    return actualStart;
-            }
-        }
-
-        @Override
-        public synchronized void setActualStart(LocalDate actualStart) {
-            if (!Objects.equals(this.actualStart, actualStart)) {
-                LocalDate oldStart = getEffectiveStart();
-                this.actualStart = actualStart;
-                actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
-                actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
-                LocalDate newStart = getEffectiveStart();
-                if (!Objects.equals(oldStart, newStart)) {
-                    resetOverview();
-                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-                    effectiveStartLiveData.postValue(newStart);
-                }
-            }
-        }
-
-        public synchronized LocalDate getEffectiveEnd() {
-            switch (status) {
-                case UNPLANNED:
-                    return null;
-                case PLANNED:
-                    return expectedEnd;
-                default:
-                    return actualEnd;
-            }
-        }
-
-        @Nullable
-        @Override
-        public synchronized LocalDate getExpectedEnd() {
-            if (status == CourseStatus.UNPLANNED) {
-                return null;
-            }
-            return expectedEnd;
-        }
-
-        @Override
-        public synchronized void setExpectedEnd(LocalDate expectedEnd) {
-            if (!Objects.equals(this.expectedEnd, expectedEnd)) {
-                LocalDate oldEnd = getEffectiveEnd();
-                this.expectedEnd = expectedEnd;
-                expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
-                expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
-                LocalDate newEnd = getEffectiveEnd();
-                if (!Objects.equals(oldEnd, newEnd)) {
-                    resetOverview();
-                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-                    effectiveEndLiveData.postValue(newEnd);
-                }
-            }
-        }
-
-        @Nullable
-        @Override
-        public synchronized LocalDate getActualEnd() {
-            switch (status) {
-                case UNPLANNED:
-                case PLANNED:
-                    return null;
-                default:
-                    return actualEnd;
-            }
-        }
-
-        @Override
-        public synchronized void setActualEnd(LocalDate actualEnd) {
-            if (!Objects.equals(this.actualEnd, actualEnd)) {
-                LocalDate oldEnd = getEffectiveEnd();
-                this.actualEnd = actualEnd;
-                actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
-                actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
-                LocalDate newEnd = getEffectiveEnd();
-                if (!Objects.equals(oldEnd, newEnd)) {
-                    resetOverview();
-                    overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-                    effectiveEndLiveData.postValue(newEnd);
-                }
-            }
-        }
-
-        @NonNull
-        @Override
-        public CourseStatus getStatus() {
-            return status;
-        }
-
-        @Override
-        public synchronized void setStatus(CourseStatus status) {
-            if (null == status) {
-                status = CourseStatus.UNPLANNED;
-            }
-            if (status != this.status) {
-                Log.d(LOG_TAG, String.format("Status changing from %s to %s", this.status.name(), status.name()));
-                LocalDate oldStart = getEffectiveStart();
-                LocalDate oldEnd = getEffectiveEnd();
-                this.status = status;
-                expectedStartErrorMessageLiveData.postValue(validateExpectedStart().orElse(null));
-                actualStartErrorMessageLiveData.postValue(validateActualStart().orElse(null));
-                expectedEndMessageLiveData.postValue(validateExpectedEnd().orElse(null));
-                actualEndMessageLiveData.postValue(validateActualEnd().orElse(null));
-                LocalDate newStart = getEffectiveStart();
-                if (!Objects.equals(oldStart, newStart)) {
-                    effectiveStartLiveData.postValue(newStart);
-                }
-                LocalDate newEnd = getEffectiveEnd();
-                if (!Objects.equals(oldEnd, newEnd)) {
-                    effectiveEndLiveData.postValue(newEnd);
-                }
-                resetOverview();
-                overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-            }
-        }
-
-        @Override
-        public int getCompetencyUnits() {
-            return (null == competencyUnits) ? 0 : competencyUnits;
-        }
-
-        @Override
-        public synchronized void setCompetencyUnits(int competencyUnits) {
-            if (!Objects.equals(this.competencyUnits, competencyUnits)) {
-                this.competencyUnits = competencyUnits;
-                resetOverview();
-                overviewFactoryLiveData.postValue(EditCourseViewModel.this::calculateOverview);
-            }
-        }
-
-        @NonNull
-        @Override
-        public String getNotes() {
-            return (null == notes) ? normalizedNotes : notes;
-        }
-
-        @Override
-        public synchronized void setNotes(String notes) {
-            if (null == notes || notes.isEmpty()) {
-                normalizedNotes = "";
-                this.notes = null;
-            } else if (!getNotes().equals(notes)) {
-                this.notes = notes;
-                normalizedNotes = null;
-            }
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            return ToStringBuilder.toEscapedString(this, false);
-        }
-
+    public LiveData<List<AlertListItem>> getAllAlerts() {
+        // TODO: Implement this
+        throw new UnsupportedOperationException();
     }
 }

@@ -75,7 +75,7 @@ public class CourseAlertListFragment extends Fragment {
         listViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(CourseAlertListViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         listViewModel.getLiveData().observe(viewLifecycleOwner, this::onListLoaded);
-        courseViewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onCourseLoaded);
+        courseViewModel.getOriginalValuesLiveData().observe(viewLifecycleOwner, this::onCourseLoaded);
         courseViewModel.getEffectiveStartLiveData().observe(viewLifecycleOwner, this::onEffectiveStartChanged);
         courseViewModel.getEffectiveEndLiveData().observe(viewLifecycleOwner, this::onEffectiveEndChanged);
     }
@@ -128,7 +128,7 @@ public class CourseAlertListFragment extends Fragment {
 
     private void onEditAlert(CourseAlert courseAlert) {
         long editAlertId = courseAlert.getAlert().getId();
-        if (courseViewModel.isChanged()) {
+        if (courseViewModel.getHasChangesLiveData().getValue()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
                     () -> doEditAlert(editAlertId),
                     () -> ObserverHelper.subscribeOnce(courseViewModel.save(false), getViewLifecycleOwner(),

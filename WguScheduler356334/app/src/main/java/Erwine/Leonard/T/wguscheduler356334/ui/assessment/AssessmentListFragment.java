@@ -74,7 +74,7 @@ public class AssessmentListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         // Get shared view model, which is initialized by ViewCourseActivity
         editCourseViewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
-        editCourseViewModel.getEntityLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
+        editCourseViewModel.getOriginalValuesLiveData().observe(getViewLifecycleOwner(), this::onEntityLoaded);
         editCourseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
                 f -> overviewTextView.setText(f.apply(getResources())));
     }
@@ -89,7 +89,7 @@ public class AssessmentListFragment extends Fragment {
         Log.d(LOG_TAG, "Loaded course details " + entity);
         long courseId = entity.getId();
         if (ID_NEW != courseId) {
-            editCourseViewModel.getAssessments().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);
+            editCourseViewModel.getAssessmentsLiveData().observe(getViewLifecycleOwner(), this::onAssessmentListChanged);
             editCourseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(), f -> overviewTextView.setText(f.apply(getResources())));
         }
     }

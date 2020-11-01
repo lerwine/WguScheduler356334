@@ -88,7 +88,7 @@ public class AddCourseActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        if (viewModel.isChanged()) {
+        if (viewModel.getHasChangesLiveData().getValue()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
                     ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveOperationFinished, this::onSaveFailed), null);
         } else {

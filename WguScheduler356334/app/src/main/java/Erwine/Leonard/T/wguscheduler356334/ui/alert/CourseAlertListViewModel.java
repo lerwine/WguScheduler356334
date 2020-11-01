@@ -19,6 +19,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 
+/**
+ * TODO: 11/1/2020 Consolidate with {@link Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel}
+ */
 public class CourseAlertListViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(CourseAlertListViewModel.class);
@@ -51,7 +54,7 @@ public class CourseAlertListViewModel extends WguSchedulerViewModel {
         if (null != observed) {
             observed.removeObserver(alertsLoadedObserver);
         }
-        observed = dbLoader.getAlertsByCourseId(course.getId());
+        observed = dbLoader.getAlertsLiveDataByCourseId(course.getId());
         observed.observe(viewLifecycleOwner, alertsLoadedObserver);
     }
 

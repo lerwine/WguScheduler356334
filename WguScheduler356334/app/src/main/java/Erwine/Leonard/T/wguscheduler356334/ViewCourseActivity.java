@@ -121,7 +121,7 @@ ViewCourseActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        if (viewModel.isChanged()) {
+        if (viewModel.getHasChangesLiveData().getValue()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
                     ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), this,
                             alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts))), null);
@@ -171,7 +171,7 @@ ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onAddAlertFloatingActionButtonClick(View view) {
-        if (viewModel.isChanged()) {
+        if (viewModel.getHasChangesLiveData().getValue()) {
             new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
                     () -> {
                         EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
@@ -191,7 +191,7 @@ ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onShareFloatingActionButton(View view) {
-        ObserverHelper.observeOnce(viewModel.getAssessments(), this, assessments -> {
+        ObserverHelper.observeOnce(viewModel.getAssessmentsLiveData(), this, assessments -> {
             Resources resources = getResources();
             StringBuilder sb = new StringBuilder("Course ").append(viewModel.getNumber()).append(" Report: ").append(viewModel.getTitle());
             String title = sb.toString();

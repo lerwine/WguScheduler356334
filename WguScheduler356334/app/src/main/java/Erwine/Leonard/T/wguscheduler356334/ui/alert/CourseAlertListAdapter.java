@@ -66,7 +66,7 @@ public class CourseAlertListAdapter extends RecyclerView.Adapter<CourseAlertList
             onItemClick.accept(alertListItem);
         }
 
-        public void setItem(CourseAlert alertListItem) {
+        public void setItem(@NonNull CourseAlert alertListItem) {
             this.alertListItem = alertListItem;
             AlertEntity alert = alertListItem.getAlert();
             LocalDate d = alertListItem.getAlertDate();

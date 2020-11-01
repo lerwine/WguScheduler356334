@@ -12,7 +12,6 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
@@ -24,11 +23,11 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.AbstractMentorEntity;
@@ -37,7 +36,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -105,19 +106,15 @@ public class EditCourseFragment extends Fragment {
         // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         viewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        viewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onEntityLoaded);
-        viewModel.getTermsLiveData().observe(viewLifecycleOwner, this::onTermsLoaded);
-        viewModel.getMentorsLiveData().observe(viewLifecycleOwner, this::onMentorsLoaded);
         viewModel.getTermValidLiveData().observe(viewLifecycleOwner, this::onTermValidChanged);
         viewModel.getNumberValidLiveData().observe(viewLifecycleOwner, this::onNumberValidChanged);
         viewModel.getTitleValidLiveData().observe(viewLifecycleOwner, this::onTitleValidChanged);
-        viewModel.getExpectedStartErrorMessageLiveData().observe(viewLifecycleOwner, this::onExpectedStartErrorMessageChanged);
-        viewModel.getExpectedStartWarningMessageLiveData().observe(viewLifecycleOwner, this::onExpectedStartWarningMessageChanged);
-        viewModel.getExpectedEndMessageLiveData().observe(viewLifecycleOwner, this::onExpectedEndMessageChanged);
-        viewModel.getActualStartErrorMessageLiveData().observe(viewLifecycleOwner, this::onActualStartErrorMessageChanged);
-        viewModel.getActualStartWarningMessageLiveData().observe(viewLifecycleOwner, this::onActualStartWarningMessageChanged);
-        viewModel.getActualEndMessageLiveData().observe(viewLifecycleOwner, this::onActualEndMessageChanged);
-        viewModel.getCompetencyUnitsMessageLiveData().observe(viewLifecycleOwner, this::onCompetencyUnitsMessageChanged);
+        viewModel.getExpectedStartValidationMessageLiveData().observe(viewLifecycleOwner, this::onExpectedStartErrorMessageChanged);
+        viewModel.getExpectedEndValidationMessageLiveData().observe(viewLifecycleOwner, this::onExpectedEndMessageChanged);
+        viewModel.getActualStartValidationMessageLiveData().observe(viewLifecycleOwner, this::onActualStartErrorMessageChanged);
+        viewModel.getActualEndValidationMessageLiveData().observe(viewLifecycleOwner, this::onActualEndMessageChanged);
+        viewModel.getCompetencyUnitsValidationMessageLiveData().observe(viewLifecycleOwner, this::onCompetencyUnitsMessageChanged);
+        ObserverHelper.subscribeOnce(viewModel.getInitializedCompletable(), viewLifecycleOwner, this::onViewModelInitialized);
     }
 
     @Override
@@ -153,105 +150,58 @@ public class EditCourseFragment extends Fragment {
         }
     }
 
-    private void onExpectedStartErrorMessageChanged(@StringRes Integer id) {
-        if (null != id) {
-            Log.d(LOG_TAG, String.format("Enter onExpectedStartErrorMessageChanged(%d)", id));
-            expectedStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
-        } else if (null == (id = viewModel.getExpectedStartWarningMessageLiveData().getValue())) {
-            Log.d(LOG_TAG, "Enter onExpectedStartErrorMessageChanged(null); warning=null");
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void onExpectedStartErrorMessageChanged(@NonNull Optional<ResourceMessageFactory> messageFactory) {
+        if (messageFactory.isPresent()) {
+            ResourceMessageFactory message = messageFactory.get();
+            expectedStartChip.setError(message.apply(getResources()), AppCompatResources.getDrawable(requireContext(), message.getLevel().getErrorIcon()));
+        } else {
             expectedStartChip.setError(null);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onExpectedStartErrorMessageChanged(null); warning=%d", id));
-            expectedStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
         }
     }
 
-    private void onExpectedStartWarningMessageChanged(Integer id) {
-        if (null == viewModel.getExpectedStartErrorMessageLiveData().getValue()) {
-            if (null == id) {
-                Log.d(LOG_TAG, "Enter onExpectedStartWarningMessageChanged(null)");
-                expectedStartChip.setError(null);
-            } else {
-                Log.d(LOG_TAG, String.format("Enter onExpectedStartWarningMessageChanged(%d)", id));
-                expectedStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
-            }
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void onExpectedEndMessageChanged(@NonNull Optional<ResourceMessageFactory> messageFactory) {
+        if (messageFactory.isPresent()) {
+            ResourceMessageFactory message = messageFactory.get();
+            expectedEndChip.setError(message.apply(getResources()), AppCompatResources.getDrawable(requireContext(), message.getLevel().getErrorIcon()));
         } else {
-            Log.d(LOG_TAG, (null == id) ? "Enter onExpectedStartWarningMessageChanged(null); error != null" : String.format("Enter onExpectedStartWarningMessageChanged(%d); error != null", id));
-        }
-    }
-
-    private void onExpectedEndMessageChanged(@StringRes Integer id) {
-        if (null == id) {
-            Log.d(LOG_TAG, "Enter onExpectedEndMessageChanged(null)");
             expectedEndChip.setError(null);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onExpectedEndMessageChanged(%d)", id));
-            String message = getResources().getString(id);
-            if (id == R.string.message_required) {
-                expectedEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
-            } else {
-                expectedEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
-            }
         }
     }
 
-    private void onActualStartErrorMessageChanged(@StringRes Integer id) {
-        if (null != id) {
-            Log.d(LOG_TAG, String.format("Enter onActualStartErrorMessageChanged(%d)", id));
-            actualStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
-        } else if (null == (id = viewModel.getActualStartWarningMessageLiveData().getValue())) {
-            Log.d(LOG_TAG, "Enter onActualStartErrorMessageChanged(null); warning=null");
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void onActualStartErrorMessageChanged(@NonNull Optional<ResourceMessageFactory> messageFactory) {
+        if (messageFactory.isPresent()) {
+            ResourceMessageFactory message = messageFactory.get();
+            actualStartChip.setError(message.apply(getResources()), AppCompatResources.getDrawable(requireContext(), message.getLevel().getErrorIcon()));
+        } else {
             actualStartChip.setError(null);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onActualStartErrorMessageChanged(null); warning=%d", id));
-            actualStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
         }
     }
 
-    private void onActualStartWarningMessageChanged(Integer id) {
-        if (null == viewModel.getActualStartErrorMessageLiveData().getValue()) {
-            if (null == id) {
-                Log.d(LOG_TAG, "Enter onActualStartWarningMessageChanged(null)");
-                actualStartChip.setError(null);
-            } else {
-                Log.d(LOG_TAG, String.format("Enter onActualStartWarningMessageChanged(%d)", id));
-                actualStartChip.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
-            }
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void onActualEndMessageChanged(@NonNull Optional<ResourceMessageFactory> messageFactory) {
+        if (messageFactory.isPresent()) {
+            ResourceMessageFactory message = messageFactory.get();
+            actualEndChip.setError(message.apply(getResources()), AppCompatResources.getDrawable(requireContext(), message.getLevel().getErrorIcon()));
         } else {
-            Log.d(LOG_TAG, (null == id) ? "Enter onActualStartWarningMessageChanged(null); error != null" : String.format("Enter onActualStartWarningMessageChanged(%d); error != null", id));
-        }
-    }
-
-    private void onActualEndMessageChanged(@StringRes Integer id) {
-        if (null == id) {
-            Log.d(LOG_TAG, "Enter onActualEndMessageChanged(null)");
             actualEndChip.setError(null);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onActualEndMessageChanged(%d)", id));
-            String message = getResources().getString(id);
-            if (id == R.string.message_required) {
-                actualEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
-            } else {
-                actualEndChip.setError(message, AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_warning));
-            }
         }
     }
 
-    private void onCompetencyUnitsMessageChanged(@StringRes Integer id) {
-        if (null == id) {
-            Log.d(LOG_TAG, "Enter onCompetencyUnitsMessageChanged(null)");
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void onCompetencyUnitsMessageChanged(@NonNull Optional<ResourceMessageFactory> messageFactory) {
+        if (messageFactory.isPresent()) {
+            ResourceMessageFactory message = messageFactory.get();
+            competencyUnitsEditText.setError(message.apply(getResources()), AppCompatResources.getDrawable(requireContext(), message.getLevel().getErrorIcon()));
+        } else {
             competencyUnitsEditText.setError(null);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onCompetencyUnitsMessageChanged(%d)", id));
-            competencyUnitsEditText.setError(getResources().getString(id), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
         }
     }
 
-    private void onEntityLoaded(@NonNull CourseDetails entity) {
-        Log.d(LOG_TAG, String.format("Enter onEntityLoaded(%s)", entity));
-        viewModel.initializeTermProperty(viewModel.getTermsLiveData().getValue());
+    private void onViewModelInitialized() {
         onTermChanged(viewModel.getSelectedTerm());
-        viewModel.initializeMentorProperty(viewModel.getMentorsLiveData().getValue());
         onMentorChanged(viewModel.getSelectedMentor());
         courseCodeEditText.setText(viewModel.getNumber());
         competencyUnitsEditText.setText(viewModel.getCompetencyUnitsText());
@@ -268,25 +218,9 @@ public class EditCourseFragment extends Fragment {
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
     }
 
-    private void onTermsLoaded(@NonNull List<TermListItem> termListItems) {
-        Log.d(LOG_TAG, String.format("Loaded %d terms", termListItems.size()));
-        AbstractTermEntity<?> term = viewModel.initializeTermProperty(termListItems);
-        if (null != term) {
-            onTermChanged(term);
-        }
-    }
-
-    private void onMentorsLoaded(@NonNull List<MentorListItem> mentorListItems) {
-        Log.d(LOG_TAG, String.format("Loaded %d mentors", mentorListItems.size()));
-        AbstractMentorEntity<?> mentor = viewModel.initializeMentorProperty(mentorListItems);
-        if (null != mentor) {
-            onMentorChanged(mentor);
-        }
-    }
-
     private void onTermButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onTermButtonClick");
-        List<TermListItem> termListItems = viewModel.getTermsLiveData().getValue();
+        List<TermListItem> termListItems = viewModel.getTermOptionsLiveData().getValue();
         if (null != termListItems) {
             AlertHelper.showSingleSelectDialog(R.string.title_select_term, viewModel.getSelectedTerm(), termListItems, requireContext(), AbstractTermEntity::getName, t -> {
                 viewModel.setSelectedTerm(t);
@@ -299,7 +233,7 @@ public class EditCourseFragment extends Fragment {
 
     private void onMentorChipClick(View view) {
         Log.d(LOG_TAG, "Enter onMentorChipClick");
-        List<MentorListItem> mentorListItems = viewModel.getMentorsLiveData().getValue();
+        List<MentorListItem> mentorListItems = viewModel.getMentorOptionsLiveData().getValue();
         if (null != mentorListItems) {
             AlertHelper.showSingleSelectDialog(R.string.title_select_mentor, viewModel.getSelectedMentor(), mentorListItems, requireContext(), AbstractMentorEntity::getName, t -> {
                 viewModel.setSelectedMentor(t);

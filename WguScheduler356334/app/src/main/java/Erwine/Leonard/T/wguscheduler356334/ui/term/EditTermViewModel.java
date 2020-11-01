@@ -132,6 +132,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
 
         Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
+        // FIXME: Where is term coming from?
         Observable<Boolean> hasChangesObservable = Observable.combineLatest(
                 entitySubject,
                 normalizedNameObservable,
@@ -376,7 +377,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
             if (ID_NEW == id) {
                 coursesLiveData = new MutableLiveData<>(Collections.emptyList());
             } else if (fromInitializedState) {
-                coursesLiveData = dbLoader.getCoursesByTermId(id);
+                coursesLiveData = dbLoader.getCoursesLiveDataByTermId(id);
             } else {
                 return dbLoader.getTermById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
@@ -459,7 +460,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         startDateSubject.onNext(Optional.ofNullable(entity.getStart()));
         endDateSubject.onNext(Optional.ofNullable(entity.getEnd()));
         notesSubject.onNext(entity.getNotes());
-        coursesLiveData = dbLoader.getCoursesByTermId(entity.getId());
+        coursesLiveData = dbLoader.getCoursesLiveDataByTermId(entity.getId());
         originalValuesLiveData.postValue(entity);
         initializedSubject.onComplete();
     }

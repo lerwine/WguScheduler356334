@@ -19,6 +19,9 @@ import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 
+/**
+ * TODO: 11/1/2020 Consolidate with {@link Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel}
+ */
 public class AssessmentAlertListViewModel extends WguSchedulerViewModel {
 
     private static final String LOG_TAG = MainActivity.getLogTag(AssessmentAlertListViewModel.class);
