@@ -153,7 +153,7 @@
         <item name="srcCompat">@drawable/undo_icon</item>
     </style>
 
-    <style name="WGU.Scheduler.FieldLabel" parent="TextAppearance.AppCompat.Medium">
+    <style name="WGU.Scheduler.FieldLabel" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -172,9 +172,17 @@
     </style>
 
     <style name="WGU.Scheduler.TextInputEditText" parent="Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
-        <item name="android:padding">4dp</item>
-        <item name="android:background">@android:drawable/edit_text</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:background">@drawable/edit_text_bg</item>
+        <item name="android:drawableEnd">@drawable/vertical_border</item>
+        <item name="android:drawableBottom">@drawable/horizontal_border</item>
+        <!--        <item name="android:background">@android:drawable/edit_text</item>-->
     </style>
 
     <style name="WGU.Scheduler.Chip.Action" parent="Widget.MaterialComponents.Chip.Action">

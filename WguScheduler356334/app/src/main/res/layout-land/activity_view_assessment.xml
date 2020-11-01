@@ -55,8 +55,8 @@
         style="@style/WGU.Scheduler.ShareFabButtonStyle"
         android:clickable="true"
         android:contentDescription="@string/label_share_assessment"
-        app:layout_constraintBottom_toTopOf="@+id/addFloatingActionButton"
-        app:layout_constraintEnd_toStartOf="@+id/saveFloatingActionButton" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/addFloatingActionButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/saveFloatingActionButton"

@@ -193,6 +193,7 @@ public interface Assessment extends NoteColumnIncludedEntity {
         } else {
             setGoalDate(null);
         }
+        key = stateKey(COLNAME_TYPE, isOriginal);
         setType((bundle.containsKey(key)) ? AssessmentType.valueOf(bundle.getString(key)) : AssessmentType.OBJECTIVE_ASSESSMENT);
         key = stateKey(COLNAME_COMPLETION_DATE, isOriginal);
         if (bundle.containsKey(key)) {

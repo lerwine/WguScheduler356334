@@ -39,13 +39,16 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.MessageLevel;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.CompletableSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -77,7 +80,9 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     private final BehaviorSubject<Optional<LocalDate>> endDateSubject;
     private final BehaviorSubject<Optional<ResourceMessageFactory>> endMessageOverride;
     private final BehaviorSubject<String> notesSubject;
-    private final PrivateLiveData<TermEntity> entityLiveData;
+    private final CompletableSubject initializedSubject;
+    private final Completable initializedCompletable;
+    private final PrivateLiveData<TermEntity> originalValuesLiveData;
     private final PrivateLiveData<Function<Resources, String>> titleFactory;
     private final PrivateLiveData<Function<Resources, Spanned>> overviewFactory;
     private final PrivateLiveData<Boolean> nameValid;
@@ -101,8 +106,10 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         endDateSubject = BehaviorSubject.createDefault(Optional.empty());
         endMessageOverride = BehaviorSubject.createDefault(Optional.empty());
         notesSubject = BehaviorSubject.createDefault("");
+        initializedSubject = CompletableSubject.create();
+        initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
         compositeDisposable = new CompositeDisposable();
-        entityLiveData = new PrivateLiveData<>();
+        originalValuesLiveData = new PrivateLiveData<>();
         nameValid = new PrivateLiveData<>(false);
         startMessage = new PrivateLiveData<>(Optional.empty());
         endMessage = new PrivateLiveData<>(Optional.empty());
@@ -190,7 +197,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
             return Optional.of(ResourceMessageFactory.ofWarning(R.string.message_recommended));
         });
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n &&
-                s.map(ResourceMessageFactory::isWarning).orElse(true) && e.map(ResourceMessageFactory::isWarning).orElse(true));
+                s.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true) && e.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true));
 
         compositeDisposable.add(validObservable.subscribe(isValid::postValue));
         compositeDisposable.add(Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).subscribe(canSave::postValue));
@@ -242,12 +249,12 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     }
 
     public long getId() {
-        return entitySubject.getValue().getId();
+        return Objects.requireNonNull(entitySubject.getValue()).getId();
     }
 
     @NonNull
     public String getName() {
-        return nameSubject.getValue();
+        return Objects.requireNonNull(nameSubject.getValue());
     }
 
     public synchronized void setName(String value) {
@@ -256,17 +263,15 @@ public class EditTermViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public LocalDate getStart() {
-        return startDateSubject.getValue().orElse(null);
+        return Objects.requireNonNull(startDateSubject.getValue()).orElse(null);
     }
 
     public synchronized void setStart(@Nullable LocalDate value) {
         Log.d(LOG_TAG, "Enter setStart(" + ToStringBuilder.toEscapedString(value, true) + ")");
-        // TODO: Use validation observables instead
         startMessageOverride.onNext(Optional.empty());
         startDateSubject.onNext(Optional.ofNullable(value));
     }
 
-    // TODO: Use validation observables instead
     public synchronized void setStart(@NonNull ResourceMessageFactory value) {
         Log.d(LOG_TAG, "Enter setStart(" + value + ")");
         startMessageOverride.onNext(Optional.of(value));
@@ -275,17 +280,15 @@ public class EditTermViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public LocalDate getEnd() {
-        return endDateSubject.getValue().orElse(null);
+        return Objects.requireNonNull(endDateSubject.getValue()).orElse(null);
     }
 
     public synchronized void setEnd(@Nullable LocalDate value) {
         Log.d(LOG_TAG, "Enter setEnd(" + ToStringBuilder.toEscapedString(value, true) + ")");
-        // TODO: Use validation observables instead
         endMessageOverride.onNext(Optional.empty());
         endDateSubject.onNext(Optional.ofNullable(value));
     }
 
-    // TODO: Use validation observables instead
     public synchronized void setEnd(@NonNull ResourceMessageFactory value) {
         Log.d(LOG_TAG, "Enter setEnd(" + value + ")");
         endMessageOverride.onNext(Optional.of(value));
@@ -294,7 +297,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public String getNotes() {
-        return notesSubject.getValue();
+        return Objects.requireNonNull(notesSubject.getValue());
     }
 
     public synchronized void setNotes(String value) {
@@ -333,8 +336,12 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         return overviewFactory;
     }
 
-    public LiveData<TermEntity> getEntityLiveData() {
-        return entityLiveData;
+    public LiveData<TermEntity> getOriginalValuesLiveData() {
+        return originalValuesLiveData;
+    }
+
+    public Completable getInitializedCompletable() {
+        return initializedCompletable;
     }
 
     public boolean isFromInitializedState() {
@@ -346,7 +353,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     }
 
     public LiveData<List<AlertListItem>> getAllAlerts() {
-        long id = entitySubject.getValue().getId();
+        long id = Objects.requireNonNull(entitySubject.getValue()).getId();
         if (id != ID_NEW) {
             return dbLoader.getAllAlertsByTermId(id);
         }
@@ -397,26 +404,27 @@ public class EditTermViewModel extends WguSchedulerViewModel {
             initializeObservables(entity);
             coursesLiveData = new MutableLiveData<>(Collections.emptyList());
         }
-        entityLiveData.postValue(entity);
+        originalValuesLiveData.postValue(entity);
+        initializedSubject.onComplete();
         return Single.just(entity).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void saveViewModelState(@NonNull Bundle outState) {
         Log.d(LOG_TAG, "Enter saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        entitySubject.getValue().saveState(outState, true);
+        Objects.requireNonNull(entitySubject.getValue()).saveState(outState, true);
         outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_NAME, false), nameSubject.getValue());
-        startDateSubject.getValue().ifPresent(d -> outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_START, false), LocalDateConverter.fromLocalDate(d)));
-        endDateSubject.getValue().ifPresent(d -> outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_END, false), LocalDateConverter.fromLocalDate(d)));
+        Objects.requireNonNull(startDateSubject.getValue()).ifPresent(d -> outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_START, false), LocalDateConverter.fromLocalDate(d)));
+        Objects.requireNonNull(endDateSubject.getValue()).ifPresent(d -> outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_END, false), LocalDateConverter.fromLocalDate(d)));
         outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_NOTES, false), notesSubject.getValue());
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter save(" + ToStringBuilder.toEscapedString(ignoreWarnings) + ")");
-        LocalDate newStart = startDateSubject.getValue().orElse(null);
-        LocalDate newEnd = endDateSubject.getValue().orElse(null);
+        LocalDate newStart = Objects.requireNonNull(startDateSubject.getValue()).orElse(null);
+        LocalDate newEnd = Objects.requireNonNull(endDateSubject.getValue()).orElse(null);
         TermEntity originalValues = entitySubject.getValue();
-        String originalName = originalValues.getName();
+        String originalName = Objects.requireNonNull(originalValues).getName();
         LocalDate originalStart = originalValues.getStart();
         LocalDate originalEnd = originalValues.getEnd();
         String originalNotes = originalValues.getNotes();
@@ -452,7 +460,8 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         endDateSubject.onNext(Optional.ofNullable(entity.getEnd()));
         notesSubject.onNext(entity.getNotes());
         coursesLiveData = dbLoader.getCoursesByTermId(entity.getId());
-        entityLiveData.postValue(entity);
+        originalValuesLiveData.postValue(entity);
+        initializedSubject.onComplete();
     }
 
     private static class PrivateLiveData<T> extends LiveData<T> {

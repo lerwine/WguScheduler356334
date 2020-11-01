@@ -24,15 +24,16 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:importantForAutofill="no"
-            android:inputType="textCapWords" />
+            android:inputType="textCapWords"
+            android:minEms="@integer/min_ems_short_text" />
 
         <TextView
             android:id="@+id/termStartTextView"
             style="@style/WGU.Scheduler.FieldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/termStartEditView"
             android:text="@string/label_start_of_term" />
 
@@ -41,13 +42,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/edit_text"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/termEndTextView"
             style="@style/WGU.Scheduler.FieldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/termEndEditView"
             android:text="@string/label_end_of_term" />
 
@@ -56,13 +58,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/edit_text"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/termNotesLabelTextView"
             style="@style/WGU.Scheduler.FieldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/notesEditText"
             android:text="@string/label_notes" />
 
@@ -71,10 +74,10 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:gravity="start|top"
             android:importantForAutofill="no"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:minLines="@integer/min_lines_notes" />
 
     </LinearLayout>
 

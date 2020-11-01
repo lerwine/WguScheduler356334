@@ -51,6 +51,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
@@ -110,7 +111,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
     }
 
     private final DbLoader dbLoader;
-    private final BehaviorSubject<AlertEntity> alertEntitySubject;
+    private final BehaviorSubject<AlertEntity> originalValuesSubject;
     private final BehaviorSubject<Integer> typeResourceIdSubject;
     private final BehaviorSubject<Boolean> beforeEndAllowedSubject;
     private final BehaviorSubject<String> daysTextSubject;
@@ -129,12 +130,13 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
 //    private final PrivateLiveData<Boolean> hasChangesLiveData;
     private final PrivateLiveData<String> eventDateStringLiveData;
     private final PrivateLiveData<String> selectedDateStringLiveData;
+    private final PrivateLiveData<AlertDateOption> selectedOptionLiveData;
     private final PrivateLiveData<String> effectiveTimeStringLiveData;
     private final PrivateLiveData<String> effectiveAlertDateTimeStringLiveData;
     private final PrivateLiveData<Optional<LocalDateTime>> effectiveAlertDateTimeValueLiveData;
     private final PrivateLiveData<Optional<ResourceMessageFactory>> daysValidationMessageLiveData;
     private final PrivateLiveData<Optional<ResourceMessageFactory>> selectedDateValidationMessageLiveData;
-    private final PrivateLiveData<AlertEntity> alertEntityLiveData;
+    //    private final PrivateLiveData<AlertEntity> originalValuesLiveData;
     private BinaryAlternate<? extends CourseAlertDetails, ? extends AssessmentAlertDetails> target;
     @StringRes
     private volatile int startLabelTextResourceId;
@@ -146,7 +148,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
     public EditAlertViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        alertEntitySubject = BehaviorSubject.create();
+        originalValuesSubject = BehaviorSubject.create();
         typeResourceIdSubject = BehaviorSubject.createDefault(TYPE_VALUE_COURSE);
         beforeEndAllowedSubject = BehaviorSubject.createDefault(true);
         daysTextSubject = BehaviorSubject.createDefault("");
@@ -163,50 +165,53 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
 //        hasChangesLiveData = new PrivateLiveData<>(false);
         daysValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
         selectedDateValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
+        selectedOptionLiveData = new PrivateLiveData<>(selectedOptionSubject.getValue());
         eventDateStringLiveData = new PrivateLiveData<>("");
         selectedDateStringLiveData = new PrivateLiveData<>("");
         effectiveTimeStringLiveData = new PrivateLiveData<>("");
         effectiveAlertDateTimeStringLiveData = new PrivateLiveData<>("");
         effectiveAlertDateTimeValueLiveData = new PrivateLiveData<>(Optional.empty());
-        alertEntityLiveData = new PrivateLiveData<>();
+//        originalValuesLiveData = new PrivateLiveData<>();
 
         ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), this, defaultEventTimeSubject::onNext);
 
-        Scheduler workerScheduler = Workers.getScheduler();
-        Observable<AlertDateOption> selectedOptionObservable = selectedOptionSubject.subscribeOn(workerScheduler).observeOn(workerScheduler);
-        Observable<String> normalizedMessageObservable = customMessageTextSubject.subscribeOn(workerScheduler).observeOn(workerScheduler).map(Workers.asCached(AbstractEntity.SINGLE_LINE_NORMALIZER::apply));
+        Scheduler computationScheduler = Schedulers.computation();
+
+        Observable<AlertDateOption> selectedOptionObservable = selectedOptionSubject.observeOn(computationScheduler);
+        Observable<String> normalizedMessageObservable = customMessageTextSubject.observeOn(computationScheduler)
+                .map(Workers.asCached(AbstractEntity.SINGLE_LINE_NORMALIZER::apply));
         Observable<BinaryOptional<Integer, ResourceMessageFactory>> daysEditTextParseResultObservable = Observable.combineLatest(
-                daysTextSubject.subscribeOn(workerScheduler).observeOn(workerScheduler),
+                daysTextSubject.observeOn(computationScheduler),
                 selectedOptionObservable,
                 this::calculateDaysEditTextParseResult
         );
         Observable<Optional<LocalDate>> eventDateObservable = selectedOptionObservable.map(Workers.asCached(this::calculateEventDate));
-        Observable<Optional<LocalDate>> selectedDateObservable = selectedDateSubject.subscribeOn(workerScheduler).observeOn(workerScheduler);
-        Observable<Optional<LocalTime>> selectedTimeObservable = selectedTimeSubject.subscribeOn(workerScheduler).observeOn(workerScheduler);
+        Observable<Optional<LocalDate>> selectedDateObservable = selectedDateSubject.observeOn(computationScheduler);
+        Observable<Optional<LocalTime>> selectedTimeObservable = selectedTimeSubject.observeOn(computationScheduler);
         Observable<BinaryOptional<LocalDate, ResourceMessageFactory>> effectiveAlertDateObservable = Observable.combineLatest(
                 daysEditTextParseResultObservable,
                 selectedDateObservable,
                 selectedOptionObservable,
                 eventDateObservable,
-                beforeEndAllowedSubject.subscribeOn(workerScheduler).observeOn(workerScheduler),
+                beforeEndAllowedSubject.observeOn(computationScheduler),
                 Workers.asCached(this::calculateEffectiveAlertDate)
         );
         Observable<Optional<LocalTime>> effectiveTimeObservable = Observable.combineLatest(
-                defaultEventTimeSubject.subscribeOn(workerScheduler).observeOn(workerScheduler),
-                explicitTimeSubject.subscribeOn(workerScheduler).observeOn(workerScheduler),
+                defaultEventTimeSubject.observeOn(computationScheduler),
+                explicitTimeSubject.observeOn(computationScheduler),
                 selectedTimeObservable,
                 Workers.asCached((defaultEventTime, isExplicitTime, selectedTime) -> (isExplicitTime) ? selectedTime : Optional.of(defaultEventTime))
         );
         Observable<Optional<Long>> timeSpecObservable = Observable.combineLatest(selectedOptionObservable, daysEditTextParseResultObservable, selectedDateObservable,
                 Workers.asCached(this::calculateTimeSpec));
-        Observable<AlertEntity> alertEntityObservable = alertEntitySubject.subscribeOn(workerScheduler).observeOn(workerScheduler);
+        Observable<AlertEntity> originalValuesObservable = originalValuesSubject.observeOn(computationScheduler);
         Observable<Boolean> changedObservable = Observable.combineLatest(
                 selectedOptionObservable,
                 timeSpecObservable,
                 selectedDateObservable,
                 selectedTimeObservable,
                 normalizedMessageObservable,
-                alertEntityObservable,
+                originalValuesObservable,
                 Workers.asCached(this::calculateChanged)
         );
         Observable<Boolean> validObservable = Observable.combineLatest(daysEditTextParseResultObservable, effectiveAlertDateObservable, effectiveTimeObservable,
@@ -215,22 +220,24 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
         Observable<Boolean> canSaveObservable = Observable.combineLatest(changedObservable, validObservable, (c, v) -> c && v);
 
         compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(daysEditTextParseResultObservable.subscribe(this::onDaysEditTextChanged, throwable -> daysValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
+        compositeDisposable.add(daysEditTextParseResultObservable.subscribe(this::onDaysEditTextChanged,
+                throwable -> daysValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
         compositeDisposable.add(effectiveAlertDateObservable.subscribe(this::onEffectiveAlertDateChanged,
                 throwable -> selectedDateValidationMessageLiveData.postValue(Optional.of(ResourceMessageFactory.ofError(throwable)))));
         compositeDisposable.add(canSaveObservable.subscribe(canSaveLiveData::postValue));
-        compositeDisposable.add(eventDateObservable.subscribe(e ->
-                eventDateStringLiveData.postValue(e.map(LocalDateConverter.MEDIUM_FORMATTER::format).orElse(""))
-        ));
-        compositeDisposable.add(selectedDateObservable.subscribe(e ->
-                selectedDateStringLiveData.postValue(e.map(LocalDateConverter.SHORT_FORMATTER::format).orElse(""))
-        ));
-        compositeDisposable.add(effectiveTimeObservable.subscribe(t ->
-                effectiveTimeStringLiveData.postValue(t.map(LocalTimeConverter.MEDIUM_FORMATTER::format).orElse(""))));
+        compositeDisposable.add(eventDateObservable.map(e -> e.map(LocalDateConverter.MEDIUM_FORMATTER::format).orElse(""))
+                .subscribe(eventDateStringLiveData::postValue));
+        compositeDisposable.add(Observable.combineLatest(selectedOptionObservable, selectedDateObservable,
+                (o, d) -> (o == AlertDateOption.EXPLICIT) ? d : Optional.<LocalDate>empty())
+                .map(e -> e.map(LocalDateConverter.SHORT_FORMATTER::format).orElse(""))
+                .subscribe(selectedDateStringLiveData::postValue));
+        compositeDisposable.add(selectedOptionObservable.subscribe(selectedOptionLiveData::postValue));
+        compositeDisposable.add(effectiveTimeObservable.map(t -> t.map(LocalTimeConverter.MEDIUM_FORMATTER::format).orElse(""))
+                .subscribe(effectiveTimeStringLiveData::postValue));
         compositeDisposable.add(validObservable.subscribe(validLiveData::postValue));
         compositeDisposable.add(Observable.combineLatest(effectiveAlertDateObservable, effectiveTimeObservable, Workers.asCached((effectiveAlertDate, effectiveTime) ->
                 effectiveAlertDate.ofPrimary().flatMap(d -> effectiveTime.map(d::atTime)))).subscribe(this::onEffectiveAlertDateTimeChanged));
-        compositeDisposable.add(alertEntityObservable.subscribe(this::onAlertEntityChanged));
+        compositeDisposable.add(originalValuesObservable.subscribe(this::onAlertEntityChanged));
     }
 
     @Override
@@ -397,7 +404,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
     }
 
     private void onAlertEntityChanged(AlertEntity alertEntity) {
-        alertEntityLiveData.postValue(alertEntity);
+//        originalValuesLiveData.postValue(alertEntity);
         long t = alertEntity.getTimeSpec();
         AlertDateOption alertDateOption = AlertDateOption.of(alertEntity.isSubsequent(), t);
         setAlertDateOption(alertDateOption);
@@ -435,7 +442,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
     }
 
     public int getNotificationId() {
-        return ComparisonHelper.mapNonNullElse(alertEntitySubject.getValue(), AlertEntity::getNotificationId, 0);
+        return ComparisonHelper.mapNonNullElse(originalValuesSubject.getValue(), AlertEntity::getNotificationId, 0);
     }
 
     public boolean isBeforeEndAllowed() {
@@ -448,7 +455,10 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
     }
 
     public void setDaysText(String text) {
-        daysTextSubject.onNext(ComparisonHelper.requireNonNullElse(text, ""));
+        String s = ComparisonHelper.requireNonNullElse(text, "");
+        if (!s.isEmpty() || selectedOptionSubject.getValue() != AlertDateOption.EXPLICIT) {
+            daysTextSubject.onNext(s);
+        }
     }
 
     @NonNull
@@ -511,10 +521,6 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
         customMessageTextSubject.onNext(ComparisonHelper.requireNonNullElse(customMessage, ""));
     }
 
-    public LiveData<AlertEntity> getAlertEntityLiveData() {
-        return alertEntityLiveData;
-    }
-
     public LiveData<String> getEventDateStringLiveData() {
         return eventDateStringLiveData;
     }
@@ -541,6 +547,10 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
 
     public LiveData<Optional<ResourceMessageFactory>> getSelectedDateValidationMessageLiveData() {
         return selectedDateValidationMessageLiveData;
+    }
+
+    public LiveData<AlertDateOption> getSelectedOptionLiveData() {
+        return selectedOptionLiveData;
     }
 
     public LiveData<Boolean> getCanSaveLiveData() {
@@ -724,7 +734,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
             beforeEndAllowedSubject.onNext(false);
             return assessmentAlertDetails.getAlert();
         });
-        alertEntitySubject.onNext(alertEntity);
+        originalValuesSubject.onNext(alertEntity);
         return alertEntity;
     }
 
@@ -739,7 +749,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
                 if (m.isSucceeded()) {
                     AlertEntity alertEntity = courseAlert.getAlert();
                     courseAlertDetails.setAlert(alertEntity);
-                    alertEntitySubject.onNext(alertEntity);
+                    originalValuesSubject.onNext(alertEntity);
                 }
             });
         }, assessmentAlertDetails -> {
@@ -752,7 +762,7 @@ public class EditAlertViewModel extends WguSchedulerViewModel {
                 if (m.isSucceeded()) {
                     AlertEntity alertEntity = assessmentAlert.getAlert();
                     assessmentAlertDetails.setAlert(alertEntity);
-                    alertEntitySubject.onNext(alertEntity);
+                    originalValuesSubject.onNext(alertEntity);
                 }
             });
         });

@@ -1,10 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.util;
 
 import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
-import io.reactivex.Scheduler;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
@@ -13,23 +10,14 @@ import io.reactivex.functions.Function4;
 import io.reactivex.functions.Function5;
 import io.reactivex.functions.Function6;
 import io.reactivex.functions.Function7;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.functions.Function8;
+import io.reactivex.functions.Function9;
 
 public class Workers {
-    private static final Executor executor = Executors.newScheduledThreadPool(3);
-    private static final Scheduler scheduler = Schedulers.from(executor);
-
-    public static Executor getExecutor() {
-        return executor;
-    }
-
-    public static Scheduler getScheduler() {
-        return scheduler;
-    }
-
     private Workers() {
     }
 
+    @NonNull
     public static <T, R> Function<T, R> asCached(@NonNull Function<T, R> source) {
         return (source instanceof CachedResultFunction) ? source : new CachedResultFunction<>(source);
     }
@@ -53,6 +41,7 @@ public class Workers {
         }
     }
 
+    @NonNull
     public static <T1, T2, R> BiFunction<T1, T2, R> asCached(@NonNull BiFunction<T1, T2, R> source) {
         return (source instanceof CachedResultBiFunction) ? source : new CachedResultBiFunction<>(source);
     }
@@ -79,6 +68,7 @@ public class Workers {
         }
     }
 
+    @NonNull
     public static <T1, T2, T3, R> Function3<T1, T2, T3, R> asCached(@NonNull Function3<T1, T2, T3, R> source) {
         return (source instanceof CachedResultFunction3) ? source : new CachedResultFunction3<>(source);
     }
@@ -107,6 +97,7 @@ public class Workers {
         }
     }
 
+    @NonNull
     public static <T1, T2, T3, T4, R> Function4<T1, T2, T3, T4, R> asCached(@NonNull Function4<T1, T2, T3, T4, R> source) {
         return (source instanceof CachedResultFunction4) ? source : new CachedResultFunction4<>(source);
     }
@@ -137,6 +128,7 @@ public class Workers {
         }
     }
 
+    @NonNull
     public static <T1, T2, T3, T4, T5, R> Function5<T1, T2, T3, T4, T5, R> asCached(@NonNull Function5<T1, T2, T3, T4, T5, R> source) {
         return (source instanceof CachedResultFunction5) ? source : new CachedResultFunction5<>(source);
     }
@@ -169,6 +161,7 @@ public class Workers {
         }
     }
 
+    @NonNull
     public static <T1, T2, T3, T4, T5, T6, R> Function6<T1, T2, T3, T4, T5, T6, R> asCached(@NonNull Function6<T1, T2, T3, T4, T5, T6, R> source) {
         return (source instanceof CachedResultFunction6) ? source : new CachedResultFunction6<>(source);
     }
@@ -203,6 +196,7 @@ public class Workers {
         }
     }
 
+    @NonNull
     public static <T1, T2, T3, T4, T5, T6, T7, R> Function7<T1, T2, T3, T4, T5, T6, T7, R> asCached(@NonNull Function7<T1, T2, T3, T4, T5, T6, T7, R> source) {
         return (source instanceof CachedResultFunction7) ? source : new CachedResultFunction7<>(source);
     }
@@ -234,6 +228,88 @@ public class Workers {
                 lastArg6 = t6;
                 lastArg7 = t7;
                 lastResult = source.apply(lastArg1, lastArg2, lastArg3, lastArg4, lastArg5, lastArg6, lastArg7);
+            }
+            return lastResult;
+        }
+    }
+
+    @NonNull
+    public static <T1, T2, T3, T4, T5, T6, T7, T8, R> Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> asCached(@NonNull Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> source) {
+        return (source instanceof CachedResultFunction8) ? source : new CachedResultFunction8<>(source);
+    }
+
+    public static class CachedResultFunction8<T1, T2, T3, T4, T5, T6, T7, T8, R> implements Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> {
+        private final Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> source;
+        private T1 lastArg1;
+        private T2 lastArg2;
+        private T3 lastArg3;
+        private T4 lastArg4;
+        private T5 lastArg5;
+        private T6 lastArg6;
+        private T7 lastArg7;
+        private T8 lastArg8;
+        private R lastResult;
+
+        public CachedResultFunction8(@NonNull Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> source) {
+            this.source = source;
+        }
+
+        @NonNull
+        @Override
+        public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5, @NonNull T6 t6, @NonNull T7 t7, @NonNull T8 t8) throws Exception {
+            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5)
+                    && Objects.equals(t6, lastArg6) && Objects.equals(t7, lastArg7) && Objects.equals(t8, lastArg8))) {
+                lastArg1 = t1;
+                lastArg2 = t2;
+                lastArg3 = t3;
+                lastArg4 = t4;
+                lastArg5 = t5;
+                lastArg6 = t6;
+                lastArg7 = t7;
+                lastArg8 = t8;
+                lastResult = source.apply(lastArg1, lastArg2, lastArg3, lastArg4, lastArg5, lastArg6, lastArg7, lastArg8);
+            }
+            return lastResult;
+        }
+    }
+
+    @NonNull
+    public static <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> asCached(@NonNull Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> source) {
+        return (source instanceof CachedResultFunction8) ? source : new CachedResultFunction9<>(source);
+    }
+
+    public static class CachedResultFunction9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> implements Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> {
+        private final Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> source;
+        private T1 lastArg1;
+        private T2 lastArg2;
+        private T3 lastArg3;
+        private T4 lastArg4;
+        private T5 lastArg5;
+        private T6 lastArg6;
+        private T7 lastArg7;
+        private T8 lastArg8;
+        private T9 lastArg9;
+        private R lastResult;
+
+        public CachedResultFunction9(@NonNull Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> source) {
+            this.source = source;
+        }
+
+        @NonNull
+        @Override
+        public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5, @NonNull T6 t6, @NonNull T7 t7, @NonNull T8 t8, @NonNull T9 t9) throws Exception {
+            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5)
+                    && Objects.equals(t6, lastArg6) && Objects.equals(t7, lastArg7) && Objects.equals(t8, lastArg8))) {
+                lastArg1 = t1;
+                lastArg2 = t2;
+                lastArg3 = t3;
+                lastArg4 = t4;
+                lastArg5 = t5;
+                lastArg6 = t6;
+                lastArg7 = t7;
+                lastArg8 = t8;
+                lastArg9 = t9;
+                lastResult = source.apply(lastArg1, lastArg2, lastArg3, lastArg4, lastArg5, lastArg6, lastArg7, lastArg8, lastArg9);
             }
             return lastResult;
         }

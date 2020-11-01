@@ -40,14 +40,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO: Remove this
-        try {
-            Class.forName("dalvik.system.CloseGuard")
-                    .getMethod("setEnabled", boolean.class)
-                    .invoke(null, true);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            Class.forName("dalvik.system.CloseGuard")
+//                    .getMethod("setEnabled", boolean.class)
+//                    .invoke(null, true);
+//        } catch (ReflectiveOperationException e) {
+//            throw new RuntimeException(e);
+//        }
 
         super.onCreate(savedInstanceState);
         new AssessmentAlertBroadcastReceiver().createNotificationChannel(this);

@@ -10,11 +10,12 @@ import java.util.function.Function;
 import Erwine.Leonard.T.wguscheduler356334.R;
 
 public interface ResourceMessageFactory extends Function<Resources, String> {
-    static ResourceMessageFactory ofWarning(int id) {
+    @NonNull
+    static ResourceMessageFactory of(@NonNull MessageLevel level, int id) {
         return new ResourceMessageFactory() {
             @Override
-            public boolean isWarning() {
-                return true;
+            public MessageLevel getLevel() {
+                return level;
             }
 
             @Override
@@ -24,11 +25,12 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
         };
     }
 
-    static ResourceMessageFactory ofWarning(@NonNull Throwable throwable) {
+    @NonNull
+    static ResourceMessageFactory of(@NonNull MessageLevel level, @NonNull Throwable throwable) {
         return new ResourceMessageFactory() {
             @Override
-            public boolean isWarning() {
-                return true;
+            public MessageLevel getLevel() {
+                return level;
             }
 
             @Override
@@ -42,11 +44,12 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
         };
     }
 
-    static ResourceMessageFactory ofWarning(Function<Resources, String> factory) {
+    @NonNull
+    static ResourceMessageFactory of(@NonNull MessageLevel level, @NonNull Function<Resources, String> factory) {
         return new ResourceMessageFactory() {
             @Override
-            public boolean isWarning() {
-                return true;
+            public MessageLevel getLevel() {
+                return level;
             }
 
             @Override
@@ -56,11 +59,12 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
         };
     }
 
-    static ResourceMessageFactory ofWarning(@StringRes int id, Object... formatArgs) {
+    @NonNull
+    static ResourceMessageFactory of(@NonNull MessageLevel level, @StringRes int id, Object... formatArgs) {
         return new ResourceMessageFactory() {
             @Override
-            public boolean isWarning() {
-                return true;
+            public MessageLevel getLevel() {
+                return level;
             }
 
             @Override
@@ -70,11 +74,53 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
         };
     }
 
-    static ResourceMessageFactory ofError(@StringRes int id) {
+    @NonNull
+    static ResourceMessageFactory ofWarning(int id) {
+        return of(MessageLevel.WARNING, id);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofWarning(@NonNull Throwable throwable) {
+        return of(MessageLevel.WARNING, throwable);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofWarning(Function<Resources, String> factory) {
+        return of(MessageLevel.WARNING, factory);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofWarning(@StringRes int id, Object... formatArgs) {
+        return of(MessageLevel.WARNING, id, formatArgs);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofError(int id) {
+        return of(MessageLevel.ERROR, id);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofError(@NonNull Throwable throwable) {
+        return of(MessageLevel.ERROR, throwable);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofError(Function<Resources, String> factory) {
+        return of(MessageLevel.ERROR, factory);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofError(@StringRes int id, Object... formatArgs) {
+        return of(MessageLevel.ERROR, id, formatArgs);
+    }
+
+    @NonNull
+    static ResourceMessageFactory ofInfo(@StringRes int id) {
         return r -> r.getString(id);
     }
 
-    static ResourceMessageFactory ofError(@NonNull Throwable throwable) {
+    @NonNull
+    static ResourceMessageFactory ofInfo(@NonNull Throwable throwable) {
         return r -> {
             String message = throwable.getLocalizedMessage();
             if ((null == message || message.trim().isEmpty()) && (null == (message = throwable.getMessage()) || message.trim().isEmpty())) {
@@ -84,15 +130,17 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
         };
     }
 
-    static ResourceMessageFactory ofError(Function<Resources, String> factory) {
+    @NonNull
+    static ResourceMessageFactory ofInfo(@NonNull Function<Resources, String> factory) {
         return factory::apply;
     }
 
-    static ResourceMessageFactory ofError(@StringRes int id, Object... formatArgs) {
+    @NonNull
+    static ResourceMessageFactory ofInfo(@StringRes int id, Object... formatArgs) {
         return r -> r.getString(id, formatArgs);
     }
 
-    default boolean isWarning() {
-        return false;
+    default MessageLevel getLevel() {
+        return MessageLevel.INFO;
     }
 }

@@ -24,6 +24,7 @@
         android:id="@+id/valuesScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_margin="@dimen/control_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,14 +49,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="name"
-                android:ems="10"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:minEms="@integer/min_ems_short_text"
+                android:tooltipText="@string/tool_tip_name_of_mentor" />
 
             <TextView
                 android:id="@+id/phoneNumberLabelTextView"
                 style="@style/WGU.Scheduler.FieldLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/control_margin"
                 android:labelFor="@id/phoneNumberEditText"
                 android:text="@string/label_phone_number" />
 
@@ -64,15 +67,17 @@
                 style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autoLink="phone"
                 android:autofillHints="phone"
-                android:ems="10"
-                android:inputType="phone" />
+                android:inputType="phone"
+                android:minEms="@integer/min_ems_short_text" />
 
             <TextView
                 android:id="@+id/emailAddressLabelTextView"
                 style="@style/WGU.Scheduler.FieldLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/control_margin"
                 android:labelFor="@id/emailAddressEditText"
                 android:text="@string/label_email_address" />
 
@@ -81,15 +86,17 @@
                 style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autoLink="email"
                 android:autofillHints="emailAddress"
-                android:ems="10"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:minEms="@integer/min_ems_short_text" />
 
             <TextView
                 android:id="@+id/mentorNotesLabelTextView"
                 style="@style/WGU.Scheduler.FieldLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/control_margin"
                 android:labelFor="@id/notesEditText"
                 android:text="@string/label_notes" />
 
@@ -98,10 +105,10 @@
                 style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:gravity="start|top"
                 android:importantForAutofill="no"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:minLines="@integer/min_lines_notes" />
         </LinearLayout>
 
     </ScrollView>

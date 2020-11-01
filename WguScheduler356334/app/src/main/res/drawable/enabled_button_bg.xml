@@ -5,9 +5,8 @@
     android:viewportWidth="42"
     android:viewportHeight="42">
     <path
-        android:pathData="M0.0,0.0h41.9273v41.9273h-41.9273z"
-        android:strokeWidth="0.0726554"
-        android:strokeColor="#000000">
+        android:pathData="M0.0,0.0h42.0v42.0h-42.0z"
+        android:strokeWidth="0.0">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:startX="21"
@@ -20,16 +19,16 @@
                     android:offset="0.0" />
                 <item
                     android:color="#ffBC641F"
-                    android:offset="0.04438971" />
+                    android:offset="0.05" />
                 <item
                     android:color="@color/color_accent"
-                    android:offset="0.09094573" />
+                    android:offset="0.1" />
                 <item
                     android:color="@color/color_accent"
                     android:offset="0.5" />
                 <item
                     android:color="#ff421D00"
-                    android:offset="0.92169463" />
+                    android:offset="0.9" />
                 <item
                     android:color="#ff000000"
                     android:offset="1.0" />
@@ -37,9 +36,8 @@
         </aapt:attr>
     </path>
     <path
-        android:pathData="M41.9637,0.0363l-0,41.9273l-41.9273,0l-0,-41.9273z"
-        android:strokeWidth="0.0726554"
-        android:strokeColor="#000000">
+        android:pathData="M42.0,0.0l-0,42.0-42.0,0l-0,-42.0z"
+        android:strokeWidth="0.0">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:startX="0"
@@ -52,16 +50,16 @@
                     android:offset="0.0" />
                 <item
                     android:color="#7fBC641F"
-                    android:offset="0.04438971" />
+                    android:offset="0.05" />
                 <item
                     android:color="#7f6C2F00"
-                    android:offset="0.09094573" />
+                    android:offset="0.1" />
                 <item
                     android:color="#7f6C2F00"
                     android:offset="0.5" />
                 <item
                     android:color="#7f421D00"
-                    android:offset="0.92169463" />
+                    android:offset="0.9" />
                 <item
                     android:color="#7f000000"
                     android:offset="1.0" />

@@ -167,6 +167,12 @@ public class DbLoader {
         return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
+    @NonNull
+    public Single<TermEntity> getTermByIdForComputation(long id) {
+        Log.d(LOG_TAG, "Enter getTermByIdForComputation(" + id + ")");
+        return appDb.termDAO().getById(id).subscribeOn(scheduler).observeOn(Schedulers.computation());
+    }
+
     /**
      * Gets all rows from the {@link AppDb#TABLE_NAME_TERMS "terms"} data table within the underlying {@link AppDb}.
      *
@@ -195,7 +201,16 @@ public class DbLoader {
                 if (list.stream().anyMatch(t -> t.getName().equals(name))) {
                     builder.acceptError(R.string.message_term_duplicate_name);
                 }
-                if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                if (builder.getLevel().map(l -> {
+                    switch (l) {
+                        case ERROR:
+                            return true;
+                        case WARNING:
+                            return !ignoreWarnings;
+                        default:
+                            return false;
+                    }
+                }).orElse(false)) {
                     return builder.build();
                 }
                 entity.setId(dao.insertSynchronous(entity));
@@ -221,7 +236,16 @@ public class DbLoader {
                     builder.acceptWarning(R.string.message_term_end_before_course_end);
                 }
             }
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+            if (builder.getLevel().map(l -> {
+                switch (l) {
+                    case ERROR:
+                        return true;
+                    case WARNING:
+                        return !ignoreWarnings;
+                    default:
+                        return false;
+                }
+            }).orElse(false)) {
                 return builder.build();
             }
             dao.updateSynchronous(entity);
@@ -290,7 +314,16 @@ public class DbLoader {
                 if (list.stream().anyMatch(t -> t.getName().equals(name))) {
                     builder.acceptError(R.string.message_mentor_duplicate_name);
                 }
-                if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                if (builder.getLevel().map(l -> {
+                    switch (l) {
+                        case ERROR:
+                            return true;
+                        case WARNING:
+                            return !ignoreWarnings;
+                        default:
+                            return false;
+                    }
+                }).orElse(false)) {
                     return builder.build();
                 }
                 entity.setId(dao.insertSynchronous(entity));
@@ -301,7 +334,16 @@ public class DbLoader {
             }
 
 
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+            if (builder.getLevel().map(l -> {
+                switch (l) {
+                    case ERROR:
+                        return true;
+                    case WARNING:
+                        return !ignoreWarnings;
+                    default:
+                        return false;
+                }
+            }).orElse(false)) {
                 return builder.build();
             }
             dao.updateSynchronous(entity);
@@ -343,6 +385,12 @@ public class DbLoader {
     public Single<MentorEntity> getMentorById(long id) {
         Log.d(LOG_TAG, "Enter getMentorById(" + id + ")");
         return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @NonNull
+    public Single<MentorEntity> getMentorByIdForComputation(long id) {
+        Log.d(LOG_TAG, "Enter getMentorByIdForComputation(" + id + ")");
+        return appDb.mentorDAO().getById(id).subscribeOn(scheduler).observeOn(Schedulers.computation());
     }
 
     /**
@@ -462,7 +510,16 @@ public class DbLoader {
                 if (list.stream().anyMatch(t -> t.getNumber().equals(number))) {
                     builder.acceptWarning(R.string.message_course_duplicate_number);
                 }
-                if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                if (builder.getLevel().map(l -> {
+                    switch (l) {
+                        case ERROR:
+                            return true;
+                        case WARNING:
+                            return !ignoreWarnings;
+                        default:
+                            return false;
+                    }
+                }).orElse(false)) {
                     return builder.build();
                 }
                 entity.setId(dao.insertSynchronous(entity));
@@ -483,7 +540,16 @@ public class DbLoader {
                 }
             });
 
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+            if (builder.getLevel().map(l -> {
+                switch (l) {
+                    case ERROR:
+                        return true;
+                    case WARNING:
+                        return !ignoreWarnings;
+                    default:
+                        return false;
+                }
+            }).orElse(false)) {
                 return builder.build();
             }
             dao.updateSynchronous(entity);
@@ -585,7 +651,16 @@ public class DbLoader {
                 if (list.stream().anyMatch(t -> t.getCode().equals(code))) {
                     builder.acceptWarning(R.string.message_assessment_duplicate_code);
                 }
-                if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+                if (builder.getLevel().map(l -> {
+                    switch (l) {
+                        case ERROR:
+                            return true;
+                        case WARNING:
+                            return !ignoreWarnings;
+                        default:
+                            return false;
+                    }
+                }).orElse(false)) {
                     return builder.build();
                 }
                 entity.setId(dao.insertSynchronous(entity));
@@ -595,7 +670,16 @@ public class DbLoader {
                 builder.acceptWarning(R.string.message_assessment_duplicate_code);
             }
 
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+            if (builder.getLevel().map(l -> {
+                switch (l) {
+                    case ERROR:
+                        return true;
+                    case WARNING:
+                        return !ignoreWarnings;
+                    default:
+                        return false;
+                }
+            }).orElse(false)) {
                 return builder.build();
             }
             dao.updateSynchronous(entity);
@@ -662,7 +746,16 @@ public class DbLoader {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             AlertEntity alert = entity.getAlert();
             AlertLink.validate(builder, entity);
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+            if (builder.getLevel().map(l -> {
+                switch (l) {
+                    case ERROR:
+                        return true;
+                    case WARNING:
+                        return !ignoreWarnings;
+                    default:
+                        return false;
+                }
+            }).orElse(false)) {
                 return builder.build();
             }
 
@@ -716,7 +809,16 @@ public class DbLoader {
         return Single.fromCallable(() -> {
             final ResourceMessageBuilder builder = new ResourceMessageBuilder();
             entity.validate(builder);
-            if (builder.hasError() || (!ignoreWarnings && builder.hasWarning())) {
+            if (builder.getLevel().map(l -> {
+                switch (l) {
+                    case ERROR:
+                        return true;
+                    case WARNING:
+                        return !ignoreWarnings;
+                    default:
+                        return false;
+                }
+            }).orElse(false)) {
                 return builder.build();
             }
             appDb.runInTransaction(() -> {

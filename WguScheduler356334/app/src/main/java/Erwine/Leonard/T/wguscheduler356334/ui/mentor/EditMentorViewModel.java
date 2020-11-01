@@ -37,15 +37,19 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.validation.MessageLevel;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageFactory;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.CompletableSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
@@ -58,15 +62,22 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
     private static final Predicate<String> EMAIL_PREDICATE = Pattern.compile("^[^@]+@[^.]+\\.[^.]+.*$").asPredicate();
     private static final Predicate<String> PHONE_PREDICATE = Pattern.compile("^([0-9+]|\\(\\d{1,3}\\))[0-9\\-. ]{3,15}").asPredicate();
 
+    public static void startEditMentorActivity(Context context, Long id) {
+        Intent intent = new Intent(context, EditMentorActivity.class);
+        if (null != id) {
+            intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, false), id);
+        }
+        context.startActivity(intent);
+    }
+
     private final DbLoader dbLoader;
-    private final PrivateLiveData<MentorEntity> currentEntitySubject;
-    private final PrivateLiveData<Function<Resources, String>> titleFactory;
-    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactory;
+    private final BehaviorSubject<MentorEntity> originalValuesSubject;
     private final BehaviorSubject<Boolean> sharingDisabledNotificationDismissedSubject;
     private final BehaviorSubject<String> nameSubject;
     private final BehaviorSubject<String> phoneNumberSubject;
     private final BehaviorSubject<String> emailAddressSubject;
     private final BehaviorSubject<String> notesSubject;
+    private final Observable<String> normalizedNameObservable;
     private final PrivateLiveData<Boolean> canShareLiveData;
     private final PrivateLiveData<Boolean> canSaveLiveData;
     private final PrivateLiveData<Boolean> sharingDisabledNotificationVisibleLiveData;
@@ -76,28 +87,33 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
     private final PrivateLiveData<Optional<ResourceMessageFactory>> phoneValidationMessageLiveData;
     private final PrivateLiveData<Boolean> isValidLiveData;
     private final PrivateLiveData<Boolean> hasChangesLiveData;
-    private final CurrentValues currentValues;
+    private final PrivateLiveData<Function<Resources, String>> titleFactory;
+    private final PrivateLiveData<Function<Resources, Spanned>> overviewFactory;
     @SuppressWarnings("FieldCanBeLocal")
     private final CompositeDisposable compositeDisposable;
+    private final CompletableSubject initializedSubject;
+    private final Completable initializedCompletable;
     private LiveData<List<MentorCourseListItem>> coursesLiveData;
-    private MentorEntity mentorEntity;
     private boolean fromInitializedState;
 
     public EditMentorViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        currentEntitySubject = new PrivateLiveData<>();
-        nameSubject = BehaviorSubject.create();
-        phoneNumberSubject = BehaviorSubject.create();
-        emailAddressSubject = BehaviorSubject.create();
-        notesSubject = BehaviorSubject.create();
-        sharingDisabledNotificationDismissedSubject = BehaviorSubject.create();
-        currentValues = new CurrentValues();
+        originalValuesSubject = BehaviorSubject.createDefault(new MentorEntity());
+        nameSubject = BehaviorSubject.createDefault("");
+        phoneNumberSubject = BehaviorSubject.createDefault("");
+        emailAddressSubject = BehaviorSubject.createDefault("");
+        notesSubject = BehaviorSubject.createDefault("");
+        sharingDisabledNotificationDismissedSubject = BehaviorSubject.createDefault(false);
+        initializedSubject = CompletableSubject.create();
+        initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
 
-        Observable<String> normalizedNameObservable = nameSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Scheduler computationScheduler = Schedulers.computation();
+
+        normalizedNameObservable = nameSubject.observeOn(computationScheduler).map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
-        Observable<String> normalizedPhoneObservable = phoneNumberSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
-        Observable<String> normalizedEmailObservable = emailAddressSubject.map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<String> normalizedPhoneObservable = phoneNumberSubject.observeOn(computationScheduler).map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
+        Observable<String> normalizedEmailObservable = emailAddressSubject.observeOn(computationScheduler).map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<Optional<ResourceMessageFactory>> phoneValidationMessageObservable = Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable,
                 (phone, email) -> {
                     if (phone.isEmpty()) {
@@ -112,15 +128,13 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
                     }
                     return (EMAIL_PREDICATE.test(email)) ? Optional.empty() : Optional.of(ResourceMessageFactory.ofError(R.string.message_invalid_email_address));
                 });
-        Observable<Boolean> hasChangesObservable = Observable.combineLatest(
-                normalizedNameObservable.map(n -> !n.equals(mentorEntity.getName())),
-                normalizedPhoneObservable.map(n -> !n.equals(mentorEntity.getPhoneNumber())),
-                normalizedEmailObservable.map(n -> !n.equals(mentorEntity.getEmailAddress())),
-                notesSubject.map(n -> !AbstractNotedEntity.MULTI_LINE_NORMALIZER.apply(n).equals(mentorEntity.getNotes())),
-                (n, p, e, s) -> n || p || e || s);
+        Observable<MentorEntity> originalValuesObservable = originalValuesSubject.observeOn(computationScheduler);
+        Observable<Boolean> hasChangesObservable = Observable.combineLatest(originalValuesObservable, normalizedNameObservable, normalizedPhoneObservable, normalizedEmailObservable,
+                notesSubject.observeOn(computationScheduler).map(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply),
+                (o, n, p, e, s) -> n.equals(o.getName()) && p.equals(o.getPhoneNumber()) && e.equals(o.getEmailAddress()) && n.equals(o.getNotes()));
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, phoneValidationMessageObservable, emailValidationMessageObservable,
-                (nameValid, phoneValidationMessage, emailValidationMessage) -> nameValid && phoneValidationMessage.map(ResourceMessageFactory::isWarning).orElse(true) &&
-                        emailValidationMessage.map(ResourceMessageFactory::isWarning).orElse(true));
+                (nameValid, phoneValidationMessage, emailValidationMessage) -> nameValid && phoneValidationMessage.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true) &&
+                        emailValidationMessage.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true));
         hasChangesLiveData = new PrivateLiveData<>(false);
         canShareLiveData = new PrivateLiveData<>(false);
         canSaveLiveData = new PrivateLiveData<>(false);
@@ -134,38 +148,24 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
         phoneValidationMessageLiveData = new PrivateLiveData<>(Optional.empty());
 
         compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(hasChangesObservable.subscribe(this::onHasChangesChanged));
-        compositeDisposable.add(validObservable.subscribe(this::onValidChanged));
         compositeDisposable.add(nameValidObservable.subscribe(nameValidLiveData::postValue));
         compositeDisposable.add(normalizedNameObservable.subscribe(normalizedNameLiveData::postValue));
         compositeDisposable.add(phoneValidationMessageObservable.subscribe(phoneValidationMessageLiveData::postValue));
         compositeDisposable.add(emailValidationMessageObservable.subscribe(emailValidationMessageLiveData::postValue));
         compositeDisposable.add(Observable.combineLatest(normalizedPhoneObservable, normalizedEmailObservable, this::getOverviewFactory)
                 .subscribe(overviewFactory::postValue));
-        compositeDisposable.add(Observable.combineLatest(hasChangesObservable, validObservable, sharingDisabledNotificationDismissedSubject, (c, v, d) -> v && c && !d)
+        compositeDisposable.add(Observable.combineLatest(hasChangesObservable, validObservable, sharingDisabledNotificationDismissedSubject.observeOn(computationScheduler), (c, v, d) -> v && c && !d)
                 .subscribe(sharingDisabledNotificationVisibleLiveData::postValue));
+        compositeDisposable.add(hasChangesObservable.subscribe(hasChangesLiveData::postValue));
+        compositeDisposable.add(validObservable.subscribe(isValidLiveData::postValue));
+        compositeDisposable.add(Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c).subscribe(canSaveLiveData::postValue));
+        compositeDisposable.add(Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c).subscribe(canShareLiveData::postValue));
     }
 
     @Override
     protected void onCleared() {
         compositeDisposable.dispose();
         super.onCleared();
-    }
-
-    private void onHasChangesChanged(Boolean hasChanges) {
-        boolean c = Boolean.TRUE.equals(hasChanges);
-        boolean v = Boolean.TRUE.equals(isValidLiveData.getValue());
-        this.hasChangesLiveData.postValue(c);
-        canShareLiveData.postValue(v && !c);
-        canSaveLiveData.postValue(v && c);
-    }
-
-    private void onValidChanged(Boolean isValid) {
-        boolean c = Boolean.TRUE.equals(hasChangesLiveData.getValue());
-        boolean v = Boolean.TRUE.equals(isValid);
-        this.isValidLiveData.postValue(v);
-        canShareLiveData.postValue(v && !c);
-        canSaveLiveData.postValue(v && c);
     }
 
     @NonNull
@@ -197,57 +197,45 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
         };
     }
 
-    @NonNull
-    private synchronized Function<Resources, String> getViewTitleFactory(String name) {
-        return r -> r.getString(R.string.format_mentor, name);
-    }
-
-    public static void startEditMentorActivity(Context context, Long id) {
-        Intent intent = new Intent(context, EditMentorActivity.class);
-        if (null != id) {
-            intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, false), id);
-        }
-        context.startActivity(intent);
-    }
-
     public long getId() {
+        MentorEntity mentorEntity = originalValuesSubject.getValue();
         return (null == mentorEntity) ? ID_NEW : mentorEntity.getId();
     }
 
     public String getName() {
-        return currentValues.getName();
+        return nameSubject.getValue();
     }
 
     public synchronized void setName(String value) {
-        currentValues.setName(value);
+        nameSubject.onNext(value);
     }
 
     public String getPhoneNumber() {
-        return currentValues.getPhoneNumber();
+        return phoneNumberSubject.getValue();
     }
 
     public synchronized void setPhoneNumber(String value) {
-        currentValues.setPhoneNumber(value);
+        phoneNumberSubject.onNext(value);
     }
 
     public String getEmailAddress() {
-        return currentValues.getEmailAddress();
+        return emailAddressSubject.getValue();
     }
 
     public synchronized void setEmailAddress(String value) {
-        currentValues.setEmailAddress(value);
+        emailAddressSubject.onNext(value);
     }
 
     public String getNotes() {
-        return currentValues.getNotes();
+        return notesSubject.getValue();
     }
 
     public synchronized void setNotes(String value) {
-        currentValues.setNotes(value);
+        notesSubject.onNext(value);
     }
 
     public boolean isSharingDisabledNotificationDismissed() {
-        return sharingDisabledNotificationDismissedSubject.getValue();
+        return Boolean.TRUE.equals(sharingDisabledNotificationDismissedSubject.getValue());
     }
 
     public void setSharingDisabledNotificationDismissed(boolean value) {
@@ -256,6 +244,10 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
 
     public LiveData<Boolean> getSharingDisabledNotificationVisibleLiveData() {
         return sharingDisabledNotificationVisibleLiveData;
+    }
+
+    public Completable getInitializedCompletable() {
+        return initializedCompletable;
     }
 
     public LiveData<Boolean> getNameValidLiveData() {
@@ -305,66 +297,77 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
     public synchronized Single<MentorEntity> restoreState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
         fromInitializedState = null != savedInstanceState && savedInstanceState.getBoolean(STATE_KEY_STATE_INITIALIZED, false);
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
-        mentorEntity = new MentorEntity();
+        MentorEntity mentorEntity = new MentorEntity();
         if (null != state) {
             sharingDisabledNotificationDismissedSubject.onNext(state.getBoolean(STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED, false));
-            currentValues.restoreState(state, false);
-            long id = currentValues.getId();
+            long id = state.getLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, true), ID_NEW);
             if (ID_NEW == id || fromInitializedState) {
-                mentorEntity.restoreState(state, fromInitializedState);
+                nameSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_NAME, false), ""));
+                phoneNumberSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_PHONE_NUMBER, false), ""));
+                emailAddressSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_EMAIL_ADDRESS, false), ""));
+                notesSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_NOTES, false), ""));
+                mentorEntity.restoreState(state, true);
             } else {
                 return dbLoader.getMentorById(id)
                         .doOnSuccess(this::onEntityLoadedFromDb)
                         .doOnError(throwable -> Log.e(getClass().getName(), "Error loading mentor", throwable));
             }
         }
-        currentEntitySubject.postValue(mentorEntity);
+        originalValuesSubject.onNext(mentorEntity);
+        if (mentorEntity.getId() == ID_NEW) {
+            titleFactory.postValue(r -> r.getString(R.string.title_activity_new_mentor));
+        } else {
+            compositeDisposable.add(normalizedNameObservable.subscribe(n ->
+                    titleFactory.postValue(r -> r.getString(R.string.format_mentor, n))));
+        }
         coursesLiveData = new PrivateLiveData<>(Collections.emptyList());
+        initializedSubject.onComplete();
         return Single.just(mentorEntity).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<ResourceMessageResult> save(boolean ignoreWarnings) {
-        String newName = currentValues.name;
-        String newPhone = currentValues.phoneNumber;
-        String newEmail = currentValues.emailAddress;
-        String originalName = mentorEntity.getName();
-        String originalPhoneNumber = mentorEntity.getPhoneNumber();
-        String originalEmailAddress = mentorEntity.getEmailAddress();
-        String originalNotes = mentorEntity.getNotes();
-        mentorEntity.setName(newName);
-        mentorEntity.setPhoneNumber(newEmail);
-        mentorEntity.setEmailAddress(newPhone);
-        mentorEntity.setNotes(currentValues.notes);
-        return dbLoader.saveMentor(mentorEntity, ignoreWarnings).doOnError(throwable -> {
-            mentorEntity.setName(originalName);
-            mentorEntity.setPhoneNumber(originalPhoneNumber);
-            mentorEntity.setEmailAddress(originalEmailAddress);
-            mentorEntity.setNotes(originalNotes);
+        MentorEntity mentorEntity = new MentorEntity(originalValuesSubject.getValue());
+        long oldId = mentorEntity.getId();
+        mentorEntity.setName(nameSubject.getValue());
+        mentorEntity.setPhoneNumber(emailAddressSubject.getValue());
+        mentorEntity.setEmailAddress(phoneNumberSubject.getValue());
+        mentorEntity.setNotes(notesSubject.getValue());
+        return dbLoader.saveMentor(mentorEntity, ignoreWarnings).doOnSuccess(m -> {
+            if (!m.isError()) {
+                originalValuesSubject.onNext(mentorEntity);
+                if (oldId == ID_NEW) {
+                    compositeDisposable.add(normalizedNameObservable.subscribe(n ->
+                            titleFactory.postValue(r -> r.getString(R.string.format_mentor, n))));
+                }
+            }
         });
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete(" + ignoreWarnings + ")");
-        return dbLoader.deleteMentor(mentorEntity, ignoreWarnings);
+        return dbLoader.deleteMentor(originalValuesSubject.getValue(), ignoreWarnings);
     }
 
     private void onEntityLoadedFromDb(MentorEntity entity) {
         Log.d(LOG_TAG, "Enter onEntityLoadedFromDb(" + entity + ")");
-        mentorEntity = entity;
-        setNotes(entity.getNotes());
-        setName(entity.getName());
-        setPhoneNumber(entity.getPhoneNumber());
-        setEmailAddress(entity.getEmailAddress());
+        notesSubject.onNext(entity.getNotes());
+        nameSubject.onNext(entity.getName());
+        phoneNumberSubject.onNext(entity.getPhoneNumber());
+        emailAddressSubject.onNext(entity.getEmailAddress());
         coursesLiveData = dbLoader.getCoursesByMentorId(entity.getId());
-        currentEntitySubject.postValue(mentorEntity);
+        originalValuesSubject.onNext(entity);
+        initializedSubject.onComplete();
     }
 
     public void saveState(Bundle outState) {
         Log.d(LOG_TAG, "Enter saveState");
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        outState.putBoolean(STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED, sharingDisabledNotificationDismissedSubject.getValue());
-        currentValues.saveState(outState, false);
-        mentorEntity.saveState(outState, true);
+        outState.putBoolean(STATE_KEY_SHARING_DISABLED_NOTIFICATION_DISMISSED, Boolean.TRUE.equals(sharingDisabledNotificationDismissedSubject.getValue()));
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_NAME, false), nameSubject.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_PHONE_NUMBER, false), phoneNumberSubject.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_EMAIL_ADDRESS, false), emailAddressSubject.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_NOTES, false), notesSubject.getValue());
+        Objects.requireNonNull(originalValuesSubject.getValue()).saveState(outState, true);
     }
 
     public LiveData<List<MentorCourseListItem>> getCoursesLiveData() {
@@ -372,7 +375,7 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
     }
 
     public LiveData<List<AlertListItem>> getAllAlerts() {
-        long id = mentorEntity.getId();
+        long id = Objects.requireNonNull(originalValuesSubject.getValue()).getId();
         if (id != ID_NEW) {
             return dbLoader.getAllAlertsByMentorId(id);
         }
@@ -393,89 +396,6 @@ public class EditMentorViewModel extends WguSchedulerViewModel {
         public void postValue(T value) {
             super.postValue(value);
         }
-
     }
 
-    // TODO: Discontinue use and use BehaviorSubject fields
-    private class CurrentValues implements Mentor {
-
-        private long id;
-        @NonNull
-        private String name = "";
-        @NonNull
-        private String phoneNumber = "";
-        @NonNull
-        private String emailAddress = "";
-        @NonNull
-        private String notes = "";
-
-        @Override
-        public long getId() {
-            return id;
-        }
-
-        @Override
-        public void setId(long id) {
-            this.id = id;
-        }
-
-        @NonNull
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public void setName(String name) {
-            Log.d(LOG_TAG, "Enter setName(" + ToStringBuilder.toEscapedString(name) + "); this.name = " + ToStringBuilder.toEscapedString(this.name));
-            this.name = (null == name) ? "" : name;
-            nameSubject.onNext(this.name);
-        }
-
-        @NonNull
-        @Override
-        public String getPhoneNumber() {
-            return phoneNumber;
-        }
-
-        @Override
-        public void setPhoneNumber(String phoneNumber) {
-            Log.d(LOG_TAG, "Enter setPhoneNumber(" + ToStringBuilder.toEscapedString(phoneNumber) + "); this.phoneNumber = " + ToStringBuilder.toEscapedString(this.phoneNumber));
-            this.phoneNumber = (null == phoneNumber) ? "" : phoneNumber;
-            phoneNumberSubject.onNext(this.phoneNumber);
-        }
-
-        @NonNull
-        @Override
-        public String getEmailAddress() {
-            return emailAddress;
-        }
-
-        @Override
-        public void setEmailAddress(String emailAddress) {
-            Log.d(LOG_TAG, "Enter setEmailAddress(" + ToStringBuilder.toEscapedString(emailAddress) + "); this.emailAddress = " + ToStringBuilder.toEscapedString(this.emailAddress));
-
-            this.emailAddress = (null == emailAddress) ? "" : emailAddress;
-            emailAddressSubject.onNext(this.emailAddress);
-        }
-
-        @NonNull
-        @Override
-        public String getNotes() {
-            return notes;
-        }
-
-        @Override
-        public void setNotes(String notes) {
-            this.notes = (null == notes) ? "" : notes;
-            notesSubject.onNext(this.notes);
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            return ToStringBuilder.toEscapedString(this, false);
-        }
-
-    }
 }

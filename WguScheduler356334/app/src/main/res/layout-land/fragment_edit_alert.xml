@@ -121,7 +121,7 @@
                 style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:ems="10"
+                android:minEms="@integer/min_ems_date"
                 app:layout_constraintEnd_toStartOf="@id/daysEditText"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/daysEditText" />
@@ -131,9 +131,10 @@
                 style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:ems="10"
+                android:layout_marginStart="@dimen/control_margin"
                 android:importantForAutofill="no"
                 android:inputType="number"
+                android:minEms="@integer/min_ems_tiny_int"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/specificDateTextView"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
@@ -152,6 +153,7 @@
                 android:id="@+id/calculatedDateLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/control_margin"
                 android:layout_marginTop="@dimen/control_margin"
                 android:labelFor="@id/calculatedDateValueTextView"
                 android:text="@string/label_effective_date"
@@ -189,6 +191,7 @@
                 style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:minEms="@integer/min_ems_time"
                 app:layout_constraintEnd_toEndOf="@+id/specificDateTextView"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/alertTimeLabelTextView" />
@@ -197,6 +200,8 @@
                 android:id="@+id/calculatedDateValueTextView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:layout_marginStart="@dimen/control_margin"
+                android:minEms="@integer/min_ems_date"
                 app:layout_constraintBottom_toBottomOf="@+id/alertTimeValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/alertTimeValueTextView"
@@ -217,9 +222,9 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:importantForAutofill="no"
-            android:inputType="textShortMessage" />
+            android:inputType="textShortMessage"
+            android:minLines="@integer/min_lines_notes" />
 
         <LinearLayout
             android:layout_width="match_parent"

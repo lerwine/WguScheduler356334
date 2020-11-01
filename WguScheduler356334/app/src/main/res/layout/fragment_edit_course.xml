@@ -27,6 +27,7 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:stretchColumns="1"
             android:weightSum="100">
 
@@ -48,6 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
+                    android:layout_marginStart="@dimen/control_margin"
                     android:layout_weight="35"
                     android:labelFor="@id/competencyUnitsEditText"
                     android:text="@string/label_competency_units"
@@ -67,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_column="0"
                     android:layout_weight="65"
-                    android:ems="10"
+                    android:ems="12"
                     android:importantForAutofill="no"
                     android:inputType="textShortMessage|text" />
 
@@ -77,8 +79,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
+                    android:layout_marginStart="@dimen/control_margin"
                     android:layout_weight="35"
-                    android:ems="10"
+                    android:ems="4"
                     android:importantForAutofill="no"
                     android:inputType="number" />
             </TableRow>
@@ -89,6 +92,7 @@
             android:id="@+id/titleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/titleEditText"
             android:text="@string/label_title"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -98,7 +102,6 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:importantForAutofill="no"
             android:inputType="textShortMessage|text" />
 
@@ -106,6 +109,7 @@
             android:id="@+id/mentorTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/mentorChip"
             android:text="@string/label_mentor"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -121,6 +125,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:orientation="horizontal">
 
             <TextView
@@ -141,6 +146,7 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:shrinkColumns="0,2"
             android:stretchColumns="1,3">
 
@@ -242,6 +248,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/notesEditText"
             android:text="@string/label_notes"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -255,7 +262,8 @@
             android:ems="10"
             android:gravity="start|top"
             android:importantForAutofill="no"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:minLines="@integer/min_lines_notes" />
 
     </LinearLayout>
 

@@ -165,7 +165,7 @@ public class EditMentorActivity extends AppCompatActivity {
             if (resourceMessageFactory.isPresent()) {
                 ResourceMessageFactory f = resourceMessageFactory.get();
                 phoneNumberEditText.setError(f.apply(getResources()), AppCompatResources.getDrawable(this,
-                        (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+                        f.getLevel().getErrorIcon()));
             } else {
                 phoneNumberEditText.setError(null);
             }
@@ -174,7 +174,7 @@ public class EditMentorActivity extends AppCompatActivity {
             if (resourceMessageFactory.isPresent()) {
                 ResourceMessageFactory f = resourceMessageFactory.get();
                 emailAddressEditText.setError(f.apply(getResources()), AppCompatResources.getDrawable(this,
-                        (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+                        f.getLevel().getErrorIcon()));
             } else {
                 emailAddressEditText.setError(null);
             }

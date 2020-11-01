@@ -55,6 +55,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/control_margin"
                         android:labelFor="@id/courseCodeEditText"
                         android:text="@string/label_course_number"
                         android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -64,14 +65,15 @@
                         style="@style/WGU.Scheduler.TextInputEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ems="10"
                         android:importantForAutofill="no"
-                        android:inputType="textShortMessage|text" />
+                        android:inputType="textShortMessage|text"
+                        android:minEms="@integer/min_ems_code" />
 
                     <TextView
                         android:id="@+id/titleTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/control_margin"
                         android:labelFor="@id/titleEditText"
                         android:text="@string/label_title"
                         android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -81,9 +83,9 @@
                         style="@style/WGU.Scheduler.TextInputEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ems="10"
                         android:importantForAutofill="no"
-                        android:inputType="textShortMessage|text" />
+                        android:inputType="textShortMessage|text"
+                        android:minEms="@integer/min_ems_short_text" />
 
                 </LinearLayout>
 
@@ -107,14 +109,15 @@
                         style="@style/WGU.Scheduler.TextInputEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ems="10"
                         android:importantForAutofill="no"
-                        android:inputType="number" />
+                        android:inputType="number"
+                        android:minEms="@integer/min_ems_tiny_int" />
 
                     <TextView
                         android:id="@+id/mentorTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/control_margin"
                         android:labelFor="@id/mentorChip"
                         android:text="@string/label_mentor"
                         android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -131,6 +134,7 @@
                         android:id="@+id/statusTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/control_margin"
                         android:labelFor="@id/typeButton"
                         android:text="@string/label_status"
                         android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -146,6 +150,7 @@
             <TableLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/control_margin"
                 android:shrinkColumns="0,2"
                 android:stretchColumns="1,3">
 

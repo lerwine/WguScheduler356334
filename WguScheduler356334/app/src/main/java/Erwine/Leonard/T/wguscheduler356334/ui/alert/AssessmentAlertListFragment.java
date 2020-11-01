@@ -22,6 +22,7 @@ import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
@@ -75,9 +76,9 @@ public class AssessmentAlertListFragment extends Fragment {
         listViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentAlertListViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         listViewModel.getLiveData().observe(viewLifecycleOwner, this::onListLoaded);
-        assessmentViewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onAssessmentLoaded);
-        assessmentViewModel.getEffectiveStartLiveData().observe(viewLifecycleOwner, this::onEffectiveStartChanged);
-        assessmentViewModel.getEffectiveEndLiveData().observe(viewLifecycleOwner, this::onEffectiveEndChanged);
+        assessmentViewModel.getOriginalValuesLiveData().observe(viewLifecycleOwner, this::onAssessmentLoaded);
+        assessmentViewModel.getGoalDateLiveData().observe(viewLifecycleOwner, this::onGoalDateChanged);
+        assessmentViewModel.getCompletionDateLiveData().observe(viewLifecycleOwner, this::onCompletionDateChanged);
     }
 
     @Override
@@ -86,20 +87,20 @@ public class AssessmentAlertListFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void onEffectiveStartChanged(LocalDate localDate) {
-        if (listViewModel.setEffectiveStartDate(localDate) && null != adapter) {
+    private void onGoalDateChanged(LocalDate localDate) {
+        if (listViewModel.setGoalDate(localDate) && null != adapter) {
             adapter.notifyDataSetChanged();
         }
     }
 
-    private void onEffectiveEndChanged(LocalDate localDate) {
-        if (listViewModel.setEffectiveEndDate(localDate) && null != adapter) {
+    private void onCompletionDateChanged(LocalDate localDate) {
+        if (listViewModel.setCompletionDate(localDate) && null != adapter) {
             adapter.notifyDataSetChanged();
         }
     }
 
     private void onAssessmentLoaded(AssessmentDetails assessmentDetails) {
-        if (null != assessmentDetails) {
+        if (null != assessmentDetails && assessmentDetails.getId() != IdIndexedEntity.ID_NEW) {
             listViewModel.setAssessment(assessmentDetails, getViewLifecycleOwner());
             assessmentViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
                     f -> overviewTextView.setText(f.apply(getResources())));
@@ -128,15 +129,17 @@ public class AssessmentAlertListFragment extends Fragment {
 
     private void onEditAlert(AssessmentAlert assessmentAlert) {
         long editAlertId = assessmentAlert.getAlert().getId();
-        if (assessmentViewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                    () -> doEditAlert(editAlertId),
-                    () -> ObserverHelper.subscribeOnce(assessmentViewModel.save(false), getViewLifecycleOwner(),
-                            m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed),
-                    null);
-        } else {
-            doEditAlert(editAlertId);
-        }
+        ObserverHelper.observeOnce(assessmentViewModel.getChangedLiveData(), getViewLifecycleOwner(), changed -> {
+            if (changed) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
+                        () -> doEditAlert(editAlertId),
+                        () -> ObserverHelper.subscribeOnce(assessmentViewModel.save(false), getViewLifecycleOwner(),
+                                m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed),
+                        null);
+            } else {
+                doEditAlert(editAlertId);
+            }
+        });
     }
 
     private void onSaveForEditAlertFinished(ResourceMessageResult messages, long editAlertId) {

@@ -30,9 +30,6 @@ import Erwine.Leonard.T.wguscheduler356334.db.DbLoader;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
-import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertBroadcastReceiver;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertDialog;
 import Erwine.Leonard.T.wguscheduler356334.ui.alert.EditAlertViewModel;
@@ -84,6 +81,8 @@ public class ViewAssessmentActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditAssessmentViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> toolbar.setTitle(f.apply(getResources())));
         viewModel.getSubTitleLiveData().observe(this, toolbar::setSubtitle);
+        viewModel.getCanSaveLiveData().observe(this, saveFloatingActionButton::setEnabled);
+        viewModel.getCanShareLiveData().observe(this, shareFloatingActionButton::setEnabled);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
         ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this, this::onEntityLoadSucceeded, this::onEntityLoadFailed);
@@ -111,13 +110,15 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
-                            alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts))), null);
-        } else {
-            finish();
-        }
+        ObserverHelper.observeOnce(viewModel.getChangedLiveData(), this, changed -> {
+            if (changed) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
+                        ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                                alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts))), null);
+            } else {
+                finish();
+            }
+        });
     }
 
     private void onEntityLoadSucceeded(AssessmentDetails entity) {
@@ -148,114 +149,104 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     }
 
     private void onAddFloatingActionButtonClick(View view) {
-        if (viewModel.isChanged()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                    this::doAddAlert,
-                    () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
-                        @Override
-                        public void onSuccess(ResourceMessageResult messages) {
-                            super.onSuccess(messages);
-                            if (!messages.isError()) {
+        ObserverHelper.observeOnce(viewModel.getChangedLiveData(), this, changed -> {
+            if (changed) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
+                        this::doAddAlert,
+                        () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
+                            @Override
+                            public void onSucceeded() {
                                 doAddAlert();
                             }
-                        }
-                    }), null);
-        } else {
-            doAddAlert();
-        }
-    }
-
-    private void onShareFloatingActionButton(View view) {
-        ObserverHelper.subscribeOnce(viewModel.getCurrentTerm(), this, termEntity -> {
-            if (null == viewModel.getMentorId()) {
-                onShareAssessment(termEntity, null);
+                        }), null);
             } else {
-                ObserverHelper.subscribeOnce(viewModel.getCourseMentor(), this, mentorEntity -> onShareAssessment(termEntity, mentorEntity), throwable -> {
-                    Log.e(LOG_TAG, "Error loading mentor", throwable);
-                    new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog();
-                });
+                doAddAlert();
             }
-        }, throwable -> {
-            Log.e(LOG_TAG, "Error loading term", throwable);
-            new AlertHelper(R.drawable.dialog_error, R.string.title_read_error, getString(R.string.format_message_read_error, throwable.getMessage()), this).showDialog();
         });
     }
 
-    private void onShareAssessment(TermEntity termEntity, MentorEntity mentorEntity) {
-        Resources resources = getResources();
-        StringBuilder sb = new StringBuilder(resources.getString(viewModel.getType().displayResourceId())).append(" ")
-                .append(viewModel.getCode()).append(" Report");
-        String title = sb.toString();
-        String s = viewModel.getName();
-        if (!s.isEmpty()) {
-            sb.append(": ").append(s);
-        }
-        LocalDate date = viewModel.getCompletionDate();
-        if (null != date) {
-            sb.append("\nCompleted: ").append(LONG_FORMATTER.format(date));
-            if (null != (date = viewModel.getGoalDate())) {
-                sb.append("; Goal Date: ").append(LONG_FORMATTER.format(date));
-            }
-        } else if (null != (date = viewModel.getGoalDate())) {
-            sb.append("\nGoal Date: ").append(LONG_FORMATTER.format(date));
-        }
-        sb.append("\nStatus:").append(resources.getString(viewModel.getStatus().displayResourceId()));
-        AbstractCourseEntity<?> course = viewModel.getSelectedCourse();
-        sb.append("\nCourse ").append(course.getNumber()).append(": ").append(course.getTitle())
-                .append("\n\tStatus:").append(resources.getString(course.getStatus().displayResourceId()));
-        if (null != (date = course.getActualStart())) {
-            sb.append("\n\tStarted: ").append(LONG_FORMATTER.format(date));
-            if (null != (date = course.getActualEnd())) {
-                sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
-            } else if (null != (date = course.getExpectedEnd())) {
-                sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
-            }
-        } else if (null != (date = course.getExpectedStart())) {
-            sb.append("\n\tExpected Start: ").append(LONG_FORMATTER.format(date));
-            if (null != (date = course.getActualEnd())) {
-                sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
-            } else if (null != (date = course.getExpectedEnd())) {
-                sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
-            }
-        } else if (null != (date = course.getActualEnd())) {
-            sb.append("\n\tEnded: ").append(LONG_FORMATTER.format(date));
-        } else if (null != (date = course.getExpectedEnd())) {
-            sb.append("\n\tExpected End: ").append(LONG_FORMATTER.format(date));
-        }
-        if (null != mentorEntity) {
-            sb.append("\nMentor:").append(mentorEntity.getName());
-            if (!(s = mentorEntity.getPhoneNumber()).isEmpty()) {
-                sb.append("\n\tPhone:").append(s);
-                if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
-                    sb.append("; Email:").append(s);
-                }
-            } else if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
-                sb.append("\n\tEmail:").append(s);
-            }
-        }
-        s = termEntity.getName();
-        String t = resources.getString(R.string.format_term, s);
-        int i = t.indexOf(':');
-        sb.append("\n").append((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t);
-        date = termEntity.getStart();
-        if (null != date) {
-            sb.append("\n\tStart: ").append(LONG_FORMATTER.format(date));
-            if (null != (date = termEntity.getEnd())) {
-                sb.append("; End: ").append(LONG_FORMATTER.format(date));
-            }
-        } else if (null != (date = termEntity.getEnd())) {
-            sb.append("\n\tEnd: ").append(LONG_FORMATTER.format(date));
-        }
-        if (!(s = viewModel.getNotes()).trim().isEmpty()) {
-            sb.append("\nAssessment Notes:\n").append(s);
-        }
-
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
-        sendIntent.setType("text/plain");
-        Intent shareIntent = Intent.createChooser(sendIntent, title);
-        startActivity(shareIntent);
+    private void onShareFloatingActionButton(View view) {
+        ObserverHelper.observeOnce(viewModel.getOriginalValuesLiveData(), this, assessment ->
+                ObserverHelper.observeOnce(viewModel.getSelectedCourseLiveData(), this, course ->
+                        ObserverHelper.observeOnce(viewModel.getCurrentTermLiveData(), this, termEntity ->
+                                ObserverHelper.observeOnce(viewModel.getCurrentMentorLiveData(), this, mentorEntity -> {
+                                            Resources resources = getResources();
+                                            StringBuilder sb = new StringBuilder(resources.getString(assessment.getType().displayResourceId())).append(" ")
+                                                    .append(assessment.getCode()).append(" Report");
+                                            String title = sb.toString();
+                                            String s = assessment.getName();
+                                            if (null != s && !s.isEmpty()) {
+                                                sb.append(": ").append(s);
+                                            }
+                                            LocalDate date = assessment.getCompletionDate();
+                                            if (null != date) {
+                                                sb.append("\nCompleted: ").append(LONG_FORMATTER.format(date));
+                                                if (null != (date = assessment.getGoalDate())) {
+                                                    sb.append("; Goal Date: ").append(LONG_FORMATTER.format(date));
+                                                }
+                                            } else if (null != (date = assessment.getGoalDate())) {
+                                                sb.append("\nGoal Date: ").append(LONG_FORMATTER.format(date));
+                                            }
+                                            sb.append("\nStatus:").append(resources.getString(assessment.getStatus().displayResourceId()));
+                                            sb.append("\nCourse ").append(course.getNumber()).append(": ").append(course.getTitle())
+                                                    .append("\n\tStatus:").append(resources.getString(course.getStatus().displayResourceId()));
+                                            if (null != (date = course.getActualStart())) {
+                                                sb.append("\n\tStarted: ").append(LONG_FORMATTER.format(date));
+                                                if (null != (date = course.getActualEnd())) {
+                                                    sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
+                                                } else if (null != (date = course.getExpectedEnd())) {
+                                                    sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
+                                                }
+                                            } else if (null != (date = course.getExpectedStart())) {
+                                                sb.append("\n\tExpected Start: ").append(LONG_FORMATTER.format(date));
+                                                if (null != (date = course.getActualEnd())) {
+                                                    sb.append("; Ended: ").append(LONG_FORMATTER.format(date));
+                                                } else if (null != (date = course.getExpectedEnd())) {
+                                                    sb.append("; Expected End: ").append(LONG_FORMATTER.format(date));
+                                                }
+                                            } else if (null != (date = course.getActualEnd())) {
+                                                sb.append("\n\tEnded: ").append(LONG_FORMATTER.format(date));
+                                            } else if (null != (date = course.getExpectedEnd())) {
+                                                sb.append("\n\tExpected End: ").append(LONG_FORMATTER.format(date));
+                                            }
+                                            if (null != mentorEntity) {
+                                                sb.append("\nMentor:").append(mentorEntity.getName());
+                                                if (!(s = mentorEntity.getPhoneNumber()).isEmpty()) {
+                                                    sb.append("\n\tPhone:").append(s);
+                                                    if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
+                                                        sb.append("; Email:").append(s);
+                                                    }
+                                                } else if (!(s = mentorEntity.getEmailAddress()).isEmpty()) {
+                                                    sb.append("\n\tEmail:").append(s);
+                                                }
+                                            }
+                                            s = termEntity.getName();
+                                            String t = resources.getString(R.string.format_term, s);
+                                            int i = t.indexOf(':');
+                                            sb.append("\n").append((s.toLowerCase().startsWith(t.substring(0, i).toLowerCase())) ? s : t);
+                                            date = termEntity.getStart();
+                                            if (null != date) {
+                                                sb.append("\n\tStart: ").append(LONG_FORMATTER.format(date));
+                                                if (null != (date = termEntity.getEnd())) {
+                                                    sb.append("; End: ").append(LONG_FORMATTER.format(date));
+                                                }
+                                            } else if (null != (date = termEntity.getEnd())) {
+                                                sb.append("\n\tEnd: ").append(LONG_FORMATTER.format(date));
+                                            }
+                                            if (!(s = assessment.getNotes()).trim().isEmpty()) {
+                                                sb.append("\nAssessment Notes:\n").append(s);
+                                            }
+                                            Intent sendIntent = new Intent();
+                                            sendIntent.setAction(Intent.ACTION_SEND);
+                                            sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+                                            sendIntent.setType("text/plain");
+                                            Intent shareIntent = Intent.createChooser(sendIntent, title);
+                                            startActivity(shareIntent);
+                                        }, true
+                                ), false
+                        ), false
+                )
+        );
     }
 
     private void onSaveFloatingActionButtonClick(View view) {
@@ -339,7 +330,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                         if (alertsAfterSave.length > 0) {
                             ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewAssessmentActivity.this, defaultAlertTime -> {
                                 updateAlerts(alertsAfterSave, defaultAlertTime);
-                                finish();
+                                onSucceeded();
                             });
                         } else {
                             if (alertsBeforeSave.length > 0) {
@@ -347,7 +338,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                                     AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewAssessmentActivity.this);
                                 }
                             }
-                            finish();
+                            onSucceeded();
                         }
                     });
                 }
@@ -367,6 +358,10 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                 AlertDialog dlg = builder.setCancelable(true).create();
                 dlg.show();
             }
+        }
+
+        protected void onSucceeded() {
+            finish();
         }
 
         @Override
@@ -400,8 +395,12 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                         AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewAssessmentActivity.this);
                     }
                 }
-                finish();
+                onSucceeded();
             }
+        }
+
+        protected void onSucceeded() {
+            finish();
         }
 
         @Override

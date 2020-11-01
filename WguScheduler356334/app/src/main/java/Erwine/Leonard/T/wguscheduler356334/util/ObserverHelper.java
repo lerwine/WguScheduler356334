@@ -258,6 +258,38 @@ public class ObserverHelper {
     }
 
     private static CompletableObserver toCompletableObserver(@NonNull Action onComplete, @Nullable Consumer<? super Throwable> onError) {
+        if (null != onError) {
+            return new CompletableObserver() {
+                @Override
+                public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
+                }
+
+                @Override
+                public void onComplete() {
+                    try {
+                        onComplete.run();
+                    } catch (Exception ex) {
+                        Thread.UncaughtExceptionHandler eh = Thread.getDefaultUncaughtExceptionHandler();
+                        if (null != eh) {
+                            eh.uncaughtException(Thread.currentThread(), ex);
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                    try {
+                        onError.accept(e);
+                    } catch (Exception ex) {
+                        Thread.UncaughtExceptionHandler eh = Thread.getDefaultUncaughtExceptionHandler();
+                        if (null != eh) {
+                            eh.uncaughtException(Thread.currentThread(), ex);
+                        }
+                    }
+                }
+            };
+        }
+
         return new CompletableObserver() {
             @Override
             public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
@@ -277,14 +309,6 @@ public class ObserverHelper {
 
             @Override
             public void onError(@io.reactivex.annotations.NonNull Throwable e) {
-                try {
-                    onError.accept(e);
-                } catch (Exception ex) {
-                    Thread.UncaughtExceptionHandler eh = Thread.getDefaultUncaughtExceptionHandler();
-                    if (null != eh) {
-                        eh.uncaughtException(Thread.currentThread(), ex);
-                    }
-                }
             }
         };
     }
@@ -295,6 +319,10 @@ public class ObserverHelper {
 
     public static void subscribeOnce(@NonNull Completable source, LifecycleOwner owner, @NonNull Action onComplete, @NonNull Consumer<? super Throwable> onError) {
         source.subscribe(new LifecycleCompletableObserverProxy(toCompletableObserver(onComplete, onError), owner));
+    }
+
+    public static void subscribeOnce(@NonNull Completable source, LifecycleOwner owner, @NonNull Action onComplete) {
+        source.subscribe(new LifecycleCompletableObserverProxy(toCompletableObserver(onComplete, null), owner));
     }
 
     public static void subscribeOnce(@NonNull Completable source, LifecycleOwner owner, @NonNull CompletableObserver observer) {

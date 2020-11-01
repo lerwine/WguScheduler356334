@@ -79,6 +79,7 @@ public class DatePickerEditView extends ConstraintLayout {
         dateEditText = new EditText(context, null, 0, R.style.WGU_Scheduler_TextInputEditText);
         pickerImageButton = new ImageButton(context, null, 0, R.style.WGU_Scheduler_ImageButtonStyle);
         dateEditText.setId(View.generateViewId());
+        dateEditText.setMinEms(context.getResources().getInteger(R.integer.min_ems_date));
         pickerImageButton.setId(View.generateViewId());
         super.addView(dateEditText);
         super.addView(pickerImageButton);

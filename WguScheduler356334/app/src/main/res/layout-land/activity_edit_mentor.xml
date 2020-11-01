@@ -14,22 +14,23 @@
         android:elevation="4dp"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/AppTheme.AppBarOverlay"
-        app:title="@string/title_activity_mentor_detail"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/AppTheme.PopupOverlay" />
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:title="@string/title_activity_mentor_detail" />
 
     <LinearLayout
         android:id="@+id/valuesLinearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
+        android:layout_margin="@dimen/control_margin"
         android:gravity="start|top"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintWidth_min="250dp">
+        app:layout_constraintWidth_min="350dp">
 
         <TextView
             android:id="@+id/mentorNameLabelTextView"
@@ -45,8 +46,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="name"
-            android:ems="10"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:minEms="@integer/min_ems_short_text" />
 
         <TextView
             android:id="@+id/phoneNumberLabelTextView"
@@ -61,9 +62,10 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="phone"
             android:autofillHints="phone"
-            android:ems="10"
-            android:inputType="phone" />
+            android:inputType="phone"
+            android:minEms="@integer/min_ems_short_text" />
 
         <TextView
             android:id="@+id/emailAddressLabelTextView"
@@ -78,9 +80,10 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="email"
             android:autofillHints="emailAddress"
-            android:ems="10"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:minEms="@integer/min_ems_short_text" />
 
     </LinearLayout>
 
@@ -114,6 +117,8 @@
         style="@style/WGU.Scheduler.FieldLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/control_margin"
+        android:layout_marginTop="@dimen/control_margin"
         android:labelFor="@id/notesEditText"
         android:text="@string/label_notes"
         app:layout_constraintEnd_toEndOf="@+id/notesEditText"
@@ -125,8 +130,8 @@
         style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/control_margin"
-        android:ems="10"
+        android:layout_marginHorizontal="@dimen/control_margin"
+        android:layout_marginBottom="@dimen/control_margin"
         android:gravity="start|top"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"

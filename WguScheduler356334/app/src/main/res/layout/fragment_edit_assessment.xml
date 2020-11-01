@@ -27,6 +27,7 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/control_margin"
             android:weightSum="100">
 
             <TableRow
@@ -38,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="0"
-                    android:layout_weight="65"
+                    android:layout_weight="55"
                     android:labelFor="@+id/codeEditText"
                     android:text="@string/label_code"
                     android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -47,7 +48,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
-                    android:layout_weight="35"
+                    android:layout_marginStart="@dimen/control_margin"
+                    android:layout_weight="45"
                     android:labelFor="@+id/typeButton"
                     android:text="@string/label_type"
                     android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -63,15 +65,17 @@
                     style="@style/WGU.Scheduler.TextInputEditText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="65"
+                    android:layout_weight="55"
                     android:importantForAutofill="no"
-                    android:inputType="textShortMessage|text|textCapCharacters" />
+                    android:inputType="textShortMessage|text|textCapCharacters"
+                    android:minEms="@integer/min_ems_code" />
 
                 <Button
                     android:id="@+id/typeButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="35"
+                    android:layout_marginStart="@dimen/control_margin"
+                    android:layout_weight="45"
                     android:background="@android:drawable/btn_dropdown" />
             </TableRow>
 
@@ -81,6 +85,7 @@
             android:id="@+id/textView12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@+id/nameEditText"
             android:text="@string/label_html_name_optional"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -96,6 +101,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:text="@string/label_status"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
 
@@ -108,6 +114,7 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/control_margin"
             android:weightSum="100">
 
             <TableRow
@@ -128,6 +135,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
+                    android:layout_marginStart="@dimen/control_margin"
                     android:layout_weight="50"
                     android:labelFor="@+id/completionDateChip"
                     android:text="@string/label_completion_date"
@@ -154,6 +162,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
+                    android:layout_marginStart="@dimen/control_margin"
                     android:layout_weight="50"
                     android:checkable="false" />
             </TableRow>
@@ -164,6 +173,7 @@
             android:id="@+id/notesLabelTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_margin"
             android:labelFor="@id/notesEditText"
             android:text="@string/label_notes"
             android:textAppearance="@style/WGU.Scheduler.FieldLabel" />
@@ -173,9 +183,9 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:ems="10"
             android:gravity="start|top"
             android:importantForAutofill="no"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:minLines="@integer/min_lines_notes" />
     </LinearLayout>
 </ScrollView>

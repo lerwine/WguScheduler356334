@@ -27,8 +27,8 @@ public class AssessmentAlertListViewModel extends WguSchedulerViewModel {
     private final MutableLiveData<List<AssessmentAlert>> liveData;
     private LiveData<List<AssessmentAlert>> observed;
     private AssessmentDetails assessment;
-    private LocalDate effectiveStartDate;
-    private LocalDate effectiveEndDate;
+    private LocalDate goalDate;
+    private LocalDate completionDate;
     private List<AssessmentAlert> assessmentAlerts;
 
     public AssessmentAlertListViewModel(@NonNull Application application) {
@@ -55,31 +55,31 @@ public class AssessmentAlertListViewModel extends WguSchedulerViewModel {
         observed.observe(viewLifecycleOwner, alertsLoadedObserver);
     }
 
-    public LocalDate getEffectiveStartDate() {
-        return effectiveStartDate;
+    public LocalDate getGoalDate() {
+        return goalDate;
     }
 
-    public synchronized boolean setEffectiveStartDate(LocalDate effectiveStartDate) {
-        if (Objects.equals(this.effectiveStartDate, effectiveStartDate)) {
+    public synchronized boolean setGoalDate(LocalDate goalDate) {
+        if (Objects.equals(this.goalDate, goalDate)) {
             return false;
         }
-        this.effectiveStartDate = effectiveStartDate;
+        this.goalDate = goalDate;
         return recalculateAll();
     }
 
-    public LocalDate getEffectiveEndDate() {
-        return effectiveEndDate;
+    public LocalDate getCompletionDate() {
+        return completionDate;
     }
 
-    public synchronized boolean setEffectiveEndDate(LocalDate effectiveEndDate) {
-        if (Objects.equals(this.effectiveEndDate, effectiveEndDate)) {
+    public synchronized boolean setCompletionDate(LocalDate completionDate) {
+        if (Objects.equals(this.completionDate, completionDate)) {
             return false;
         }
-        this.effectiveEndDate = effectiveEndDate;
+        this.completionDate = completionDate;
         return recalculateAll();
     }
 
-    private void onAlertsLoaded(List<AssessmentAlert> assessmentAlerts) {
+    private void onAlertsLoaded(@NonNull List<AssessmentAlert> assessmentAlerts) {
         assessmentAlerts.forEach(t -> t.calculate(this));
         this.assessmentAlerts = assessmentAlerts;
         liveData.postValue(assessmentAlerts);

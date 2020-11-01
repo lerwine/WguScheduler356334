@@ -18,7 +18,6 @@ import java.time.LocalDate;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.DatePickerEditView;
 import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
@@ -63,7 +62,7 @@ public class EditTermFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        ObserverHelper.observeOnce(viewModel.getEntityLiveData(), getViewLifecycleOwner(), this::onLoadSuccess);
+        ObserverHelper.subscribeOnce(viewModel.getInitializedCompletable(), getViewLifecycleOwner(), this::onViewModelInitialized);
     }
 
     @Override
@@ -72,8 +71,8 @@ public class EditTermFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void onLoadSuccess(TermEntity entity) {
-        Log.d(LOG_TAG, String.format("Loaded %s", entity));
+    private void onViewModelInitialized() {
+        Log.d(LOG_TAG, "onViewModelInitialized");
         termNameEditText.setText(viewModel.getName());
         termStartEditText.setSelectedDate(viewModel.getStart());
         termEndEditText.setSelectedDate(viewModel.getEnd());
@@ -153,8 +152,8 @@ public class EditTermFragment extends Fragment {
                     if (o.isPresent()) {
                         ResourceMessageFactory f = o.get();
                         String m = f.apply(getResources());
-                        Log.d(LOG_TAG, "startMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", isWarning: " + f.isWarning() + ")");
-                        termStartEditText.setError(m, AppCompatResources.getDrawable(requireContext(), (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+                        Log.d(LOG_TAG, "startMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", level: " + f.getLevel() + ")");
+                        termStartEditText.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
                     } else {
                         termStartEditText.setError(null);
                     }
@@ -165,8 +164,8 @@ public class EditTermFragment extends Fragment {
                     if (o.isPresent()) {
                         ResourceMessageFactory f = o.get();
                         String m = f.apply(getResources());
-                        Log.d(LOG_TAG, "endMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", isWarning: " + f.isWarning() + ")");
-                        termEndEditText.setError(m, AppCompatResources.getDrawable(requireContext(), (f.isWarning()) ? R.drawable.dialog_warning : R.drawable.dialog_error));
+                        Log.d(LOG_TAG, "endMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", level: " + f.getLevel().name() + ")");
+                        termEndEditText.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
                     } else {
                         termEndEditText.setError(null);
                     }

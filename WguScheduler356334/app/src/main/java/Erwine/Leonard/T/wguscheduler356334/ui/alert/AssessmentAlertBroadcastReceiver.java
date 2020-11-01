@@ -34,7 +34,7 @@ public class AssessmentAlertBroadcastReceiver extends AlertBroadcastReceiver<Ass
     protected CharSequence getNotificationTitle(@NonNull AssessmentAlertDetails entity, @NonNull Context context) {
         Resources resources = context.getResources();
         AssessmentEntity assessment = entity.getAssessment();
-        return resources.getString(R.string.format_assessment, resources.getString(assessment.getType().displayResourceId()), assessment.getCode()) + " Alert";
+        return resources.getString(R.string.format_value_colon_value, resources.getString(assessment.getType().displayResourceId()), assessment.getCode()) + " Alert";
     }
 
     @NonNull

@@ -13,6 +13,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,7 +26,6 @@ import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
-import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentType;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.AbstractCourseEntity;
@@ -33,8 +33,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.StringHelper;
-
-import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.FULL_FORMATTER;
 
 public class EditAssessmentFragment extends Fragment {
 
@@ -84,7 +82,21 @@ public class EditAssessmentFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        viewModel.getEntityLiveData().observe(viewLifecycleOwner, this::onEntityLoaded);
+        viewModel.getCourseDisplayLiveData().observe(viewLifecycleOwner, f -> courseButton.setText(f.apply(getResources())));
+        viewModel.getTypeDisplayLiveData().observe(viewLifecycleOwner, typeButton::setText);
+        viewModel.getStatusDisplayLiveData().observe(viewLifecycleOwner, statusButton::setText);
+        viewModel.getGoalDateDisplayLiveData().observe(viewLifecycleOwner, goalDateChip::setText);
+        viewModel.getShowGoalDateCloseIconLiveData().observe(viewLifecycleOwner, goalDateChip::setCloseIconVisible);
+        viewModel.getCompletionDateDisplayLiveData().observe(viewLifecycleOwner, completionDateChip::setText);
+        viewModel.getShowCompletionDateCloseIconLiveData().observe(viewLifecycleOwner, completionDateChip::setCloseIconVisible);
+        viewModel.getCodeValidLiveData().observe(viewLifecycleOwner, v -> {
+            if (v) {
+                codeEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
+            } else {
+                codeEditText.setError(null);
+            }
+        });
+        ObserverHelper.subscribeOnce(viewModel.getInitializedCompletable(), viewLifecycleOwner, this::onViewModelInitialized);
     }
 
     @Override
@@ -93,20 +105,11 @@ public class EditAssessmentFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void onEntityLoaded(AssessmentDetails assessmentDetails) {
-        if (null == assessmentDetails) {
-            return;
-        }
-        Log.d(LOG_TAG, String.format("Enter onEntityLoaded(%s)", assessmentDetails));
+    private void onViewModelInitialized() {
+        Log.d(LOG_TAG, "Enter onEntityLoaded");
         codeEditText.setText(viewModel.getCode());
         nameEditText.setText(viewModel.getName());
         notesEditText.setText(viewModel.getNotes());
-        viewModel.setSelectedCourse(assessmentDetails.getCourse());
-        onCourseChanged(viewModel.getSelectedCourse());
-        onTypeChanged();
-        onStatusChanged();
-        onGoalDateChanged();
-        onCompletionDateChanged();
         codeEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setCode));
         nameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
@@ -117,14 +120,13 @@ public class EditAssessmentFragment extends Fragment {
         ObserverHelper.subscribeOnce(viewModel.loadCourses(), getViewLifecycleOwner(), this::onCoursesLoadedForPicker, this::onLoadCourseOptionsListError);
     }
 
-    private void onCoursesLoadedForPicker(List<TermCourseListItem> termCourseListItems) {
-        AlertHelper.showSingleSelectDialog(R.string.title_select_course, viewModel.getSelectedCourse(), termCourseListItems, requireContext(), AbstractCourseEntity::toPickerItemDescription, t -> {
-            viewModel.setSelectedCourse(t);
-            onCourseChanged(t);
-        });
+    private void onCoursesLoadedForPicker(@NonNull List<TermCourseListItem> termCourseListItems) {
+        ObserverHelper.observeOnce(viewModel.getSelectedCourseLiveData(), this,
+                abstractCourseEntity -> AlertHelper.showSingleSelectDialog(R.string.title_select_course, abstractCourseEntity, termCourseListItems, requireContext(),
+                        AbstractCourseEntity::toPickerItemDescription, t -> viewModel.setSelectedCourse(t)), true);
     }
 
-    private void onLoadCourseOptionsListError(Throwable throwable) {
+    private void onLoadCourseOptionsListError(@NonNull Throwable throwable) {
         AlertDialog dlg = new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.title_read_error)
                 .setMessage(getString(R.string.format_message_save_error, throwable.getMessage()))
@@ -137,126 +139,68 @@ public class EditAssessmentFragment extends Fragment {
     private void onTypeButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onTypeButtonClick");
         Resources resources = getResources();
-        AlertHelper.showSingleSelectDialog(R.string.title_select_type, viewModel.getType(), Arrays.asList(AssessmentType.values()), requireContext(), t -> resources.getString(t.displayResourceId()), t -> {
-            if (viewModel.getType() != t) {
-                viewModel.setType(t);
-                onTypeChanged();
-            }
-        });
+        AlertHelper.showSingleSelectDialog(R.string.title_select_type, viewModel.getType(), Arrays.asList(AssessmentType.values()), requireContext(),
+                t -> resources.getString(t.displayResourceId()),
+                t -> viewModel.setType(t));
     }
 
     private void onStatusButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onStatusButtonClick");
         Resources resources = getResources();
-        AlertHelper.showSingleSelectDialog(R.string.title_select_status, viewModel.getStatus(), Arrays.asList(AssessmentStatus.values()), requireContext(), t -> resources.getString(t.displayResourceId()), t -> {
-            if (viewModel.getStatus() != t) {
-                viewModel.setStatus(t);
-                onStatusChanged();
-            }
-        });
+        AlertHelper.showSingleSelectDialog(R.string.title_select_status, viewModel.getStatus(), Arrays.asList(AssessmentStatus.values()), requireContext(),
+                t -> resources.getString(t.displayResourceId()),
+                t -> viewModel.setStatus(t));
     }
 
     private void onGoalDateChipClick(View view) {
         LocalDate date = viewModel.getGoalDate();
-        if (null == date) {
-            AbstractCourseEntity<?> course = viewModel.getSelectedCourse();
-            if (null != course) {
-                if (null == (date = course.getActualEnd()) && null == (date = course.getExpectedEnd())) {
-                    date = LocalDate.now();
+        if (null != date) {
+            showGoalDatePicker(date);
+        } else {
+            ObserverHelper.observeOnce(viewModel.getSelectedCourseLiveData(), this, course -> {
+                LocalDate d;
+                if (null == course || (null == (d = course.getActualEnd()) && null == (d = course.getExpectedEnd()))) {
+                    showGoalDatePicker(LocalDate.now());
+                } else {
+                    showGoalDatePicker(d);
                 }
-            } else {
-                date = LocalDate.now();
-            }
+                showGoalDatePicker(LocalDate.now());
+            }, true);
         }
-        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> {
-            LocalDate v = LocalDate.of(y, m + 1, d);
-            if (!v.equals(viewModel.getGoalDate())) {
-                viewModel.setGoalDate(v);
-                onGoalDateChanged();
-            }
-        }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
+    }
+
+    private void showGoalDatePicker(@NonNull LocalDate date) {
+        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> viewModel.setGoalDate(LocalDate.of(y, m + 1, d)),
+                date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     private void onGoalDateChipCloseIconClick(View view) {
-        if (null != viewModel.getGoalDate()) {
-            viewModel.setGoalDate(null);
-            onGoalDateChanged();
-        }
+        viewModel.setGoalDate(null);
     }
 
     private void onCompletionDateChipClick(View view) {
         LocalDate date = viewModel.getCompletionDate();
-        if (null == date && null == (date = viewModel.getGoalDate())) {
-            AbstractCourseEntity<?> course = viewModel.getSelectedCourse();
-            if (null != course) {
-                if (null == (date = course.getActualEnd()) && null == (date = course.getExpectedEnd())) {
-                    date = LocalDate.now();
+        if (null != date || null != (date = viewModel.getGoalDate())) {
+            showCompletionDatePicker(date);
+        } else {
+            ObserverHelper.observeOnce(viewModel.getSelectedCourseLiveData(), this, course -> {
+                LocalDate d;
+                if (null == course || (null == (d = course.getActualEnd()) && null == (d = course.getExpectedEnd()))) {
+                    showCompletionDatePicker(LocalDate.now());
+                } else {
+                    showCompletionDatePicker(d);
                 }
-            } else {
-                date = LocalDate.now();
-            }
+            }, true);
         }
-        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> {
-            LocalDate v = LocalDate.of(y, m + 1, d);
-            if (!v.equals(viewModel.getCompletionDate())) {
-                viewModel.setCompletionDate(v);
-                onCompletionDateChanged();
-            }
-        }, date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
+    }
+
+    private void showCompletionDatePicker(@NonNull LocalDate date) {
+        new DatePickerDialog(requireActivity(), (datePicker, y, m, d) -> viewModel.setCompletionDate(LocalDate.of(y, m + 1, d)),
+                date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth()).show();
     }
 
     private void onCompletionDateChipCloseIconClick(View view) {
-        if (null != viewModel.getCompletionDate()) {
-            viewModel.setCompletionDate(null);
-            onCompletionDateChanged();
-        }
-    }
-
-    private void onCourseChanged(AbstractCourseEntity<?> course) {
-        if (null == course) {
-            Log.d(LOG_TAG, "Enter onCourseChanged(null)");
-            courseButton.setText(R.string.label_none);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onCourseChanged(%s)", course));
-            courseButton.setText(course.getTitle());
-        }
-    }
-
-    private void onTypeChanged() {
-        typeButton.setText(viewModel.getType().displayResourceId());
-    }
-
-    private void onStatusChanged() {
-        Log.d(LOG_TAG, "Enter onStatusChanged");
-        statusButton.setText(viewModel.getStatus().displayResourceId());
-        onGoalDateChanged();
-        onCompletionDateChanged();
-    }
-
-    private void onCompletionDateChanged() {
-        LocalDate d = viewModel.getCompletionDate();
-        if (null == d) {
-            Log.d(LOG_TAG, "Enter onCompletionDateChanged(null)");
-            completionDateChip.setText("");
-            completionDateChip.setCloseIconVisible(false);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onCompletionDateChanged(%s)", d));
-            completionDateChip.setText(FULL_FORMATTER.format(d));
-            completionDateChip.setCloseIconVisible(true);
-        }
-    }
-
-    private void onGoalDateChanged() {
-        LocalDate d = viewModel.getGoalDate();
-        if (null == d) {
-            Log.d(LOG_TAG, "Enter onGoalDateChanged(null)");
-            goalDateChip.setText("");
-            goalDateChip.setCloseIconVisible(false);
-        } else {
-            Log.d(LOG_TAG, String.format("Enter onGoalDateChanged(%s)", d));
-            goalDateChip.setText(FULL_FORMATTER.format(d));
-            goalDateChip.setCloseIconVisible(true);
-        }
+        viewModel.setCompletionDate(null);
     }
 
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="min_ems_tiny_int">3</integer>
+    <integer name="min_ems_time">8</integer>
+    <integer name="min_ems_date">12</integer>
+    <integer name="min_lines_notes">4</integer>
+    <integer name="min_ems_code">4</integer>
+    <integer name="min_ems_short_text">10</integer>
+</resources>

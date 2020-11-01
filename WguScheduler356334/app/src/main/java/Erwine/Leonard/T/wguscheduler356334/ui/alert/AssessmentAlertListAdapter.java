@@ -66,24 +66,24 @@ public class AssessmentAlertListAdapter extends RecyclerView.Adapter<AssessmentA
 
         public void setItem(AssessmentAlert alertListItem) {
             this.alertListItem = alertListItem;
-            AlertEntity alert = alertListItem.getAlert();
             LocalDate d = alertListItem.getAlertDate();
             if (null != d) {
                 dateTextView.setText(LocalDateConverter.LONG_FORMATTER.format(d));
             } else {
+                AlertEntity alert = alertListItem.getAlert();
                 long timeSpec = alert.getTimeSpec();
                 if (Objects.requireNonNull(alert.isSubsequent())) {
                     if (timeSpec == 0) {
-                        dateTextView.setText(mView.getResources().getString(R.string.message_on_course_end));
+                        dateTextView.setText(mView.getResources().getString(R.string.message_on_completion_date));
                     } else {
-                        dateTextView.setText(mView.getResources().getString(R.string.format_days_after_course_end, Math.abs(timeSpec)));
+                        dateTextView.setText(mView.getResources().getString(R.string.format_days_after_completion_date, Math.abs(timeSpec)));
                     }
                 } else if (timeSpec == 0) {
-                    dateTextView.setText(mView.getResources().getString(R.string.message_on_course_start));
+                    dateTextView.setText(mView.getResources().getString(R.string.message_on_goal_date));
                 } else if (timeSpec < 0) {
-                    dateTextView.setText(mView.getResources().getString(R.string.format_days_before_course_start, Math.abs(timeSpec)));
+                    dateTextView.setText(mView.getResources().getString(R.string.format_days_before_goal_date, Math.abs(timeSpec)));
                 } else {
-                    dateTextView.setText(mView.getResources().getString(R.string.format_days_after_course_start, timeSpec));
+                    dateTextView.setText(mView.getResources().getString(R.string.format_days_after_goal_date, Math.abs(timeSpec)));
                 }
             }
             if (alertListItem.isMessagePresent()) {
