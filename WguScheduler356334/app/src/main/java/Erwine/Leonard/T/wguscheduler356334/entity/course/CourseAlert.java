@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.course;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 import androidx.room.Ignore;
 import androidx.room.Relation;
@@ -14,7 +15,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.alert.CourseAlertListViewModel;
+import Erwine.Leonard.T.wguscheduler356334.ui.course.EditCourseViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
@@ -101,21 +102,20 @@ public class CourseAlert implements AlertLinkEntity<CourseAlertLink> {
         this.alert = alert;
     }
 
-    public boolean reCalculate(CourseAlertListViewModel viewModel) {
+    public boolean reCalculate(@Nullable LocalDate startDate, @Nullable LocalDate endDate) {
         Boolean subsequent = alert.isSubsequent();
         if (null == subsequent) {
             return false;
         }
         relativeDays = alert.getTimeSpec();
-        LocalDate date = (subsequent) ?
-                viewModel.getEffectiveEndDate() :
-                viewModel.getEffectiveStartDate();
+
+        LocalDate date = (subsequent) ? endDate : startDate;
         LocalDate oldValue = alertDate;
         alertDate = (null == date) ? null : date.plusDays(relativeDays);
         return !Objects.equals(oldValue, alertDate);
     }
 
-    public void calculate(CourseAlertListViewModel viewModel) {
+    public void calculate(EditCourseViewModel viewModel) {
         Boolean subsequent = alert.isSubsequent();
         if (null == subsequent) {
             alertDate = LocalDateConverter.toLocalDate(alert.getTimeSpec());

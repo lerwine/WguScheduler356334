@@ -13,6 +13,7 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentEntity;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 @Dao
@@ -50,6 +51,9 @@ public interface AssessmentDAO {
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
     LiveData<List<AssessmentEntity>> getLiveDataByCourseId(long courseId);
+
+    @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
+    Observable<List<AssessmentEntity>> getObservableByCourseId(long courseId);
 
     @Query("SELECT * FROM assessments WHERE courseId = :courseId ORDER BY [goalDate], completionDate")
     Single<List<AssessmentEntity>> loadByCourseId(long courseId);

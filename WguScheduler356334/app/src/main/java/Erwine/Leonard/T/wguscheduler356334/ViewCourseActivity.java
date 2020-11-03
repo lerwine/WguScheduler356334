@@ -94,6 +94,8 @@ ViewCourseActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
         viewModel.getTitleFactoryLiveData().observe(this, f -> toolbar.setTitle(f.apply(getResources())));
         viewModel.getSubTitleLiveData().observe(this, toolbar::setSubtitle);
+        viewModel.getCanShareLiveData().observe(this, shareFloatingActionButton::setEnabled);
+        viewModel.getCanSaveLiveData().observe(this, saveFloatingActionButton::setEnabled);
         waitDialog = new AlertHelper(R.drawable.dialog_busy, R.string.title_loading, R.string.message_please_wait, this).createDialog();
         waitDialog.show();
         ObserverHelper.subscribeOnce(viewModel.initializeViewModelState(savedInstanceState, () -> getIntent().getExtras()), this, this::onEntityLoadSucceeded, this::onEntityLoadFailed);
@@ -121,13 +123,15 @@ ViewCourseActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        if (viewModel.getHasChangesLiveData().getValue()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), this,
-                            alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts))), null);
-        } else {
-            finish();
-        }
+        ObserverHelper.observeOnce(viewModel.getHasChangesLiveData(), this, hasChanges -> {
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
+                        ObserverHelper.observeOnce(viewModel.getCourseAlertsLiveData(), this,
+                                alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts))), null);
+            } else {
+                finish();
+            }
+        });
     }
 
     private void onEntityLoadSucceeded(CourseDetails entity) {
@@ -171,23 +175,25 @@ ViewCourseActivity extends AppCompatActivity {
     }
 
     private void onAddAlertFloatingActionButtonClick(View view) {
-        if (viewModel.getHasChangesLiveData().getValue()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                    () -> {
-                        EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
-                        dlg.show(getSupportFragmentManager(), null);
-                    },
-                    () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
-                        @Override
-                        protected void onSuccessComplete() {
+        ObserverHelper.observeOnce(viewModel.getHasChangesLiveData(), this, hasChanges -> {
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
+                        () -> {
                             EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                             dlg.show(getSupportFragmentManager(), null);
-                        }
-                    }), null);
-        } else {
-            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
-            dlg.show(getSupportFragmentManager(), null);
-        }
+                        },
+                        () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
+                            @Override
+                            protected void onSuccessComplete() {
+                                EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+                                dlg.show(getSupportFragmentManager(), null);
+                            }
+                        }), null);
+            } else {
+                EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+                dlg.show(getSupportFragmentManager(), null);
+            }
+        });
     }
 
     private void onShareFloatingActionButton(View view) {
@@ -279,13 +285,13 @@ ViewCourseActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), this, alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts)));
+        ObserverHelper.observeOnce(viewModel.getCourseAlertsLiveData(), this, alerts -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener(alerts)));
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_course, R.string.message_delete_course_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                ObserverHelper.subscribeOnce(viewModel.getCourseAndAssessmentAlerts(), this,
                         alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), this,
                                 new DeleteOperationListener(alerts))), null);
     }
@@ -356,7 +362,7 @@ ViewCourseActivity extends AppCompatActivity {
                     EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                     dlg.show(getSupportFragmentManager(), null);
                 } else {
-                    ObserverHelper.observeOnce(viewModel.getAllCourseAlerts(), ViewCourseActivity.this, alerts -> {
+                    ObserverHelper.observeOnce(viewModel.getCourseAlertsLiveData(), ViewCourseActivity.this, alerts -> {
                         CourseAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
                         if (alertsAfterSave.length > 0) {
                             ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> updateAlerts(alertsAfterSave, defaultAlertTime));

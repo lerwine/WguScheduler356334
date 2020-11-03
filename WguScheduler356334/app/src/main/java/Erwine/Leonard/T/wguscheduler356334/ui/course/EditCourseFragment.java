@@ -22,7 +22,6 @@ import com.google.android.material.chip.Chip;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -31,9 +30,7 @@ import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.AbstractMentorEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.mentor.MentorListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.util.AlertHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.EntityHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
@@ -220,26 +217,30 @@ public class EditCourseFragment extends Fragment {
 
     private void onTermButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onTermButtonClick");
-        List<TermListItem> termListItems = viewModel.getTermOptionsLiveData().getValue();
-        if (null != termListItems) {
-            AlertHelper.showSingleSelectDialog(R.string.title_select_term, viewModel.getSelectedTerm(), termListItems, requireContext(), AbstractTermEntity::getName, t -> {
-                viewModel.setSelectedTerm(t);
-                onTermChanged(t);
-            });
-        } else {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_db_read_operation_in_progress, requireContext()).showDialog();
-        }
+        ObserverHelper.observeOnce(viewModel.getTermOptionsLiveData(), getViewLifecycleOwner(), termListItems -> {
+            if (null == termListItems || termListItems.isEmpty()) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_db_read_operation_in_progress, requireContext()).showDialog();
+            } else {
+                AlertHelper.showSingleSelectDialog(R.string.title_select_term, viewModel.getSelectedTerm(), termListItems, requireContext(), AbstractTermEntity::getName, t -> {
+                    viewModel.setSelectedTerm(t);
+                    onTermChanged(t);
+                });
+            }
+        });
     }
 
     private void onMentorChipClick(View view) {
         Log.d(LOG_TAG, "Enter onMentorChipClick");
-        List<MentorListItem> mentorListItems = viewModel.getMentorOptionsLiveData().getValue();
-        if (null != mentorListItems) {
-            AlertHelper.showSingleSelectDialog(R.string.title_select_mentor, viewModel.getSelectedMentor(), mentorListItems, requireContext(), AbstractMentorEntity::getName, t -> {
-                viewModel.setSelectedMentor(t);
-                onMentorChanged(t);
-            });
-        }
+        ObserverHelper.observeOnce(viewModel.getMentorOptionsLiveData(), getViewLifecycleOwner(), mentorListItems -> {
+            if (null == mentorListItems || mentorListItems.isEmpty()) {
+                AlertHelper.showSingleSelectDialog(R.string.title_select_mentor, viewModel.getSelectedMentor(), mentorListItems, requireContext(), AbstractMentorEntity::getName, t -> {
+                    viewModel.setSelectedMentor(t);
+                    onMentorChanged(t);
+                });
+            } else {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_no_mentors, requireContext()).showDialog();
+            }
+        });
     }
 
     private void onMentorChipCloseIconClick(View view) {

@@ -175,6 +175,7 @@
     <string name="title_select_type">Select Type</string>
     <string name="title_not_ready">Not Ready</string>
     <string name="message_db_read_operation_in_progress">Data still being read from database… Please try again in a couple seconds.</string>
+    <string name="message_no_mentors">No mentors have been created.</string>
     <string name="label_course">Course</string>
     <string name="label_code">Code</string>
     <string name="label_type">Type</string>

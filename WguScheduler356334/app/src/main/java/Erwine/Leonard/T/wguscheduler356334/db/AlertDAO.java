@@ -47,13 +47,13 @@ public interface AlertDAO {
     LiveData<List<AlertListItem>> getAll();
 
     @Query("SELECT * FROM alertListView WHERE courseId=:courseId ORDER BY alertDate DESC, eventDate DESC, code, title")
-    LiveData<List<AlertListItem>> getAllByCourseId(long courseId);
+    Single<List<AlertListItem>> getAllByCourseId(long courseId);
 
     @Query("SELECT * FROM alertListView WHERE termId=:termId ORDER BY alertDate DESC, eventDate DESC, code, title")
-    LiveData<List<AlertListItem>> getAllByTermId(long termId);
+    Single<List<AlertListItem>> getAllByTermId(long termId);
 
     @Query("SELECT * FROM alertListView WHERE mentorId=:mentorId ORDER BY alertDate DESC, eventDate DESC, code, title")
-    LiveData<List<AlertListItem>> getAllByMentorId(long mentorId);
+    Single<List<AlertListItem>> getAllByMentorId(long mentorId);
 
     @Query("SELECT * FROM alertListView")
     List<AlertListItem> getAllSynchronous();

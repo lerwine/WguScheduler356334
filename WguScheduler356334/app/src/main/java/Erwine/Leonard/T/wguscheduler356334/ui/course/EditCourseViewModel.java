@@ -11,6 +11,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,6 +54,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
+import Erwine.Leonard.T.wguscheduler356334.util.BehaviorComputationSource;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
 import Erwine.Leonard.T.wguscheduler356334.util.LiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
@@ -64,13 +66,10 @@ import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ValidationMessage;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.CompletableSubject;
 
 import static Erwine.Leonard.T.wguscheduler356334.db.LocalDateConverter.LONG_FORMATTER;
@@ -106,110 +105,96 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     private final DbLoader dbLoader;
     private final CompositeDisposable compositeDisposable;
-    private final BehaviorSubject<String> numberSubject;
-    private final BehaviorSubject<String> titleSubject;
-    private final BehaviorSubject<CourseStatus> statusSubject;
-    private final BehaviorSubject<String> competencyUnitsTextSubject;
-    private final BehaviorSubject<Optional<LocalDate>> expectedStartSubject;
-    private final BehaviorSubject<Optional<LocalDate>> actualStartSubject;
-    private final BehaviorSubject<Optional<LocalDate>> expectedEndSubject;
-    private final BehaviorSubject<Optional<LocalDate>> actualEndSubject;
-    private final BehaviorSubject<Optional<AbstractMentorEntity<?>>> selectedMentorSubject;
-    private final BehaviorSubject<Optional<AbstractTermEntity<?>>> selectedTermSubject;
-    private final BehaviorSubject<String> notesSubject;
-    private final BehaviorSubject<CourseDetails> originalValuesSubject;
-    private final BehaviorSubject<List<TermCourseListItem>> coursesForTermSubject;
+    private final BehaviorComputationSource<CourseDetails> originalValues;
+    private final BehaviorComputationSource<String> number;
+    private final BehaviorComputationSource<String> title;
+    private final BehaviorComputationSource<CourseStatus> status;
+    private final BehaviorComputationSource<String> competencyUnitsText;
+    private final BehaviorComputationSource<Optional<LocalDate>> expectedStart;
+    private final BehaviorComputationSource<Optional<LocalDate>> actualStart;
+    private final BehaviorComputationSource<Optional<LocalDate>> expectedEnd;
+    private final BehaviorComputationSource<Optional<LocalDate>> actualEnd;
+    private final BehaviorComputationSource<Optional<AbstractMentorEntity<?>>> selectedMentor;
+    private final BehaviorComputationSource<Optional<AbstractTermEntity<?>>> selectedTerm;
+    private final BehaviorComputationSource<String> notes;
+    private final BehaviorComputationSource<List<TermCourseListItem>> coursesForTerm;
     private final CompletableSubject initializedSubject;
     private final Completable initializedCompletable;
 
     private final LiveData<List<TermListItem>> termOptionsLiveData;
     private final LiveData<List<MentorListItem>> mentorOptionsLiveData;
-    private LiveData<List<AssessmentEntity>> assessmentsLiveData;
-    private final LiveDataWrapper<List<CourseAlert>> alertsLiveData;
-    private final SubscribingLiveDataWrapper<LocalDate> effectiveStartLiveData;
-    private final SubscribingLiveDataWrapper<LocalDate> effectiveEndLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> termValidLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> numberValidLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> titleValidLiveData;
-    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> expectedStartValidationMessageLiveData;
-    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> expectedEndValidationMessageLiveData;
-    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> actualStartValidationMessageLiveData;
-    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> actualEndValidationMessageLiveData;
-    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> competencyUnitsValidationMessageLiveData;
-    private final SubscribingLiveDataWrapper<Optional<Integer>> competencyUnitsValueLiveData;
-    private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactoryLiveData;
-    private final SubscribingLiveDataWrapper<String> subTitleLiveData;
-    private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> overviewFactoryLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> canSaveLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> canShareLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> hasChangesLiveData;
-    private final SubscribingLiveDataWrapper<Boolean> isValidLiveData;
-    //    private Observable<List<TermCourseListItem>> coursesForTermObservable;
-    private Disposable coursesForTermObserving;
-    //    private Observable<List<CourseAlert>> alertsObservable;
-    private Disposable alertsObserving;
+    private final LiveDataWrapper<List<AssessmentEntity>> assessmentsLiveData;
+    private final LiveDataWrapper<List<CourseAlert>> courseAlertsLiveData;
+    private final SubscribingLiveDataWrapper<LocalDate> effectiveStartObserver;
+    private final SubscribingLiveDataWrapper<LocalDate> effectiveEndObserver;
+    private final SubscribingLiveDataWrapper<Boolean> termValidObserver;
+    private final SubscribingLiveDataWrapper<Boolean> numberValidObserver;
+    private final SubscribingLiveDataWrapper<Boolean> titleValidObserver;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> expectedStartValidationMessageObserver;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> expectedEndValidationMessageObserver;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> actualStartValidationMessageObserver;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> actualEndValidationMessageObserver;
+    private final SubscribingLiveDataWrapper<Optional<ResourceMessageFactory>> competencyUnitsValidationMessageObserver;
+    private final SubscribingLiveDataWrapper<Optional<Integer>> competencyUnitsValueObserver;
+    private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactoryObserver;
+    private final SubscribingLiveDataWrapper<String> subTitleObserver;
+    private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> overviewFactoryObserver;
+    private final SubscribingLiveDataWrapper<Boolean> canSaveObserver;
+    private final SubscribingLiveDataWrapper<Boolean> canShareObserver;
+    private final SubscribingLiveDataWrapper<Boolean> hasChangesObserver;
+    //    private final SubscribingLiveDataWrapper<Boolean> isValidObserver;
+    private Pair<Long, Disposable> coursesForTermObserving;
+    private Pair<Long, Disposable> courseAlertsObserving;
+    private Pair<Long, Disposable> assessmentsObserving;
     private boolean fromInitializedState;
 
     public EditCourseViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        compositeDisposable = new CompositeDisposable();
-        numberSubject = BehaviorSubject.createDefault("");
-        titleSubject = BehaviorSubject.createDefault("");
-        statusSubject = BehaviorSubject.createDefault(CourseStatus.UNPLANNED);
-        competencyUnitsTextSubject = BehaviorSubject.createDefault("");
-        expectedStartSubject = BehaviorSubject.createDefault(Optional.empty());
-        actualStartSubject = BehaviorSubject.createDefault(Optional.empty());
-        expectedEndSubject = BehaviorSubject.createDefault(Optional.empty());
-        actualEndSubject = BehaviorSubject.createDefault(Optional.empty());
-        selectedMentorSubject = BehaviorSubject.createDefault(Optional.empty());
-        selectedTermSubject = BehaviorSubject.createDefault(Optional.empty());
-        notesSubject = BehaviorSubject.createDefault("");
-        originalValuesSubject = BehaviorSubject.createDefault(new CourseDetails(null));
-        coursesForTermSubject = BehaviorSubject.createDefault(Collections.emptyList());
+        number = BehaviorComputationSource.createDefault("");
+        title = BehaviorComputationSource.createDefault("");
+        status = BehaviorComputationSource.createDefault(CourseStatus.UNPLANNED);
+        competencyUnitsText = BehaviorComputationSource.createDefault("");
+        expectedStart = BehaviorComputationSource.createDefault(Optional.empty());
+        actualStart = BehaviorComputationSource.createDefault(Optional.empty());
+        expectedEnd = BehaviorComputationSource.createDefault(Optional.empty());
+        actualEnd = BehaviorComputationSource.createDefault(Optional.empty());
+        selectedMentor = BehaviorComputationSource.createDefault(Optional.empty());
+        selectedTerm = BehaviorComputationSource.createDefault(Optional.empty());
+        notes = BehaviorComputationSource.createDefault("");
+        originalValues = BehaviorComputationSource.createDefault(new CourseDetails(null));
+        coursesForTerm = BehaviorComputationSource.createDefault(Collections.emptyList());
         initializedSubject = CompletableSubject.create();
+        initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
         termOptionsLiveData = dbLoader.getAllTerms();
         mentorOptionsLiveData = dbLoader.getAllMentors();
 
-        Scheduler computationScheduler = Schedulers.computation();
-        initializedCompletable = initializedSubject.observeOn(computationScheduler);
-        Observable<String> numberObservable = numberSubject.observeOn(computationScheduler).map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
-        Observable<String> titleObservable = titleSubject.observeOn(computationScheduler).map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
-        Observable<BinaryAlternate<Integer, ResourceMessageFactory>> competencyUnitsParsedObservable = competencyUnitsTextSubject.observeOn(computationScheduler)
+        Observable<String> numberObservable = number.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<String> titleObservable = title.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<BinaryAlternate<Integer, ResourceMessageFactory>> competencyUnitsParsedObservable = competencyUnitsText.getObservable()
                 .map(Workers.asCached(EditCourseViewModel::parseCompetencyUnits));
-        Observable<String> notesObservable = notesSubject.observeOn(computationScheduler).map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply));
-        Observable<CourseStatus> statusObservable = statusSubject.observeOn(computationScheduler);
-        Observable<Optional<LocalDate>> expectedStartValueObservable = expectedStartSubject.observeOn(computationScheduler);
-        Observable<Optional<LocalDate>> actualStartValueObservable = actualStartSubject.observeOn(computationScheduler);
-        Observable<Optional<LocalDate>> expectedEndValueObservable = expectedEndSubject.observeOn(computationScheduler);
-        Observable<Optional<LocalDate>> actualEndValueObservable = actualEndSubject.observeOn(computationScheduler);
-        Observable<Optional<AbstractTermEntity<?>>> selectedTermObservable = selectedTermSubject.observeOn(computationScheduler);
-        Observable<Optional<Long>> selectedTermIdObservable = selectedTermObservable.map(t -> t.map(AbstractEntity::getId).filter(i -> ID_NEW != i));
-        Observable<Optional<AbstractMentorEntity<?>>> selectedMentorObservable = selectedMentorSubject.observeOn(computationScheduler);
-        Observable<Optional<ResourceMessageFactory>> expectedStartMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
-                expectedEndValueObservable, selectedTermObservable, EditCourseViewModel::validateExpectedStart);
-        Observable<Optional<ResourceMessageFactory>> expectedEndMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
-                expectedEndValueObservable, selectedTermObservable, EditCourseViewModel::validateExpectedEnd);
-        Observable<Optional<ResourceMessageFactory>> actualStartMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
-                expectedEndValueObservable, EditCourseViewModel::validateActualStart);
-        Observable<Optional<ResourceMessageFactory>> actualEndMessage = Observable.combineLatest(statusObservable, expectedStartValueObservable,
-                expectedEndValueObservable, EditCourseViewModel::validateActualEnd);
-        Observable<Optional<LocalDate>> effectiveStartObservable = Observable.combineLatest(expectedStartValueObservable, actualStartValueObservable,
-                (e, a) -> (a.isPresent()) ? a : e);
-        Observable<Optional<LocalDate>> effectiveEndObservable = Observable.combineLatest(expectedEndValueObservable, actualEndValueObservable,
-                (e, a) -> (a.isPresent()) ? a : e);
-        Observable<CourseDetails> originalValuesObservable = originalValuesSubject.observeOn(computationScheduler);
+        Observable<Optional<Long>> selectedTermIdObservable = selectedTerm.getObservable().map(t -> t.map(AbstractEntity::getId).filter(i -> ID_NEW != i));
+        Observable<Optional<ResourceMessageFactory>> expectedStartMessage = Observable.combineLatest(status.getObservable(), expectedStart.getObservable(),
+                expectedEnd.getObservable(), selectedTerm.getObservable(), EditCourseViewModel::validateExpectedStart);
+        Observable<Optional<ResourceMessageFactory>> expectedEndMessage = Observable.combineLatest(status.getObservable(), expectedStart.getObservable(),
+                expectedEnd.getObservable(), selectedTerm.getObservable(), EditCourseViewModel::validateExpectedEnd);
+        Observable<Optional<ResourceMessageFactory>> actualStartMessage = Observable.combineLatest(status.getObservable(), actualStart.getObservable(),
+                actualEnd.getObservable(), EditCourseViewModel::validateActualStart);
+        Observable<Optional<ResourceMessageFactory>> actualEndMessage = Observable.combineLatest(status.getObservable(), actualStart.getObservable(),
+                actualEnd.getObservable(), EditCourseViewModel::validateActualEnd);
         Observable<Optional<Integer>> competencyUnitsObservable = competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary);
+        Observable<Long> courseIdObservable = originalValues.getObservable().map(AbstractEntity::getId);
         Observable<Boolean> hasChangesObservable = Observable.combineLatest(
-                originalValuesObservable,
+                originalValues.getObservable(),
                 numberObservable,
                 titleObservable,
-                statusObservable,
+                status.getObservable(),
                 competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary),
-                selectedMentorObservable.map(o -> o.map(AbstractEntity::getId)),
+                selectedMentor.getObservable().map(o -> o.map(AbstractEntity::getId)),
                 selectedTermIdObservable,
-                notesObservable,
-                Observable.combineLatest(originalValuesObservable, expectedStartValueObservable, expectedEndValueObservable, actualStartValueObservable, actualEndValueObservable,
+                notes.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)),
+                Observable.combineLatest(originalValues.getObservable(), expectedStart.getObservable(), expectedEnd.getObservable(),
+                        actualStart.getObservable(), actualEnd.getObservable(),
                         (course, expectedStart, expectedEnd, actualStart, actualEnd) -> Objects.equals(expectedStart.orElse(null), course.getExpectedStart()) &&
                                 Objects.equals(expectedEnd.orElse(null), course.getExpectedEnd()) &&
                                 Objects.equals(actualStart.orElse(null), course.getExpectedStart()) &&
@@ -224,7 +209,6 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
         Observable<Boolean> termValidObservable = selectedTermIdObservable.map(Optional::isPresent);
         Observable<Boolean> numberValidObservable = numberObservable.map(s -> !s.isEmpty());
         Observable<Boolean> titleValidObservable = titleObservable.map(s -> !s.isEmpty());
-        Observable<Optional<ResourceMessageFactory>> competencyUnitsMessage = competencyUnitsParsedObservable.map(BinaryAlternate::extractSecondary);
 
         Observable<Boolean> validObservable = Observable.combineLatest(termValidObservable, numberValidObservable, titleValidObservable,
                 expectedStartMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
@@ -234,66 +218,116 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 (termValid, numberValid, titleValid, expectedStartValid, expectedEndValid, actualStartValid, actualEndValid) ->
                         termValid && numberValid && titleValid && expectedStartValid && expectedEndValid && actualStartValid && actualEndValid);
 
-        effectiveStartLiveData = SubscribingLiveDataWrapper.ofOptional(effectiveStartObservable);
-        effectiveEndLiveData = SubscribingLiveDataWrapper.ofOptional(effectiveEndObservable);
-        alertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
-        termValidLiveData = SubscribingLiveDataWrapper.of(false, termValidObservable);
-        numberValidLiveData = SubscribingLiveDataWrapper.of(false, numberValidObservable);
-        titleValidLiveData = SubscribingLiveDataWrapper.of(false, titleValidObservable);
-        expectedStartValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), expectedStartMessage);
-        expectedEndValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), expectedEndMessage);
-        actualStartValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), actualStartMessage);
-        actualEndValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), actualEndMessage);
-        originalValuesLiveData = SubscribingLiveDataWrapper.of(originalValuesObservable);
-        competencyUnitsValidationMessageLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), competencyUnitsMessage);
-        competencyUnitsValueLiveData = SubscribingLiveDataWrapper.of(Optional.empty(), competencyUnitsObservable);
-        titleFactoryLiveData = SubscribingLiveDataWrapper.of(c -> c.getString(R.string.title_activity_view_course), numberObservable.map(EditCourseViewModel::calculateViewTitleFactory));
-        subTitleLiveData = SubscribingLiveDataWrapper.of("", titleObservable);
-        overviewFactoryLiveData = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(statusObservable, competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary), expectedStartValueObservable,
-                expectedEndValueObservable, actualStartValueObservable, actualEndValueObservable, selectedTermObservable, selectedMentorObservable,
+        effectiveStartObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedStart.getObservable(), actualStart.getObservable(),
+                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(d.orElse(null), actualStart.getValue().orElseGet(() -> expectedStart.getValue().orElse(null)))));
+        effectiveEndObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedEnd.getObservable(), actualEnd.getObservable(),
+                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(actualEnd.getValue().orElseGet(() -> expectedEnd.getValue().orElse(null)), d.orElse(null))));
+        courseAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
+        assessmentsLiveData = new LiveDataWrapper<>(Collections.emptyList());
+        termValidObserver = SubscribingLiveDataWrapper.of(false, termValidObservable);
+        numberValidObserver = SubscribingLiveDataWrapper.of(false, numberValidObservable);
+        titleValidObserver = SubscribingLiveDataWrapper.of(false, titleValidObservable);
+        expectedStartValidationMessageObserver = SubscribingLiveDataWrapper.of(Optional.empty(), expectedStartMessage);
+        expectedEndValidationMessageObserver = SubscribingLiveDataWrapper.of(Optional.empty(), expectedEndMessage);
+        actualStartValidationMessageObserver = SubscribingLiveDataWrapper.of(Optional.empty(), actualStartMessage);
+        actualEndValidationMessageObserver = SubscribingLiveDataWrapper.of(Optional.empty(), actualEndMessage);
+        originalValuesLiveData = SubscribingLiveDataWrapper.of(originalValues.getObservable());
+        competencyUnitsValidationMessageObserver = SubscribingLiveDataWrapper.of(Optional.empty(), competencyUnitsParsedObservable.map(BinaryAlternate::extractSecondary));
+        competencyUnitsValueObserver = SubscribingLiveDataWrapper.of(Optional.empty(), competencyUnitsObservable);
+        titleFactoryObserver = SubscribingLiveDataWrapper.of(c -> c.getString(R.string.title_activity_view_course), numberObservable.map(EditCourseViewModel::calculateViewTitleFactory));
+        subTitleObserver = SubscribingLiveDataWrapper.of("", titleObservable);
+        overviewFactoryObserver = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(status.getObservable(),
+                competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary), expectedStart.getObservable(), expectedEnd.getObservable(),
+                actualStart.getObservable(), actualEnd.getObservable(), selectedTerm.getObservable(), selectedMentor.getObservable(),
                 EditCourseViewModel::calculateOverviewFactory));
-        canSaveLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c));
-        canShareLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c));
-        hasChangesLiveData = SubscribingLiveDataWrapper.of(false, hasChangesObservable);
-        isValidLiveData = SubscribingLiveDataWrapper.of(false, validObservable);
-        compositeDisposable.addAll(effectiveStartLiveData, effectiveEndLiveData, termValidLiveData, numberValidLiveData, titleValidLiveData,
-                expectedStartValidationMessageLiveData, expectedEndValidationMessageLiveData, actualStartValidationMessageLiveData, actualEndValidationMessageLiveData,
-                competencyUnitsValidationMessageLiveData, titleFactoryLiveData, subTitleLiveData, overviewFactoryLiveData, hasChangesLiveData, isValidLiveData,
-                canSaveLiveData, canShareLiveData);
-        compositeDisposable.add(originalValuesObservable.subscribe(originalValues -> {
-            try {
-                if (null != alertsObserving) {
-                    compositeDisposable.remove(alertsObserving);
-                    alertsObserving = null;
-                }
-            } finally {
-                long id = originalValues.getId();
-                if (ID_NEW != id) {
-                    alertsObserving = dbLoader.getAlertsObservableByCourseId(id).observeOn(computationScheduler).subscribe(alertsLiveData::postValue);
-                    compositeDisposable.add(alertsObserving);
-                } else {
-                    coursesForTermSubject.onNext(Collections.emptyList());
-                    alertsObserving = null;
-                }
+        canSaveObserver = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c));
+        canShareObserver = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c));
+        hasChangesObserver = SubscribingLiveDataWrapper.of(false, hasChangesObservable);
+//        isValidObserver = SubscribingLiveDataWrapper.of(false, validObservable);
+        compositeDisposable = new CompositeDisposable(effectiveStartObserver, effectiveEndObserver, termValidObserver, numberValidObserver, titleValidObserver,
+                expectedStartValidationMessageObserver, expectedEndValidationMessageObserver, actualStartValidationMessageObserver, actualEndValidationMessageObserver,
+                competencyUnitsValidationMessageObserver, titleFactoryObserver, subTitleObserver, overviewFactoryObserver, hasChangesObserver,
+                canSaveObserver, canShareObserver, courseIdObservable.subscribe(this::observeCourseAlertsByCourseId),
+                courseIdObservable.subscribe(this::observeAssessmentsByCourseId), selectedTermIdObservable.subscribe(this::observeCoursesByTermId));
+    }
+
+    void recalculateAlerts(@Nullable LocalDate startDate, @Nullable LocalDate endDate) {
+        List<CourseAlert> list = getCourseAlertsLiveData().getValue();
+        if (null != list) {
+            for (CourseAlert a : list) {
+                a.reCalculate(startDate, endDate);
             }
-        }));
-        compositeDisposable.add(selectedTermIdObservable.subscribe(selectedTermId -> {
-            try {
-                if (null != coursesForTermObserving) {
-                    compositeDisposable.remove(coursesForTermObserving);
-                    coursesForTermObserving = null;
+        }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void observeCoursesByTermId(Optional<Long> selectedTermId) {
+        try {
+            if (null != coursesForTermObserving) {
+                if (selectedTermId.map(i -> Objects.equals(courseAlertsObserving.first, i)).orElse(false)) {
+                    return;
                 }
-            } finally {
-                if (selectedTermId.isPresent()) {
-                    coursesForTermObserving = dbLoader.getCoursesObservableByTermId(selectedTermId.get()).observeOn(computationScheduler)
-                            .subscribe(list -> coursesForTermSubject.onNext((null == list) ? Collections.emptyList() : list));
-                    compositeDisposable.add(coursesForTermObserving);
-                } else {
-                    coursesForTermSubject.onNext(Collections.emptyList());
-                    coursesForTermObserving = null;
-                }
+                compositeDisposable.remove(coursesForTermObserving.second);
+                coursesForTermObserving = null;
             }
-        }));
+        } finally {
+            if (selectedTermId.isPresent()) {
+                long id = selectedTermId.get();
+                coursesForTermObserving = new Pair<>(id, dbLoader.getCoursesObservableByTermId(id)
+                        .subscribe(list -> coursesForTerm.onNext((null == list) ? Collections.emptyList() : list)));
+                compositeDisposable.add(coursesForTermObserving.second);
+            } else {
+                coursesForTerm.onNext(Collections.emptyList());
+                coursesForTermObserving = null;
+            }
+        }
+    }
+
+    private void observeCourseAlertsByCourseId(long courseId) {
+        try {
+            if (null != courseAlertsObserving) {
+                if (courseAlertsObserving.first == courseId) {
+                    return;
+                }
+                compositeDisposable.remove(courseAlertsObserving.second);
+                courseAlertsObserving = null;
+            }
+        } finally {
+            if (ID_NEW != courseId) {
+                courseAlertsObserving = new Pair<>(courseId, dbLoader.getAlertsObservableByCourseId(courseId).subscribe(this::onAlertsLoaded));
+                compositeDisposable.add(courseAlertsObserving.second);
+            } else {
+                courseAlertsLiveData.postValue(Collections.emptyList());
+                courseAlertsObserving = null;
+            }
+        }
+    }
+
+    private void onAlertsLoaded(List<CourseAlert> courseAlerts) {
+        for (CourseAlert a : courseAlerts) {
+            a.calculate(this);
+        }
+        courseAlertsLiveData.postValue(courseAlerts);
+    }
+
+    private void observeAssessmentsByCourseId(long courseId) {
+        try {
+            if (null != assessmentsObserving) {
+                if (assessmentsObserving.first == courseId) {
+                    return;
+                }
+                compositeDisposable.remove(courseAlertsObserving.second);
+                courseAlertsObserving = null;
+            }
+        } finally {
+            if (ID_NEW != courseId) {
+                assessmentsObserving = new Pair<>(courseId, dbLoader.getAssessmentsObservableByCourseId(courseId).subscribe(assessmentsLiveData::postValue));
+                compositeDisposable.add(courseAlertsObserving.second);
+            } else {
+                assessmentsLiveData.postValue(Collections.emptyList());
+                courseAlertsObserving = null;
+            }
+        }
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -514,110 +548,110 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     }
 
     public long getId() {
-        return originalValuesSubject.getValue().getId();
+        return originalValues.getValue().getId();
     }
 
     @Nullable
     public AbstractTermEntity<?> getSelectedTerm() {
-        return selectedTermSubject.getValue().orElse(null);
+        return selectedTerm.getValue().orElse(null);
     }
 
-    public void setSelectedTerm(AbstractTermEntity<?> selectedTerm) {
-        selectedTermSubject.onNext(Optional.ofNullable(selectedTerm));
+    public void setSelectedTerm(AbstractTermEntity<?> term) {
+        selectedTerm.onNext(Optional.ofNullable(term));
     }
 
     @Nullable
     public AbstractMentorEntity<?> getSelectedMentor() {
-        return selectedMentorSubject.getValue().orElse(null);
+        return selectedMentor.getValue().orElse(null);
     }
 
-    public void setSelectedMentor(@Nullable AbstractMentorEntity<?> selectedMentor) {
-        selectedMentorSubject.onNext(Optional.ofNullable(selectedMentor));
+    public void setSelectedMentor(@Nullable AbstractMentorEntity<?> mentor) {
+        selectedMentor.onNext(Optional.ofNullable(mentor));
     }
 
     @NonNull
     public String getNumber() {
-        return numberSubject.getValue();
+        return number.getValue();
     }
 
     public void setNumber(String value) {
-        numberSubject.onNext((null == value) ? "" : value);
+        number.onNext((null == value) ? "" : value);
     }
 
     @NonNull
     public String getTitle() {
-        return titleSubject.getValue();
+        return title.getValue();
     }
 
     public void setTitle(String value) {
-        titleSubject.onNext((null == value) ? "" : value);
+        title.onNext((null == value) ? "" : value);
     }
 
     @Nullable
     public LocalDate getExpectedStart() {
-        return expectedStartSubject.getValue().orElse(null);
+        return expectedStart.getValue().orElse(null);
     }
 
     public void setExpectedStart(LocalDate value) {
-        expectedStartSubject.onNext(Optional.ofNullable(value));
+        expectedStart.onNext(Optional.ofNullable(value));
     }
 
     @Nullable
     public LocalDate getActualStart() {
-        return actualStartSubject.getValue().orElse(null);
+        return actualStart.getValue().orElse(null);
     }
 
     public void setActualStart(LocalDate value) {
-        actualStartSubject.onNext(Optional.ofNullable(value));
+        actualStart.onNext(Optional.ofNullable(value));
     }
 
     @Nullable
     public LocalDate getExpectedEnd() {
-        return expectedEndSubject.getValue().orElse(null);
+        return expectedEnd.getValue().orElse(null);
     }
 
     public void setExpectedEnd(LocalDate value) {
-        expectedEndSubject.onNext(Optional.ofNullable(value));
+        expectedEnd.onNext(Optional.ofNullable(value));
     }
 
     @Nullable
     public LocalDate getActualEnd() {
-        return actualEndSubject.getValue().orElse(null);
+        return actualEnd.getValue().orElse(null);
     }
 
     public void setActualEnd(LocalDate value) {
-        actualEndSubject.onNext(Optional.ofNullable(value));
+        actualEnd.onNext(Optional.ofNullable(value));
     }
 
     @NonNull
     public String getCompetencyUnitsText() {
-        return competencyUnitsTextSubject.getValue();
+        return competencyUnitsText.getValue();
     }
 
     public void setCompetencyUnitsText(String value) {
-        competencyUnitsTextSubject.onNext((null == value) ? "" : value);
+        competencyUnitsText.onNext((null == value) ? "" : value);
     }
 
     @NonNull
     public CourseStatus getStatus() {
-        return statusSubject.getValue();
+        return status.getValue();
     }
 
     public synchronized void setStatus(CourseStatus status) {
-        statusSubject.onNext((null == status) ? CourseStatus.UNPLANNED : status);
+        this.status.onNext((null == status) ? CourseStatus.UNPLANNED : status);
     }
 
     @NonNull
     public String getNotes() {
-        return notesSubject.getValue();
+        return notes.getValue();
     }
 
     public synchronized void setNotes(String value) {
-        notesSubject.onNext((null == value) ? "" : value);
+        notes.onNext((null == value) ? "" : value);
     }
 
     public List<TermCourseListItem> getCoursesForTerm() {
-        return coursesForTermSubject.getValue();
+        return coursesForTerm.getValue();
     }
 
     public Completable getInitializedCompletable() {
@@ -625,95 +659,79 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     }
 
     public LiveData<LocalDate> getEffectiveStartLiveData() {
-        return effectiveStartLiveData.getLiveData();
+        return effectiveStartObserver.getLiveData();
     }
 
     public LiveData<LocalDate> getEffectiveEndLiveData() {
-        return effectiveEndLiveData.getLiveData();
+        return effectiveEndObserver.getLiveData();
     }
 
     public LiveData<Boolean> getTermValidLiveData() {
-        return termValidLiveData.getLiveData();
+        return termValidObserver.getLiveData();
     }
 
     public LiveData<Boolean> getNumberValidLiveData() {
-        return numberValidLiveData.getLiveData();
+        return numberValidObserver.getLiveData();
     }
 
     public LiveData<Boolean> getTitleValidLiveData() {
-        return titleValidLiveData.getLiveData();
+        return titleValidObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<List<TermListItem>> getTermOptionsLiveData() {
         return termOptionsLiveData;
     }
 
-    // TODO: Bind to this
     public LiveData<List<MentorListItem>> getMentorOptionsLiveData() {
         return mentorOptionsLiveData;
     }
 
-    // TODO: Bind to this
     public LiveData<List<AssessmentEntity>> getAssessmentsLiveData() {
-        return assessmentsLiveData;
+        return assessmentsLiveData.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Optional<ResourceMessageFactory>> getExpectedStartValidationMessageLiveData() {
-        return expectedStartValidationMessageLiveData.getLiveData();
+        return expectedStartValidationMessageObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Optional<ResourceMessageFactory>> getExpectedEndValidationMessageLiveData() {
-        return expectedEndValidationMessageLiveData.getLiveData();
+        return expectedEndValidationMessageObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Optional<ResourceMessageFactory>> getActualStartValidationMessageLiveData() {
-        return actualStartValidationMessageLiveData.getLiveData();
+        return actualStartValidationMessageObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Optional<ResourceMessageFactory>> getActualEndValidationMessageLiveData() {
-        return actualEndValidationMessageLiveData.getLiveData();
+        return actualEndValidationMessageObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Optional<ResourceMessageFactory>> getCompetencyUnitsValidationMessageLiveData() {
-        return competencyUnitsValidationMessageLiveData.getLiveData();
+        return competencyUnitsValidationMessageObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Boolean> getCanSaveLiveData() {
-        return canSaveLiveData.getLiveData();
+        return canSaveObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Boolean> getCanShareLiveData() {
-        return canShareLiveData.getLiveData();
+        return canShareObserver.getLiveData();
     }
 
-    // TODO: Bind to this
     public LiveData<Boolean> getHasChangesLiveData() {
-        return hasChangesLiveData.getLiveData();
-    }
-
-    // TODO: Bind to this
-    public LiveData<Boolean> getIsValidLiveData() {
-        return isValidLiveData.getLiveData();
+        return hasChangesObserver.getLiveData();
     }
 
     public LiveData<Function<Resources, CharSequence>> getTitleFactoryLiveData() {
-        return titleFactoryLiveData.getLiveData();
+        return titleFactoryObserver.getLiveData();
     }
 
     public LiveData<String> getSubTitleLiveData() {
-        return subTitleLiveData.getLiveData();
+        return subTitleObserver.getLiveData();
     }
 
     public LiveData<Function<Resources, CharSequence>> getOverviewFactoryLiveData() {
-        return overviewFactoryLiveData.getLiveData();
+        return overviewFactoryObserver.getLiveData();
     }
 
     public LiveData<CourseDetails> getOriginalValuesLiveData() {
@@ -738,87 +756,87 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 if (state.containsKey(key)) {
                     TermEntity term = new TermEntity();
                     term.restoreState(state, false);
-                    selectedTermSubject.onNext(Optional.of(term));
+                    selectedTerm.onNext(Optional.of(term));
                 } else {
-                    selectedTermSubject.onNext(Optional.empty());
+                    selectedTerm.onNext(Optional.empty());
                 }
                 key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, false);
                 if (state.containsKey(key)) {
                     MentorEntity mentor = new MentorEntity();
                     mentor.restoreState(state, false);
-                    selectedMentorSubject.onNext(Optional.of(mentor));
+                    selectedMentor.onNext(Optional.of(mentor));
                 } else {
-                    selectedMentorSubject.onNext(Optional.empty());
+                    selectedMentor.onNext(Optional.empty());
                 }
-                numberSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), ""));
-                titleSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), ""));
-                notesSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), ""));
+                number.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), ""));
+                title.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), ""));
+                notes.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), ""));
                 key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false);
-                statusSubject.onNext((state.containsKey(key)) ? CourseStatus.valueOf(state.getString(key)) : CourseStatus.UNPLANNED);
+                status.onNext((state.containsKey(key)) ? CourseStatus.valueOf(state.getString(key)) : CourseStatus.UNPLANNED);
                 key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false);
                 if (state.containsKey(key)) {
-                    expectedStartSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                    expectedStart.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
                 } else {
-                    expectedStartSubject.onNext(Optional.empty());
+                    expectedStart.onNext(Optional.empty());
                 }
                 key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_START, false);
                 if (state.containsKey(key)) {
-                    actualStartSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                    actualStart.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
                 } else {
-                    actualStartSubject.onNext(Optional.empty());
+                    actualStart.onNext(Optional.empty());
                 }
                 key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_END, false);
                 if (state.containsKey(key)) {
-                    expectedEndSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                    expectedEnd.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
                 } else {
-                    expectedEndSubject.onNext(Optional.empty());
+                    expectedEnd.onNext(Optional.empty());
                 }
                 key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_END, false);
                 if (state.containsKey(key)) {
-                    actualEndSubject.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+                    actualEnd.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
                 } else {
-                    actualEndSubject.onNext(Optional.empty());
+                    actualEnd.onNext(Optional.empty());
                 }
-                competencyUnitsTextSubject.onNext(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
+                competencyUnitsText.onNext(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
             } else {
                 Log.d(LOG_TAG, "Loading courseEntity from database");
                 return dbLoader.getCourseById(id).doOnSuccess(this::onEntityLoadedFromDb);
             }
         } else {
             Log.d(LOG_TAG, "No saved state or arguments");
-            competencyUnitsTextSubject.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
+            competencyUnitsText.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
         }
-        originalValuesSubject.onNext(entity);
+        originalValues.onNext(entity);
         initializedSubject.onComplete();
         return Single.just(entity).observeOn(AndroidSchedulers.mainThread());
     }
 
     private void onEntityLoadedFromDb(CourseDetails entity) {
         Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
-        selectedTermSubject.onNext(Optional.ofNullable(entity.getTerm()));
-        selectedMentorSubject.onNext(Optional.ofNullable(entity.getMentor()));
-        numberSubject.onNext(entity.getNumber());
-        titleSubject.onNext(entity.getTitle());
-        statusSubject.onNext(entity.getStatus());
-        expectedStartSubject.onNext(Optional.ofNullable(entity.getExpectedStart()));
-        expectedEndSubject.onNext(Optional.ofNullable(entity.getExpectedEnd()));
-        actualStartSubject.onNext(Optional.ofNullable(entity.getActualStart()));
-        actualEndSubject.onNext(Optional.ofNullable(entity.getActualEnd()));
-        competencyUnitsTextSubject.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
-        notesSubject.onNext(entity.getNotes());
-        originalValuesSubject.onNext(entity);
+        selectedTerm.onNext(Optional.ofNullable(entity.getTerm()));
+        selectedMentor.onNext(Optional.ofNullable(entity.getMentor()));
+        number.onNext(entity.getNumber());
+        title.onNext(entity.getTitle());
+        status.onNext(entity.getStatus());
+        expectedStart.onNext(Optional.ofNullable(entity.getExpectedStart()));
+        expectedEnd.onNext(Optional.ofNullable(entity.getExpectedEnd()));
+        actualStart.onNext(Optional.ofNullable(entity.getActualStart()));
+        actualEnd.onNext(Optional.ofNullable(entity.getActualEnd()));
+        competencyUnitsText.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));
+        notes.onNext(entity.getNotes());
+        originalValues.onNext(entity);
         initializedSubject.onComplete();
     }
 
     public void saveViewModelState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        originalValuesSubject.getValue().saveState(outState, true);
-        selectedTermSubject.getValue().ifPresent(t -> t.saveState(outState, false));
-        selectedMentorSubject.getValue().ifPresent(m -> m.saveState(outState, false));
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), numberSubject.getValue());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false), statusSubject.getValue().name());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), titleSubject.getValue());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), notesSubject.getValue());
+        originalValues.getValue().saveState(outState, true);
+        selectedTerm.getValue().ifPresent(t -> t.saveState(outState, false));
+        selectedMentor.getValue().ifPresent(m -> m.saveState(outState, false));
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), number.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false), status.getValue().name());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), title.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), notes.getValue());
         Long d = LocalDateConverter.fromLocalDate(getExpectedStart());
         if (null != d) {
             outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false), d);
@@ -835,51 +853,57 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
         if (null != d) {
             outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_END, false), d);
         }
-        outState.putString(STATE_KEY_COMPETENCY_UNITS_TEXT, competencyUnitsTextSubject.getValue());
+        outState.putString(STATE_KEY_COMPETENCY_UNITS_TEXT, competencyUnitsText.getValue());
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
-        AbstractTermEntity<?> selectedTerm = selectedTermSubject.getValue().orElse(null);
-        if (null == selectedTerm) {
+        AbstractTermEntity<?> term = selectedTerm.getValue().orElse(null);
+        if (null == term) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_term_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
-        Integer cu = competencyUnitsValueLiveData.getLiveData().getValue().orElse(null);
+        Integer cu = competencyUnitsValueObserver.getLiveData().getValue().orElse(null);
         if (null == cu) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_required)).observeOn(AndroidSchedulers.mainThread());
         }
-        CourseDetails originalValues = originalValuesSubject.getValue();
+        CourseDetails originalValues = this.originalValues.getValue();
         CourseEntity entity = originalValues.toEntity();
-        entity.setTermId(Objects.requireNonNull(selectedTerm).getId());
-        entity.setMentorId(selectedMentorSubject.getValue().map(AbstractEntity::getId).orElse(null));
-        entity.setNumber(numberSubject.getValue());
-        entity.setTitle(titleSubject.getValue());
-        entity.setStatus(statusSubject.getValue());
-        entity.setExpectedStart(expectedStartSubject.getValue().orElse(null));
-        entity.setExpectedEnd(expectedEndSubject.getValue().orElse(null));
-        entity.setActualStart(actualStartSubject.getValue().orElse(null));
-        entity.setActualEnd(actualEndSubject.getValue().orElse(null));
+        entity.setTermId(Objects.requireNonNull(term).getId());
+        entity.setMentorId(selectedMentor.getValue().map(AbstractEntity::getId).orElse(null));
+        entity.setNumber(number.getValue());
+        entity.setTitle(title.getValue());
+        entity.setStatus(status.getValue());
+        entity.setExpectedStart(expectedStart.getValue().orElse(null));
+        entity.setExpectedEnd(expectedEnd.getValue().orElse(null));
+        entity.setActualStart(actualStart.getValue().orElse(null));
+        entity.setActualEnd(actualEnd.getValue().orElse(null));
         entity.setCompetencyUnits(cu);
-        entity.setNotes(notesSubject.getValue());
+        entity.setNotes(notes.getValue());
         Log.d(LOG_TAG, String.format("Saving %s to database", entity));
         return dbLoader.saveCourse(entity, ignoreWarnings).doOnSuccess(m -> {
             if (m.isSucceeded()) {
-                originalValuesSubject.onNext(new CourseDetails(entity, selectedTerm, selectedMentorSubject.getValue().orElse(null)));
+                this.originalValues.onNext(new CourseDetails(entity, term, selectedMentor.getValue().orElse(null)));
             }
         });
     }
 
     public Single<ResourceMessageResult> delete(boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter delete(" + ignoreWarnings + ")");
-        return dbLoader.deleteCourse(Objects.requireNonNull(originalValuesSubject.getValue()).toEntity(), ignoreWarnings);
+        return dbLoader.deleteCourse(Objects.requireNonNull(originalValues.getValue()).toEntity(), ignoreWarnings);
     }
 
-    public LiveData<List<CourseAlert>> getAllCourseAlerts() {
-        // TODO: Implement this
-        throw new UnsupportedOperationException();
+    public LiveData<List<CourseAlert>> getCourseAlertsLiveData() {
+        return courseAlertsLiveData.getLiveData();
     }
 
-    public LiveData<List<AlertListItem>> getAllAlerts() {
-        // TODO: Implement this
-        throw new UnsupportedOperationException();
+    public synchronized Single<List<AlertListItem>> getCourseAndAssessmentAlerts() {
+        return dbLoader.getAllAlertsByCourseId(getId());
+    }
+
+    public LocalDate getEffectiveStartDate() {
+        return effectiveStartObserver.getLiveData().getValue();
+    }
+
+    public LocalDate getEffectiveEndDate() {
+        return effectiveEndObserver.getLiveData().getValue();
     }
 }

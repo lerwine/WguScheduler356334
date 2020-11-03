@@ -244,7 +244,7 @@ public class ViewTermActivity extends AppCompatActivity {
     private void onDeleteFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onDeleteFloatingActionButtonClick");
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_term, R.string.message_delete_term_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                ObserverHelper.subscribeOnce(viewModel.getAllAlerts(), this,
                         alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), this, new DeleteOperationListener(alerts))), null);
     }
 

@@ -36,7 +36,7 @@ public class CourseAlertListFragment extends Fragment {
 
     private static final String LOG_TAG = MainActivity.getLogTag(CourseAlertListFragment.class);
     private final List<CourseAlert> items;
-    private CourseAlertListViewModel listViewModel;
+//    private CourseAlertListViewModel listViewModel;
     private TextView overviewTextView;
     private TextView noAlertsTextView;
     private RecyclerView alertsRecyclerView;
@@ -72,12 +72,19 @@ public class CourseAlertListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         // Get shared view model, which is initialized by AddCourseActivity and ViewCourseActivity
         courseViewModel = new ViewModelProvider(requireActivity()).get(EditCourseViewModel.class);
-        listViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(CourseAlertListViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        listViewModel.getLiveData().observe(viewLifecycleOwner, this::onListLoaded);
+        courseViewModel.getCourseAlertsLiveData().observe(viewLifecycleOwner, this::onListLoaded);
         courseViewModel.getOriginalValuesLiveData().observe(viewLifecycleOwner, this::onCourseLoaded);
         courseViewModel.getEffectiveStartLiveData().observe(viewLifecycleOwner, this::onEffectiveStartChanged);
         courseViewModel.getEffectiveEndLiveData().observe(viewLifecycleOwner, this::onEffectiveEndChanged);
+    }
+
+    private void onEffectiveStartChanged(LocalDate localDate) {
+        adapter.notifyDataSetChanged();
+    }
+
+    private void onEffectiveEndChanged(LocalDate localDate) {
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -86,21 +93,8 @@ public class CourseAlertListFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void onEffectiveStartChanged(LocalDate localDate) {
-        if (listViewModel.setEffectiveStartDate(localDate) && null != adapter) {
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    private void onEffectiveEndChanged(LocalDate localDate) {
-        if (listViewModel.setEffectiveEndDate(localDate) && null != adapter) {
-            adapter.notifyDataSetChanged();
-        }
-    }
-
     private void onCourseLoaded(CourseDetails courseDetails) {
         if (null != courseDetails) {
-            listViewModel.setCourse(courseDetails, getViewLifecycleOwner());
             courseViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
                     f -> overviewTextView.setText(f.apply(getResources())));
         }
@@ -127,15 +121,17 @@ public class CourseAlertListFragment extends Fragment {
     }
 
     private void onEditAlert(CourseAlert courseAlert) {
-        long editAlertId = courseAlert.getAlert().getId();
-        if (courseViewModel.getHasChangesLiveData().getValue()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                    () -> doEditAlert(editAlertId),
-                    () -> ObserverHelper.subscribeOnce(courseViewModel.save(false), getViewLifecycleOwner(),
-                            m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError), null);
-        } else {
-            doEditAlert(editAlertId);
-        }
+        ObserverHelper.observeOnce(courseViewModel.getHasChangesLiveData(), this, hasChanges -> {
+            long editAlertId = courseAlert.getAlert().getId();
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
+                        () -> doEditAlert(editAlertId),
+                        () -> ObserverHelper.subscribeOnce(courseViewModel.save(false), getViewLifecycleOwner(),
+                                m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError), null);
+            } else {
+                doEditAlert(editAlertId);
+            }
+        });
     }
 
     private void onSaveForEditAlertFinished(@NonNull ResourceMessageResult messages, long editAlertId) {

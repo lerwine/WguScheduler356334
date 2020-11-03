@@ -25,7 +25,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
@@ -152,29 +151,27 @@ public class EditMentorActivity extends AppCompatActivity {
             shareFloatingActionButton.setVisibility(View.GONE);
             deleteFloatingActionButton.setVisibility(View.GONE);
             ((Toolbar) findViewById(R.id.toolbar)).setTitle(R.string.title_activity_new_mentor);
-            viewModel.getIsValidLiveData().observe(this, b -> saveFloatingActionButton.setEnabled(b));
+            viewModel.getIsValidLiveData().observe(this, saveFloatingActionButton::setEnabled);
         } else {
             viewModel.getTitleFactory().observe(this, f -> ((Toolbar) findViewById(R.id.toolbar)).setTitle(f.apply(getResources())));
             shareFloatingActionButton.setOnClickListener(this::onShareFloatingActionButtonClick);
             deleteFloatingActionButton.setOnClickListener(this::onDeleteFloatingActionButtonClick);
-            viewModel.getCanSaveLiveData().observe(this, b -> saveFloatingActionButton.setEnabled(b));
-            viewModel.getCanShareLiveData().observe(this, b -> shareFloatingActionButton.setEnabled(b));
+            viewModel.getCanSaveLiveData().observe(this, saveFloatingActionButton::setEnabled);
+            viewModel.getCanShareLiveData().observe(this, shareFloatingActionButton::setEnabled);
         }
         viewModel.getNameValidLiveData().observe(this, this::onNameValidChanged);
-        viewModel.getPhoneValidationMessageLiveData().observe(this, (Optional<ResourceMessageFactory> resourceMessageFactory) -> {
-            if (resourceMessageFactory.isPresent()) {
-                ResourceMessageFactory f = resourceMessageFactory.get();
-                phoneNumberEditText.setError(f.apply(getResources()), AppCompatResources.getDrawable(this,
-                        f.getLevel().getErrorIcon()));
+        viewModel.getPhoneValidationMessageLiveData().observe(this, (ResourceMessageFactory resourceMessageFactory) -> {
+            if (null != resourceMessageFactory) {
+                phoneNumberEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(this,
+                        resourceMessageFactory.getLevel().getErrorIcon()));
             } else {
                 phoneNumberEditText.setError(null);
             }
         });
-        viewModel.getEmailValidationMessageLiveData().observe(this, (Optional<ResourceMessageFactory> resourceMessageFactory) -> {
-            if (resourceMessageFactory.isPresent()) {
-                ResourceMessageFactory f = resourceMessageFactory.get();
-                emailAddressEditText.setError(f.apply(getResources()), AppCompatResources.getDrawable(this,
-                        f.getLevel().getErrorIcon()));
+        viewModel.getEmailValidationMessageLiveData().observe(this, (ResourceMessageFactory resourceMessageFactory) -> {
+            if (null != resourceMessageFactory) {
+                emailAddressEditText.setError(resourceMessageFactory.apply(getResources()), AppCompatResources.getDrawable(this,
+                        resourceMessageFactory.getLevel().getErrorIcon()));
             } else {
                 emailAddressEditText.setError(null);
             }
@@ -306,7 +303,7 @@ public class EditMentorActivity extends AppCompatActivity {
 
     private void onDeleteFloatingActionButtonClick(View view) {
         new AlertHelper(R.drawable.dialog_warning, R.string.title_delete_mentor, R.string.message_delete_mentor_confirm, this).showYesNoDialog(() ->
-                ObserverHelper.observeOnce(viewModel.getAllAlerts(), this,
+                ObserverHelper.subscribeOnce(viewModel.getAllAlerts(), this,
                         alerts -> ObserverHelper.subscribeOnce(viewModel.delete(false), this, new DeleteOperationListener(alerts))), null);
     }
 

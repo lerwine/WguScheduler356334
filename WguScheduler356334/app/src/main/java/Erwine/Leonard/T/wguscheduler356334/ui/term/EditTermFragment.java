@@ -148,9 +148,8 @@ public class EditTermFragment extends Fragment {
             }
         });
         viewModel.getStartMessage().observe(getViewLifecycleOwner(),
-                o -> {
-                    if (o.isPresent()) {
-                        ResourceMessageFactory f = o.get();
+                f -> {
+                    if (null != f) {
                         String m = f.apply(getResources());
                         Log.d(LOG_TAG, "startMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", level: " + f.getLevel() + ")");
                         termStartEditText.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
@@ -160,9 +159,8 @@ public class EditTermFragment extends Fragment {
                 }
         );
         viewModel.getEndMessage().observe(getViewLifecycleOwner(),
-                o -> {
-                    if (o.isPresent()) {
-                        ResourceMessageFactory f = o.get();
+                f -> {
+                    if (null != f) {
                         String m = f.apply(getResources());
                         Log.d(LOG_TAG, "endMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", level: " + f.getLevel().name() + ")");
                         termEndEditText.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));

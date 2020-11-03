@@ -37,7 +37,7 @@ public class AssessmentAlertListFragment extends Fragment {
 
     private static final String LOG_TAG = MainActivity.getLogTag(AssessmentAlertListFragment.class);
     private final List<AssessmentAlert> items;
-    private AssessmentAlertListViewModel listViewModel;
+//    private AssessmentAlertListViewModel listViewModel;
     private AssessmentAlertListAdapter adapter;
     private TextView overviewTextView;
     private TextView noAlertsTextView;
@@ -73,9 +73,8 @@ public class AssessmentAlertListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         assessmentViewModel = new ViewModelProvider(requireActivity()).get(EditAssessmentViewModel.class);
-        listViewModel = MainActivity.getViewModelFactory(requireActivity().getApplication()).create(AssessmentAlertListViewModel.class);
         LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        listViewModel.getLiveData().observe(viewLifecycleOwner, this::onListLoaded);
+        assessmentViewModel.getAllAlerts().observe(viewLifecycleOwner, this::onListLoaded);
         assessmentViewModel.getOriginalValuesLiveData().observe(viewLifecycleOwner, this::onAssessmentLoaded);
         assessmentViewModel.getGoalDateLiveData().observe(viewLifecycleOwner, this::onGoalDateChanged);
         assessmentViewModel.getCompletionDateLiveData().observe(viewLifecycleOwner, this::onCompletionDateChanged);
@@ -88,20 +87,15 @@ public class AssessmentAlertListFragment extends Fragment {
     }
 
     private void onGoalDateChanged(LocalDate localDate) {
-        if (listViewModel.setGoalDate(localDate) && null != adapter) {
-            adapter.notifyDataSetChanged();
-        }
+        adapter.notifyDataSetChanged();
     }
 
     private void onCompletionDateChanged(LocalDate localDate) {
-        if (listViewModel.setCompletionDate(localDate) && null != adapter) {
-            adapter.notifyDataSetChanged();
-        }
+        adapter.notifyDataSetChanged();
     }
 
     private void onAssessmentLoaded(AssessmentDetails assessmentDetails) {
         if (null != assessmentDetails && assessmentDetails.getId() != IdIndexedEntity.ID_NEW) {
-            listViewModel.setAssessment(assessmentDetails, getViewLifecycleOwner());
             assessmentViewModel.getOverviewFactoryLiveData().observe(getViewLifecycleOwner(),
                     f -> overviewTextView.setText(f.apply(getResources())));
         }

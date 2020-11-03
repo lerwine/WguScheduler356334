@@ -13,6 +13,7 @@ import java.util.List;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlert;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.assessment.AssessmentAlertLink;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 @Dao
@@ -49,7 +50,11 @@ public interface AssessmentAlertDAO {
 
     @Transaction
     @Query("SELECT * FROM assessmentAlerts WHERE targetId = :assessmentId")
-    LiveData<List<AssessmentAlert>> getByAssessmentId(long assessmentId);
+    LiveData<List<AssessmentAlert>> getLiveDataByAssessmentId(long assessmentId);
+
+    @Transaction
+    @Query("SELECT * FROM assessmentAlerts WHERE targetId = :assessmentId")
+    Observable<List<AssessmentAlert>> getObservableByAssessmentId(long assessmentId);
 
     @Transaction
     @Query("SELECT * FROM assessmentAlerts WHERE targetId = :assessmentId")

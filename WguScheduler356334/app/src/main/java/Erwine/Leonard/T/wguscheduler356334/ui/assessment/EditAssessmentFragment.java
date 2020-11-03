@@ -89,6 +89,13 @@ public class EditAssessmentFragment extends Fragment {
         viewModel.getShowGoalDateCloseIconLiveData().observe(viewLifecycleOwner, goalDateChip::setCloseIconVisible);
         viewModel.getCompletionDateDisplayLiveData().observe(viewLifecycleOwner, completionDateChip::setText);
         viewModel.getShowCompletionDateCloseIconLiveData().observe(viewLifecycleOwner, completionDateChip::setCloseIconVisible);
+        viewModel.getCourseValidLiveData().observe(viewLifecycleOwner, v -> {
+            if (v) {
+                courseButton.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));
+            } else {
+                courseButton.setError(null);
+            }
+        });
         viewModel.getCodeValidLiveData().observe(viewLifecycleOwner, v -> {
             if (v) {
                 codeEditText.setError(getResources().getString(R.string.message_required), AppCompatResources.getDrawable(requireContext(), R.drawable.dialog_error));

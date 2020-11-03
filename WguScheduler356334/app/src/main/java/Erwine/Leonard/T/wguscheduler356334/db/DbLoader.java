@@ -613,6 +613,12 @@ public class DbLoader {
     }
 
     @NonNull
+    public Observable<List<AssessmentEntity>> getAssessmentsObservableByCourseId(long courseId) {
+        Log.d(LOG_TAG, "Enter getAssessmentsObservableByCourseId(" + courseId + ")");
+        return appDb.assessmentDAO().getObservableByCourseId(courseId);
+    }
+
+    @NonNull
     public Single<List<AssessmentEntity>> loadAssessmentsByCourseId(long courseId) {
         Log.d(LOG_TAG, "Enter loadAssessmentsByCourseId(" + courseId + ")");
         return appDb.assessmentDAO().loadByCourseId(courseId).subscribeOn(scheduler).observeOn(AndroidSchedulers.mainThread());
@@ -861,8 +867,13 @@ public class DbLoader {
     }
 
     @NonNull
-    public LiveData<List<AssessmentAlert>> getAlertsByAssessmentId(long id) {
-        return appDb.assessmentAlertDAO().getByAssessmentId(id);
+    public LiveData<List<AssessmentAlert>> getAlertsLiveDataByAssessmentId(long id) {
+        return appDb.assessmentAlertDAO().getLiveDataByAssessmentId(id);
+    }
+
+    @NonNull
+    public Observable<List<AssessmentAlert>> getAlertsObservableByAssessmentId(long id) {
+        return appDb.assessmentAlertDAO().getObservableByAssessmentId(id);
     }
 
     @NonNull
@@ -884,17 +895,17 @@ public class DbLoader {
     }
 
     @NonNull
-    public LiveData<List<AlertListItem>> getAllAlertsByCourseId(long courseId) {
+    public Single<List<AlertListItem>> getAllAlertsByCourseId(long courseId) {
         return appDb.alertDAO().getAllByCourseId(courseId);
     }
 
     @NonNull
-    public LiveData<List<AlertListItem>> getAllAlertsByTermId(long termId) {
+    public Single<List<AlertListItem>> getAllAlertsByTermId(long termId) {
         return appDb.alertDAO().getAllByTermId(termId);
     }
 
     @NonNull
-    public LiveData<List<AlertListItem>> getAllAlertsByMentorId(long mentorId) {
+    public Single<List<AlertListItem>> getAllAlertsByMentorId(long mentorId) {
         return appDb.alertDAO().getAllByMentorId(mentorId);
     }
 

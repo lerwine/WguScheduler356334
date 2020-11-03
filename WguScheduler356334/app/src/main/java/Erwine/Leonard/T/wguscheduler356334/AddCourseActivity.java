@@ -88,12 +88,14 @@ public class AddCourseActivity extends AppCompatActivity {
     }
 
     private void confirmSave() {
-        if (viewModel.getHasChangesLiveData().getValue()) {
-            new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
-                    ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveOperationFinished, this::onSaveFailed), null);
-        } else {
-            finish();
-        }
+        ObserverHelper.observeOnce(viewModel.getHasChangesLiveData(), this, hasChanges -> {
+            if (hasChanges) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(this::finish, () ->
+                        ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveOperationFinished, this::onSaveFailed), null);
+            } else {
+                finish();
+            }
+        });
     }
 
     private void onCourseLoadSuccess(CourseDetails entity) {

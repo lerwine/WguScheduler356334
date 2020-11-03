@@ -1,6 +1,7 @@
 package Erwine.Leonard.T.wguscheduler356334.entity.assessment;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 import androidx.room.Ignore;
 import androidx.room.Relation;
@@ -15,7 +16,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.alert.Alert;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.alert.AlertLinkEntity;
-import Erwine.Leonard.T.wguscheduler356334.ui.alert.AssessmentAlertListViewModel;
+import Erwine.Leonard.T.wguscheduler356334.ui.assessment.EditAssessmentViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageBuilder;
 
@@ -103,7 +104,7 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         this.alert = alert;
     }
 
-    public void calculate(AssessmentAlertListViewModel viewModel) {
+    public void calculate(EditAssessmentViewModel viewModel) {
         Boolean subsequent = alert.isSubsequent();
         if (null == subsequent) {
             alertDate = LocalDateConverter.toLocalDate(alert.getTimeSpec());
@@ -125,15 +126,13 @@ public class AssessmentAlert implements AlertLinkEntity<AssessmentAlertLink> {
         }
     }
 
-    public boolean reCalculate(AssessmentAlertListViewModel viewModel) {
+    public boolean reCalculate(@Nullable LocalDate goalDate, @Nullable LocalDate completionDate) {
         Boolean subsequent = alert.isSubsequent();
         if (null == subsequent) {
             return false;
         }
         relativeDays = alert.getTimeSpec();
-        LocalDate date = (subsequent) ?
-                viewModel.getCompletionDate() :
-                viewModel.getGoalDate();
+        LocalDate date = (subsequent) ? completionDate : goalDate;
         LocalDate oldValue = alertDate;
         alertDate = (null == date) ? null : date.plusDays(relativeDays);
         return !Objects.equals(oldValue, alertDate);
