@@ -58,6 +58,7 @@ import Erwine.Leonard.T.wguscheduler356334.util.BehaviorComputationSource;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
 import Erwine.Leonard.T.wguscheduler356334.util.LiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.Workers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.MessageLevel;
@@ -215,11 +216,16 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 expectedEndMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
                 actualStartMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
                 actualEndMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
-                (termValid, numberValid, titleValid, expectedStartValid, expectedEndValid, actualStartValid, actualEndValid) ->
-                        termValid && numberValid && titleValid && expectedStartValid && expectedEndValid && actualStartValid && actualEndValid);
+                (termValid, numberValid, titleValid, expectedStartValid, expectedEndValid, actualStartValid, actualEndValid) -> {
+                    Log.d(LOG_TAG, "Calculating valid: termValid = " + termValid + "; numberValid = " + numberValid + "; titleValid = " + titleValid +
+                            "; expectedStartValid = " + expectedStartValid + "; expectedEndValid = " + expectedEndValid + "; actualStartValid = " + actualStartValid +
+                            "; actualEndValid = " + actualEndValid);
+                    return termValid && numberValid && titleValid && expectedStartValid && expectedEndValid && actualStartValid && actualEndValid;
+                });
 
         effectiveStartObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedStart.getObservable(), actualStart.getObservable(),
-                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(d.orElse(null), actualStart.getValue().orElseGet(() -> expectedStart.getValue().orElse(null)))));
+                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(d.orElse(null), actualStart.getValue().orElseGet(() ->
+                expectedStart.getValue().orElse(null)))));
         effectiveEndObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedEnd.getObservable(), actualEnd.getObservable(),
                 (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(actualEnd.getValue().orElseGet(() -> expectedEnd.getValue().orElse(null)), d.orElse(null))));
         courseAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
@@ -240,8 +246,14 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary), expectedStart.getObservable(), expectedEnd.getObservable(),
                 actualStart.getObservable(), actualEnd.getObservable(), selectedTerm.getObservable(), selectedMentor.getObservable(),
                 EditCourseViewModel::calculateOverviewFactory));
-        canSaveObserver = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c));
-        canShareObserver = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && !c));
+        canSaveObserver = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> {
+            Log.d(LOG_TAG, "Calculating canSave: valid = " + v + "; changed = " + c);
+            return v && c;
+        }));
+        canShareObserver = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> {
+            Log.d(LOG_TAG, "Calculating canShare: valid = " + v + "; changed = " + c);
+            return v && !c;
+        }));
         hasChangesObserver = SubscribingLiveDataWrapper.of(false, hasChangesObservable);
 //        isValidObserver = SubscribingLiveDataWrapper.of(false, validObservable);
         compositeDisposable = new CompositeDisposable(effectiveStartObserver, effectiveEndObserver, termValidObserver, numberValidObserver, titleValidObserver,
@@ -447,6 +459,10 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     @NonNull
     private static Optional<ResourceMessageFactory> validateExpectedStart(@NonNull CourseStatus status, Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
                                                                           Optional<AbstractTermEntity<?>> selectedTerm) {
+        Log.d(LOG_TAG, "Enter validateExpectedStart(status = " + status.name() + ", expectedStart = " +
+                ToStringBuilder.toEscapedString(expectedStart.orElse(null), false) + ", expectedEnd = " +
+                ToStringBuilder.toEscapedString(expectedEnd.orElse(null), false) + ", selectedTerm = " +
+                ToStringBuilder.toEscapedString(selectedTerm.orElse(null)) + ")");
         return expectedStart.map(s ->
                 expectedEnd.flatMap(e ->
                         (s.compareTo(e) > 0) ?
@@ -467,12 +483,16 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     @NonNull
     private static Optional<ResourceMessageFactory> validateExpectedEnd(@NonNull CourseStatus status, Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
                                                                         Optional<AbstractTermEntity<?>> selectedTerm) {
+        Log.d(LOG_TAG, "Enter validateExpectedEnd(status = " + status.name() + ", expectedStart = " +
+                ToStringBuilder.toEscapedString(expectedStart.orElse(null), false) + ", expectedEnd = " +
+                ToStringBuilder.toEscapedString(expectedEnd.orElse(null), false) + ", selectedTerm = " +
+                ToStringBuilder.toEscapedString(selectedTerm.orElse(null)) + ")");
         return expectedEnd.map(e ->
                 expectedStart.flatMap(s ->
                         (s.compareTo(e) > 0) ?
                                 Optional.of(ResourceMessageFactory.ofError(R.string.message_start_after_end)) :
                                 selectedTerm.flatMap(t -> {
-                                    LocalDate d = t.getStart();
+                                    LocalDate d = t.getEnd();
                                     return (null != d && e.compareTo(d) > 0) ?
                                             Optional.of(ResourceMessageFactory.ofWarning(R.string.message_after_term_end)) :
                                             Optional.empty();
@@ -486,6 +506,9 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @NonNull
     private static Optional<ResourceMessageFactory> validateActualStart(@NonNull CourseStatus status, Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd) {
+        Log.d(LOG_TAG, "Enter validateActualStart(status = " + status.name() + ", actualStart = " +
+                ToStringBuilder.toEscapedString(actualStart.orElse(null), false) + ", actualEnd = " +
+                ToStringBuilder.toEscapedString(actualEnd.orElse(null), false) + ")");
         return actualStart.map(s ->
                 actualEnd.flatMap(e ->
                         (s.compareTo(e) > 0) ?
@@ -506,6 +529,9 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @NonNull
     private static Optional<ResourceMessageFactory> validateActualEnd(@NonNull CourseStatus status, Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd) {
+        Log.d(LOG_TAG, "Enter validateActualEnd(status = " + status.name() + ", actualStart = " +
+                ToStringBuilder.toEscapedString(actualStart.orElse(null), false) + ", actualEnd = " +
+                ToStringBuilder.toEscapedString(actualEnd.orElse(null), false) + ")");
         return actualEnd.map(e ->
                 actualStart.flatMap(s ->
                         (s.compareTo(e) > 0) ?

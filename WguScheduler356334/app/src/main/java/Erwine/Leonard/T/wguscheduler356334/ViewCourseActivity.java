@@ -177,18 +177,15 @@ ViewCourseActivity extends AppCompatActivity {
     private void onAddAlertFloatingActionButtonClick(View view) {
         ObserverHelper.observeOnce(viewModel.getHasChangesLiveData(), this, hasChanges -> {
             if (hasChanges) {
-                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                        () -> {
-                            EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
-                            dlg.show(getSupportFragmentManager(), null);
-                        },
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_unsaved_changes, R.string.message_save_changes_required, this).showYesNoCancelDialog(
                         () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
                             @Override
                             protected void onSuccessComplete() {
                                 EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                                 dlg.show(getSupportFragmentManager(), null);
                             }
-                        }), null);
+                        }),
+                        null, null);
             } else {
                 EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
                 dlg.show(getSupportFragmentManager(), null);

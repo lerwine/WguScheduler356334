@@ -151,14 +151,13 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private void onAddFloatingActionButtonClick(View view) {
         ObserverHelper.observeOnce(viewModel.getChangedLiveData(), this, changed -> {
             if (changed) {
-                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, this).showYesNoCancelDialog(
-                        this::doAddAlert,
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_unsaved_changes, R.string.message_save_changes_required, this).showYesNoCancelDialog(
                         () -> ObserverHelper.subscribeOnce(viewModel.save(false), this, new SaveOperationListener() {
                             @Override
                             public void onSucceeded() {
                                 doAddAlert();
                             }
-                        }), null);
+                        }), null, null);
             } else {
                 doAddAlert();
             }

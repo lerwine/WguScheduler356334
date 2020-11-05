@@ -124,10 +124,10 @@ public class CourseAlertListFragment extends Fragment {
         ObserverHelper.observeOnce(courseViewModel.getHasChangesLiveData(), this, hasChanges -> {
             long editAlertId = courseAlert.getAlert().getId();
             if (hasChanges) {
-                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                        () -> doEditAlert(editAlertId),
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_unsaved_changes, R.string.message_save_changes_required, requireContext()).showYesNoCancelDialog(
                         () -> ObserverHelper.subscribeOnce(courseViewModel.save(false), getViewLifecycleOwner(),
-                                m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError), null);
+                                m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveCourseError),
+                        null, null);
             } else {
                 doEditAlert(editAlertId);
             }

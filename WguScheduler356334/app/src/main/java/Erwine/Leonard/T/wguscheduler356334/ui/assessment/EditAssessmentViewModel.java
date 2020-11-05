@@ -50,6 +50,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.BehaviorComputationSource;
 import Erwine.Leonard.T.wguscheduler356334.util.LiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.Workers;
 import Erwine.Leonard.T.wguscheduler356334.util.validation.ResourceMessageResult;
@@ -136,6 +137,7 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
         nameSubject = BehaviorComputationSource.createDefault("");
         codeSubject = BehaviorComputationSource.createDefault("");
         originalValuesSubject = BehaviorComputationSource.createDefault(new AssessmentDetails((AbstractCourseEntity<?>) null));
+        assessmentAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
         initializedSubject = CompletableSubject.create();
         initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
 
@@ -144,7 +146,8 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
 
         Observable<Boolean> changedObservable = Observable.combineLatest(originalValuesSubject.getObservable(),
                 normalizedCodeObservable, normalizedNameObservable, statusSubject.getObservable(), goalDateSubject.getObservable(), completionDateSubject.getObservable(),
-                typeSubject.getObservable(), notesSubject.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)), selectedCourseSubject.getObservable(), Workers.asCached(this::calculateChanged));
+                typeSubject.getObservable(), notesSubject.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)),
+                selectedCourseSubject.getObservable(), Workers.asCached(this::calculateChanged));
 
         Observable<Boolean> codeValidObservable = normalizedCodeObservable.map(c -> !c.isEmpty());
         Observable<Boolean> courseValidObservable = selectedCourseSubject.getObservable().map(Optional::isPresent);
@@ -195,7 +198,7 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
                     if (null == id) {
                         return Single.just(Optional.empty());
                     }
-                    return dbLoader.getMentorByIdForComputation(t.getTermId()).doOnError(throwable ->
+                    return dbLoader.getMentorByIdForComputation(id).doOnError(throwable ->
                             Log.e(LOG_TAG, "Error loading mentor", throwable)).map(Optional::of);
                 }).orElseGet(() -> Single.just(Optional.empty())).toObservable()
         ));
@@ -209,9 +212,14 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
         showGoalDateCloseIconLiveData = SubscribingLiveDataWrapper.of(false, goalDateSubject.getObservable().map(Optional::isPresent));
         showCompletionDateCloseIconLiveData = SubscribingLiveDataWrapper.of(false, completionDateSubject.getObservable().map(Optional::isPresent));
         changedLiveData = SubscribingLiveDataWrapper.of(false, changedObservable);
-        canShareLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, changedObservable, (v, c) -> v && !c));
-        canSaveLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, changedObservable, (v, c) -> v && c));
-        assessmentAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
+        canShareLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, changedObservable, (v, c) -> {
+            Log.d(LOG_TAG, "Calculating canShare: valid = " + v + "; changed =  " + c);
+            return v && !c;
+        }));
+        canSaveLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, changedObservable, (v, c) -> {
+            Log.d(LOG_TAG, "Calculating canSave: valid = " + v + "; changed = " + c);
+            return v && c;
+        }));
         compositeDisposable = new CompositeDisposable(titleFactoryLiveData, subTitleLiveData, overviewFactoryLiveData, originalValuesLiveData, codeValidLiveData, courseValidLiveData,
                 goalDateLiveData, completionDateLiveData, selectedCourseLiveData, currentTermLiveData, currentMentorLiveData, courseDisplayLiveData, typeDisplayLiveData,
                 statusDisplayLiveData, goalDateDisplayLiveData, completionDateDisplayLiveData, showGoalDateCloseIconLiveData, showCompletionDateCloseIconLiveData,
@@ -266,11 +274,17 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     private boolean calculateChanged(@NonNull AssessmentDetails originalValues, @NonNull String code, @NonNull String name, @NonNull AssessmentStatus status,
                                      Optional<LocalDate> goalDate, Optional<LocalDate> completionDate, @NonNull AssessmentType type, @NonNull String notes,
                                      Optional<AbstractCourseEntity<?>> selectedCourse) {
-        return !(code.equals(originalValues.getCode()) && Objects.equals(name, originalValues.getName()) && status == originalValues.getStatus() &&
+        Log.d(LOG_TAG, "Enter calculateChanged(originalValues = " + ToStringBuilder.toEscapedString(originalValues) + ", code = " +
+                ToStringBuilder.toEscapedString(code) + ", name = " + ToStringBuilder.toEscapedString(name) + ", status = " + status.name() +
+                ", goalDate = " + ToStringBuilder.toEscapedString(goalDate.orElse(null), false) + ", completionDate = " +
+                ToStringBuilder.toEscapedString(completionDate.orElse(null), false) + ", type = " + type.name() + ", notes = " +
+                ToStringBuilder.toEscapedString(notes) + ", selectedCourse = " + ToStringBuilder.toEscapedString(selectedCourse.orElse(null)) + ")");
+        String n = originalValues.getName();
+        return !(code.equals(originalValues.getCode()) && Objects.equals(name, (null == n) ? "" : n) && status == originalValues.getStatus() &&
                 goalDate.map(d -> d.equals(originalValues.getGoalDate())).orElseGet(() -> null == originalValues.getGoalDate()) &&
                 completionDate.map(d -> d.equals(originalValues.getCompletionDate())).orElseGet(() -> null == originalValues.getCompletionDate()) &&
-                type == originalValues.getType() && notes.equals(originalValues.getNotes()) &&
-                selectedCourse.map(c -> c.getId() == originalValues.getCourseId()).orElseGet(() -> originalValues.getCourseId() == ID_NEW));
+                type == originalValues.getType() && notes.equals(originalValues.getNotes())) ||
+                selectedCourse.map(c -> c.getId() != originalValues.getCourseId()).orElse(true);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

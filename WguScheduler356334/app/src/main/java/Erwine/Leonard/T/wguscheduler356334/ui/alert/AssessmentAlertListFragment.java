@@ -125,11 +125,10 @@ public class AssessmentAlertListFragment extends Fragment {
         long editAlertId = assessmentAlert.getAlert().getId();
         ObserverHelper.observeOnce(assessmentViewModel.getChangedLiveData(), getViewLifecycleOwner(), changed -> {
             if (changed) {
-                new AlertHelper(R.drawable.dialog_warning, R.string.title_discard_changes, R.string.message_discard_changes, requireContext()).showYesNoCancelDialog(
-                        () -> doEditAlert(editAlertId),
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_unsaved_changes, R.string.message_save_changes_required, requireContext()).showYesNoCancelDialog(
                         () -> ObserverHelper.subscribeOnce(assessmentViewModel.save(false), getViewLifecycleOwner(),
                                 m -> onSaveForEditAlertFinished(m, editAlertId), this::onSaveFailed),
-                        null);
+                        null, null);
             } else {
                 doEditAlert(editAlertId);
             }
