@@ -183,6 +183,7 @@
             style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/bottom_most_margin"
             android:gravity="start|top"
             android:importantForAutofill="no"
             android:inputType="textMultiLine"

@@ -56,7 +56,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.BehaviorComputationSource;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
-import Erwine.Leonard.T.wguscheduler356334.util.LiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
@@ -119,13 +118,15 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     private final BehaviorComputationSource<Optional<AbstractTermEntity<?>>> selectedTerm;
     private final BehaviorComputationSource<String> notes;
     private final BehaviorComputationSource<List<TermCourseListItem>> coursesForTerm;
+    private final BehaviorComputationSource<List<AssessmentEntity>> assessments;
+    private final BehaviorComputationSource<List<CourseAlert>> courseAlerts;
     private final CompletableSubject initializedSubject;
     private final Completable initializedCompletable;
 
     private final LiveData<List<TermListItem>> termOptionsLiveData;
     private final LiveData<List<MentorListItem>> mentorOptionsLiveData;
-    private final LiveDataWrapper<List<AssessmentEntity>> assessmentsLiveData;
-    private final LiveDataWrapper<List<CourseAlert>> courseAlertsLiveData;
+    private final SubscribingLiveDataWrapper<List<AssessmentEntity>> assessmentsLiveData;
+    private final SubscribingLiveDataWrapper<List<CourseAlert>> courseAlertsLiveData;
     private final SubscribingLiveDataWrapper<LocalDate> effectiveStartObserver;
     private final SubscribingLiveDataWrapper<LocalDate> effectiveEndObserver;
     private final SubscribingLiveDataWrapper<Boolean> termValidObserver;
@@ -165,6 +166,8 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
         notes = BehaviorComputationSource.createDefault("");
         originalValues = BehaviorComputationSource.createDefault(new CourseDetails(null));
         coursesForTerm = BehaviorComputationSource.createDefault(Collections.emptyList());
+        assessments = BehaviorComputationSource.createDefault(Collections.emptyList());
+        courseAlerts = BehaviorComputationSource.createDefault(Collections.emptyList());
         initializedSubject = CompletableSubject.create();
         initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
         termOptionsLiveData = dbLoader.getAllTerms();
@@ -224,7 +227,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 });
 
         effectiveStartObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedStart.getObservable(), actualStart.getObservable(),
-                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(d.orElse(null), actualStart.getValue().orElseGet(() ->
+                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(courseAlerts.getValue(), d.orElse(null), actualStart.getValue().orElseGet(() ->
                 expectedStart.getValue().orElse(null)))));
         effectiveEndObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedEnd.getObservable(), actualEnd.getObservable(),
                 (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(actualEnd.getValue().orElseGet(() -> expectedEnd.getValue().orElse(null)), d.orElse(null))));
@@ -263,12 +266,9 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 courseIdObservable.subscribe(this::observeAssessmentsByCourseId), selectedTermIdObservable.subscribe(this::observeCoursesByTermId));
     }
 
-    void recalculateAlerts(@Nullable LocalDate startDate, @Nullable LocalDate endDate) {
-        List<CourseAlert> list = getCourseAlertsLiveData().getValue();
-        if (null != list) {
-            for (CourseAlert a : list) {
-                a.reCalculate(startDate, endDate);
-            }
+    private static void recalculateAlerts(@NonNull List<CourseAlert> alerts, @Nullable LocalDate startDate, @Nullable LocalDate endDate) {
+        for (CourseAlert a : alerts) {
+            a.reCalculate(startDate, endDate);
         }
     }
 
@@ -309,7 +309,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 courseAlertsObserving = new Pair<>(courseId, dbLoader.getAlertsObservableByCourseId(courseId).subscribe(this::onAlertsLoaded));
                 compositeDisposable.add(courseAlertsObserving.second);
             } else {
-                courseAlertsLiveData.postValue(Collections.emptyList());
+                courseAlerts.onNext(Collections.emptyList());
                 courseAlertsObserving = null;
             }
         }
@@ -319,7 +319,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
         for (CourseAlert a : courseAlerts) {
             a.calculate(this);
         }
-        courseAlertsLiveData.postValue(courseAlerts);
+        this.courseAlerts.onNext(courseAlerts);
     }
 
     private void observeAssessmentsByCourseId(long courseId) {
@@ -344,10 +344,10 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @NonNull
-    public static Function<Resources, CharSequence> calculateOverviewFactory(@NonNull CourseStatus status, Optional<Integer> competencyUnits,
-                                                                             Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
-                                                                             Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd,
-                                                                             Optional<AbstractTermEntity<?>> selectedTerm, Optional<AbstractMentorEntity<?>> selectedMentor) {
+    private static Function<Resources, CharSequence> calculateOverviewFactory(@NonNull CourseStatus status, Optional<Integer> competencyUnits,
+                                                                              Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd,
+                                                                              Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd,
+                                                                              Optional<AbstractTermEntity<?>> selectedTerm, Optional<AbstractMentorEntity<?>> selectedMentor) {
         return resources -> {
             SpannableStringBuilder result = new SpannableStringBuilder("Status: ");
             result.setSpan(new StyleSpan(Typeface.BOLD), 0, result.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -448,7 +448,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     }
 
     @NonNull
-    public static Function<Resources, CharSequence> calculateViewTitleFactory(@NonNull String number) {
+    private static Function<Resources, CharSequence> calculateViewTitleFactory(@NonNull String number) {
         if (number.isEmpty()) {
             return r -> r.getString(R.string.label_course);
         }

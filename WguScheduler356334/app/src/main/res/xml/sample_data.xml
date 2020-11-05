@@ -1186,8 +1186,8 @@ Risus quis varius quam quisque id diam. In nulla posuere sollicitudin aliquam ul
                     number="C196"
                     title="Mobile Application Development"
                     status="NOT_PASSED"
-                    expectedStart="2020-08-21"
-                    expectedEnd="2020-09-30"
+                    actualStart="2020-08-21"
+                    actualEnd="2020-09-30"
                     competencyUnits="3"
                     mentorId="23">
                     <notes><![CDATA[Arcu risus quis varius quam quisque.
@@ -1201,7 +1201,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                         <item
                             code="ABM1"
                             status="NOT_PASSED"
-                            goalDate="expectedEnd"
+                            goalDate="actualEnd"
                             type="PERFORMANCE_EVALUATION" />
                     </assessments>
                 </item>

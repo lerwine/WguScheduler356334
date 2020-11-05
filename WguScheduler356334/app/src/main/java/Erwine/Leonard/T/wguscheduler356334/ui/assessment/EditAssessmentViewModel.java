@@ -72,15 +72,15 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     public static final String EXTRA_KEY_ASSESSMENT_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_ID, false);
 
     private final DbLoader dbLoader;
-    private final BehaviorComputationSource<String> codeSubject;
-    private final BehaviorComputationSource<String> nameSubject;
-    private final BehaviorComputationSource<AssessmentStatus> statusSubject;
-    private final BehaviorComputationSource<Optional<LocalDate>> goalDateSubject;
-    private final BehaviorComputationSource<Optional<LocalDate>> completionDateSubject;
-    private final BehaviorComputationSource<AssessmentType> typeSubject;
-    private final BehaviorComputationSource<String> notesSubject;
-    private final BehaviorComputationSource<Optional<AbstractCourseEntity<?>>> selectedCourseSubject;
-    private final BehaviorComputationSource<AssessmentDetails> originalValuesSubject;
+    private final BehaviorComputationSource<String> code;
+    private final BehaviorComputationSource<String> name;
+    private final BehaviorComputationSource<AssessmentStatus> status;
+    private final BehaviorComputationSource<Optional<LocalDate>> goalDate;
+    private final BehaviorComputationSource<Optional<LocalDate>> completionDate;
+    private final BehaviorComputationSource<AssessmentType> type;
+    private final BehaviorComputationSource<String> notes;
+    private final BehaviorComputationSource<Optional<AbstractCourseEntity<?>>> selectedCourse;
+    private final BehaviorComputationSource<AssessmentDetails> originalValues;
     private final CompletableSubject initializedSubject;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactoryLiveData;
     private final SubscribingLiveDataWrapper<String> subTitleLiveData;
@@ -128,89 +128,97 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     public EditAssessmentViewModel(@NonNull Application application) {
         super(application);
         dbLoader = DbLoader.getInstance(getApplication());
-        selectedCourseSubject = BehaviorComputationSource.createDefault(Optional.empty());
-        notesSubject = BehaviorComputationSource.createDefault("");
-        typeSubject = BehaviorComputationSource.createDefault(AssessmentType.OBJECTIVE_ASSESSMENT);
-        completionDateSubject = BehaviorComputationSource.createDefault(Optional.empty());
-        goalDateSubject = BehaviorComputationSource.createDefault(Optional.empty());
-        statusSubject = BehaviorComputationSource.createDefault(AssessmentStatus.NOT_STARTED);
-        nameSubject = BehaviorComputationSource.createDefault("");
-        codeSubject = BehaviorComputationSource.createDefault("");
-        originalValuesSubject = BehaviorComputationSource.createDefault(new AssessmentDetails((AbstractCourseEntity<?>) null));
+        selectedCourse = BehaviorComputationSource.createDefault(Optional.empty());
+        notes = BehaviorComputationSource.createDefault("");
+        type = BehaviorComputationSource.createDefault(AssessmentType.OBJECTIVE_ASSESSMENT);
+        completionDate = BehaviorComputationSource.createDefault(Optional.empty());
+        goalDate = BehaviorComputationSource.createDefault(Optional.empty());
+        status = BehaviorComputationSource.createDefault(AssessmentStatus.NOT_STARTED);
+        name = BehaviorComputationSource.createDefault("");
+        code = BehaviorComputationSource.createDefault("");
+        originalValues = BehaviorComputationSource.createDefault(new AssessmentDetails((AbstractCourseEntity<?>) null));
         assessmentAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
         initializedSubject = CompletableSubject.create();
         initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
 
-        Observable<String> normalizedCodeObservable = codeSubject.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
-        Observable<String> normalizedNameObservable = nameSubject.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<String> codeObservable = code.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
+        Observable<String> nameObservable = name.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
 
-        Observable<Boolean> changedObservable = Observable.combineLatest(originalValuesSubject.getObservable(),
-                normalizedCodeObservable, normalizedNameObservable, statusSubject.getObservable(), goalDateSubject.getObservable(), completionDateSubject.getObservable(),
-                typeSubject.getObservable(), notesSubject.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)),
-                selectedCourseSubject.getObservable(), Workers.asCached(this::calculateChanged));
+        Observable<Boolean> codeValidObservable = codeObservable.map(c -> !c.isEmpty());
+        Observable<Boolean> courseValidObservable = selectedCourse.getObservable().map(Optional::isPresent);
 
-        Observable<Boolean> codeValidObservable = normalizedCodeObservable.map(c -> !c.isEmpty());
-        Observable<Boolean> courseValidObservable = selectedCourseSubject.getObservable().map(Optional::isPresent);
-        Observable<Boolean> validObservable = Observable.combineLatest(codeValidObservable, courseValidObservable, (code, course) -> code && course);
-
-        titleFactoryLiveData = SubscribingLiveDataWrapper.of(c -> c.getString(R.string.title_activity_view_assessment), Observable.combineLatest(typeSubject.getObservable(), normalizedCodeObservable,
+        titleFactoryLiveData = SubscribingLiveDataWrapper.of(c -> c.getString(R.string.title_activity_view_assessment), Observable.combineLatest(type.getObservable(), codeObservable,
                 Workers.asCached(
                         (type, code) -> resources -> resources.getString(R.string.format_value_colon_value, resources.getString(type.displayResourceId()), code)
                 )
         ));
-        subTitleLiveData = SubscribingLiveDataWrapper.of("", normalizedNameObservable);
-        overviewFactoryLiveData = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(goalDateSubject.getObservable(), completionDateSubject.getObservable(),
-                statusSubject.getObservable(),
-                Workers.asCached(this::calculateOverview)
+        subTitleLiveData = SubscribingLiveDataWrapper.of("", nameObservable);
+        overviewFactoryLiveData = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(goalDate.getObservable(), completionDate.getObservable(),
+                status.getObservable(),
+                Workers.asCached(EditAssessmentViewModel::calculateOverview)
         ));
-        originalValuesLiveData = SubscribingLiveDataWrapper.of(originalValuesSubject.getValue(), originalValuesSubject.getObservable());
+        originalValuesLiveData = SubscribingLiveDataWrapper.of(originalValues.getValue(), originalValues.getObservable());
         codeValidLiveData = SubscribingLiveDataWrapper.of(false, codeValidObservable);
         courseValidLiveData = SubscribingLiveDataWrapper.of(false, courseValidObservable);
-        goalDateLiveData = SubscribingLiveDataWrapper.ofOptional(goalDateSubject.getObservable().doOnNext(d -> recalculateAlerts(d.orElse(null), completionDateSubject.getValue().filter(c -> {
-            switch (statusSubject.getValue()) {
-                case NOT_PASSED:
-                case PASSED:
-                    return true;
-                default:
-                    return false;
-            }
-        }).orElse(null))));
-        completionDateLiveData = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(statusSubject.getObservable(), completionDateSubject.getObservable(),
+        goalDateLiveData = SubscribingLiveDataWrapper.ofOptional(goalDate.getObservable().doOnNext(d -> {
+            Log.d(LOG_TAG, "Calculating goalDate: goalDate = " + ToStringBuilder.toEscapedString(d.orElse(null), false));
+            recalculateAlerts(d.orElse(null), completionDate.getValue().filter(c -> {
+                switch (status.getValue()) {
+                    case NOT_PASSED:
+                    case PASSED:
+                        return true;
+                    default:
+                        return false;
+                }
+            }).orElse(null));
+        }));
+        completionDateLiveData = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(status.getObservable(), completionDate.getObservable(),
                 Workers.asCached((status, completionDate) -> {
+                    Log.d(LOG_TAG, "Calculating completionDate: status = " + status.name() +
+                            ", completionDate = " + ToStringBuilder.toEscapedString(completionDate.orElse(null), false));
                     switch (status) {
                         case NOT_PASSED:
                         case PASSED:
-                            recalculateAlerts(goalDateSubject.getValue().orElse(null), completionDate.orElse(null));
+                            recalculateAlerts(goalDate.getValue().orElse(null), completionDate.orElse(null));
                             return completionDate;
                         default:
-                            recalculateAlerts(goalDateSubject.getValue().orElse(null), null);
+                            recalculateAlerts(goalDate.getValue().orElse(null), null);
                             return Optional.empty();
                     }
                 })));
-        selectedCourseLiveData = SubscribingLiveDataWrapper.ofOptional(selectedCourseSubject.getObservable());
-        currentTermLiveData = SubscribingLiveDataWrapper.ofOptional(selectedCourseSubject.getObservable().flatMap(o ->
-                o.map(t -> dbLoader.getTermByIdForComputation(t.getTermId()).doOnError(throwable ->
-                        Log.e(LOG_TAG, "Error loading term", throwable)).map(Optional::of)).orElseGet(() -> Single.just(Optional.empty())).toObservable()
+        selectedCourseLiveData = SubscribingLiveDataWrapper.ofOptional(selectedCourse.getObservable());
+        currentTermLiveData = SubscribingLiveDataWrapper.ofOptional(selectedCourse.getObservable().flatMap(o -> {
+                    Log.d(LOG_TAG, "Calculating currentTerm: selectedCourse = " + ToStringBuilder.toEscapedString(o.orElse(null)));
+                    return o.map(t -> dbLoader.getTermByIdForComputation(t.getTermId()).doOnError(throwable ->
+                            Log.e(LOG_TAG, "Error loading term", throwable)).map(Optional::of)).orElseGet(() -> Single.just(Optional.empty())).toObservable();
+                }
         ));
-        currentMentorLiveData = SubscribingLiveDataWrapper.ofOptional(selectedCourseSubject.getObservable().flatMap(o ->
-                o.<Single<Optional<MentorEntity>>>map(t -> {
-                    Long id = t.getMentorId();
-                    if (null == id) {
-                        return Single.just(Optional.empty());
-                    }
-                    return dbLoader.getMentorByIdForComputation(id).doOnError(throwable ->
-                            Log.e(LOG_TAG, "Error loading mentor", throwable)).map(Optional::of);
-                }).orElseGet(() -> Single.just(Optional.empty())).toObservable()
+        currentMentorLiveData = SubscribingLiveDataWrapper.ofOptional(selectedCourse.getObservable().flatMap(o -> {
+                    Log.d(LOG_TAG, "Calculating currentMentor: selectedCourse = " + ToStringBuilder.toEscapedString(o.orElse(null)));
+                    return o.<Single<Optional<MentorEntity>>>map(t -> {
+                        Long id = t.getMentorId();
+                        if (null == id) {
+                            return Single.just(Optional.empty());
+                        }
+                        return dbLoader.getMentorByIdForComputation(id).doOnError(throwable ->
+                                Log.e(LOG_TAG, "Error loading mentor", throwable)).map(Optional::of);
+                    }).orElseGet(() -> Single.just(Optional.empty())).toObservable();
+                }
         ));
-        courseDisplayLiveData = SubscribingLiveDataWrapper.of(selectedCourseSubject.getObservable().map(o -> o.<Function<Resources, CharSequence>>map(course -> r ->
+        courseDisplayLiveData = SubscribingLiveDataWrapper.of(selectedCourse.getObservable().map(o -> o.<Function<Resources, CharSequence>>map(course -> r ->
                 r.getString(R.string.format_value_colon_value, course.getNumber(), course.getTitle())
         ).orElseGet(() -> r -> HtmlCompat.fromHtml(r.getString(R.string.html_none), HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_DIV))));
-        typeDisplayLiveData = SubscribingLiveDataWrapper.of(AssessmentType.OBJECTIVE_ASSESSMENT.displayResourceId(), typeSubject.getObservable().map(AssessmentType::displayResourceId));
-        statusDisplayLiveData = SubscribingLiveDataWrapper.of(AssessmentStatus.NOT_STARTED.displayResourceId(), statusSubject.getObservable().map(AssessmentStatus::displayResourceId));
-        goalDateDisplayLiveData = SubscribingLiveDataWrapper.of("", goalDateSubject.getObservable().map(o -> o.map(FULL_FORMATTER::format).orElse("")));
-        completionDateDisplayLiveData = SubscribingLiveDataWrapper.of("", completionDateSubject.getObservable().map(o -> o.map(FULL_FORMATTER::format).orElse("")));
-        showGoalDateCloseIconLiveData = SubscribingLiveDataWrapper.of(false, goalDateSubject.getObservable().map(Optional::isPresent));
-        showCompletionDateCloseIconLiveData = SubscribingLiveDataWrapper.of(false, completionDateSubject.getObservable().map(Optional::isPresent));
+        typeDisplayLiveData = SubscribingLiveDataWrapper.of(AssessmentType.OBJECTIVE_ASSESSMENT.displayResourceId(), type.getObservable().map(AssessmentType::displayResourceId));
+        statusDisplayLiveData = SubscribingLiveDataWrapper.of(AssessmentStatus.NOT_STARTED.displayResourceId(), status.getObservable().map(AssessmentStatus::displayResourceId));
+        goalDateDisplayLiveData = SubscribingLiveDataWrapper.of("", goalDate.getObservable().map(o -> o.map(FULL_FORMATTER::format).orElse("")));
+        completionDateDisplayLiveData = SubscribingLiveDataWrapper.of("", completionDate.getObservable().map(o -> o.map(FULL_FORMATTER::format).orElse("")));
+        showGoalDateCloseIconLiveData = SubscribingLiveDataWrapper.of(false, goalDate.getObservable().map(Optional::isPresent));
+        showCompletionDateCloseIconLiveData = SubscribingLiveDataWrapper.of(false, completionDate.getObservable().map(Optional::isPresent));
+        Observable<Boolean> changedObservable = Observable.combineLatest(originalValues.getObservable(),
+                codeObservable, nameObservable, status.getObservable(), goalDate.getObservable(), completionDate.getObservable(),
+                type.getObservable(), notes.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)),
+                selectedCourse.getObservable(), EditAssessmentViewModel::calculateChanged);
+        Observable<Boolean> validObservable = Observable.combineLatest(codeValidObservable, courseValidObservable, (code, course) -> code && course);
         changedLiveData = SubscribingLiveDataWrapper.of(false, changedObservable);
         canShareLiveData = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, changedObservable, (v, c) -> {
             Log.d(LOG_TAG, "Calculating canShare: valid = " + v + "; changed =  " + c);
@@ -224,10 +232,12 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
                 goalDateLiveData, completionDateLiveData, selectedCourseLiveData, currentTermLiveData, currentMentorLiveData, courseDisplayLiveData, typeDisplayLiveData,
                 statusDisplayLiveData, goalDateDisplayLiveData, completionDateDisplayLiveData, showGoalDateCloseIconLiveData, showCompletionDateCloseIconLiveData,
                 changedLiveData, canShareLiveData, canSaveLiveData,
-                originalValuesSubject.getObservable().map(AbstractEntity::getId).subscribe(this::observeAlertsByAssessmentId));
+                originalValues.getObservable().map(AbstractEntity::getId).subscribe(this::observeAlertsByAssessmentId));
     }
 
     private void recalculateAlerts(@Nullable LocalDate goalDate, @Nullable LocalDate completionDate) {
+        Log.d(LOG_TAG, "Enter recalculateAlerts(goalDate = " + ToStringBuilder.toEscapedString(goalDate, false) +
+                ", completionDate = " + ToStringBuilder.toEscapedString(completionDate, false));
         List<AssessmentAlert> list = getAllAlerts().getValue();
         if (null != list) {
             for (AssessmentAlert a : list) {
@@ -271,16 +281,16 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private boolean calculateChanged(@NonNull AssessmentDetails originalValues, @NonNull String code, @NonNull String name, @NonNull AssessmentStatus status,
-                                     Optional<LocalDate> goalDate, Optional<LocalDate> completionDate, @NonNull AssessmentType type, @NonNull String notes,
-                                     Optional<AbstractCourseEntity<?>> selectedCourse) {
-        Log.d(LOG_TAG, "Enter calculateChanged(originalValues = " + ToStringBuilder.toEscapedString(originalValues) + ", code = " +
+    private static boolean calculateChanged(@NonNull AssessmentDetails originalValues, @NonNull String code, @NonNull String name, @NonNull AssessmentStatus status,
+                                            Optional<LocalDate> goalDate, Optional<LocalDate> completionDate, @NonNull AssessmentType type, @NonNull String notes,
+                                            Optional<AbstractCourseEntity<?>> selectedCourse) {
+        Log.d(LOG_TAG, "Enter calculateChanged(originalValues = " + ToStringBuilder.toEscapedString(originalValues) + ",\ncode = " +
                 ToStringBuilder.toEscapedString(code) + ", name = " + ToStringBuilder.toEscapedString(name) + ", status = " + status.name() +
                 ", goalDate = " + ToStringBuilder.toEscapedString(goalDate.orElse(null), false) + ", completionDate = " +
                 ToStringBuilder.toEscapedString(completionDate.orElse(null), false) + ", type = " + type.name() + ", notes = " +
                 ToStringBuilder.toEscapedString(notes) + ", selectedCourse = " + ToStringBuilder.toEscapedString(selectedCourse.orElse(null)) + ")");
         String n = originalValues.getName();
-        return !(code.equals(originalValues.getCode()) && Objects.equals(name, (null == n) ? "" : n) && status == originalValues.getStatus() &&
+        return !(code.equals(originalValues.getCode()) && name.equals((null == n) ? "" : n) && status == originalValues.getStatus() &&
                 goalDate.map(d -> d.equals(originalValues.getGoalDate())).orElseGet(() -> null == originalValues.getGoalDate()) &&
                 completionDate.map(d -> d.equals(originalValues.getCompletionDate())).orElseGet(() -> null == originalValues.getCompletionDate()) &&
                 type == originalValues.getType() && notes.equals(originalValues.getNotes())) ||
@@ -289,7 +299,7 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @NonNull
-    public synchronized Function<Resources, CharSequence> calculateOverview(@NonNull Optional<LocalDate> goalDate, @NonNull Optional<LocalDate> completionDate, @NonNull AssessmentStatus status) {
+    private static Function<Resources, CharSequence> calculateOverview(@NonNull Optional<LocalDate> goalDate, @NonNull Optional<LocalDate> completionDate, @NonNull AssessmentStatus status) {
         return completionDate.map(c ->
                 goalDate.map(g -> (Function<Resources, CharSequence>) resources -> Html.fromHtml(resources.getString(R.string.html_format_assessment_overview_completed,
                         resources.getString(status.displayResourceId()), completionDate, goalDate), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE))
@@ -391,75 +401,75 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     }
 
     public long getId() {
-        return Objects.requireNonNull(originalValuesSubject.getValue()).getId();
+        return Objects.requireNonNull(originalValues.getValue()).getId();
     }
 
     public synchronized void setSelectedCourse(AbstractCourseEntity<?> selectedCourse) {
         Log.d(LOG_TAG, "Enter setSelectedCourse(" + selectedCourse + ")");
-        selectedCourseSubject.onNext(Optional.ofNullable(selectedCourse));
+        this.selectedCourse.onNext(Optional.ofNullable(selectedCourse));
     }
 
     @NonNull
     public String getCode() {
-        return Objects.requireNonNull(codeSubject.getValue());
+        return Objects.requireNonNull(code.getValue());
     }
 
     public void setCode(String code) {
-        codeSubject.onNext((null == code) ? "" : code);
+        this.code.onNext((null == code) ? "" : code);
     }
 
     @NonNull
     public String getName() {
-        return Objects.requireNonNull(nameSubject.getValue());
+        return Objects.requireNonNull(name.getValue());
     }
 
     public void setName(String name) {
-        nameSubject.onNext((null == name) ? "" : name);
+        this.name.onNext((null == name) ? "" : name);
     }
 
     @NonNull
     public AssessmentStatus getStatus() {
-        return Objects.requireNonNull(statusSubject.getValue());
+        return Objects.requireNonNull(status.getValue());
     }
 
     public void setStatus(AssessmentStatus status) {
-        statusSubject.onNext((null == status) ? AssessmentStatus.NOT_STARTED : status);
+        this.status.onNext((null == status) ? AssessmentStatus.NOT_STARTED : status);
     }
 
     @Nullable
     public LocalDate getGoalDate() {
-        return Objects.requireNonNull(goalDateSubject.getValue()).orElse(null);
+        return Objects.requireNonNull(goalDate.getValue()).orElse(null);
     }
 
     public void setGoalDate(LocalDate goalDate) {
-        goalDateSubject.onNext(Optional.ofNullable(goalDate));
+        this.goalDate.onNext(Optional.ofNullable(goalDate));
     }
 
     @Nullable
     public LocalDate getCompletionDate() {
-        return Objects.requireNonNull(completionDateSubject.getValue()).orElse(null);
+        return Objects.requireNonNull(completionDate.getValue()).orElse(null);
     }
 
     public void setCompletionDate(LocalDate completionDate) {
-        completionDateSubject.onNext(Optional.ofNullable(completionDate));
+        this.completionDate.onNext(Optional.ofNullable(completionDate));
     }
 
     @NonNull
     public AssessmentType getType() {
-        return Objects.requireNonNull(typeSubject.getValue());
+        return Objects.requireNonNull(type.getValue());
     }
 
     public void setType(AssessmentType type) {
-        typeSubject.onNext((null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type);
+        this.type.onNext((null == type) ? AssessmentType.OBJECTIVE_ASSESSMENT : type);
     }
 
     @NonNull
     public String getNotes() {
-        return Objects.requireNonNull(notesSubject.getValue());
+        return Objects.requireNonNull(notes.getValue());
     }
 
     public void setNotes(String notes) {
-        notesSubject.onNext((null == notes) ? "" : notes);
+        this.notes.onNext((null == notes) ? "" : notes);
     }
 
     public boolean isFromInitializedState() {
@@ -472,7 +482,7 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public Single<List<TermCourseListItem>> loadCourses() {
-        return dbLoader.loadCoursesByTermId(Objects.requireNonNull(originalValuesSubject.getValue()).getTermId());
+        return dbLoader.loadCoursesByTermId(Objects.requireNonNull(originalValues.getValue()).getTermId());
     }
 
     public synchronized Single<AssessmentDetails> initializeViewModelState(@Nullable Bundle savedInstanceState, Supplier<Bundle> getArguments) {
@@ -490,75 +500,75 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
             }
             AssessmentDetails originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
             originalValues.restoreState(state, true);
-            originalValuesSubject.onNext(originalValues);
+            this.originalValues.onNext(originalValues);
             String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false);
             if (state.containsKey(key)) {
                 CourseEntity courseEntity = new CourseEntity();
                 courseEntity.restoreState(state, false);
-                selectedCourseSubject.onNext(Optional.of(courseEntity));
+                selectedCourse.onNext(Optional.of(courseEntity));
             }
-            codeSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_CODE, false), ""));
-            nameSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NAME, false), ""));
+            code.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_CODE, false), ""));
+            name.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NAME, false), ""));
             key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_STATUS, false);
-            statusSubject.onNext((state.containsKey(key)) ? AssessmentStatus.valueOf(state.getString(key)) : AssessmentStatusConverter.DEFAULT);
+            status.onNext((state.containsKey(key)) ? AssessmentStatus.valueOf(state.getString(key)) : AssessmentStatusConverter.DEFAULT);
             key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_GOAL_DATE, false);
-            goalDateSubject.onNext((state.containsKey(key)) ? Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))) : Optional.empty());
+            goalDate.onNext((state.containsKey(key)) ? Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))) : Optional.empty());
             key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_COMPLETION_DATE, false);
-            completionDateSubject.onNext((state.containsKey(key)) ? Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))) : Optional.empty());
+            completionDate.onNext((state.containsKey(key)) ? Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))) : Optional.empty());
             key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_TYPE, false);
-            typeSubject.onNext((state.containsKey(key)) ? AssessmentType.valueOf(state.getString(key)) : AssessmentType.OBJECTIVE_ASSESSMENT);
-            notesSubject.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NOTES, false), ""));
+            type.onNext((state.containsKey(key)) ? AssessmentType.valueOf(state.getString(key)) : AssessmentType.OBJECTIVE_ASSESSMENT);
+            notes.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NOTES, false), ""));
         }
         initializedSubject.onComplete();
-        return Single.just(Objects.requireNonNull(originalValuesSubject.getValue())).observeOn(AndroidSchedulers.mainThread());
+        return Single.just(Objects.requireNonNull(originalValues.getValue())).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void saveViewModelState(Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        Objects.requireNonNull(selectedCourseSubject.getValue()).ifPresent(c -> c.saveState(outState, false));
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_CODE, false), codeSubject.getValue());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NAME, false), nameSubject.getValue());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NOTES, false), notesSubject.getValue());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_STATUS, false), Objects.requireNonNull(statusSubject.getValue()).name());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_TYPE, false), Objects.requireNonNull(typeSubject.getValue()).name());
-        Objects.requireNonNull(goalDateSubject.getValue()).ifPresent(d ->
+        Objects.requireNonNull(selectedCourse.getValue()).ifPresent(c -> c.saveState(outState, false));
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_CODE, false), code.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NAME, false), name.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_NOTES, false), notes.getValue());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_STATUS, false), Objects.requireNonNull(status.getValue()).name());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_TYPE, false), Objects.requireNonNull(type.getValue()).name());
+        Objects.requireNonNull(goalDate.getValue()).ifPresent(d ->
                 outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_GOAL_DATE, false), LocalDateConverter.fromLocalDate(d)));
-        Objects.requireNonNull(completionDateSubject.getValue()).ifPresent(d ->
+        Objects.requireNonNull(completionDate.getValue()).ifPresent(d ->
                 outState.putLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_ASSESSMENTS, Assessment.COLNAME_COMPLETION_DATE, false), LocalDateConverter.fromLocalDate(d)));
-        Objects.requireNonNull(originalValuesSubject.getValue()).saveState(outState, true);
+        Objects.requireNonNull(originalValues.getValue()).saveState(outState, true);
     }
 
     private void onEntityLoadedFromDb(AssessmentDetails entity) {
         Log.d(LOG_TAG, String.format("Loaded %s from database", entity));
-        originalValuesSubject.onNext(entity);
-        codeSubject.onNext(entity.getCode());
+        originalValues.onNext(entity);
+        code.onNext(entity.getCode());
         String s = entity.getName();
-        nameSubject.onNext((null == s) ? "" : s);
-        statusSubject.onNext(entity.getStatus());
-        goalDateSubject.onNext(Optional.ofNullable(entity.getGoalDate()));
-        completionDateSubject.onNext(Optional.ofNullable(entity.getCompletionDate()));
-        typeSubject.onNext(entity.getType());
-        notesSubject.onNext(entity.getNotes());
-        selectedCourseSubject.onNext(Optional.ofNullable(entity.getCourse()));
+        name.onNext((null == s) ? "" : s);
+        status.onNext(entity.getStatus());
+        goalDate.onNext(Optional.ofNullable(entity.getGoalDate()));
+        completionDate.onNext(Optional.ofNullable(entity.getCompletionDate()));
+        type.onNext(entity.getType());
+        notes.onNext(entity.getNotes());
+        selectedCourse.onNext(Optional.ofNullable(entity.getCourse()));
         initializedSubject.onComplete();
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
-        return Objects.requireNonNull(selectedCourseSubject.getValue()).map(c -> {
-            AssessmentEntity entity = new AssessmentEntity(originalValuesSubject.getValue());
-            entity.setCode(codeSubject.getValue());
-            entity.setCompletionDate(Objects.requireNonNull(completionDateSubject.getValue()).orElse(null));
+        return Objects.requireNonNull(selectedCourse.getValue()).map(c -> {
+            AssessmentEntity entity = new AssessmentEntity(originalValues.getValue());
+            entity.setCode(code.getValue());
+            entity.setCompletionDate(Objects.requireNonNull(completionDate.getValue()).orElse(null));
             entity.setCourseId(c.getId());
-            entity.setGoalDate(Objects.requireNonNull(goalDateSubject.getValue()).orElse(null));
-            entity.setName(nameSubject.getValue());
-            entity.setStatus(statusSubject.getValue());
-            entity.setType(typeSubject.getValue());
-            entity.setNotes(notesSubject.getValue());
+            entity.setGoalDate(Objects.requireNonNull(goalDate.getValue()).orElse(null));
+            entity.setName(name.getValue());
+            entity.setStatus(status.getValue());
+            entity.setType(type.getValue());
+            entity.setNotes(notes.getValue());
             return dbLoader.saveAssessment(entity, ignoreWarnings).doOnSuccess(m -> {
                 if (m.isSucceeded()) {
                     AssessmentDetails originalValues = new AssessmentDetails((AbstractCourseEntity<?>) null);
                     originalValues.applyChanges(entity, c);
-                    originalValuesSubject.onNext(originalValues);
+                    this.originalValues.onNext(originalValues);
                 }
             });
         }).orElseGet(() -> Single.just(ValidationMessage.ofSingleError(R.string.message_course_not_selected)).observeOn(AndroidSchedulers.mainThread()));
@@ -566,7 +576,7 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
 
     public Single<Integer> delete() {
         Log.d(LOG_TAG, "Enter delete");
-        AssessmentEntity entity = new AssessmentEntity(originalValuesSubject.getValue());
+        AssessmentEntity entity = new AssessmentEntity(originalValues.getValue());
         return dbLoader.deleteAssessment(entity).doOnError(throwable -> Log.e(getClass().getName(),
                 "Error deleting course", throwable));
     }
