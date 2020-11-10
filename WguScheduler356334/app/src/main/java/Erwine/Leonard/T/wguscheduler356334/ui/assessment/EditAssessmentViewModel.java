@@ -77,11 +77,10 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     private final BehaviorComputationSource<AssessmentStatus> status;
     private final BehaviorComputationSource<Optional<LocalDate>> goalDate;
     private final BehaviorComputationSource<Optional<LocalDate>> completionDate;
+    private final BehaviorComputationSource<Optional<AbstractCourseEntity<?>>> selectedCourse;
     private final BehaviorComputationSource<AssessmentType> type;
     private final BehaviorComputationSource<String> notes;
-    private final BehaviorComputationSource<Optional<AbstractCourseEntity<?>>> selectedCourse;
     private final BehaviorComputationSource<AssessmentDetails> originalValues;
-    private final CompletableSubject initializedSubject;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactoryLiveData;
     private final SubscribingLiveDataWrapper<String> subTitleLiveData;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> overviewFactoryLiveData;
@@ -96,8 +95,6 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     private final SubscribingLiveDataWrapper<Boolean> canSaveLiveData;
     private final SubscribingLiveDataWrapper<Boolean> changedLiveData;
     private final SubscribingLiveDataWrapper<AssessmentDetails> originalValuesLiveData;
-    private final CompositeDisposable compositeDisposable;
-    private final Completable initializedCompletable;
     private final SubscribingLiveDataWrapper<Integer> typeDisplayLiveData;
     private final SubscribingLiveDataWrapper<Integer> statusDisplayLiveData;
     private final SubscribingLiveDataWrapper<String> goalDateDisplayLiveData;
@@ -106,8 +103,11 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
     private final SubscribingLiveDataWrapper<Boolean> showCompletionDateCloseIconLiveData;
     private final LiveDataWrapper<List<AssessmentAlert>> assessmentAlertsLiveData;
     private final SubscribingLiveDataWrapper<Boolean> courseValidLiveData;
-    private boolean fromInitializedState;
+    private final CompletableSubject initializedSubject;
+    private final CompositeDisposable compositeDisposable;
+    private final Completable initializedCompletable;
     private Pair<Long, Disposable> alertsObserving;
+    private boolean fromInitializedState;
 
     public static void startAddAssessmentActivity(@NonNull Activity activity, int requestCode, long courseId, @Nullable LocalDate goalDate) {
         Intent intent = new Intent(activity, AddAssessmentActivity.class);
