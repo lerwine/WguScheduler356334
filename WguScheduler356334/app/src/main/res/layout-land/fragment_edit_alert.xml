@@ -41,8 +41,8 @@
 
             <RadioButton
                 android:id="@+id/specificDateRadioButton"
-                style="@style/WGU.Scheduler.RadioButtonStyle"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/control_margin"
                 android:labelFor="@id/specificDateTextView"
                 android:text="@string/label_specific_date"
@@ -81,14 +81,12 @@
 
                     <RadioButton
                         android:id="@+id/daysBeforeRadioButton"
-                        style="@style/WGU.Scheduler.RadioButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_before" />
 
                     <RadioButton
                         android:id="@+id/daysAfterRadioButton"
-                        style="@style/WGU.Scheduler.RadioButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_after" />
@@ -96,7 +94,6 @@
 
                 <RadioButton
                     android:id="@+id/startDateRadioButton"
-                    style="@style/WGU.Scheduler.RadioButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/control_margin"
@@ -106,7 +103,6 @@
 
                 <RadioButton
                     android:id="@+id/endDateRadioButton"
-                    style="@style/WGU.Scheduler.RadioButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/control_margin"
@@ -118,7 +114,6 @@
 
             <TextView
                 android:id="@+id/specificDateTextView"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:minEms="@integer/min_ems_date"
@@ -128,7 +123,6 @@
 
             <EditText
                 android:id="@+id/daysEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/control_margin"
@@ -164,7 +158,6 @@
 
             <RadioButton
                 android:id="@+id/defaultTimeRadioButton"
-                style="@style/WGU.Scheduler.RadioButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="2"
@@ -177,7 +170,6 @@
 
             <RadioButton
                 android:id="@+id/explicitTimeRadioButton"
-                style="@style/WGU.Scheduler.RadioButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/control_margin"
@@ -188,7 +180,6 @@
 
             <TextView
                 android:id="@+id/alertTimeValueTextView"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:minEms="@integer/min_ems_time"
@@ -219,7 +210,6 @@
 
         <EditText
             android:id="@+id/messageEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"

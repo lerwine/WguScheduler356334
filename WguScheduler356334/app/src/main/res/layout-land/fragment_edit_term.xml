@@ -35,7 +35,6 @@
 
             <EditText
                 android:id="@+id/termNameEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/control_margin"
@@ -117,7 +116,6 @@
 
     <EditText
         android:id="@+id/notesEditText"
-        style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/control_margin"

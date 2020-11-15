@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
 
@@ -19,12 +20,18 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_TERM_COURSE_LIST,
-        value = "SELECT courses.*, COUNT(assessments.id) AS [assessmentCount], mentors.name as [mentorName], mentors.phoneNumber, mentors.emailAddress\n" +
+        value = "SELECT courses.*, CASE WHEN courses.actualStart IS NOT NULL THEN courses.actualStart ELSE courses.expectedStart END AS [effectiveStart], " +
+                "CASE WHEN courses.actualEnd IS NOT NULL THEN courses.actualEnd ELSE courses.expectedEnd END AS [effectiveEnd], " +
+                "COUNT(assessments.id) AS [assessmentCount], mentors.name as [mentorName], mentors.phoneNumber, mentors.emailAddress " +
                 "FROM courses LEFT JOIN mentors ON courses.mentorId = mentors.id\n" +
                 "LEFT JOIN assessments ON courses.id = assessments.courseId\n" +
                 "GROUP BY courses.id ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]"
 )
 public final class TermCourseListItem extends AbstractCourseEntity<TermCourseListItem> implements Comparable<TermCourseListItem> {
+
+    public static final String COLNAME_COURSE_EFFECTIVE_START = "effectiveStart";
+
+    public static final String COLNAME_COURSE_EFFECTIVE_END = "effectiveEnd";
 
     /**
      * The name of the {@link #assessmentCount "assessmentCount"} view column, which contains the number of assessments for the course.
@@ -46,6 +53,10 @@ public final class TermCourseListItem extends AbstractCourseEntity<TermCourseLis
      */
     public static final String COLNAME_EMAIL_ADDRESS = "emailAddress";
 
+    @ColumnInfo(name = COLNAME_COURSE_EFFECTIVE_START)
+    private LocalDate effectiveStart;
+    @ColumnInfo(name = COLNAME_COURSE_EFFECTIVE_END)
+    private LocalDate effectiveEnd;
     @ColumnInfo(name = COLNAME_ASSESSMENT_COUNT)
     private int assessmentCount;
     @ColumnInfo(name = COLNAME_MENTOR_NAME)
@@ -72,13 +83,71 @@ public final class TermCourseListItem extends AbstractCourseEntity<TermCourseLis
      * @param id              The value of the {@link #COLNAME_ID primary key column}.
      */
     public TermCourseListItem(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart, LocalDate expectedEnd, LocalDate actualEnd,
-                              int competencyUnits, String notes, long termId, Long mentorId, Integer assessmentCount, String mentorName, String phoneNumber,
-                              String emailAddress, long id) {
+                              int competencyUnits, String notes, long termId, Long mentorId, LocalDate effectiveStart, LocalDate effectiveEnd, Integer assessmentCount,
+                              String mentorName, String phoneNumber, String emailAddress, long id) {
         super(IdIndexedEntity.assertNotNewId(id), termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+        this.effectiveStart = (null == actualStart) ? expectedStart : actualStart;
+        if (null == this.effectiveStart && null != effectiveStart) {
+            this.effectiveStart = effectiveStart;
+        }
+        this.effectiveEnd = (null == actualEnd) ? expectedEnd : actualEnd;
+        if (null == this.effectiveEnd && null != effectiveEnd) {
+            this.effectiveEnd = effectiveEnd;
+        }
         this.assessmentCount = (null == assessmentCount || assessmentCount < 0) ? 0 : assessmentCount;
         this.mentorName = SINGLE_LINE_NORMALIZER.apply(mentorName);
         this.phoneNumber = SINGLE_LINE_NORMALIZER.apply(phoneNumber);
         this.emailAddress = SINGLE_LINE_NORMALIZER.apply(emailAddress);
+    }
+
+    @Override
+    public synchronized void setExpectedStart(@Nullable LocalDate expectedStart) {
+        super.setExpectedStart(expectedStart);
+        LocalDate actualStart = getActualEnd();
+        effectiveStart = (null == actualStart) ? expectedStart : actualStart;
+    }
+
+    @Override
+    public synchronized void setActualStart(@Nullable LocalDate actualStart) {
+        super.setActualStart(actualStart);
+        effectiveStart = (null == actualStart) ? getExpectedStart() : actualStart;
+    }
+
+    @Override
+    public synchronized void setExpectedEnd(@Nullable LocalDate expectedEnd) {
+        super.setExpectedEnd(expectedEnd);
+        LocalDate actualEnd = getActualEnd();
+        effectiveEnd = (null == actualEnd) ? expectedEnd : actualEnd;
+    }
+
+    @Override
+    public synchronized void setActualEnd(@Nullable LocalDate actualEnd) {
+        super.setActualEnd(actualEnd);
+        effectiveEnd = (null == actualEnd) ? getExpectedEnd() : actualEnd;
+    }
+
+    @Nullable
+    public LocalDate getEffectiveStart() {
+        return effectiveStart;
+    }
+
+    public synchronized void setEffectiveStart(LocalDate effectiveStart) {
+        if (null != this.effectiveStart && !this.effectiveStart.equals(effectiveStart)) {
+            throw new IllegalStateException();
+        }
+        this.effectiveStart = effectiveStart;
+    }
+
+    @Nullable
+    public LocalDate getEffectiveEnd() {
+        return effectiveEnd;
+    }
+
+    public synchronized void setEffectiveEnd(LocalDate effectiveEnd) {
+        if (null != this.effectiveEnd && !this.effectiveEnd.equals(effectiveEnd)) {
+            throw new IllegalStateException();
+        }
+        this.effectiveEnd = effectiveEnd;
     }
 
     public long getAssessmentCount() {

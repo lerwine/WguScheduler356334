@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
@@ -42,16 +43,19 @@ public interface TermDAO {
     @Delete
     int deleteSynchronous(TermEntity term);
 
-    @Query("SELECT * FROM terms WHERE id = :id")
+    @Query("SELECT * FROM terms WHERE id = :id LIMIT 1")
     Single<TermEntity> getById(long id);
 
-    @Query("SELECT * FROM terms WHERE id = :id")
+    @Query("SELECT * FROM terms WHERE id = :id LIMIT 1")
     TermEntity getByIdSynchronous(long id);
 
-    @Query("SELECT * FROM termListView")
+    @Query("SELECT * FROM termListView ORDER BY start, `end`")
     LiveData<List<TermListItem>> getAll();
 
-    @Query("SELECT * FROM termListView")
+    @Query("SELECT * FROM termListView WHERE null != start AND start >= :date AND (null == `end` || `end` >= :date)")
+    LiveData<List<TermListItem>> getOnOrAfterDate(LocalDate date);
+
+    @Query("SELECT * FROM termListView ORDER BY start, `end`")
     List<TermListItem> getAllSynchronous();
 
     @Query("SELECT COUNT(*) FROM terms")

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="108" height="108" version="1.1" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg version="1.1" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
  <defs>
-  <linearGradient id="linearGradient3901" x1="8" x2="152" y1="16" y2="16" gradientTransform="matrix(.5612 0 0 .5612 .125 .125)" gradientUnits="userSpaceOnUse">
+  <linearGradient id="linearGradient3901" x1="8" x2="152" y1="16" y2="16" gradientTransform="matrix(.56177 0 0 .56177 .070221 .070221)" gradientUnits="userSpaceOnUse">
    <stop stop-color="#6deb77" offset="0"/>
    <stop stop-color="#4fb857" offset=".28571"/>
    <stop stop-color="#2c7c33" offset=".81441"/>
    <stop stop-color="#1b5e20" offset=".88845"/>
    <stop stop-color="#17501b" offset="1"/>
   </linearGradient>
-  <linearGradient id="linearGradient3932" x1="96" x2="96" y2="152" gradientTransform="matrix(-.5612 0 0 -.5612 -.125 -.125)" gradientUnits="userSpaceOnUse">
+  <linearGradient id="linearGradient3932" x1="96" x2="96" y2="152" gradientTransform="matrix(-.56177 0 0 -.56177 -.070221 -.070221)" gradientUnits="userSpaceOnUse">
    <stop stop-color="#6deb77" offset="0"/>
    <stop stop-color="#4fb857" offset=".28571"/>
    <stop stop-color="#2c7c33" offset=".81441"/>
@@ -16,6 +16,6 @@
    <stop stop-color="#17501b" offset="1"/>
   </linearGradient>
  </defs>
- <rect x=".125" y=".125" width="107.75" height="107.75" fill="url(#linearGradient3901)" opacity=".997" stroke="#5f5000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".25" style="paint-order:markers fill stroke"/>
- <rect transform="scale(-1)" x="-107.88" y="-107.88" width="107.75" height="107.75" fill="url(#linearGradient3932)" opacity=".495" stroke="#5f5000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".25" style="paint-order:markers fill stroke"/>
+ <rect x=".070221" y=".070221" width="107.86" height="107.86" fill="url(#linearGradient3901)" stroke="#5f5000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".14044" style="paint-order:markers fill stroke"/>
+ <rect transform="scale(-1)" x="-107.93" y="-107.93" width="107.86" height="107.86" fill="url(#linearGradient3932)" opacity=".495" stroke="#5f5000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".14044" style="paint-order:markers fill stroke"/>
 </svg>

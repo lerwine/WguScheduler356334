@@ -28,6 +28,8 @@ android {
 
 dependencies {
     implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     testImplementation 'android.arch.core:core-testing:1.1.1'
     def room_version = "2.2.5"
     def lifecycle_version = "2.2.0"

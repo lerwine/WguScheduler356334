@@ -61,7 +61,6 @@
 
             <EditText
                 android:id="@+id/codeEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:importantForAutofill="no"
@@ -86,7 +85,6 @@
 
             <EditText
                 android:id="@+id/nameEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:importantForAutofill="no"
@@ -219,7 +217,6 @@
 
     <EditText
         android:id="@+id/notesEditText"
-        style="@style/WGU.Scheduler.TextInputEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/control_margin"

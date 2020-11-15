@@ -227,8 +227,8 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 });
 
         effectiveStartObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedStart.getObservable(), actualStart.getObservable(),
-                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(courseAlerts.getValue(), d.orElse(null), actualStart.getValue().orElseGet(() ->
-                expectedStart.getValue().orElse(null)))));
+                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(Objects.requireNonNull(courseAlerts.getValue()), d.orElse(null), Objects.requireNonNull(actualStart.getValue()).orElseGet(() ->
+                Objects.requireNonNull(expectedStart.getValue()).orElse(null)))));
         effectiveEndObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedEnd.getObservable(), actualEnd.getObservable(),
                 (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(actualEnd.getValue().orElseGet(() -> expectedEnd.getValue().orElse(null)), d.orElse(null))));
         courseAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
@@ -574,12 +574,12 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     }
 
     public long getId() {
-        return originalValues.getValue().getId();
+        return Objects.requireNonNull(originalValues.getValue()).getId();
     }
 
     @Nullable
     public AbstractTermEntity<?> getSelectedTerm() {
-        return selectedTerm.getValue().orElse(null);
+        return Objects.requireNonNull(selectedTerm.getValue()).orElse(null);
     }
 
     public void setSelectedTerm(AbstractTermEntity<?> term) {
@@ -588,7 +588,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public AbstractMentorEntity<?> getSelectedMentor() {
-        return selectedMentor.getValue().orElse(null);
+        return Objects.requireNonNull(selectedMentor.getValue()).orElse(null);
     }
 
     public void setSelectedMentor(@Nullable AbstractMentorEntity<?> mentor) {
@@ -597,7 +597,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public String getNumber() {
-        return number.getValue();
+        return Objects.requireNonNull(number.getValue());
     }
 
     public void setNumber(String value) {
@@ -606,7 +606,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public String getTitle() {
-        return title.getValue();
+        return Objects.requireNonNull(title.getValue());
     }
 
     public void setTitle(String value) {
@@ -615,7 +615,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public LocalDate getExpectedStart() {
-        return expectedStart.getValue().orElse(null);
+        return Objects.requireNonNull(expectedStart.getValue()).orElse(null);
     }
 
     public void setExpectedStart(LocalDate value) {
@@ -624,7 +624,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public LocalDate getActualStart() {
-        return actualStart.getValue().orElse(null);
+        return Objects.requireNonNull(actualStart.getValue()).orElse(null);
     }
 
     public void setActualStart(LocalDate value) {
@@ -633,7 +633,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public LocalDate getExpectedEnd() {
-        return expectedEnd.getValue().orElse(null);
+        return Objects.requireNonNull(expectedEnd.getValue()).orElse(null);
     }
 
     public void setExpectedEnd(LocalDate value) {
@@ -642,7 +642,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @Nullable
     public LocalDate getActualEnd() {
-        return actualEnd.getValue().orElse(null);
+        return Objects.requireNonNull(actualEnd.getValue()).orElse(null);
     }
 
     public void setActualEnd(LocalDate value) {
@@ -651,7 +651,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public String getCompetencyUnitsText() {
-        return competencyUnitsText.getValue();
+        return Objects.requireNonNull(competencyUnitsText.getValue());
     }
 
     public void setCompetencyUnitsText(String value) {
@@ -660,7 +660,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public CourseStatus getStatus() {
-        return status.getValue();
+        return Objects.requireNonNull(status.getValue());
     }
 
     public synchronized void setStatus(CourseStatus status) {
@@ -669,7 +669,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     @NonNull
     public String getNotes() {
-        return notes.getValue();
+        return Objects.requireNonNull(notes.getValue());
     }
 
     public synchronized void setNotes(String value) {
@@ -856,11 +856,11 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
 
     public void saveViewModelState(@NonNull Bundle outState) {
         outState.putBoolean(STATE_KEY_STATE_INITIALIZED, true);
-        originalValues.getValue().saveState(outState, true);
-        selectedTerm.getValue().ifPresent(t -> t.saveState(outState, false));
-        selectedMentor.getValue().ifPresent(m -> m.saveState(outState, false));
+        Objects.requireNonNull(originalValues.getValue()).saveState(outState, true);
+        Objects.requireNonNull(selectedTerm.getValue()).ifPresent(t -> t.saveState(outState, false));
+        Objects.requireNonNull(selectedMentor.getValue()).ifPresent(m -> m.saveState(outState, false));
         outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), number.getValue());
-        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false), status.getValue().name());
+        outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false), Objects.requireNonNull(status.getValue()).name());
         outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), title.getValue());
         outState.putString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), notes.getValue());
         Long d = LocalDateConverter.fromLocalDate(getExpectedStart());
@@ -883,25 +883,25 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     }
 
     public synchronized Single<ResourceMessageResult> save(boolean ignoreWarnings) {
-        AbstractTermEntity<?> term = selectedTerm.getValue().orElse(null);
+        AbstractTermEntity<?> term = Objects.requireNonNull(selectedTerm.getValue()).orElse(null);
         if (null == term) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_term_not_selected)).observeOn(AndroidSchedulers.mainThread());
         }
-        Integer cu = competencyUnitsValueObserver.getLiveData().getValue().orElse(null);
+        Integer cu = Objects.requireNonNull(competencyUnitsValueObserver.getLiveData().getValue()).orElse(null);
         if (null == cu) {
             return Single.just(ValidationMessage.ofSingleError(R.string.message_required)).observeOn(AndroidSchedulers.mainThread());
         }
         CourseDetails originalValues = this.originalValues.getValue();
-        CourseEntity entity = originalValues.toEntity();
+        CourseEntity entity = Objects.requireNonNull(originalValues).toEntity();
         entity.setTermId(Objects.requireNonNull(term).getId());
-        entity.setMentorId(selectedMentor.getValue().map(AbstractEntity::getId).orElse(null));
+        entity.setMentorId(Objects.requireNonNull(selectedMentor.getValue()).map(AbstractEntity::getId).orElse(null));
         entity.setNumber(number.getValue());
         entity.setTitle(title.getValue());
         entity.setStatus(status.getValue());
-        entity.setExpectedStart(expectedStart.getValue().orElse(null));
-        entity.setExpectedEnd(expectedEnd.getValue().orElse(null));
-        entity.setActualStart(actualStart.getValue().orElse(null));
-        entity.setActualEnd(actualEnd.getValue().orElse(null));
+        entity.setExpectedStart(Objects.requireNonNull(expectedStart.getValue()).orElse(null));
+        entity.setExpectedEnd(Objects.requireNonNull(expectedEnd.getValue()).orElse(null));
+        entity.setActualStart(Objects.requireNonNull(actualStart.getValue()).orElse(null));
+        entity.setActualEnd(Objects.requireNonNull(actualEnd.getValue()).orElse(null));
         entity.setCompetencyUnits(cu);
         entity.setNotes(notes.getValue());
         Log.d(LOG_TAG, String.format("Saving %s to database", entity));
@@ -932,4 +932,54 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     public LocalDate getEffectiveEndDate() {
         return effectiveEndObserver.getLiveData().getValue();
     }
+
+    private static class DateValues {
+        private final LocalDate expectedStart;
+        private final LocalDate expectedEnd;
+        private final LocalDate actualStart;
+        private final LocalDate actualEnd;
+
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        DateValues(Optional<LocalDate> expectedStart, Optional<LocalDate> expectedEnd, Optional<LocalDate> actualStart, Optional<LocalDate> actualEnd) {
+            this.expectedStart = expectedStart.orElse(null);
+            this.expectedEnd = expectedEnd.orElse(null);
+            this.actualStart = actualStart.orElse(null);
+            this.actualEnd = actualEnd.orElse(null);
+        }
+
+        public Boolean isChanged(CourseDetails course) {
+            return !(Objects.equals(course.getExpectedStart(), expectedStart) && Objects.equals(course.getExpectedEnd(), expectedEnd) &&
+                    Objects.equals(course.getActualStart(), actualStart) && Objects.equals(course.getActualEnd(), actualEnd));
+        }
+    }
+
+    private static class ModifiedValues {
+        private final String number;
+        private final String title;
+        private final CourseStatus status;
+        private final Integer competencyUnits;
+        private final Long selectedMentorId;
+        private final Long selectedTermId;
+        private final String notes;
+
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        public ModifiedValues(String number, String title, CourseStatus status, Optional<Integer> competencyUnits, Optional<Long> selectedMentorId,
+                              Optional<Long> selectedTermId, String notes) {
+            this.number = number;
+            this.title = title;
+            this.status = status;
+            this.competencyUnits = competencyUnits.orElse(null);
+            this.selectedMentorId = selectedMentorId.orElse(null);
+            this.selectedTermId = selectedTermId.orElse(null);
+            this.notes = notes;
+        }
+
+        public boolean isChanged(CourseDetails course) {
+            return !(Objects.equals(course.getNumber(), number) && Objects.equals(course.getTitle(), title) &&
+                    Objects.equals(course.getStatus(), status) && Objects.equals(course.getCompetencyUnits(), competencyUnits) &&
+                    Objects.equals(course.getMentorId(), selectedMentorId) && Objects.equals(course.getTermId(), selectedTermId) &&
+                    Objects.equals(course.getNotes(), notes));
+        }
+    }
+
 }

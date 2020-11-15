@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context=".ui.HomeFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:weightSum="100">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/currentTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/fab_margin"
+                android:text="@string/title_current_term" />
+
+            <FrameLayout
+                android:id="@+id/currentFrameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/dialog_holo_light_frame">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin">
+
+                    <Button
+                        android:id="@+id/currentTermButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/currentTermStartedOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_started_on"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/currentTermButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentTermEndsOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_ends_on"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/currentTermStartedOnLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/currentTermButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentTermStartedOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentTermStartedOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentTermEndsOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/currentTermStartedOnDateTextView"
+                        app:layout_constraintTop_toBottomOf="@+id/currentTermEndsOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentCourseTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_current_course"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentTermStartedOnDateTextView" />
+
+                    <Button
+                        android:id="@+id/currentCourseButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentCourseTextView" />
+
+                    <TextView
+                        android:id="@+id/currentCourseStartedOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_started_on"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/currentCourseButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentCourseEndsOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_ends_on"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/currentCourseStartedOnLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/currentCourseButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentCourseStartedOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentCourseStartedOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentCourseEndsOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/currentCourseStartedOnDateTextView"
+                        app:layout_constraintTop_toBottomOf="@+id/currentCourseEndsOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentMentorTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_course_mentor"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentCourseStartedOnDateTextView" />
+
+                    <Button
+                        android:id="@+id/currentMentorButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentMentorTextView" />
+
+                    <TextView
+                        android:id="@+id/currentMentorPhoneNumberLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_phone_number"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/currentMentorButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentMentorEmailAddressLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_email_address"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/currentMentorPhoneNumberLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/currentMentorButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentMentorPhoneNumberTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentMentorPhoneNumberLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/currentMentorEmailAddressTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/currentMentorPhoneNumberTextView"
+                        app:layout_constraintTop_toBottomOf="@+id/currentMentorEmailAddressLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nextTextView"
+                style="@style/WGU.Scheduler.FieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/fab_margin"
+                android:text="@string/title_next_term" />
+
+            <FrameLayout
+                android:id="@+id/nextFrameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/dialog_holo_light_frame">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin">
+
+                    <Button
+                        android:id="@+id/nextTermButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/nextTermStartsOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_started_on"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/nextTermButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextTermEndsOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_ends_on"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nextTermStartsOnLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/nextTermButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextTermStartsOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextTermStartsOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextTermEndsOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nextTermStartsOnDateTextView"
+                        app:layout_constraintTop_toBottomOf="@+id/nextTermEndsOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextCourseTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_next_course"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextTermStartsOnDateTextView" />
+
+                    <Button
+                        android:id="@+id/nextCourseButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextCourseTextView" />
+
+                    <TextView
+                        android:id="@+id/nextCourseStartsOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_started_on"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/nextCourseButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextCourseEndsOnLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_ends_on"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nextCourseStartsOnLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/nextCourseButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextCourseStartsOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextCourseStartsOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextCourseEndsOnDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nextCourseStartsOnDateTextView"
+                        app:layout_constraintTop_toBottomOf="@+id/nextCourseEndsOnLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextMentorTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_course_mentor"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextCourseStartsOnDateTextView" />
+
+                    <Button
+                        android:id="@+id/nextMentorButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextMentorTextView" />
+
+                    <TextView
+                        android:id="@+id/nextMentorPhoneNumberLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_phone_number"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/nextMentorButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextMentorEmailAddressLabelTextView"
+                        style="@style/WGU.Scheduler.FieldLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_email_address"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nextMentorPhoneNumberLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/nextMentorButton"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextMentorPhoneNumberTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nextMentorPhoneNumberLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                    <TextView
+                        android:id="@+id/nextMentorEmailAddressTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nextMentorPhoneNumberTextView"
+                        app:layout_constraintTop_toBottomOf="@+id/nextMentorEmailAddressLabelTextView"
+                        app:layout_constraintWidth_percent="0.5" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

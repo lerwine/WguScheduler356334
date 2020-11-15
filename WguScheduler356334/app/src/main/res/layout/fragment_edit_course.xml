@@ -64,7 +64,6 @@
 
                 <EditText
                     android:id="@+id/courseCodeEditText"
-                    style="@style/WGU.Scheduler.TextInputEditText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="0"
@@ -75,7 +74,6 @@
 
                 <EditText
                     android:id="@+id/competencyUnitsEditText"
-                    style="@style/WGU.Scheduler.TextInputEditText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
@@ -99,7 +97,6 @@
 
         <EditText
             android:id="@+id/titleEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
@@ -255,7 +252,6 @@
 
         <EditText
             android:id="@+id/notesEditText"
-            style="@style/WGU.Scheduler.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/bottom_most_margin"

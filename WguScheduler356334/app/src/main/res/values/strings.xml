@@ -19,6 +19,7 @@
     <string name="label_competency_units">Competency Units</string>
     <string name="label_completed">Completed:</string>
     <string name="label_course_number">Course Number</string>
+    <string name="label_course_mentor">Course Mentor</string>
     <string name="label_dropped">Dropped</string>
     <string name="label_edit_mentor_name">Edit mentor name</string>
     <string name="label_email_address">Email Address</string>
@@ -34,8 +35,15 @@
     <string name="tool_tip_name_of_mentor">Name of mentor</string>
     <string name="label_none">(none)</string>
     <string name="html_none"><i>(none)</i></string>
+    <string name="html_no_upcoming_terms">\n<i><big>No active or planned terms.</big></i>
+        \n\n<i>Use Terms tab to add and manage terms and courses.</i>
+        \n\n<i>You can also use the options-menu overflow button to add sample course data.</i></string>
     <string name="label_not_passed">Not Passed</string>
     <string name="label_not_started">Not Started</string>
+    <string name="label_started_on">Started On</string>
+    <string name="label_starts_on">Starts On</string>
+    <string name="label_ended_on">Ended On</string>
+    <string name="label_ends_on">Ends On</string>
     <string name="label_notes">Notes</string>
     <string name="label_objective_assessment">Objective Assessment</string>
     <string name="label_passed">Passed</string>
@@ -166,7 +174,12 @@
     <string name="title_reset_db_error">Reset Database Error</string>
     <string name="title_save_error">Save Error</string>
     <string name="title_save_warning">Save Warning</string>
+    <string name="title_home">Home</string>
     <string name="title_terms">Terms</string>
+    <string name="title_current_term">Current Term</string>
+    <string name="title_next_term">Next Term</string>
+    <string name="title_current_course">Current Course</string>
+    <string name="title_next_course">Next Course</string>
     <string name="tooltip_clear_database">Removes all data from the database</string>
     <string name="tooltip_reset_with_sample_data">Deletes all existing data and populates database with sample data</string>
     <string name="validation_succeeded">Validation succeeded.</string>
@@ -276,7 +289,9 @@
     <string name="title_add_alert">Add Alert</string>
     <string name="title_add_term">Add Term</string>
     <string name="html_no_dates_specified"><i>No dates specified</i></string>
+    <string name="format_ended_on">Ended on %s</string>
     <string name="format_ends_on">Ends on %s</string>
+    <string name="format_started_on">Started on %s</string>
     <string name="format_starts_on">Starts on %s</string>
     <string name="html_format_assessment_overview_completed"><b>%s</b>: <b>Completed On </b> %s; <b>Goal Date was </b> %s</string>
     <string name="html_format_assessment_overview_completed_no_goal"><b>%s</b>: <b>Completed On </b> %s</string>

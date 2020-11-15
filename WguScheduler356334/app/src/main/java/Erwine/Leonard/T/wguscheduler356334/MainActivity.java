@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 //        } catch (ReflectiveOperationException e) {
 //            throw new RuntimeException(e);
 //        }
-
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         new AssessmentAlertBroadcastReceiver().createNotificationChannel(this);
         new CourseAlertBroadcastReceiver().createNotificationChannel(this);
@@ -59,8 +59,11 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_terms, R.id.navigation_mentors, R.id.navigation_alerts)
-                .build();
+                R.id.navigation_home,
+                R.id.navigation_terms,
+                R.id.navigation_mentors,
+                R.id.navigation_alerts
+        ).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);

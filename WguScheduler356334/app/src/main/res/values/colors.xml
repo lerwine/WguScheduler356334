@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="color_foreground">#000000</color>
+    <color name="color_foreground_disabled">#3F000000</color>
+    <color name="color_background">#FFFFFF</color>
+    <color name="color_foreground_inverse">#FFFFFF</color>
+    <color name="color_foreground_inverse_disabled">#3FFFFFFF</color>
+    <color name="color_background_inverse">#000000</color>
     <color name="color_primary">#1B5E20</color>
     <color name="color_primary_light">#6deb77</color>
     <color name="color_primary_variant">#1C5761</color>
     <color name="color_primary_dark">#032f07</color>
-    <color name="color_on_primary">#FFFFFF</color>
+    <!--    <color name="color_on_primary">#FFFFFF</color>-->
     <color name="color_accent">#6C2F00</color>
     <color name="color_accent_dark">#361700</color>
     <color name="color_accent_light">#ed883b</color>

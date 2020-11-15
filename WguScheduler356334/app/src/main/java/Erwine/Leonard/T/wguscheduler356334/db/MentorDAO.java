@@ -41,10 +41,10 @@ public interface MentorDAO {
     @Delete
     int deleteSynchronous(MentorEntity mentor);
 
-    @Query("SELECT * FROM mentors WHERE id = :id")
+    @Query("SELECT * FROM mentors WHERE id = :id LIMIT 1")
     Single<MentorEntity> getById(long id);
 
-    @Query("SELECT * FROM mentors WHERE id = :id")
+    @Query("SELECT * FROM mentors WHERE id = :id LIMIT 1")
     MentorEntity getByIdSynchronous(long id);
 
     @Query("SELECT * FROM mentorListView")

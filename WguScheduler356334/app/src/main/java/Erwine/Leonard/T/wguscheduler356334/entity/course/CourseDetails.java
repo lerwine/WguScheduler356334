@@ -23,14 +23,19 @@ import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 @DatabaseView(
         viewName = AppDb.VIEW_NAME_COURSE_DETAIL,
-        value = "SELECT courses.*, " +
+        value = "SELECT courses.*, CASE WHEN courses.actualStart IS NOT NULL THEN courses.actualStart ELSE courses.expectedStart END AS [effectiveStart], " +
+                "CASE WHEN courses.actualEnd IS NOT NULL THEN courses.actualEnd ELSE courses.expectedEnd END AS [effectiveEnd], " +
                 "terms.name as [termName], terms.start as [termStart], terms.[end] as [termEnd], terms.notes as [termNotes], " +
                 "mentors.name as [mentorName], mentors.phoneNumber, mentors.emailAddress, mentors.notes as [mentorNotes]\n" +
                 "FROM courses LEFT JOIN mentors ON courses.mentorId = mentors.id\n" +
                 "LEFT JOIN terms ON courses.termId = terms.id\n" +
-                "GROUP BY courses.id ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]"
+                "GROUP BY courses.id"
 )
 public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
+
+    public static final String COLNAME_COURSE_EFFECTIVE_START = "effectiveStart";
+
+    public static final String COLNAME_COURSE_EFFECTIVE_END = "effectiveEnd";
 
     /**
      * The name of the {@link #termName "termName"} view column, which contains the name of the term.
@@ -76,6 +81,10 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
     private AbstractTermEntity<?> term;
     @Ignore
     private AbstractMentorEntity<?> mentor;
+    @ColumnInfo(name = COLNAME_COURSE_EFFECTIVE_START)
+    private LocalDate effectiveStart;
+    @ColumnInfo(name = COLNAME_COURSE_EFFECTIVE_END)
+    private LocalDate effectiveEnd;
     @ColumnInfo(name = COLNAME_TERM_NAME)
     private String termName;
     @ColumnInfo(name = COLNAME_TERM_START)
@@ -94,9 +103,17 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
     private String mentorNotes;
 
     public CourseDetails(String number, String title, CourseStatus status, LocalDate expectedStart, LocalDate actualStart, LocalDate expectedEnd, LocalDate actualEnd,
-                         int competencyUnits, String notes, long termId, Long mentorId, String termName, LocalDate termStart, LocalDate termEnd, String termNotes,
-                         String mentorName, String phoneNumber, String emailAddress, String mentorNotes, long id) {
+                         int competencyUnits, String notes, long termId, Long mentorId, LocalDate effectiveStart, LocalDate effectiveEnd, String termName, LocalDate termStart,
+                         LocalDate termEnd, String termNotes, String mentorName, String phoneNumber, String emailAddress, String mentorNotes, long id) {
         super(id, termId, mentorId, number, title, status, expectedStart, actualStart, expectedEnd, actualEnd, competencyUnits, notes);
+        this.effectiveStart = (null == actualStart) ? expectedStart : actualStart;
+        if (null == this.effectiveStart && null != effectiveStart) {
+            this.effectiveStart = effectiveStart;
+        }
+        this.effectiveEnd = (null == actualEnd) ? expectedEnd : actualEnd;
+        if (null == this.effectiveEnd && null != effectiveEnd) {
+            this.effectiveEnd = effectiveEnd;
+        }
         setTerm(new TermEntity(termName, termStart, termEnd, termNotes, termId));
         if (null == mentorId) {
             setMentor(null);
@@ -122,6 +139,56 @@ public final class CourseDetails extends AbstractCourseEntity<CourseDetails> {
             termStart = termEnd = null;
         }
         setMentor(null);
+    }
+
+    @Override
+    public synchronized void setExpectedStart(@Nullable LocalDate expectedStart) {
+        super.setExpectedStart(expectedStart);
+        LocalDate actualStart = getActualEnd();
+        effectiveStart = (null == actualStart) ? expectedStart : actualStart;
+    }
+
+    @Override
+    public synchronized void setActualStart(@Nullable LocalDate actualStart) {
+        super.setActualStart(actualStart);
+        effectiveStart = (null == actualStart) ? getExpectedStart() : actualStart;
+    }
+
+    @Override
+    public synchronized void setExpectedEnd(@Nullable LocalDate expectedEnd) {
+        super.setExpectedEnd(expectedEnd);
+        LocalDate actualEnd = getActualEnd();
+        effectiveEnd = (null == actualEnd) ? expectedEnd : actualEnd;
+    }
+
+    @Override
+    public synchronized void setActualEnd(@Nullable LocalDate actualEnd) {
+        super.setActualEnd(actualEnd);
+        effectiveEnd = (null == actualEnd) ? getExpectedEnd() : actualEnd;
+    }
+
+    @Nullable
+    public LocalDate getEffectiveStart() {
+        return effectiveStart;
+    }
+
+    public synchronized void setEffectiveStart(LocalDate effectiveStart) {
+        if (null != this.effectiveStart && !this.effectiveStart.equals(effectiveStart)) {
+            throw new IllegalStateException();
+        }
+        this.effectiveStart = effectiveStart;
+    }
+
+    @Nullable
+    public LocalDate getEffectiveEnd() {
+        return effectiveEnd;
+    }
+
+    public synchronized void setEffectiveEnd(LocalDate effectiveEnd) {
+        if (null != this.effectiveEnd && !this.effectiveEnd.equals(effectiveEnd)) {
+            throw new IllegalStateException();
+        }
+        this.effectiveEnd = effectiveEnd;
     }
 
     @Nullable

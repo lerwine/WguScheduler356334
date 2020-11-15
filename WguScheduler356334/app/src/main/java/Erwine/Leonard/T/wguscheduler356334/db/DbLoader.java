@@ -41,6 +41,7 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseAlertLink;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.mentor.Mentor;
@@ -186,6 +187,10 @@ public class DbLoader {
             allTerms = appDb.termDAO().getAll();
         }
         return allTerms;
+    }
+
+    public LiveData<List<TermListItem>> getTermsOnOrAfter(LocalDate date) {
+        return appDb.termDAO().getOnOrAfterDate(date);
     }
 
     @NonNull
@@ -476,6 +481,12 @@ public class DbLoader {
     public LiveData<List<CourseEntity>> getUnterminatedCoursesOnOrBefore(LocalDate date) {
         Log.d(LOG_TAG, "Enter getUnterminatedCoursesOnOrBefore(" + ToStringBuilder.toEscapedString(date, true) + ")");
         return appDb.courseDAO().getUnterminatedOnOrBefore(date);
+    }
+
+    @NonNull
+    public LiveData<List<CourseDetails>> getInProgressAndPlannedCourses() {
+        Log.d(LOG_TAG, "Enter getInProgressAndPlannedCourses()");
+        return appDb.courseDAO().getByStatus(CourseStatus.IN_PROGRESS, CourseStatus.PLANNED);
     }
 
     /**

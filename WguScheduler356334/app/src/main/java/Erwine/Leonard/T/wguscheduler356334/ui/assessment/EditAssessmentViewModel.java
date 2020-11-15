@@ -162,8 +162,8 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
         courseValidLiveData = SubscribingLiveDataWrapper.of(false, courseValidObservable);
         goalDateLiveData = SubscribingLiveDataWrapper.ofOptional(goalDate.getObservable().doOnNext(d -> {
             Log.d(LOG_TAG, "Calculating goalDate: goalDate = " + ToStringBuilder.toEscapedString(d.orElse(null), false));
-            recalculateAlerts(d.orElse(null), completionDate.getValue().filter(c -> {
-                switch (status.getValue()) {
+            recalculateAlerts(d.orElse(null), Objects.requireNonNull(completionDate.getValue()).filter(c -> {
+                switch (Objects.requireNonNull(status.getValue())) {
                     case NOT_PASSED:
                     case PASSED:
                         return true;
@@ -179,10 +179,10 @@ public class EditAssessmentViewModel extends WguSchedulerViewModel {
                     switch (status) {
                         case NOT_PASSED:
                         case PASSED:
-                            recalculateAlerts(goalDate.getValue().orElse(null), completionDate.orElse(null));
+                            recalculateAlerts(Objects.requireNonNull(goalDate.getValue()).orElse(null), completionDate.orElse(null));
                             return completionDate;
                         default:
-                            recalculateAlerts(goalDate.getValue().orElse(null), null);
+                            recalculateAlerts(Objects.requireNonNull(goalDate.getValue()).orElse(null), null);
                             return Optional.empty();
                     }
                 })));

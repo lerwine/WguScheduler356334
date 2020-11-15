@@ -1,7 +1,8 @@
 <resources>
-
     <style name="BaseAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+        <item name="android:colorForeground">@color/color_foreground</item>
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="android:colorForegroundInverse">@color/color_foreground_inverse</item>
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryVariant">@color/color_primary_variant</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
@@ -14,54 +15,468 @@
         <item name="colorOnError">@color/color_on_error</item>
         <item name="colorControlNormal">@color/color_on_primary</item>
         <item name="colorButtonNormal">@color/color_button_normal</item>
-        <!--        <item name="buttonStyle">WGU.Scheduler.ButtonStyle</item>-->
+        <item name="editTextColor">@color/color_edit_text</item>
+        <item name="editTextBackground">@drawable/edit_text_bg</item>
+        <item name="android:textViewStyle">@android:style/Widget.Material.Light.TextView</item>
+        <item name="android:textAppearanceButton">@style/WGU.Scheduler.TextAppearance.Button</item>
+        <item name="floatingActionButtonStyle">@style/WGU.Scheduler.FloatingActionButton</item>
+        <item name="imageButtonStyle">@style/WGU.Scheduler.ImageButtonStyle</item>
+        <item name="radioButtonStyle">@style/WGU.Scheduler.RadioButtonStyle</item>
+        <item name="editTextStyle">@style/WGU.Scheduler.TextInputEditText</item>
+        <item name="buttonStyle">@style/WGU.Scheduler.TextButtonStyle</item>
+        <item name="buttonStyleSmall">@android:style/Widget.Material.Light.Button.Small</item>
+        <item name="checkboxStyle">@android:style/Widget.Material.Light.CompoundButton.CheckBox
+        </item>
+
         <!--
-        <item name="actionMenuTextColor">?android:attr/actionMenuTextColor</item>
-        <item name="actionModeSplitBackground">?attr/colorPrimaryDark</item>
-        <item name="colorBackgroundFloating">@color/background_holo_light</item>
-        <item name="colorControlActivated">@color/holo_light_control_activated</item>
-        <item name="colorControlHighlight">@color/ripple_material_light</item>
-        <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
-        <item name="controlBackground">?attr/selectableItemBackgroundBorderless</item>
-        <item name="editTextColor">@color/primary_text_light</item>
-        <item name="textColorAlertDialogListItem">@color/primary_text_holo_light</item>
-        <item name="textColorSearchUrl">@color/abc_search_url_text</item>
-        <item name="tooltipForegroundColor">@color/bright_foreground_dark</item>
-        <item name="android:colorAccent">?attr/colorAccent</item>
-        <item name="android:colorBackground">@color/background_material_light</item>
-        <item name="android:colorButtonNormal">?attr/colorButtonNormal</item>
-        <item name="android:colorControlActivated">?attr/colorControlActivated</item>
-        <item name="android:colorControlHighlight">?attr/colorControlHighlight</item>
-        <item name="android:colorControlNormal">?attr/colorControlNormal</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
-        <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
-        <item name="android:colorPrimary">?attr/colorPrimary</item>
-        <item name="android:colorPrimaryDark">?attr/colorPrimaryDark</item>
-        <item name="android:panelBackground">@android:color/transparent</item>
-        <item name="android:textColorAlertDialogListItem">@color/abc_primary_text_material_light</item>
-        <item name="android:textColorHighlight">@color/highlighted_text_material_light</item>
-        <item name="android:textColorHighlightInverse">@color/highlighted_text_material_dark</item>
-        <item name="android:textColorHint">@color/abc_hint_foreground_material_light</item>
-        <item name="android:textColorHintInverse">@color/abc_hint_foreground_material_dark</item>
-        <item name="android:textColorLink">?attr/colorAccent</item>
-        <item name="android:textColorLinkInverse">?attr/colorAccent</item>
-        <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
-        <item name="android:textColorPrimaryDisableOnly">@color/abc_primary_text_disable_only_material_light</item>
-        <item name="android:textColorPrimaryInverse">@color/abc_primary_text_material_dark</item>
-        <item name="android:textColorPrimaryInverseDisableOnly">@color/abc_primary_text_disable_only_material_dark</item>
-        <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
-        <item name="android:textColorSecondaryInverse">@color/abc_secondary_text_material_dark</item>
-        <item name="android:textColorTertiary">@color/abc_secondary_text_material_light</item>
-        <item name="android:textColorTertiaryInverse">@color/abc_secondary_text_material_dark</item>
-        <item name="android:windowBackground">@color/background_material_light</item>
-        -->
+                <item name="dialogCornerRadius">?android:attr/dialogCornerRadius</item> &lt;!&ndash; 2dp &ndash;&gt;
+                <item name="actionBarItemBackground">?android:attr/actionBarItemBackground</item>&lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/action_bar_item_background_material.xml &ndash;&gt;
+                <item name="actionMenuTextAppearance">?android:attr/actionMenuTextAppearance</item> &lt;!&ndash; @style/TextAppearance.Material.Widget.ActionBar.Menu &ndash;&gt;
+                <item name="actionMenuTextColor">?android:attr/actionMenuTextColor</item>
+                &lt;!&ndash;#42000000
+                    Not enabled
+                    #DD000000
+                    Default&ndash;&gt;
+                <item name="actionOverflowButtonStyle">?android:attr/actionOverflowButtonStyle</item> &lt;!&ndash; @style/Widget.Material.Light.ActionButton.Overflow &ndash;&gt;
+                <item name="controlBackground">@drawable/abc_control_background_material</item> &lt;!&ndash; C:/Users/lerwi/.gradle/caches/transforms-2/files-2.1/a527ad4f532df6b258c428a911debd89/appcompat-1.2.0/res/drawable-v23/abc_control_background_material.xml &ndash;&gt;
+                <item name="ratingBarStyleIndicator">?android:attr/ratingBarStyleIndicator</item> &lt;!&ndash; @style/Widget.Material.Light.RatingBar.Indicator &ndash;&gt;
+                <item name="ratingBarStyleSmall">?android:attr/ratingBarStyleSmall</item> &lt;!&ndash; @style/Widget.Material.Light.RatingBar.Small &ndash;&gt;
+                &lt;!&ndash; Inherits from: @style/Base.V22.Theme.AppCompat.Light &ndash;&gt;
+                <item name="actionModeShareDrawable">?android:attr/actionModeShareDrawable</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_menu_share_material.xml &ndash;&gt;
+                &lt;!&ndash; Inherits from: @style/Base.V21.Theme.AppCompat.Light &ndash;&gt;
+                <item name="actionBarDivider">?android:attr/actionBarDivider</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/list_divider_material.xml &ndash;&gt;
+                <item name="actionBarSize">?android:attr/actionBarSize</item> &lt;!&ndash; 56dp &ndash;&gt;
+                <item name="actionButtonStyle">?android:attr/actionButtonStyle</item> &lt;!&ndash; @style/Widget.Material.Light.ActionButton &ndash;&gt;
+                <item name="actionModeBackground">?android:attr/actionModeBackground</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/cab_background_top_material.xml &ndash;&gt;
+                <item name="actionModeCloseDrawable">?android:attr/actionModeCloseDrawable</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_ab_back_material.xml &ndash;&gt;
+                <item name="borderlessButtonStyle">?android:borderlessButtonStyle</item> &lt;!&ndash; @style/Widget.Material.Light.Button.Borderless &ndash;&gt;
+                <item name="checkedTextViewStyle">?android:attr/checkedTextViewStyle</item> &lt;!&ndash; @style/Widget.Material.Light.CheckedTextView &ndash;&gt;
+                <item name="dividerHorizontal">?android:attr/dividerHorizontal</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/list_divider_material.xml &ndash;&gt;
+                <item name="dividerVertical">?android:attr/dividerVertical</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/list_divider_material.xml &ndash;&gt;
+                <item name="homeAsUpIndicator">?android:attr/homeAsUpIndicator</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_ab_back_material.xml &ndash;&gt;
+                <item name="listChoiceBackgroundIndicator">?android:attr/listChoiceBackgroundIndicator</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/list_choice_background_material.xml &ndash;&gt;
+                <item name="listPreferredItemHeightSmall">?android:attr/listPreferredItemHeightSmall</item> &lt;!&ndash; 48dip &ndash;&gt;
+                <item name="ratingBarStyle">?android:attr/ratingBarStyle</item> &lt;!&ndash; @style/Widget.Material.Light.RatingBar &ndash;&gt;
+                <item name="selectableItemBackground">?android:attr/selectableItemBackground</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/item_background_material.xml &ndash;&gt;
+                <item name="selectableItemBackgroundBorderless">?android:attr/selectableItemBackgroundBorderless</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/item_background_borderless_material.xml &ndash;&gt;
+                <item name="spinnerStyle">?android:attr/spinnerStyle</item> &lt;!&ndash; @style/Widget.Material.Light.Spinner.DropDown &ndash;&gt;
+                <item name="textAppearanceLargePopupMenu">?android:attr/textAppearanceLargePopupMenu</item> &lt;!&ndash; @style/TextAppearance.Material.Widget.PopupMenu.Large &ndash;&gt;
+                <item name="textAppearanceSmallPopupMenu">?android:attr/textAppearanceSmallPopupMenu</item> &lt;!&ndash; @style/TextAppearance.Material.Widget.PopupMenu.Small &ndash;&gt;
+                &lt;!&ndash; Inherits from: @style/Base.V7.Theme.AppCompat.Light &ndash;&gt;
+                <item name="actionBarPopupTheme">@null</item>
+                <item name="actionBarSplitStyle">?attr/actionBarStyle</item> &lt;!&ndash; @style/Widget.AppCompat.Light.ActionBar.Solid &ndash;&gt;
+                <item name="actionBarStyle">@style/Widget.AppCompat.Light.ActionBar.Solid</item> &lt;!&ndash; @style/Widget.AppCompat.Light.ActionBar.Solid &ndash;&gt;
+                <item name="actionBarTabBarStyle">@style/Widget.AppCompat.Light.ActionBar.TabBar</item> &lt;!&ndash; @style/Widget.AppCompat.Light.ActionBar.TabBar &ndash;&gt;
+                <item name="actionBarTabStyle">@style/Widget.AppCompat.Light.ActionBar.TabView</item> &lt;!&ndash; @style/Widget.AppCompat.Light.ActionBar.TabView &ndash;&gt;
+                <item name="actionBarTabTextStyle">@style/Widget.AppCompat.Light.ActionBar.TabText</item> &lt;!&ndash; @style/Widget.AppCompat.Light.ActionBar.TabText &ndash;&gt;
+                <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item> &lt;!&ndash; @style/ThemeOverlay.AppCompat.ActionBar &ndash;&gt;
+                <item name="actionBarWidgetTheme">@null</item>
+                <item name="actionDropDownStyle">@style/Widget.AppCompat.Light.Spinner.DropDown.ActionBar</item> &lt;!&ndash; @style/Widget.AppCompat.Light.Spinner.DropDown.ActionBar &ndash;&gt;
+                <item name="actionModeCloseButtonStyle">@style/Widget.AppCompat.ActionButton.CloseMode</item> &lt;!&ndash; @style/Widget.AppCompat.ActionButton.CloseMode &ndash;&gt;
+                <item name="actionModeCopyDrawable">@drawable/abc_ic_menu_copy_mtrl_am_alpha</item>
+                <item name="actionModeCutDrawable">@drawable/abc_ic_menu_cut_mtrl_alpha</item>
+                <item name="actionModePasteDrawable">@drawable/abc_ic_menu_paste_mtrl_am_alpha</item>
+                <item name="actionModeSelectAllDrawable">@drawable/abc_ic_menu_selectall_mtrl_alpha</item>
+                <item name="actionModeSplitBackground">?attr/colorPrimaryDark</item> &lt;!&ndash; #757575 &ndash;&gt;
+                <item name="actionModeStyle">@style/Widget.AppCompat.ActionMode</item> &lt;!&ndash; @style/Widget.AppCompat.ActionMode &ndash;&gt;
+                <item name="actionOverflowMenuStyle">@style/Widget.AppCompat.Light.PopupMenu.Overflow</item> &lt;!&ndash; @style/Widget.AppCompat.Light.PopupMenu.Overflow &ndash;&gt;
+                <item name="activityChooserViewStyle">@style/Widget.AppCompat.ActivityChooserView</item> &lt;!&ndash; @style/Widget.AppCompat.ActivityChooserView &ndash;&gt;
+                <item name="alertDialogCenterButtons">false</item>
+                <item name="alertDialogStyle">@style/AlertDialog.AppCompat.Light</item> &lt;!&ndash; @style/AlertDialog.AppCompat.Light &ndash;&gt;
+                <item name="alertDialogTheme">@style/ThemeOverlay.AppCompat.Dialog.Alert</item> &lt;!&ndash; @style/ThemeOverlay.AppCompat.Dialog.Alert &ndash;&gt;
+                <item name="android:dropDownItemStyle">@style/Widget.AppCompat.DropDownItem.Spinner</item> &lt;!&ndash; @style/Widget.AppCompat.DropDownItem.Spinner &ndash;&gt;
+        &lt;!&ndash;        <item name="android:dropDownItemStyle">@style/Widget.Material.Light.DropDownItem</item> &lt;!&ndash; @style/Widget.Material.Light.DropDownItem &ndash;&gt;&ndash;&gt;
+                <item name="android:dropDownListViewStyle">@style/Widget.AppCompat.ListView.DropDown</item> &lt;!&ndash; @style/Widget.AppCompat.ListView.DropDown &ndash;&gt;
+                <item name="android:panelBackground">@android:color/transparent</item> &lt;!&ndash; #00000000 &ndash;&gt;
+                <item name="android:spinnerItemStyle">@style/Widget.AppCompat.TextView.SpinnerItem</item> &lt;!&ndash; @style/Widget.AppCompat.TextView.SpinnerItem &ndash;&gt;
+        &lt;!&ndash;        <item name="android:spinnerItemStyle">@style/Widget.Material.TextView.SpinnerItem</item> &lt;!&ndash; @style/Widget.Material.TextView.SpinnerItem &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceButton">@style/TextAppearance.Material.Widget.Button</item> &lt;!&ndash; @style/TextAppearance.Material.Widget.Button &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textViewStyle">@style/Widget.Material.Light.TextView</item> &lt;!&ndash; @style/Widget.Material.Light.TextView &ndash;&gt;&ndash;&gt;
+                <item name="autoCompleteTextViewStyle">@style/Widget.AppCompat.AutoCompleteTextView</item> &lt;!&ndash; @style/Widget.AppCompat.AutoCompleteTextView &ndash;&gt;
+                <item name="buttonBarButtonStyle">@style/Widget.AppCompat.Button.ButtonBar.AlertDialog</item> &lt;!&ndash; @style/Widget.AppCompat.Button.ButtonBar.AlertDialog &ndash;&gt;
+                <item name="buttonBarNegativeButtonStyle">?attr/buttonBarButtonStyle</item> &lt;!&ndash; @style/Widget.AppCompat.Button.ButtonBar.AlertDialog &ndash;&gt;
+                <item name="buttonBarNeutralButtonStyle">?attr/buttonBarButtonStyle</item> &lt;!&ndash; @style/Widget.AppCompat.Button.ButtonBar.AlertDialog &ndash;&gt;
+                <item name="buttonBarPositiveButtonStyle">?attr/buttonBarButtonStyle</item> &lt;!&ndash; @style/Widget.AppCompat.Button.ButtonBar.AlertDialog &ndash;&gt;
+                <item name="buttonBarStyle">@style/Widget.AppCompat.ButtonBar</item> &lt;!&ndash; @style/Widget.AppCompat.ButtonBar &ndash;&gt;
+                <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item> &lt;!&ndash; =>
+                    #BDBDBD
+                    Not enabled
+                    #F1F1F1
+                    Default&ndash;&gt;
+                <item name="dialogPreferredPadding">@dimen/abc_dialog_padding_material</item> &lt;!&ndash; 24dp &ndash;&gt;
+                <item name="dialogTheme">@style/ThemeOverlay.AppCompat.Dialog</item> &lt;!&ndash; @style/ThemeOverlay.AppCompat.Dialog &ndash;&gt;
+                <item name="drawerArrowStyle">@style/Widget.AppCompat.DrawerArrowToggle</item> &lt;!&ndash; @style/Widget.AppCompat.DrawerArrowToggle &ndash;&gt;
+                <item name="dropDownListViewStyle">?android:attr/dropDownListViewStyle</item> &lt;!&ndash; @style/Widget.AppCompat.ListView.DropDown &ndash;&gt;
+                <item name="dropdownListPreferredItemHeight">?attr/listPreferredItemHeightSmall</item> &lt;!&ndash; 48dip &ndash;&gt;
+                <item name="isLightTheme">true</item>
+                <item name="listDividerAlertDialog">@null</item>
+                <item name="listMenuViewStyle">@style/Widget.AppCompat.ListMenuView</item> &lt;!&ndash; @style/Widget.AppCompat.ListMenuView &ndash;&gt;
+                <item name="listPopupWindowStyle">@style/Widget.AppCompat.ListPopupWindow</item> &lt;!&ndash; @style/Widget.AppCompat.ListPopupWindow &ndash;&gt;
+                <item name="listPreferredItemHeight">@dimen/abc_list_item_height_material</item> &lt;!&ndash; 64dp &ndash;&gt;
+                <item name="listPreferredItemHeightLarge">@dimen/abc_list_item_height_large_material</item> &lt;!&ndash; 80dp &ndash;&gt;
+                <item name="listPreferredItemPaddingEnd">@dimen/abc_list_item_padding_horizontal_material</item> &lt;!&ndash; 16dp &ndash;&gt;
+                <item name="listPreferredItemPaddingLeft">@dimen/abc_list_item_padding_horizontal_material</item> &lt;!&ndash; 16dp &ndash;&gt;
+                <item name="listPreferredItemPaddingRight">@dimen/abc_list_item_padding_horizontal_material</item> &lt;!&ndash; 16dp &ndash;&gt;
+                <item name="listPreferredItemPaddingStart">@dimen/abc_list_item_padding_horizontal_material</item> &lt;!&ndash; 16dp &ndash;&gt;
+                <item name="panelBackground">@drawable/abc_menu_hardkey_panel_mtrl_mult</item>
+                <item name="panelMenuListTheme">@style/Theme.AppCompat.CompactMenu</item> &lt;!&ndash; @style/Theme.AppCompat.CompactMenu &ndash;&gt;
+                <item name="panelMenuListWidth">@dimen/abc_panel_menu_list_width</item> &lt;!&ndash; 296dp &ndash;&gt;
+                <item name="popupMenuStyle">@style/Widget.AppCompat.Light.PopupMenu</item> &lt;!&ndash; @style/Widget.AppCompat.Light.PopupMenu &ndash;&gt;
+                <item name="searchViewStyle">@style/Widget.AppCompat.Light.SearchView</item> &lt;!&ndash; @style/Widget.AppCompat.Light.SearchView &ndash;&gt;
+                <item name="seekBarStyle">@style/Widget.AppCompat.SeekBar</item> &lt;!&ndash; @style/Widget.AppCompat.SeekBar &ndash;&gt;
+                <item name="spinnerDropDownItemStyle">@style/Widget.AppCompat.DropDownItem.Spinner</item> &lt;!&ndash; @style/Widget.AppCompat.DropDownItem.Spinner &ndash;&gt;
+                <item name="switchStyle">@style/Widget.AppCompat.CompoundButton.Switch</item> &lt;!&ndash; @style/Widget.AppCompat.CompoundButton.Switch &ndash;&gt;
+                <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Subhead</item> &lt;!&ndash; @style/TextAppearance.AppCompat.Subhead &ndash;&gt;
+                <item name="textAppearanceListItemSecondary">@style/TextAppearance.AppCompat.Body1</item> &lt;!&ndash; @style/TextAppearance.AppCompat.Body1 &ndash;&gt;
+                <item name="textAppearanceListItemSmall">@style/TextAppearance.AppCompat.Subhead</item> &lt;!&ndash; @style/TextAppearance.AppCompat.Subhead &ndash;&gt;
+                <item name="textAppearancePopupMenuHeader">@style/TextAppearance.AppCompat.Widget.PopupMenu.Header</item> &lt;!&ndash; @style/TextAppearance.AppCompat.Widget.PopupMenu.Header &ndash;&gt;
+                <item name="textAppearanceSearchResultSubtitle">@style/TextAppearance.AppCompat.SearchResult.Subtitle</item> &lt;!&ndash; @style/TextAppearance.AppCompat.SearchResult.Subtitle &ndash;&gt;
+                <item name="textAppearanceSearchResultTitle">@style/TextAppearance.AppCompat.SearchResult.Title</item> &lt;!&ndash; @style/TextAppearance.AppCompat.SearchResult.Title &ndash;&gt;
+                <item name="textColorAlertDialogListItem">@color/abc_primary_text_material_light</item>
+                &lt;!&ndash;#39000000
+                    Not enabled
+                    #DE000000
+                    Default&ndash;&gt;
+                <item name="textColorSearchUrl">@color/abc_search_url_text</item>
+                &lt;!&ndash;#000000
+                    Pressed
+                    #000000
+                    Selected
+                    #7FA87F
+                    Default&ndash;&gt;
+                <item name="toolbarNavigationButtonStyle">@style/Widget.AppCompat.Toolbar.Button.Navigation</item> &lt;!&ndash; @style/Widget.AppCompat.Toolbar.Button.Navigation &ndash;&gt;
+                <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item> &lt;!&ndash; @style/Widget.AppCompat.Toolbar &ndash;&gt;
+                <item name="tooltipForegroundColor">@color/foreground_material_dark</item> &lt;!&ndash; #FFFFFF &ndash;&gt;
+                <item name="tooltipFrameBackground">@drawable/tooltip_frame_dark</item> &lt;!&ndash; C:/Users/lerwi/.gradle/caches/transforms-2/files-2.1/a527ad4f532df6b258c428a911debd89/appcompat-1.2.0/res/drawable/tooltip_frame_dark.xml &ndash;&gt;
+                <item name="windowActionBarOverlay">false</item>
+                <item name="windowActionModeOverlay">false</item>
+                <item name="windowFixedHeightMajor">@null</item>
+                <item name="windowFixedHeightMinor">@null</item>
+                <item name="windowFixedWidthMajor">@null</item>
+                <item name="windowFixedWidthMinor">@null</item>
+                &lt;!&ndash; Inherits from: @android:style/Theme.Material.Light: &ndash;&gt;
+        &lt;!&ndash;        <item name="android:absListViewStyle">@style/Widget.Material.Light.AbsListView</item> &lt;!&ndash; @style/Widget.Material.Light.AbsListView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:actionModeFindDrawable">@drawable/ic_menu_find_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_menu_find_material.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:actionModePopupWindowStyle">@style/Widget.Material.Light.PopupWindow.ActionMode</item> &lt;!&ndash; @style/Widget.Material.Light.PopupWindow.ActionMode &ndash;&gt;
+        &lt;!&ndash;        <item name="android:actionModeWebSearchDrawable">@drawable/ic_menu_search_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_menu_search_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:activatedBackgroundIndicator">@drawable/activated_background_material</item> &lt;!&ndash; Empty StateList &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:alertDialogIcon">@drawable/ic_dialog_alert_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_dialog_alert_material.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:backgroundDimAmount">0.6</item>
+        &lt;!&ndash;        android:buttonCornerRadius requires API level 28 (current min is 26)
+                <item name="android:buttonCornerRadius">@dimen/control_corner_material</item> &lt;!&ndash; 2dp &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:buttonStyleInset">@style/Widget.Material.Light.Button.Inset</item> &lt;!&ndash; @style/Widget.Material.Light.Button.Inset &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:buttonStyleToggle">@style/Widget.Material.Light.Button.Toggle</item> &lt;!&ndash; @style/Widget.Material.Light.Button.Toggle &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:calendarViewStyle">@style/Widget.Material.Light.CalendarView</item> &lt;!&ndash; @style/Widget.Material.Light.CalendarView &ndash;&gt;&ndash;&gt;
+                <item name="android:candidatesTextStyleSpans">candidates</item> &lt;!&ndash; @string/candidates_style &ndash;&gt;
+        &lt;!&ndash;        <item name="android:checkBoxPreferenceStyle">@style/Preference.Material.CheckBoxPreference</item> &lt;!&ndash; @style/Preference.Material.CheckBoxPreference &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:colorBackgroundCacheHint">@color/background_cache_hint_selector_material_light</item>&ndash;&gt;
+                &lt;!&ndash;#FAFAFA
+                    Not accelerated
+                    #00000000
+                    Default&ndash;&gt;
+        &lt;!&ndash;        <item name="android:contextPopupMenuStyle">@style/Widget.Material.ContextPopupMenu</item> &lt;!&ndash; @style/Widget.Material.ContextPopupMenu &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.Material.Dialog.DatePicker</item> &lt;!&ndash; @style/ThemeOverlay.Material.Dialog.DatePicker &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:datePickerStyle">@style/Widget.Material.Light.DatePicker</item> &lt;!&ndash; @style/Widget.Material.Light.DatePicker &ndash;&gt;&ndash;&gt;
+                <item name="android:dialogCustomTitleDecorLayout">@layout/dialog_custom_title_material</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/dialog_custom_title_material.xml &ndash;&gt;
+        &lt;!&ndash;        <item name="android:dialogPreferenceStyle">@style/Preference.Material.DialogPreference</item> &lt;!&ndash; @style/Preference.Material.DialogPreference &ndash;&gt;&ndash;&gt;
+                <item name="android:dialogTitleDecorLayout">@layout/dialog_title_material</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/dialog_title_material.xml &ndash;&gt;
+                <item name="android:dialogTitleIconsDecorLayout">@layout/dialog_title_icons_material</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/dialog_title_icons_material.xml &ndash;&gt;
+                <item name="android:disabledAlpha">@dimen/disabled_alpha_material_light</item> &lt;!&ndash; 0.26 &ndash;&gt;
+        &lt;!&ndash;        <item name="android:dropDownHintAppearance">@style/TextAppearance.Material.Widget.DropDownHint</item> &lt;!&ndash; @style/TextAppearance.Material.Widget.DropDownHint &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:dropDownSpinnerStyle">@style/Widget.Material.Light.Spinner.DropDown</item> &lt;!&ndash; @style/Widget.Material.Light.Spinner.DropDown &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:editTextPreferenceStyle">@style/Preference.Material.DialogPreference.EditTextPreference</item> &lt;!&ndash; @style/Preference.Material.DialogPreference.EditTextPreference &ndash;&gt;&ndash;&gt;
+                <item name="android:errorMessageAboveBackground">@drawable/popup_inline_error_above_holo_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/popup_inline_error_above_holo_light.xml &ndash;&gt;
+                <item name="android:errorMessageBackground">@drawable/popup_inline_error_holo_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/popup_inline_error_holo_light.xml &ndash;&gt;
+                <item name="android:expandableListPreferredChildIndicatorLeft">3dip</item> &lt;!&ndash; ?attr/expandableListPreferredItemIndicatorLeft &ndash;&gt;
+                <item name="android:expandableListPreferredChildIndicatorRight">0dip</item> &lt;!&ndash; ?attr/expandableListPreferredItemIndicatorRight &ndash;&gt;
+                <item name="android:expandableListPreferredChildPaddingLeft">40dip</item> &lt;!&ndash; ?attr/expandableListPreferredItemPaddingLeft &ndash;&gt;
+                <item name="android:expandableListPreferredItemIndicatorLeft">3dip</item>
+                <item name="android:expandableListPreferredItemIndicatorRight">0dip</item>
+                <item name="android:expandableListPreferredItemPaddingLeft">40dip</item>
+        &lt;!&ndash;        <item name="android:expandableListViewStyle">@style/Widget.Material.Light.ExpandableListView</item> &lt;!&ndash; @style/Widget.Material.Light.ExpandableListView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:expandableListViewWhiteStyle">@style/Widget.Material.Light.ExpandableListView.White</item> &lt;!&ndash; @style/Widget.Material.Light.ExpandableListView.White &ndash;&gt;&ndash;&gt;
+                <item name="android:fastScrollOverlayPosition">aboveThumb</item>
+        &lt;!&ndash;        <item name="android:fastScrollPreviewBackgroundLeft">@drawable/fastscroll_label_left_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/fastscroll_label_left_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:fastScrollPreviewBackgroundRight">@drawable/fastscroll_label_right_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/fastscroll_label_right_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:fastScrollStyle">@style/Widget.Material.Light.FastScroll</item> &lt;!&ndash; @style/Widget.Material.Light.FastScroll &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:fastScrollThumbDrawable">@drawable/fastscroll_thumb_material</item> &lt;!&ndash; Empty StateList &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:fastScrollTrackDrawable">@drawable/fastscroll_track_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/fastscroll_track_material.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:findOnPageNextDrawable">@drawable/ic_find_next_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_find_next_material.xml &ndash;&gt;
+                <item name="android:findOnPagePreviousDrawable">@drawable/ic_find_previous_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_find_previous_material.xml &ndash;&gt;
+                <item name="android:fragmentBreadCrumbsStyle">@style/Widget.Material.FragmentBreadCrumbs</item> &lt;!&ndash; @style/Widget.Material.FragmentBreadCrumbs &ndash;&gt;
+        &lt;!&ndash;        <item name="android:galleryItemBackground">@drawable/gallery_item_background</item>&ndash;&gt;
+        &lt;!&ndash;        <item name="android:galleryStyle">@style/Widget.Material.Light.Gallery</item> &lt;!&ndash; @style/Widget.Material.Light.Gallery &ndash;&gt;&ndash;&gt;
+                <item name="android:gestureOverlayViewStyle">@style/Widget.Material.Light.GestureOverlayView</item> &lt;!&ndash; @style/Widget.Material.Light.GestureOverlayView &ndash;&gt;
+        &lt;!&ndash;        <item name="android:gridViewStyle">@style/Widget.Material.Light.GridView</item> &lt;!&ndash; @style/Widget.Material.Light.GridView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:horizontalScrollViewStyle">@style/Widget.Material.Light.HorizontalScrollView</item> &lt;!&ndash; @style/Widget.Material.Light.HorizontalScrollView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:imageWellStyle">@style/Widget.Material.Light.ImageWell</item> &lt;!&ndash; @style/Widget.Material.Light.ImageWell &ndash;&gt;&ndash;&gt;
+                <item name="android:keyboardViewStyle">@style/Widget.Material.KeyboardView</item> &lt;!&ndash; @style/Widget.Material.KeyboardView &ndash;&gt;
+        &lt;!&ndash;        <item name="android:listChoiceIndicatorMultiple">@drawable/btn_check_material_anim</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/btn_check_material_anim.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:listChoiceIndicatorSingle">@drawable/btn_radio_material_anim</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/btn_radio_material_anim.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:listDivider">@drawable/list_divider_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/list_divider_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:listSeparatorTextViewStyle">@style/Widget.Material.Light.TextView.ListSeparator</item> &lt;!&ndash; @style/Widget.Material.Light.TextView.ListSeparator &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:listViewStyle">@style/Widget.Material.Light.ListView</item> &lt;!&ndash; @style/Widget.Material.Light.ListView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:listViewWhiteStyle">@style/Widget.Material.Light.ListView.White</item> &lt;!&ndash; @style/Widget.Material.Light.ListView.White &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:mediaRouteButtonStyle">@style/Widget.Material.Light.MediaRouteButton</item> &lt;!&ndash; @style/Widget.Material.Light.MediaRouteButton &ndash;&gt;&ndash;&gt;
+                <item name="android:navigationBarColor">#000000</item> &lt;!&ndash; @color/black &ndash;&gt;
+        &lt;!&ndash;        <item name="android:numberPickerStyle">@style/Widget.Material.Light.NumberPicker</item> &lt;!&ndash; @style/Widget.Material.Light.NumberPicker &ndash;&gt;&ndash;&gt;
+                <item name="android:opacityListDivider">@color/list_divider_opacity_material</item> &lt;!&ndash; #1F000000 &ndash;&gt;
+                <item name="android:panelColorBackground">#000</item>
+                <item name="android:panelColorForeground">?android:attr/textColorPrimary</item>
+                &lt;!&ndash;#42000000
+                    Not enabled
+                    #DD000000
+                    Default&ndash;&gt;
+        &lt;!&ndash;        <item name="android:panelFullBackground">@drawable/menu_background_fill_parent_width</item>&ndash;&gt;
+                <item name="android:panelMenuIsCompact">true</item>
+                <item name="android:panelTextAppearance">?android:attr/textAppearance</item> &lt;!&ndash; @style/TextAppearance.Material &ndash;&gt;
+                <item name="android:popupTheme">@null</item>
+        &lt;!&ndash;        <item name="android:popupWindowStyle">@style/Widget.Material.Light.PopupWindow</item> &lt;!&ndash; @style/Widget.Material.Light.PopupWindow &ndash;&gt;&ndash;&gt;
+                <item name="android:preferenceActivityStyle">@style/PreferenceActivity.Material</item> &lt;!&ndash; @style/PreferenceActivity.Material &ndash;&gt;
+        &lt;!&ndash;        <item name="android:preferenceCategoryStyle">@style/Preference.Material.Category</item> &lt;!&ndash; @style/Preference.Material.Category &ndash;&gt;&ndash;&gt;
+                <item name="android:preferenceFragmentListStyle">@style/PreferenceFragmentList.Material</item> &lt;!&ndash; @style/PreferenceFragmentList.Material &ndash;&gt;
+                <item name="android:preferenceFragmentPaddingSide">@dimen/preference_fragment_padding_side_material</item> &lt;!&ndash; 0dp &ndash;&gt;
+                <item name="android:preferenceFragmentStyle">@style/PreferenceFragment.Material</item> &lt;!&ndash; @style/PreferenceFragment.Material &ndash;&gt;
+                <item name="android:preferenceFrameLayoutStyle">@style/Widget.Material.PreferenceFrameLayout</item> &lt;!&ndash; @style/Widget.Material.PreferenceFrameLayout &ndash;&gt;
+                <item name="android:preferenceHeaderPanelStyle">@style/PreferenceHeaderPanel.Material</item> &lt;!&ndash; @style/PreferenceHeaderPanel.Material &ndash;&gt;
+        &lt;!&ndash;        <item name="android:preferenceInformationStyle">@style/Preference.Material.Information</item> &lt;!&ndash; @style/Preference.Material.Information &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:preferenceLayoutChild">@layout/preference_child_material</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/preference_child_material.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:preferenceListStyle">@style/PreferenceHeaderList.Material</item> &lt;!&ndash; @style/PreferenceHeaderList.Material &ndash;&gt;
+                <item name="android:preferencePanelStyle">@style/PreferencePanel.Material</item> &lt;!&ndash; @style/PreferencePanel.Material &ndash;&gt;
+        &lt;!&ndash;        <item name="android:preferenceScreenStyle">@style/Preference.Material.PreferenceScreen</item> &lt;!&ndash; @style/Preference.Material.PreferenceScreen &ndash;&gt;&ndash;&gt;
+                <item name="android:preferenceStyle">@style/Preference.Material</item> &lt;!&ndash; @style/Preference.Material &ndash;&gt;
+        &lt;!&ndash;        <item name="android:presentationTheme">@style/Theme.Material.Light.Dialog.Presentation</item> &lt;!&ndash; @style/Theme.Material.Light.Dialog.Presentation &ndash;&gt;&ndash;&gt;
+                <item name="android:primaryContentAlpha">0.87</item> &lt;!&ndash; @dimen/primary_content_alpha_material_light &ndash;&gt;
+                <item name="android:progressBarCornerRadius">0dp</item> &lt;!&ndash; @dimen/progress_bar_corner_material &ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyle">@style/Widget.Material.Light.ProgressBar</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleHorizontal">@style/Widget.Material.Light.ProgressBar.Horizontal</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Horizontal &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleInverse">@style/Widget.Material.Light.ProgressBar.Inverse</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleLarge">@style/Widget.Material.Light.ProgressBar.Large</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Large &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleLargeInverse">@style/Widget.Material.Light.ProgressBar.Large.Inverse</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Large.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleSmall">@style/Widget.Material.Light.ProgressBar.Small</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Small &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleSmallInverse">@style/Widget.Material.Light.ProgressBar.Small.Inverse</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Small.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:progressBarStyleSmallTitle">@style/Widget.Material.Light.ProgressBar.Small.Title</item> &lt;!&ndash; @style/Widget.Material.Light.ProgressBar.Small.Title &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:quickContactBadgeStyleSmallWindowLarge">@style/Widget.Material.QuickContactBadgeSmall.WindowLarge</item> &lt;!&ndash; @style/Widget.Material.QuickContactBadgeSmall.WindowLarge &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:quickContactBadgeStyleSmallWindowMedium">@style/Widget.Material.QuickContactBadgeSmall.WindowMedium</item> &lt;!&ndash; @style/Widget.Material.QuickContactBadgeSmall.WindowMedium &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:quickContactBadgeStyleSmallWindowSmall">@style/Widget.Material.QuickContactBadgeSmall.WindowSmall</item> &lt;!&ndash; @style/Widget.Material.QuickContactBadgeSmall.WindowSmall &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:quickContactBadgeStyleWindowLarge">@style/Widget.Material.QuickContactBadge.WindowLarge</item> &lt;!&ndash; @style/Widget.Material.QuickContactBadge.WindowLarge &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:quickContactBadgeStyleWindowMedium">@style/Widget.Material.QuickContactBadge.WindowMedium</item> &lt;!&ndash; @style/Widget.Material.QuickContactBadge.WindowMedium &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:quickContactBadgeStyleWindowSmall">@style/Widget.Material.QuickContactBadge.WindowSmall</item> &lt;!&ndash; @style/Widget.Material.QuickContactBadge.WindowSmall &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:ringtonePreferenceStyle">@style/Preference.Material.RingtonePreference</item> &lt;!&ndash; @style/Preference.Material.RingtonePreference &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:scrollViewStyle">@style/Widget.Material.Light.ScrollView</item> &lt;!&ndash; @style/Widget.Material.Light.ScrollView &ndash;&gt;&ndash;&gt;
+                <item name="android:scrollbarDefaultDelayBeforeFade">400</item>
+                <item name="android:scrollbarFadeDuration">250</item>
+                <item name="android:scrollbarSize">4dp</item> &lt;!&ndash; @dimen/config_scrollbarSize &ndash;&gt;
+        &lt;!&ndash;        <item name="android:scrollbarThumbHorizontal">@drawable/scrollbar_handle_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/scrollbar_handle_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:scrollbarThumbVertical">@drawable/config_scrollbarThumbVertical</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/scrollbar_handle_material.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:scrollbarTrackHorizontal">@null</item>
+                <item name="android:scrollbarTrackVertical">@null</item> &lt;!&ndash; @drawable/config_scrollbarTrackVertical &ndash;&gt;
+                <item name="android:searchDialogTheme">@style/Theme.Material.Light.SearchBar</item> &lt;!&ndash; @style/Theme.Material.Light.SearchBar &ndash;&gt;
+                <item name="android:searchResultListItemHeight">58dip</item>
+                <item name="android:searchWidgetCorpusItemBackground">@color/search_widget_corpus_item_background</item> &lt;!&ndash; #DDDDDD &ndash;&gt;
+                <item name="android:secondaryContentAlpha">0.54</item> &lt;!&ndash; @dimen/secondary_content_alpha_material_light &ndash;&gt;
+                <item name="android:seekBarDialogPreferenceStyle">@style/Preference.Material.DialogPreference.SeekBarPreference</item> &lt;!&ndash; @style/Preference.Material.DialogPreference.SeekBarPreference &ndash;&gt;
+                <item name="android:seekBarPreferenceStyle">@style/Preference.Material.SeekBarPreference</item> &lt;!&ndash; @style/Preference.Material.SeekBarPreference &ndash;&gt;
+        &lt;!&ndash;        <item name="android:segmentedButtonStyle">@style/Widget.Material.Light.SegmentedButton</item> &lt;!&ndash; @style/Widget.Material.Light.SegmentedButton &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:stackViewStyle">@style/Widget.Material.Light.StackView</item> &lt;!&ndash; @style/Widget.Material.Light.StackView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:starStyle">@style/Widget.Material.Light.CompoundButton.Star</item> &lt;!&ndash; @style/Widget.Material.Light.CompoundButton.Star &ndash;&gt;&ndash;&gt;
+                <item name="android:statusBarColor">?attr/colorPrimaryDark</item> &lt;!&ndash; ?attr/colorPrimaryDark &ndash;&gt;
+        &lt;!&ndash;        <item name="android:switchPreferenceStyle">@style/Preference.Material.SwitchPreference</item> &lt;!&ndash; @style/Preference.Material.SwitchPreference &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:tabWidgetStyle">@style/Widget.Material.Light.TabWidget</item> &lt;!&ndash; @style/Widget.Material.Light.TabWidget &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearance">@style/TextAppearance.Material</item> &lt;!&ndash; @style/TextAppearance.Material &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceInverse">@style/TextAppearance.Material.Inverse</item> &lt;!&ndash; @style/TextAppearance.Material.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceLarge">@style/TextAppearance.Material.Large</item> &lt;!&ndash; @style/TextAppearance.Material.Large &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceLargeInverse">@style/TextAppearance.Material.Large.Inverse</item> &lt;!&ndash; @style/TextAppearance.Material.Large.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceMedium">@style/TextAppearance.Material.Medium</item> &lt;!&ndash; @style/TextAppearance.Material.Medium &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceMediumInverse">@style/TextAppearance.Material.Medium.Inverse</item> &lt;!&ndash; @style/TextAppearance.Material.Medium.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceSmall">@style/TextAppearance.Material.Small</item> &lt;!&ndash; @style/TextAppearance.Material.Small &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textAppearanceSmallInverse">@style/TextAppearance.Material.Small.Inverse</item> &lt;!&ndash; @style/TextAppearance.Material.Small.Inverse &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textCheckMark">@drawable/indicator_check_mark_light</item>&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textCheckMarkInverse">@drawable/indicator_check_mark_dark</item>&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textCursorDrawable">@drawable/text_cursor_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/text_cursor_material.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:textEditSuggestionContainerLayout">@layout/text_edit_suggestion_container_material</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/text_edit_suggestion_container_material.xml &ndash;&gt;
+                <item name="android:textEditSuggestionHighlightStyle">@style/TextAppearance.Material.TextSuggestionHighlight</item> &lt;!&ndash; @style/TextAppearance.Material.TextSuggestionHighlight &ndash;&gt;
+        &lt;!&ndash;        <item name="android:textEditSuggestionItemLayout">@layout/text_edit_suggestion_item_material</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/text_edit_suggestion_item_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textSelectHandle">@drawable/text_select_handle_middle_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/text_select_handle_middle_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/text_select_handle_left_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_material</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/text_select_handle_right_material.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textSelectHandleWindowStyle">@style/Widget.Material.TextSelectHandle</item> &lt;!&ndash; @style/Widget.Material.TextSelectHandle &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.Material.Dialog.TimePicker</item> &lt;!&ndash; @style/ThemeOverlay.Material.Dialog.TimePicker &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:timePickerStyle">@style/Widget.Material.Light.TimePicker</item> &lt;!&ndash; @style/Widget.Material.Light.TimePicker &ndash;&gt;&ndash;&gt;
+                <item name="android:toastFrameBackground">@drawable/toast_frame</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/toast_frame.xml &ndash;&gt;
+                <item name="android:tooltipBackgroundColor">@color/tooltip_background_dark</item> &lt;!&ndash; #E6616161 &ndash;&gt;
+        &lt;!&ndash;        <item name="android:webTextViewStyle">@style/Widget.Material.Light.WebTextView</item> &lt;!&ndash; @style/Widget.Material.Light.WebTextView &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:webViewStyle">@style/Widget.Material.Light.WebView</item> &lt;!&ndash; @style/Widget.Material.Light.WebView &ndash;&gt;&ndash;&gt;
+                <item name="android:windowActionBarFullscreenDecorLayout">@layout/screen_toolbar</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/screen_toolbar.xml &ndash;&gt;
+                <item name="android:windowActivityTransitions">true</item>
+        &lt;!&ndash;        <item name="android:windowAnimationStyle">@style/Animation.Material.Activity</item> &lt;!&ndash; @style/Animation.Material.Activity &ndash;&gt;&ndash;&gt;
+                <item name="android:windowBackground">?android:attr/colorBackground</item> &lt;!&ndash; #FAFAFA &ndash;&gt;
+                <item name="android:windowClipToOutline">true</item>
+                <item name="android:windowContentOverlay">@null</item>
+                <item name="android:windowContentTransitions">false</item>
+                <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        &lt;!&ndash;        <item name="android:windowEnterTransition">@transition/fade</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/transition/fade.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:windowFrame">@null</item>
+                <item name="android:windowFullscreen">false</item>
+                <item name="android:windowIsFloating">false</item>
+                <item name="android:windowOverscan">false</item> &lt;!&ndash; @bool/config_windowOverscanByDefault &ndash;&gt;
+        &lt;!&ndash;        <item name="android:windowSharedElementEnterTransition">@transition/move</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/transition/move.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:windowSharedElementExitTransition">@transition/move</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/transition/move.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:windowShowWallpaper">false</item>
+                <item name="android:windowSoftInputMode">stateUnspecified|adjustUnspecified</item>
+                <item name="android:windowSwipeToDismiss">false</item> &lt;!&ndash; @bool/config_windowSwipeToDismiss &ndash;&gt;
+        &lt;!&ndash;        <item name="android:windowTitleBackgroundStyle">@style/WindowTitleBackground.Material</item> &lt;!&ndash; @style/WindowTitleBackground.Material &ndash;&gt;&ndash;&gt;
+                <item name="android:windowTitleSize">56dp</item> &lt;!&ndash; @dimen/action_bar_default_height_material &ndash;&gt;
+        &lt;!&ndash;        <item name="android:windowTitleStyle">@style/WindowTitle.Material</item> &lt;!&ndash; @style/WindowTitle.Material &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:yesNoPreferenceStyle">@style/Preference.Material.DialogPreference.YesNoPreference</item> &lt;!&ndash; @style/Preference.Material.DialogPreference.YesNoPreference &ndash;&gt;&ndash;&gt;
+                &lt;!&ndash; Inherits from: @android:style/Theme.Light: &ndash;&gt;
+                <item name="android:floatingToolbarCloseDrawable">@drawable/ic_ab_back_material_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_ab_back_material_light.xml &ndash;&gt;
+                <item name="android:floatingToolbarDividerColor">@color/floating_popup_divider_light</item> &lt;!&ndash; #E9E9E9 &ndash;&gt;
+                <item name="android:floatingToolbarForegroundColor">@color/foreground_material_light</item> &lt;!&ndash; #000000 &ndash;&gt;
+                <item name="android:floatingToolbarItemBackgroundBorderlessDrawable">@drawable/item_background_borderless_material_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/item_background_borderless_material_light.xml &ndash;&gt;
+                <item name="android:floatingToolbarItemBackgroundDrawable">@drawable/item_background_material_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/item_background_material_light.xml &ndash;&gt;
+                <item name="android:floatingToolbarOpenDrawable">@drawable/ic_menu_moreoverflow_material_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_menu_moreoverflow_material_light.xml &ndash;&gt;
+                <item name="android:floatingToolbarPopupBackgroundDrawable">@drawable/floating_popup_background_light</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/floating_popup_background_light.xml &ndash;&gt;
+                <item name="android:quickContactBadgeOverlay">@drawable/quickcontact_badge_overlay_light</item>
+                <item name="android:textColorPrimaryInverseNoDisable">@color/primary_text_dark_nodisable</item>
+                &lt;!&ndash;#000000
+                    Selected
+                    #000000
+                    Activated
+                    #FFFFFF
+                    Default&ndash;&gt;
+                <item name="android:textColorPrimaryNoDisable">@color/primary_text_light_nodisable</item>
+                &lt;!&ndash;#000000
+                    Selected
+                    #000000
+                    Activated
+                    #000000
+                    Default&ndash;&gt;
+                <item name="android:textColorSecondaryInverseNoDisable">@color/secondary_text_dark_nodisable</item>
+                &lt;!&ndash;#323232
+                    Selected
+                    #000000
+                    Activated
+                    #BEBEBE
+                    Default&ndash;&gt;
+                <item name="android:textColorSecondaryNoDisable">@color/secondary_text_light_nodisable</item>
+                &lt;!&ndash;#323232
+                    Selected
+                    #000000
+                    Activated
+                    #BEBEBE
+                    Default&ndash;&gt;
+                &lt;!&ndash; Inherits from: @android:style/Theme &ndash;&gt;
+                <item name="android:accessibilityFocusedDrawable">@drawable/view_accessibility_focused</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/view_accessibility_focused.xml &ndash;&gt;
+                <item name="android:ambientShadowAlpha">0.039</item> &lt;!&ndash; @dimen/ambient_shadow_alpha &ndash;&gt;
+                <item name="android:autofillDatasetPickerMaxHeight">@dimen/autofill_dataset_picker_max_height</item> &lt;!&ndash; 90% &ndash;&gt;
+                <item name="android:autofillDatasetPickerMaxWidth">@dimen/autofill_dataset_picker_max_width</item> &lt;!&ndash; 90% &ndash;&gt;
+                <item name="android:autofillSaveCustomSubtitleMaxHeight">@dimen/autofill_save_custom_subtitle_max_height</item> &lt;!&ndash; 20% &ndash;&gt;
+        &lt;!&ndash;        <item name="android:autofilledHighlight">@drawable/autofilled_highlight</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/autofilled_highlight.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:colorActivatedHighlight">#F17A0A</item> &lt;!&ndash; @color/legacy_selected_highlight &ndash;&gt;
+                <item name="android:colorFocusedHighlight">#F17A0A</item> &lt;!&ndash; @color/legacy_selected_highlight &ndash;&gt;
+                <item name="android:colorLongPressedHighlight">#FFFFFF</item> &lt;!&ndash; @color/legacy_long_pressed_highlight &ndash;&gt;
+                <item name="android:colorMultiSelectHighlight">#F17A0A</item> &lt;!&ndash; @color/legacy_selected_highlight &ndash;&gt;
+                <item name="android:colorPressedHighlight">#FEAA0C</item> &lt;!&ndash; @color/legacy_pressed_highlight &ndash;&gt;
+                <item name="android:colorSecondary">?attr/colorPrimary</item> &lt;!&ndash; ?attr/colorPrimary &ndash;&gt;
+                <item name="android:fastScrollTextColor">@color/primary_text_dark</item>
+                &lt;!&ndash;#80FFFFFF
+                    Not enabled
+                    #FFFFFF
+                    Not window_focused
+                    #000000
+                    Pressed
+                    #000000
+                    Selected
+                    #000000
+                    Activated
+                    #FFFFFF
+                    Default&ndash;&gt;
+        &lt;!&ndash;        <item name="android:fingerprintAuthDrawable">@drawable/ic_fingerprint</item> &lt;!&ndash; C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/drawable/ic_fingerprint.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:lightRadius">@dimen/light_radius</item> &lt;!&ndash; 800dp &ndash;&gt;
+                <item name="android:lightY">@dimen/light_y</item> &lt;!&ndash; 0dp &ndash;&gt;
+                <item name="android:lightZ">@dimen/light_z</item> &lt;!&ndash; 600dp &ndash;&gt;
+                <item name="android:magnifierStyle">@style/Widget.Magnifier</item> &lt;!&ndash; @style/Widget.Magnifier &ndash;&gt;
+                <item name="android:spotShadowAlpha">0.19</item> &lt;!&ndash; @dimen/spot_shadow_alpha &ndash;&gt;
+                <item name="android:textAppearanceAutoCorrectionSuggestion">@style/TextAppearance.AutoCorrectionSuggestion</item> &lt;!&ndash; @style/TextAppearance.AutoCorrectionSuggestion &ndash;&gt;
+                <item name="android:textAppearanceEasyCorrectSuggestion">@style/TextAppearance.EasyCorrectSuggestion</item> &lt;!&ndash; @style/TextAppearance.EasyCorrectSuggestion &ndash;&gt;
+                <item name="android:textAppearanceMisspelledSuggestion">@style/TextAppearance.MisspelledSuggestion</item> &lt;!&ndash; @style/TextAppearance.MisspelledSuggestion &ndash;&gt;
+        &lt;!&ndash;        <item name="android:textEditNoPasteWindowLayout">@layout/text_edit_no_paste_window</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/text_edit_no_paste_window.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textEditPasteWindowLayout">@layout/text_edit_paste_window</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/text_edit_paste_window.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textEditSideNoPasteWindowLayout">@layout/text_edit_side_no_paste_window</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/text_edit_side_no_paste_window.xml &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;        <item name="android:textEditSidePasteWindowLayout">@layout/text_edit_side_paste_window</item> &lt;!&ndash; jar://C:/Program Files/Android/Android Studio/plugins/android/lib/layoutlib/data/framework_res.jar!/res/layout/text_edit_side_paste_window.xml &ndash;&gt;&ndash;&gt;
+                <item name="android:windowBackgroundFallback">?android:attr/colorBackground</item> &lt;!&ndash; #FAFAFA &ndash;&gt;
+                <item name="android:windowCloseOnTouchOutside">false</item>
+                <item name="android:windowTranslucentNavigation">false</item>
+                <item name="android:windowTranslucentStatus">false</item>
+                &lt;!&ndash;
+                <item name="actionMenuTextColor">?android:attr/actionMenuTextColor</item>
+                <item name="actionModeSplitBackground">?attr/colorPrimaryDark</item>
+                <item name="colorBackgroundFloating">@color/background_holo_light</item>
+                <item name="colorControlActivated">@color/holo_light_control_activated</item>
+                <item name="colorControlHighlight">@color/ripple_material_light</item>
+                <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
+                <item name="controlBackground">?attr/selectableItemBackgroundBorderless</item>
+                <item name="editTextColor">@color/primary_text_light</item>
+                <item name="textColorAlertDialogListItem">@color/primary_text_holo_light</item>
+                <item name="textColorSearchUrl">@color/abc_search_url_text</item>
+                <item name="tooltipForegroundColor">@color/bright_foreground_dark</item>
+                <item name="android:colorAccent">?attr/colorAccent</item>
+                <item name="android:colorBackground">@color/background_material_light</item>
+                <item name="android:colorButtonNormal">?attr/colorButtonNormal</item>
+                <item name="android:colorControlActivated">?attr/colorControlActivated</item>
+                <item name="android:colorControlHighlight">?attr/colorControlHighlight</item>
+                <item name="android:colorControlNormal">?attr/colorControlNormal</item>
+                <item name="android:colorForeground">@color/foreground_material_light</item>
+                <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
+                <item name="android:colorPrimary">?attr/colorPrimary</item>
+                <item name="android:colorPrimaryDark">?attr/colorPrimaryDark</item>
+                <item name="android:panelBackground">@android:color/transparent</item>
+                <item name="android:textColorAlertDialogListItem">@color/abc_primary_text_material_light</item>
+                <item name="android:textColorHighlight">@color/highlighted_text_material_light</item>
+                <item name="android:textColorHighlightInverse">@color/highlighted_text_material_dark</item>
+                <item name="android:textColorHint">@color/abc_hint_foreground_material_light</item>
+                <item name="android:textColorHintInverse">@color/abc_hint_foreground_material_dark</item>
+                <item name="android:textColorLink">?attr/colorAccent</item>
+                <item name="android:textColorLinkInverse">?attr/colorAccent</item>
+                <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
+                <item name="android:textColorPrimaryDisableOnly">@color/abc_primary_text_disable_only_material_light</item>
+                <item name="android:textColorPrimaryInverse">@color/abc_primary_text_material_dark</item>
+                <item name="android:textColorPrimaryInverseDisableOnly">@color/abc_primary_text_disable_only_material_dark</item>
+                <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
+                <item name="android:textColorSecondaryInverse">@color/abc_secondary_text_material_dark</item>
+                <item name="android:textColorTertiary">@color/abc_secondary_text_material_light</item>
+                <item name="android:textColorTertiaryInverse">@color/abc_secondary_text_material_dark</item>
+                <item name="android:windowBackground">@color/background_material_light</item>
+                -->
+    </style>
+
+    <style name="LauncherTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/launcher_drawable</item>
     </style>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="BaseAppTheme" />
 
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="WGU.Scheduler.TextButtonStyle" parent="@android:style/Widget.Material.Light.Button">
-        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:textAppearance">@style/WGU.Scheduler.TextAppearance.Button</item>
+    </style>
+
+    <style name="WGU.Scheduler.ValueButtonStyle" parent="@style/WGU.Scheduler.TextButtonStyle">
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="WGU.Scheduler.TextAppearance.Button" parent="@style/TextAppearance.AppCompat.Widget.Button">
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="WGU.Scheduler.FloatingActionButton" parent="@style/Widget.Design.FloatingActionButton">
@@ -72,7 +487,7 @@
         <item name="android:layout_marginHorizontal">@dimen/fab_margin_horizontal</item>
         <item name="android:layout_marginVertical">@dimen/fab_margin_vertical</item>
         <item name="android:background">@drawable/fab_bg</item>
-        <item name="android:backgroundTint">#00ffffff</item>
+        <item name="android:backgroundTint">#00FFFFFF</item>
         <item name="borderWidth">0dp</item>
     </style>
 
@@ -182,7 +597,7 @@
         <item name="android:background">@drawable/edit_text_bg</item>
         <item name="android:drawableEnd">@drawable/vertical_border</item>
         <item name="android:drawableBottom">@drawable/horizontal_border</item>
-        <!--        <item name="android:background">@android:drawable/edit_text</item>-->
+        <!--        <item name="android:background">@android:drawable/edit_text</item> -->
     </style>
 
     <style name="WGU.Scheduler.Chip.Action" parent="Widget.MaterialComponents.Chip.Action">
@@ -212,22 +627,13 @@
         <item name="android:textColor">@color/color_on_primary</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
     <style name="inline_command_button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <!--        <item name="android:backgroundTint">@color/color_accent</item>-->
+        <!--        <item name="android:backgroundTint">@color/color_accent</item> -->
         <item name="android:scaleX">1.25</item>
         <item name="android:scaleY">1.25</item>
-        <!--        <item name="android:tint">@color/color_primary_inverse</item>-->
+        <!--        <item name="android:tint">@color/color_primary_inverse</item> -->
         <item name="android:translationY">2dp</item>
     </style>
 
@@ -276,6 +682,5 @@
         <item name="android:paddingHorizontal">8dp</item>
         <item name="android:textColor">@color/color_on_primary</item>
     </style>
-    =
 
 </resources>

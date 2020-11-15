@@ -41,11 +41,11 @@ public interface CourseAlertDAO {
     int deleteSynchronous(CourseAlertLink course);
 
     @Transaction
-    @Query("SELECT * FROM courseAlerts WHERE alertId = :alertId AND targetId=:courseId")
+    @Query("SELECT * FROM courseAlerts WHERE alertId = :alertId AND targetId=:courseId LIMIT 1")
     Single<CourseAlert> getByAlertId(long alertId, long courseId);
 
     @Transaction
-    @Query("SELECT * FROM courseAlerts WHERE alertId = :alertId AND targetId=:courseId")
+    @Query("SELECT * FROM courseAlerts WHERE alertId = :alertId AND targetId=:courseId LIMIT 1")
     Single<CourseAlertDetails> getDetailsAlertId(long alertId, long courseId);
 
     @Transaction

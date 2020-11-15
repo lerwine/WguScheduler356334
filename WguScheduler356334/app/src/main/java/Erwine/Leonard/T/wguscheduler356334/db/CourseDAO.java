@@ -13,6 +13,7 @@ import java.util.List;
 
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseDetails;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseEntity;
+import Erwine.Leonard.T.wguscheduler356334.entity.course.CourseStatus;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.MentorCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import io.reactivex.Completable;
@@ -46,32 +47,35 @@ public interface CourseDAO {
     @Delete
     int deleteSynchronous(CourseEntity course);
 
-    @Query("SELECT * FROM courseDetailView WHERE id = :id")
+    @Query("SELECT * FROM courseDetailView WHERE id = :id LIMIT 1")
     Single<CourseDetails> getById(long id);
 
-    @Query("SELECT * FROM courses WHERE id = :id")
+    @Query("SELECT * FROM courses WHERE id = :id LIMIT 1")
     CourseEntity getByIdSynchronous(long id);
 
     @Query("SELECT * FROM courses")
     List<CourseEntity> getAllSynchronous();
 
-    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [status], [effectiveStart], [effectiveEnd]")
     LiveData<List<TermCourseListItem>> getLiveDataByTermId(long termId);
 
-    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [status], [effectiveStart], [effectiveEnd]")
     Observable<List<TermCourseListItem>> getObservableByTermId(long termId);
 
-    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    @Query("SELECT * FROM termCourseListView WHERE termId = :termId ORDER BY [status], [effectiveStart], [effectiveEnd]")
     Single<List<TermCourseListItem>> loadByTermId(long termId);
 
     @Query("SELECT * FROM termCourseListView WHERE termId = :termId")
     List<TermCourseListItem> getByTermIdSynchronous(long termId);
 
-    @Query("SELECT * FROM mentorCourseView WHERE mentorId = :mentorId ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    @Query("SELECT * FROM mentorCourseView WHERE mentorId = :mentorId ORDER BY [status], [effectiveStart], [effectiveEnd]")
     LiveData<List<MentorCourseListItem>> getByMentorId(long mentorId);
 
-    @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
+    @Query("SELECT * FROM courses WHERE actualEnd IS NULL AND expectedStart IS NOT NULL AND expectedStart <= :date ORDER BY [status], [actualStart], [expectedStart], [actualEnd], [expectedEnd]")
     LiveData<List<CourseEntity>> getUnterminatedOnOrBefore(LocalDate date);
+
+    @Query("SELECT * FROM courseDetailView WHERE (status=:status1 OR status=:status2) ORDER BY [status] DESC, [effectiveStart], [effectiveEnd]")
+    LiveData<List<CourseDetails>> getByStatus(CourseStatus status1, CourseStatus status2);
 
     @Query("SELECT COUNT(*) FROM courses")
     Single<Integer> getCount();

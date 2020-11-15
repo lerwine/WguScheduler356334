@@ -45,7 +45,6 @@
 
             <EditText
                 android:id="@+id/mentorNameEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="name"
@@ -64,7 +63,6 @@
 
             <EditText
                 android:id="@+id/phoneNumberEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autoLink="phone"
@@ -83,7 +81,6 @@
 
             <EditText
                 android:id="@+id/emailAddressEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autoLink="email"
@@ -102,7 +99,6 @@
 
             <EditText
                 android:id="@+id/notesEditText"
-                style="@style/WGU.Scheduler.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start|top"
