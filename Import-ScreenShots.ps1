@@ -1,12 +1,3 @@
-Param(
-    [Parameter(Mandatory = $true)]
-    [string]$ScreenShotDirectory = 'C:\Users\lerwi\AndroidStudioProjects\ScreenShots',
-    [Parameter(Mandatory = $true)]
-    [string]$PortraitTemplatePath = 'C:\Users\lerwi\AndroidStudioProjects\SVG\CellPhonePortrait.svg',
-    [Parameter(Mandatory = $true)]
-    [string]$LandscapeTemplatePath = 'C:\Users\lerwi\AndroidStudioProjects\SVG\CellPhoneLandscape.svg'
-)
-
 Function Create-NsMgr {
     [CmdletBinding()]
     Param(
@@ -58,23 +49,28 @@ Function Import-ScreenShot {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
-        [string]$Path
+        [string]$Path,
+        
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath
     )
 
     if ($null -eq $Script:__Import_ScreenShot_PortraitTemplate) {
-        $Script:__Import_ScreenShot_PortraitTemplate = Import-Template -Path $Script:PortraitTemplatePath;
-        $Script:__Import_ScreenShot_LandscapeTemplate = Import-Template -Path $Script:LandscapeTemplatePath;
+        $Script:__Import_ScreenShot_PortraitTemplate = Import-Template -Path ($OutputPath | Join-Path -ChildPath 'CellPhonePortrait.svg');
+        $Script:__Import_ScreenShot_LandscapeTemplate = Import-Template -Path ($OutputPath | Join-Path -ChildPath 'CellPhoneLandscape.svg');
     }
     $Document = New-Object -TypeName 'System.Xml.XmlDocument';
     $FullPath = [System.IO.Path]::GetFullPath($Path);
-    Write-Information -MessageData "Reading $FullPath";
-    $MemoryStream = [System.IO.MemoryStream]::new([System.IO.File]::ReadAllBytes($FullPath));
+    Write-Information -MessageData "Reading $Path";
+    $MemoryStream = [System.IO.MemoryStream]::new([System.IO.File]::ReadAllBytes($Path));
+    $Template = $Script:__Import_ScreenShot_PortraitTemplate;
+    $Suffix = "_Portrait";
     try {
         [System.Drawing.Image]$Image = [System.Drawing.Image]::FromStream($MemoryStream);
-        $Template = $Script:__Import_ScreenShot_PortraitTemplate;
         try {
             if ($Image.Width -gt $Image.Height) {
                 $Template = $Script:__Import_ScreenShot_LandscapeTemplate;
+                $Suffix = "_Landscape";
             }
         } finally {
             $Image.Dispose();
@@ -92,13 +88,13 @@ Function Import-ScreenShot {
         $MemoryStream.Dispose();
     }
 
-    $OutputPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($FullPath), ([System.IO.Path]::GetFileNameWithoutExtension($FullPath) + '.svg'));
+    $OutputFilePath = [System.IO.Path]::Combine($OutputPath, ([System.IO.Path]::GetFileNameWithoutExtension($Path) + $Suffix + '.svg'));
     $XmlWriterSettings = New-Object -TypeName 'System.Xml.XmlWriterSettings';
     $XmlWriterSettings.Indent = $true;
     $XmlWriterSettings.OmitXmlDeclaration = $true;
     $XmlWriterSettings.Encoding = New-Object -TypeName 'System.Text.UTF8Encoding' -ArgumentList $false, $false;
-    Write-Information -MessageData "Writing $OutputPath";
-    $XmlWriter = [System.Xml.XmlWriter]::Create($OutputPath, $XmlWriterSettings);
+    Write-Information -MessageData "Writing $OutputFilePath";
+    $XmlWriter = [System.Xml.XmlWriter]::Create($OutputFilePath, $XmlWriterSettings);
     try {
         $Document.WriteTo($XmlWriter);
         $XmlWriter.Flush();
@@ -108,4 +104,5 @@ Function Import-ScreenShot {
     }
 }
 
-(Get-ChildItem -Path $PSScriptRoot -Filter '*.png') | Import-ScreenShot;
+$OutputPath = $PSScriptRoot | Join-Path -ChildPath 'Svg'
+(Get-ChildItem -Path ($PSScriptRoot | Join-Path -ChildPath 'ScreenShots') -Filter '*.png') | Import-ScreenShot -OutputPath $OutputPath;
