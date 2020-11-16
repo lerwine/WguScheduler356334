@@ -20,9 +20,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ae0b8f6-29dc-4a5a-9ba1-0eb428d47efd" name="WguScheduler356334-60 Need to save selected tab so it can be restored upon screen rotation" comment="Fixes #64">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/BehaviorComputationSource.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/util/ComputationSource.java" afterDir="false" />
+    <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="" />
+    <list id="1ae0b8f6-29dc-4a5a-9ba1-0eb428d47efd" name="WguScheduler356334-60 Need to save selected tab so it can be restored upon screen rotation" comment="Fixed binding issues">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddCourseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/AddCourseActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/EditMentorActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/Erwine/Leonard/T/wguscheduler356334/EditMentorActivity.java" afterDir="false" />
@@ -254,49 +253,7 @@
       <created>1600925982030</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1604078478395</updated>
-    </task>
-    <task id="LOCAL-00037" summary="Fixed initialization bugs">
-      <created>1602781245427</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1602781245427</updated>
-    </task>
-    <task id="LOCAL-00038" summary="Closes #31">
-      <created>1602796614724</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1602796614725</updated>
-    </task>
-    <task id="LOCAL-00039" summary="Fixes #41">
-      <created>1602807722515</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1602807722515</updated>
-    </task>
-    <task id="LOCAL-00040" summary="Fixes #42">
-      <created>1602812320023</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1602812320023</updated>
-    </task>
-    <task id="LOCAL-00041" summary="Fixes #39">
-      <created>1602891266063</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1602891266063</updated>
-    </task>
-    <task id="LOCAL-00042" summary="Fixes #38">
-      <created>1602895756890</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1602895756890</updated>
+      <updated>1604543788086</updated>
     </task>
     <task id="LOCAL-00043" summary="Fixes #40">
       <created>1602897708650</created>
@@ -604,7 +561,49 @@
       <option name="project" value="LOCAL" />
       <updated>1604292124936</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <task id="LOCAL-00085" summary="Fixed binding issues">
+      <created>1604381225005</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1604381225006</updated>
+    </task>
+    <task id="LOCAL-00086" summary="Fixed validation issues">
+      <created>1604553080361</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1604553080365</updated>
+    </task>
+    <task id="LOCAL-00087" summary="Fixes #63">
+      <created>1604604676731</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1604604676732</updated>
+    </task>
+    <task id="LOCAL-00088" summary="Updated launcher icons">
+      <created>1604972776951</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1604972776951</updated>
+    </task>
+    <task id="LOCAL-00089" summary="Added home screen">
+      <created>1605410680430</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1605410680431</updated>
+    </task>
+    <task id="LOCAL-00090" summary="Added screen shots for story board">
+      <created>1605510581060</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1605510581060</updated>
+    </task>
+    <option name="localTasksCounter" value="91" />
     <option name="createBranch" value="false" />
     <servers>
       <GitHub url="https://github.com">
@@ -618,12 +617,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Applied upgrades" />
-    <MESSAGE value="Fixed validation bug" />
-    <MESSAGE value="Removed unnecessary annotations" />
-    <MESSAGE value="Added missing annotations" />
-    <MESSAGE value="Added onCreateView and onDestroy logging" />
-    <MESSAGE value="Added onCreate and onDestroy logging" />
     <MESSAGE value="Added construction and onCleared logging" />
     <MESSAGE value="Added code to detach observers in onCleared method" />
     <MESSAGE value="Removed dead/unnecessary code" />
@@ -643,7 +636,13 @@
     <MESSAGE value="Fixes #61" />
     <MESSAGE value="Saving tab position to to saved instance state.&#10; &#10;WguScheduler356334-60 Need to save selected tab so it can be restored&#10;upon screen rotation&#10;&#10;Fixes #60" />
     <MESSAGE value="Fixes #64" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixes #64" />
+    <MESSAGE value="Fixed binding issues" />
+    <MESSAGE value="Fixed validation issues" />
+    <MESSAGE value="Fixes #63" />
+    <MESSAGE value="Updated launcher icons" />
+    <MESSAGE value="Added home screen" />
+    <MESSAGE value="Added screen shots for story board" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added screen shots for story board" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -737,10 +736,10 @@
     </state>
     <state x="580" y="200" key="AndroidProcessChooserDialog/0.0.1366.728@0.0.1366.728" timestamp="1604256726792" />
     <state x="815" y="285" key="AndroidProcessChooserDialog/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602389622716" />
-    <state x="139" y="0" width="1232" height="1013" key="CommitChangelistDialog2" timestamp="1604292123359">
+    <state x="139" y="0" width="1097" height="728" key="CommitChangelistDialog2" timestamp="1605510636849">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="139" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1604292123359" />
+    <state x="139" y="0" width="1097" height="728" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1605510636849" />
     <state x="384" y="0" width="1232" height="1013" key="CommitChangelistDialog2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603758769811" />
     <state width="445" height="466" key="DebuggerActiveHint" timestamp="1604109805495">
       <screen x="0" y="0" width="1366" height="728" />
@@ -756,25 +755,9 @@
     </state>
     <state x="879" y="187" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1604088491519" />
     <state x="1235" y="267" key="FileChooserDialogImpl/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1602802054229" />
-    <state width="1323" height="329" key="GridCell.Tab.0.bottom" timestamp="1604287590986">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="1323" height="329" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1604287590986" />
     <state width="1877" height="492" key="GridCell.Tab.0.bottom/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
-    <state width="1323" height="329" key="GridCell.Tab.0.center" timestamp="1604287590985">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="1323" height="329" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1604287590985" />
     <state width="1877" height="492" key="GridCell.Tab.0.center/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
-    <state width="1323" height="329" key="GridCell.Tab.0.left" timestamp="1604287590985">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="1323" height="329" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1604287590985" />
     <state width="1877" height="492" key="GridCell.Tab.0.left/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
-    <state width="1323" height="329" key="GridCell.Tab.0.right" timestamp="1604287590986">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="1323" height="329" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1604287590986" />
     <state width="1877" height="492" key="GridCell.Tab.0.right/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603493880752" />
     <state width="1323" height="329" key="GridCell.Tab.1.bottom" timestamp="1604287590986">
       <screen x="0" y="0" width="1366" height="728" />
@@ -814,10 +797,10 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="408" y="178" key="SimpleOpenTaskDialog/0.0.1366.728@0.0.1366.728" timestamp="1604078478823" />
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1604316967266">
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1605510584863">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1604316967266" />
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1605510584863" />
     <state x="387" y="139" key="Vcs.Push.Dialog.v2/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1603734994649" />
     <state x="568" y="183" key="chooseDestDirectoryDialog" timestamp="1602948114782">
       <screen x="0" y="0" width="1366" height="728" />
