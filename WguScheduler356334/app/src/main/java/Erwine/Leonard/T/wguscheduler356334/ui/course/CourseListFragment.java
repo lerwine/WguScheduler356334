@@ -22,11 +22,7 @@ import java.util.Objects;
 import Erwine.Leonard.T.wguscheduler356334.MainActivity;
 import Erwine.Leonard.T.wguscheduler356334.R;
 import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
-import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
-import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
-
-import static Erwine.Leonard.T.wguscheduler356334.entity.IdIndexedEntity.ID_NEW;
 
 /**
  * A fragment representing a list of Items.
@@ -78,7 +74,9 @@ public class CourseListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         editTermViewModel = new ViewModelProvider(requireActivity()).get(EditTermViewModel.class);
-        ObserverHelper.observeOnce(editTermViewModel.getOriginalValuesLiveData(), getViewLifecycleOwner(), this::onEntityLoaded);
+        editTermViewModel.getCoursesLiveData().observe(getViewLifecycleOwner(), this::onCourseListChanged);
+        editTermViewModel.getOverviewFactory().observe(getViewLifecycleOwner(), f -> overviewTextView.setText(f.apply(getResources())));
+//        ObserverHelper.observeOnce(editTermViewModel.getOriginalValuesLiveData(), getViewLifecycleOwner(), this::onEntityLoaded);
     }
 
     @Override
@@ -87,13 +85,13 @@ public class CourseListFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void onEntityLoaded(@NonNull TermEntity termEntity) {
-        long termId = termEntity.getId();
-        if (ID_NEW != termId) {
-            editTermViewModel.getCoursesLiveData().observe(getViewLifecycleOwner(), this::onCourseListChanged);
-            editTermViewModel.getOverviewFactory().observe(getViewLifecycleOwner(), f -> overviewTextView.setText(f.apply(getResources())));
-        }
-    }
+//    private void onEntityLoaded(@NonNull TermEntity termEntity) {
+//        long termId = termEntity.getId();
+//        if (ID_NEW != termId) {
+//            editTermViewModel.getCoursesLiveData().observe(getViewLifecycleOwner(), this::onCourseListChanged);
+//            editTermViewModel.getOverviewFactory().observe(getViewLifecycleOwner(), f -> overviewTextView.setText(f.apply(getResources())));
+//        }
+//    }
 
     private void onCourseListChanged(@NonNull List<TermCourseListItem> courseEntities) {
         Log.d(LOG_TAG, "Enter onCourseListChanged");

@@ -12,6 +12,7 @@ import java.lang.ref.WeakReference;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
@@ -188,6 +189,60 @@ public class ObserverHelper {
             }
         }, owner);
         source.subscribe(singleObserverProxy);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull WguSchedulerViewModel owner, @NonNull Consumer<T> onNext) {
+        subscribeOnce(source, owner, onNext, null, null);
+    }
+
+    public static <T> void subscribeOnce(@NonNull Observable<T> source, @NonNull WguSchedulerViewModel owner, @NonNull Consumer<T> onNext,
+                                         @Nullable Consumer<? super Throwable> onError, @Nullable Action onComplete) {
+        ObserverProxy<T> observerProxy = new WguSchedulerViewModelObserverProxy<>(new Observer<T>() {
+            @Override
+            public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@io.reactivex.annotations.NonNull T t) {
+                try {
+                    onNext.accept(t);
+                } catch (Exception ex) {
+                    Thread.UncaughtExceptionHandler eh = Thread.getDefaultUncaughtExceptionHandler();
+                    if (null != eh) {
+                        eh.uncaughtException(Thread.currentThread(), ex);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                if (null != onError) {
+                    try {
+                        onError.accept(e);
+                    } catch (Exception ex) {
+                        Thread.UncaughtExceptionHandler eh = Thread.getDefaultUncaughtExceptionHandler();
+                        if (null != eh) {
+                            eh.uncaughtException(Thread.currentThread(), ex);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                if (null != onComplete) {
+                    try {
+                        onComplete.run();
+                    } catch (Exception ex) {
+                        Thread.UncaughtExceptionHandler eh = Thread.getDefaultUncaughtExceptionHandler();
+                        if (null != eh) {
+                            eh.uncaughtException(Thread.currentThread(), ex);
+                        }
+                    }
+                }
+            }
+        }, owner);
+        source.subscribe(observerProxy);
     }
 
     // TODO: Make this obsolete
@@ -497,6 +552,72 @@ public class ObserverHelper {
         public void onError(@NonNull Throwable e) {
             if (!disposable.isDisposed()) {
                 backingObserver.onError(e);
+                disposable.dispose();
+            }
+        }
+
+        @Override
+        public void dispose() {
+            if (!disposable.isDisposed()) {
+                disposable.dispose();
+            }
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return disposable.isDisposed();
+        }
+    }
+
+    private static class WguSchedulerViewModelObserverProxy<T> extends ObserverProxy<T> {
+
+        private final Disposable disposable;
+
+        WguSchedulerViewModelObserverProxy(Observer<T> backingObserver, WguSchedulerViewModel viewModel) {
+            super(backingObserver);
+            disposable = WguSchedulerViewModel.subscribeCleared(viewModel, this::onCleared);
+        }
+
+        private void onCleared() {
+
+        }
+    }
+
+    private static class ObserverProxy<T> implements Observer<T>, Disposable {
+
+        private final Observer<T> backingObserver;
+        private Disposable disposable;
+
+        ObserverProxy(Observer<T> backingObserver) {
+            this.backingObserver = backingObserver;
+        }
+
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+            disposable = d;
+            backingObserver.onSubscribe(d);
+        }
+
+        @Override
+        public void onNext(@NonNull T t) {
+            if (!disposable.isDisposed()) {
+                backingObserver.onNext(t);
+                disposable.dispose();
+            }
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+            if (!disposable.isDisposed()) {
+                backingObserver.onError(e);
+                disposable.dispose();
+            }
+        }
+
+        @Override
+        public void onComplete() {
+            if (!disposable.isDisposed()) {
+                backingObserver.onComplete();
                 disposable.dispose();
             }
         }

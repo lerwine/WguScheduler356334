@@ -53,7 +53,6 @@ import Erwine.Leonard.T.wguscheduler356334.entity.term.AbstractTermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermListItem;
-import Erwine.Leonard.T.wguscheduler356334.ui.term.EditTermViewModel;
 import Erwine.Leonard.T.wguscheduler356334.util.BehaviorComputationSource;
 import Erwine.Leonard.T.wguscheduler356334.util.BinaryAlternate;
 import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
@@ -85,14 +84,16 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     private static final String LOG_TAG = MainActivity.getLogTag(EditCourseViewModel.class);
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_COURSE_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ID, false);
+    public static final String EXTRA_KEY_TERM_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false);
+    public static final String EXTRA_KEY_EXPECTED_START = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false);
     public static final String STATE_KEY_COMPETENCY_UNITS_TEXT = "t:" + IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_COMPETENCY_UNITS, false);
     private final SubscribingLiveDataWrapper<CourseDetails> originalValuesLiveData;
 
     public static void startAddCourseActivity(@NonNull Activity activity, int requestCode, long termId, @NonNull LocalDate expectedStart) {
         Log.d(LOG_TAG, String.format("Enter startAddCourseActivity(context, %d, %s)", termId, expectedStart));
         Intent intent = new Intent(activity, AddCourseActivity.class);
-        intent.putExtra(EditTermViewModel.EXTRA_KEY_TERM_ID, termId);
-        intent.putExtra(CourseDetails.COLNAME_EXPECTED_START, LocalDateConverter.fromLocalDate(expectedStart));
+        intent.putExtra(EXTRA_KEY_TERM_ID, termId);
+        intent.putExtra(EXTRA_KEY_EXPECTED_START, LocalDateConverter.fromLocalDate(expectedStart));
         activity.startActivityForResult(intent, requestCode);
     }
 
@@ -144,7 +145,6 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     private final SubscribingLiveDataWrapper<Boolean> canSaveObserver;
     private final SubscribingLiveDataWrapper<Boolean> canShareObserver;
     private final SubscribingLiveDataWrapper<Boolean> hasChangesObserver;
-    //    private final SubscribingLiveDataWrapper<Boolean> isValidObserver;
     private Pair<Long, Disposable> coursesForTermObserving;
     private Pair<Long, Disposable> courseAlertsObserving;
     private Pair<Long, Disposable> assessmentsObserving;
@@ -172,6 +172,8 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
         initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
         termOptionsLiveData = dbLoader.getAllTerms();
         mentorOptionsLiveData = dbLoader.getAllMentors();
+        courseAlertsLiveData = SubscribingLiveDataWrapper.of(courseAlerts.getValue(), courseAlerts.getObservable());
+        assessmentsLiveData = SubscribingLiveDataWrapper.of(assessments.getValue(), assessments.getObservable());
 
         Observable<String> numberObservable = number.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
         Observable<String> titleObservable = title.getObservable().map(Workers.asCached(AbstractAssessmentEntity.SINGLE_LINE_NORMALIZER::apply));
@@ -188,31 +190,25 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 actualEnd.getObservable(), EditCourseViewModel::validateActualEnd);
         Observable<Optional<Integer>> competencyUnitsObservable = competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary);
         Observable<Long> courseIdObservable = originalValues.getObservable().map(AbstractEntity::getId);
+        Observable<DateValues> dateValuesObservable = Observable.combineLatest(expectedStart.getObservable(), expectedEnd.getObservable(),
+                actualStart.getObservable(), actualEnd.getObservable(), DateValues::new);
+        Observable<ModifiedValues> modifiedValuesObservable = Observable.combineLatest(numberObservable, titleObservable, status.getObservable(),
+                competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary), selectedMentor.getObservable().map(o -> o.map(AbstractEntity::getId)),
+                selectedTermIdObservable, notes.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)),
+                ModifiedValues::new);
         Observable<Boolean> hasChangesObservable = Observable.combineLatest(
                 originalValues.getObservable(),
-                numberObservable,
-                titleObservable,
-                status.getObservable(),
-                competencyUnitsParsedObservable.map(BinaryAlternate::extractPrimary),
-                selectedMentor.getObservable().map(o -> o.map(AbstractEntity::getId)),
-                selectedTermIdObservable,
-                notes.getObservable().map(Workers.asCached(AbstractNotedEntity.MULTI_LINE_NORMALIZER::apply)),
-                Observable.combineLatest(originalValues.getObservable(), expectedStart.getObservable(), expectedEnd.getObservable(),
-                        actualStart.getObservable(), actualEnd.getObservable(),
-                        (course, expectedStart, expectedEnd, actualStart, actualEnd) -> Objects.equals(expectedStart.orElse(null), course.getExpectedStart()) &&
-                                Objects.equals(expectedEnd.orElse(null), course.getExpectedEnd()) &&
-                                Objects.equals(actualStart.orElse(null), course.getExpectedStart()) &&
-                                Objects.equals(actualEnd.orElse(null), course.getActualEnd())),
-                (course, number, title, status, competencyUnits, selectedMentorId, selectedTermId, notes, datesUnchanged) ->
-                        !(number.equals(course.getNumber()) && title.equals(course.getTitle()) && status == course.getStatus() &&
-                                competencyUnits.map(i -> i == course.getCompetencyUnits()).orElse(false) &&
-                                selectedMentorId.map(m -> Objects.equals(m, course.getMentorId())).orElseGet(() -> null == course.getMentorId()) &&
-                                selectedTermId.map(m -> Objects.equals(m, course.getTermId())).orElse(false) &&
-                                notes.equals(course.getNotes()) && datesUnchanged)
+                dateValuesObservable,
+                modifiedValuesObservable,
+                (course, dateValues, modifiedValues) -> dateValues.isChanged(course) || modifiedValues.isChanged(course)
         );
         Observable<Boolean> termValidObservable = selectedTermIdObservable.map(Optional::isPresent);
-        Observable<Boolean> numberValidObservable = numberObservable.map(s -> !s.isEmpty());
-        Observable<Boolean> titleValidObservable = titleObservable.map(s -> !s.isEmpty());
+        Observable<Boolean> numberValidObservable = numberObservable.map(s ->
+                !s.isEmpty()
+        );
+        Observable<Boolean> titleValidObservable = titleObservable.map(s ->
+                !s.isEmpty()
+        );
 
         Observable<Boolean> validObservable = Observable.combineLatest(termValidObservable, numberValidObservable, titleValidObservable,
                 expectedStartMessage.map(o -> o.map(m -> m.getLevel() == MessageLevel.INFO).orElse(true)),
@@ -230,9 +226,8 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                 (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(Objects.requireNonNull(courseAlerts.getValue()), d.orElse(null), Objects.requireNonNull(actualStart.getValue()).orElseGet(() ->
                 Objects.requireNonNull(expectedStart.getValue()).orElse(null)))));
         effectiveEndObserver = SubscribingLiveDataWrapper.ofOptional(Observable.combineLatest(expectedEnd.getObservable(), actualEnd.getObservable(),
-                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(actualEnd.getValue().orElseGet(() -> expectedEnd.getValue().orElse(null)), d.orElse(null))));
-        courseAlertsLiveData = new LiveDataWrapper<>(Collections.emptyList());
-        assessmentsLiveData = new LiveDataWrapper<>(Collections.emptyList());
+                (e, a) -> (a.isPresent()) ? a : e).doAfterNext(d -> recalculateAlerts(Objects.requireNonNull(courseAlerts.getValue()), Objects.requireNonNull(actualEnd.getValue()).orElseGet(() ->
+                Objects.requireNonNull(expectedEnd.getValue()).orElse(null)), d.orElse(null))));
         termValidObserver = SubscribingLiveDataWrapper.of(false, termValidObservable);
         numberValidObserver = SubscribingLiveDataWrapper.of(false, numberValidObservable);
         titleValidObserver = SubscribingLiveDataWrapper.of(false, titleValidObservable);
@@ -258,7 +253,6 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
             return v && !c;
         }));
         hasChangesObserver = SubscribingLiveDataWrapper.of(false, hasChangesObservable);
-//        isValidObserver = SubscribingLiveDataWrapper.of(false, validObservable);
         compositeDisposable = new CompositeDisposable(effectiveStartObserver, effectiveEndObserver, termValidObserver, numberValidObserver, titleValidObserver,
                 expectedStartValidationMessageObserver, expectedEndValidationMessageObserver, actualStartValidationMessageObserver, actualEndValidationMessageObserver,
                 competencyUnitsValidationMessageObserver, titleFactoryObserver, subTitleObserver, overviewFactoryObserver, hasChangesObserver,
@@ -276,7 +270,7 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
     private void observeCoursesByTermId(Optional<Long> selectedTermId) {
         try {
             if (null != coursesForTermObserving) {
-                if (selectedTermId.map(i -> Objects.equals(courseAlertsObserving.first, i)).orElse(false)) {
+                if (selectedTermId.map(i -> Objects.equals(coursesForTermObserving.first, i)).orElse(false)) {
                     return;
                 }
                 compositeDisposable.remove(coursesForTermObserving.second);
@@ -329,15 +323,15 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
                     return;
                 }
                 compositeDisposable.remove(courseAlertsObserving.second);
-                courseAlertsObserving = null;
+                assessmentsObserving = null;
             }
         } finally {
             if (ID_NEW != courseId) {
-                assessmentsObserving = new Pair<>(courseId, dbLoader.getAssessmentsObservableByCourseId(courseId).subscribe(assessmentsLiveData::postValue));
-                compositeDisposable.add(courseAlertsObserving.second);
+                assessmentsObserving = new Pair<>(courseId, dbLoader.getAssessmentsObservableByCourseId(courseId).subscribe(assessments::onNext));
+                compositeDisposable.add(assessmentsObserving.second);
             } else {
-                assessmentsLiveData.postValue(Collections.emptyList());
-                courseAlertsObserving = null;
+                assessments.onNext(Collections.emptyList());
+                assessmentsObserving = null;
             }
         }
     }
@@ -774,60 +768,69 @@ public class EditCourseViewModel extends WguSchedulerViewModel {
         CourseDetails entity = new CourseDetails(null);
         if (null != state) {
             Log.d(LOG_TAG, (fromInitializedState) ? "Restoring currentValues from saved state" : "Initializing currentValues from arguments");
-            entity.restoreState(state, true);
-            long id = entity.getId();
-            if (ID_NEW == id || fromInitializedState) {
-                Log.d(LOG_TAG, "Restoring courseEntity from saved state");
-                String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false);
-                if (state.containsKey(key)) {
-                    TermEntity term = new TermEntity();
-                    term.restoreState(state, false);
+            if (!fromInitializedState) {
+                if (state.containsKey(EXTRA_KEY_COURSE_ID)) {
+                    return dbLoader.getCourseById(state.getLong(EXTRA_KEY_COURSE_ID)).doOnSuccess(this::onEntityLoadedFromDb);
+                }
+                if (state.containsKey(EXTRA_KEY_EXPECTED_START)) {
+                    entity.setExpectedStart(LocalDateConverter.toLocalDate(state.getLong(EXTRA_KEY_EXPECTED_START)));
+                }
+                return dbLoader.getTermById(state.getLong(EXTRA_KEY_TERM_ID)).map(term -> {
+                    entity.setTerm(term);
                     selectedTerm.onNext(Optional.of(term));
-                } else {
-                    selectedTerm.onNext(Optional.empty());
-                }
-                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, false);
-                if (state.containsKey(key)) {
-                    MentorEntity mentor = new MentorEntity();
-                    mentor.restoreState(state, false);
-                    selectedMentor.onNext(Optional.of(mentor));
-                } else {
-                    selectedMentor.onNext(Optional.empty());
-                }
-                number.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), ""));
-                title.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), ""));
-                notes.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), ""));
-                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false);
-                status.onNext((state.containsKey(key)) ? CourseStatus.valueOf(state.getString(key)) : CourseStatus.UNPLANNED);
-                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false);
-                if (state.containsKey(key)) {
-                    expectedStart.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
-                } else {
-                    expectedStart.onNext(Optional.empty());
-                }
-                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_START, false);
-                if (state.containsKey(key)) {
-                    actualStart.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
-                } else {
-                    actualStart.onNext(Optional.empty());
-                }
-                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_END, false);
-                if (state.containsKey(key)) {
-                    expectedEnd.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
-                } else {
-                    expectedEnd.onNext(Optional.empty());
-                }
-                key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_END, false);
-                if (state.containsKey(key)) {
-                    actualEnd.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
-                } else {
-                    actualEnd.onNext(Optional.empty());
-                }
-                competencyUnitsText.onNext(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
-            } else {
-                Log.d(LOG_TAG, "Loading courseEntity from database");
-                return dbLoader.getCourseById(id).doOnSuccess(this::onEntityLoadedFromDb);
+                    originalValues.onNext(entity);
+                    initializedSubject.onComplete();
+                    return entity;
+                });
             }
+            entity.restoreState(state, true);
+            Log.d(LOG_TAG, "Restoring courseEntity from saved state");
+            String key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false);
+            if (state.containsKey(key)) {
+                TermEntity term = new TermEntity();
+                term.restoreState(state, false);
+                selectedTerm.onNext(Optional.of(term));
+            } else {
+                selectedTerm.onNext(Optional.empty());
+            }
+            key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_MENTORS, Mentor.COLNAME_ID, false);
+            if (state.containsKey(key)) {
+                MentorEntity mentor = new MentorEntity();
+                mentor.restoreState(state, false);
+                selectedMentor.onNext(Optional.of(mentor));
+            } else {
+                selectedMentor.onNext(Optional.empty());
+            }
+            number.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NUMBER, false), ""));
+            title.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_TITLE, false), ""));
+            notes.onNext(state.getString(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_NOTES, false), ""));
+            key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_STATUS, false);
+            status.onNext((state.containsKey(key)) ? CourseStatus.valueOf(state.getString(key)) : CourseStatus.UNPLANNED);
+            key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_START, false);
+            if (state.containsKey(key)) {
+                expectedStart.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+            } else {
+                expectedStart.onNext(Optional.empty());
+            }
+            key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_START, false);
+            if (state.containsKey(key)) {
+                actualStart.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+            } else {
+                actualStart.onNext(Optional.empty());
+            }
+            key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_EXPECTED_END, false);
+            if (state.containsKey(key)) {
+                expectedEnd.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+            } else {
+                expectedEnd.onNext(Optional.empty());
+            }
+            key = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_COURSES, Course.COLNAME_ACTUAL_END, false);
+            if (state.containsKey(key)) {
+                actualEnd.onNext(Optional.of(LocalDateConverter.toLocalDate(state.getLong(key))));
+            } else {
+                actualEnd.onNext(Optional.empty());
+            }
+            competencyUnitsText.onNext(state.getString(STATE_KEY_COMPETENCY_UNITS_TEXT, ""));
         } else {
             Log.d(LOG_TAG, "No saved state or arguments");
             competencyUnitsText.onNext(NumberFormat.getIntegerInstance().format(entity.getCompetencyUnits()));

@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -38,6 +37,8 @@ import Erwine.Leonard.T.wguscheduler356334.entity.course.TermCourseListItem;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.Term;
 import Erwine.Leonard.T.wguscheduler356334.entity.term.TermEntity;
 import Erwine.Leonard.T.wguscheduler356334.util.BehaviorComputationSource;
+import Erwine.Leonard.T.wguscheduler356334.util.LiveDataWrapper;
+import Erwine.Leonard.T.wguscheduler356334.util.ObserverHelper;
 import Erwine.Leonard.T.wguscheduler356334.util.SubscribingLiveDataWrapper;
 import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 import Erwine.Leonard.T.wguscheduler356334.util.WguSchedulerViewModel;
@@ -83,7 +84,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     private final BehaviorComputationSource<String> notesSubject;
     private final CompletableSubject initializedSubject;
     private final Completable initializedCompletable;
-    private final SubscribingLiveDataWrapper<TermEntity> originalValuesLiveData;
+    //    private final SubscribingLiveDataWrapper<TermEntity> originalValuesLiveData;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactory;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> overviewFactory;
     private final SubscribingLiveDataWrapper<Boolean> nameValid;
@@ -93,8 +94,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     private final SubscribingLiveDataWrapper<Boolean> canSave;
     private final SubscribingLiveDataWrapper<Boolean> hasChanges;
     private final SubscribingLiveDataWrapper<Boolean> isValid;
-
-    private LiveData<List<TermCourseListItem>> coursesLiveData;
+    private final LiveDataWrapper<List<TermCourseListItem>> coursesLiveData;
     private boolean fromInitializedState;
 
     public EditTermViewModel(@NonNull Application application) {
@@ -109,6 +109,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         notesSubject = BehaviorComputationSource.createDefault("");
         initializedSubject = CompletableSubject.create();
         initializedCompletable = initializedSubject.observeOn(AndroidSchedulers.mainThread());
+        coursesLiveData = new LiveDataWrapper<>(Collections.emptyList());
 
         Observable<String> normalizedNameObservable = nameSubject.getObservable().map(AbstractEntity.SINGLE_LINE_NORMALIZER::apply);
         Observable<Boolean> nameValidObservable = normalizedNameObservable.map(s -> !s.isEmpty());
@@ -187,7 +188,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n &&
                 s.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true) && e.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true));
 
-        originalValuesLiveData = SubscribingLiveDataWrapper.of(new TermEntity(), entitySubject.getObservable());
+//        originalValuesLiveData = SubscribingLiveDataWrapper.of(new TermEntity(), entitySubject.getObservable());
         nameValid = SubscribingLiveDataWrapper.of(false, nameValidObservable);
         startMessage = SubscribingLiveDataWrapper.ofOptional(startMessageObservable);
         endMessage = SubscribingLiveDataWrapper.ofOptional(endMessageObservable);
@@ -197,13 +198,8 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         isValid = SubscribingLiveDataWrapper.of(false, validObservable);
         titleFactory = SubscribingLiveDataWrapper.of(r -> "", normalizedNameObservable.map(this::getViewTitleFactory));
         overviewFactory = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(startDateSubject.getObservable(), endDateSubject.getObservable(), (s, e) -> getOverviewFactory(s.orElse(null), e.orElse(null))));
-        compositeDisposable = new CompositeDisposable(originalValuesLiveData, nameValid, startMessage, endMessage, hasChanges, canShare, canSave, isValid, titleFactory, overviewFactory);
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        compositeDisposable.dispose();
+//        compositeDisposable = new CompositeDisposable(originalValuesLiveData, nameValid, startMessage, endMessage, hasChanges, canShare, canSave, isValid, titleFactory, overviewFactory);
+        compositeDisposable = new CompositeDisposable(nameValid, startMessage, endMessage, hasChanges, canShare, canSave, isValid, titleFactory, overviewFactory);
     }
 
     @NonNull
@@ -331,9 +327,9 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         return overviewFactory.getLiveData();
     }
 
-    public LiveData<TermEntity> getOriginalValuesLiveData() {
-        return originalValuesLiveData.getLiveData();
-    }
+//    public LiveData<TermEntity> getOriginalValuesLiveData() {
+//        return originalValuesLiveData.getLiveData();
+//    }
 
     public Completable getInitializedCompletable() {
         return initializedCompletable;
@@ -344,7 +340,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     }
 
     public LiveData<List<TermCourseListItem>> getCoursesLiveData() {
-        return coursesLiveData;
+        return coursesLiveData.getLiveData();
     }
 
     public Single<List<AlertListItem>> getAllAlerts() {
@@ -365,15 +361,16 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         Bundle state = (fromInitializedState) ? savedInstanceState : getArguments.get();
         TermEntity entity;
         if (null != state) {
-            long id = state.getLong(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, Term.COLNAME_ID, false), ID_NEW);
+            long id = state.getLong(EXTRA_KEY_TERM_ID, ID_NEW);
             if (ID_NEW == id) {
-                coursesLiveData = new MutableLiveData<>(Collections.emptyList());
-            } else if (fromInitializedState) {
-                coursesLiveData = dbLoader.getCoursesLiveDataByTermId(id);
+                coursesLiveData.postValue(Collections.emptyList());
             } else {
-                return dbLoader.getTermById(id)
-                        .doOnSuccess(this::onEntityLoadedFromDb)
-                        .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
+                ObserverHelper.observe(dbLoader.getCoursesLiveDataByTermId(id), this, coursesLiveData::postValue);
+                if (!fromInitializedState) {
+                    return dbLoader.getTermById(id)
+                            .doOnSuccess(this::onEntityLoadedFromDb)
+                            .doOnError(throwable -> Log.e(getClass().getName(), "Error loading term", throwable));
+                }
             }
             entity = new TermEntity();
             entity.restoreState(state, true);
@@ -395,7 +392,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         } else {
             entity = new TermEntity();
             entitySubject.onNext(entity);
-            coursesLiveData = new MutableLiveData<>(Collections.emptyList());
+            coursesLiveData.postValue(Collections.emptyList());
         }
         initializedSubject.onComplete();
         return Single.just(entity).observeOn(AndroidSchedulers.mainThread());
@@ -451,8 +448,13 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         startDateSubject.onNext(Optional.ofNullable(entity.getStart()));
         endDateSubject.onNext(Optional.ofNullable(entity.getEnd()));
         notesSubject.onNext(entity.getNotes());
-        coursesLiveData = dbLoader.getCoursesLiveDataByTermId(entity.getId());
         initializedSubject.onComplete();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.dispose();
     }
 
 }

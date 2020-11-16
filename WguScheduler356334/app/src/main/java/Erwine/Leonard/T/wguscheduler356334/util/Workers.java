@@ -32,8 +32,8 @@ public class Workers {
         }
 
         @Override
-        public R apply(@NonNull T t) throws Exception {
-            if (!Objects.equals(t, lastArg)) {
+        public synchronized R apply(@NonNull T t) throws Exception {
+            if (null == lastResult || !Objects.equals(t, lastArg)) {
                 lastArg = t;
                 lastResult = source.apply(lastArg);
             }
@@ -59,7 +59,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2))) {
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
                 lastResult = source.apply(lastArg1, lastArg2);
@@ -87,7 +87,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3))) {
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
                 lastArg3 = t3;
@@ -117,7 +117,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4))) {
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
                 lastArg3 = t3;
@@ -149,7 +149,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5))) {
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
                 lastArg3 = t3;
@@ -183,7 +183,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5, @NonNull T6 t6) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5) && Objects.equals(t6, lastArg6))) {
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5) && Objects.equals(t6, lastArg6))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
                 lastArg3 = t3;
@@ -219,7 +219,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5, @NonNull T6 t6, @NonNull T7 t7) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5) && Objects.equals(t6, lastArg6) && Objects.equals(t7, lastArg7))) {
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5) && Objects.equals(t6, lastArg6) && Objects.equals(t7, lastArg7))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
                 lastArg3 = t3;
@@ -257,7 +257,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5, @NonNull T6 t6, @NonNull T7 t7, @NonNull T8 t8) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5)
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5)
                     && Objects.equals(t6, lastArg6) && Objects.equals(t7, lastArg7) && Objects.equals(t8, lastArg8))) {
                 lastArg1 = t1;
                 lastArg2 = t2;
@@ -298,7 +298,7 @@ public class Workers {
         @NonNull
         @Override
         public R apply(@NonNull T1 t1, @NonNull T2 t2, @NonNull T3 t3, @NonNull T4 t4, @NonNull T5 t5, @NonNull T6 t6, @NonNull T7 t7, @NonNull T8 t8, @NonNull T9 t9) throws Exception {
-            if (!(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5)
+            if (null == lastResult || !(Objects.equals(t1, lastArg1) && Objects.equals(t2, lastArg2) && Objects.equals(t3, lastArg3) && Objects.equals(t4, lastArg4) && Objects.equals(t5, lastArg5)
                     && Objects.equals(t6, lastArg6) && Objects.equals(t7, lastArg7) && Objects.equals(t8, lastArg8))) {
                 lastArg1 = t1;
                 lastArg2 = t2;

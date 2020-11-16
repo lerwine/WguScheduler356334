@@ -10,20 +10,17 @@ import io.reactivex.subjects.Subject;
 
 public class ComputationSource<T, U extends Subject<T>> implements ObservableSource<T>, Observer<T> {
 
-    private final U subject;
+    protected final U subject;
     private final Observable<T> observable;
 
-    public ComputationSource(U subject) {
+    public ComputationSource(@NonNull U subject) {
         this.subject = subject;
         observable = subject.observeOn(Schedulers.computation());
     }
 
+    @NonNull
     public Observable<T> getObservable() {
         return observable;
-    }
-
-    public U getSubject() {
-        return subject;
     }
 
     @Override

@@ -907,17 +907,17 @@ public class DbLoader {
 
     @NonNull
     public Single<List<AlertListItem>> getAllAlertsByCourseId(long courseId) {
-        return appDb.alertDAO().getAllByCourseId(courseId);
+        return appDb.alertDAO().getAllByCourseId(courseId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
     public Single<List<AlertListItem>> getAllAlertsByTermId(long termId) {
-        return appDb.alertDAO().getAllByTermId(termId);
+        return appDb.alertDAO().getAllByTermId(termId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
     public Single<List<AlertListItem>> getAllAlertsByMentorId(long mentorId) {
-        return appDb.alertDAO().getAllByMentorId(mentorId);
+        return appDb.alertDAO().getAllByMentorId(mentorId).subscribeOn(this.scheduler).observeOn(AndroidSchedulers.mainThread());
     }
 
     @NonNull
