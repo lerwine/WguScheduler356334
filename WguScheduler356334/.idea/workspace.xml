@@ -20,13 +20,20 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="Added screen shots for story board" />
+    <list default="true" id="89da559d-1671-43b1-8f86-cafc635d76f7" name="Default Changelist" comment="Added screen shots for story board">
+      <change beforePath="$PROJECT_DIR$/../Import-ScreenShots.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/../Import-ScreenShots.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SVG/CellPhoneLandscape-old.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SVG/CellPhoneLandscape.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../SVG/CellPhoneLandscape.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SVG/CellPhonePortrait.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../SVG/CellPhonePortrait.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SVG/CellPhonePortrait_old.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_4_API_30]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -497,7 +504,6 @@
       <updated>1604014219286</updated>
     </task>
     <task id="WguScheduler356334-60" summary="Need to save selected tab so it can be restored upon screen rotation">
-      <changelist id="" name="WguScheduler356334-60 Need to save selected tab so it can be restored upon screen rotation" comment="" />
       <option name="closed" value="true" />
       <created>1604009870000</created>
       <option name="issue" value="true" />
