@@ -61,7 +61,7 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     static final String STATE_KEY_STATE_INITIALIZED = "state_initialized";
     public static final String EXTRA_KEY_TERM_ID = IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_ID, false);
 
-    public static void startAddTermActivity(Fragment fragment, int requestCode, @NonNull LocalDate termStart) {
+    public static void startAddTermActivity(@NonNull Fragment fragment, int requestCode, @NonNull LocalDate termStart) {
         Intent intent = new Intent(fragment.requireContext(), AddTermActivity.class);
         intent.putExtra(IdIndexedEntity.stateKey(AppDb.TABLE_NAME_TERMS, TermEntity.COLNAME_START, false), LocalDateConverter.fromLocalDate(termStart));
         fragment.startActivityForResult(intent, requestCode);
@@ -84,7 +84,6 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     private final BehaviorComputationSource<String> notesSubject;
     private final CompletableSubject initializedSubject;
     private final Completable initializedCompletable;
-    //    private final SubscribingLiveDataWrapper<TermEntity> originalValuesLiveData;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> titleFactory;
     private final SubscribingLiveDataWrapper<Function<Resources, CharSequence>> overviewFactory;
     private final SubscribingLiveDataWrapper<Boolean> nameValid;
@@ -188,7 +187,6 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         Observable<Boolean> validObservable = Observable.combineLatest(nameValidObservable, startMessageObservable, endMessageObservable, (n, s, e) -> n &&
                 s.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true) && e.map(f -> f.getLevel() != MessageLevel.ERROR).orElse(true));
 
-//        originalValuesLiveData = SubscribingLiveDataWrapper.of(new TermEntity(), entitySubject.getObservable());
         nameValid = SubscribingLiveDataWrapper.of(false, nameValidObservable);
         startMessage = SubscribingLiveDataWrapper.ofOptional(startMessageObservable);
         endMessage = SubscribingLiveDataWrapper.ofOptional(endMessageObservable);
@@ -197,8 +195,8 @@ public class EditTermViewModel extends WguSchedulerViewModel {
         canSave = SubscribingLiveDataWrapper.of(false, Observable.combineLatest(validObservable, hasChangesObservable, (v, c) -> v && c));
         isValid = SubscribingLiveDataWrapper.of(false, validObservable);
         titleFactory = SubscribingLiveDataWrapper.of(r -> "", normalizedNameObservable.map(this::getViewTitleFactory));
-        overviewFactory = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(startDateSubject.getObservable(), endDateSubject.getObservable(), (s, e) -> getOverviewFactory(s.orElse(null), e.orElse(null))));
-//        compositeDisposable = new CompositeDisposable(originalValuesLiveData, nameValid, startMessage, endMessage, hasChanges, canShare, canSave, isValid, titleFactory, overviewFactory);
+        overviewFactory = SubscribingLiveDataWrapper.of(r -> "", Observable.combineLatest(startDateSubject.getObservable(), endDateSubject.getObservable(),
+                (s, e) -> getOverviewFactory(s.orElse(null), e.orElse(null))));
         compositeDisposable = new CompositeDisposable(nameValid, startMessage, endMessage, hasChanges, canShare, canSave, isValid, titleFactory, overviewFactory);
     }
 
@@ -326,10 +324,6 @@ public class EditTermViewModel extends WguSchedulerViewModel {
     public LiveData<Function<Resources, CharSequence>> getOverviewFactory() {
         return overviewFactory.getLiveData();
     }
-
-//    public LiveData<TermEntity> getOriginalValuesLiveData() {
-//        return originalValuesLiveData.getLiveData();
-//    }
 
     public Completable getInitializedCompletable() {
         return initializedCompletable;

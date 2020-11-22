@@ -233,12 +233,12 @@ public class EditCourseFragment extends Fragment {
         Log.d(LOG_TAG, "Enter onMentorChipClick");
         ObserverHelper.observeOnce(viewModel.getMentorOptionsLiveData(), getViewLifecycleOwner(), mentorListItems -> {
             if (null == mentorListItems || mentorListItems.isEmpty()) {
+                new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_no_mentors, requireContext()).showDialog();
+            } else {
                 AlertHelper.showSingleSelectDialog(R.string.title_select_mentor, viewModel.getSelectedMentor(), mentorListItems, requireContext(), AbstractMentorEntity::getName, t -> {
                     viewModel.setSelectedMentor(t);
                     onMentorChanged(t);
                 });
-            } else {
-                new AlertHelper(R.drawable.dialog_warning, R.string.title_not_ready, R.string.message_no_mentors, requireContext()).showDialog();
             }
         });
     }
