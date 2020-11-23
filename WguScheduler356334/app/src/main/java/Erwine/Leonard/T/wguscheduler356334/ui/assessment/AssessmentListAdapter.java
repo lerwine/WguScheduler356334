@@ -85,7 +85,7 @@ public class AssessmentListAdapter extends RecyclerView.Adapter<AssessmentListAd
             switch (item.getStatus()) {
                 case NOT_STARTED:
                 case IN_PROGRESS:
-                    adjTextView.setText(R.string.label_goal);
+                    adjTextView.setText(R.string.label_goal_colon);
                     date = item.getGoalDate();
                     break;
                 default:

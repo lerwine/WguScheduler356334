@@ -1201,7 +1201,8 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                         <item
                             code="ABM1"
                             status="NOT_PASSED"
-                            goalDate="actualEnd"
+                            goalDate="2020-09-15"
+                            completionDate="actualEnd"
                             type="PERFORMANCE_EVALUATION" />
                     </assessments>
                 </item>
@@ -1210,7 +1211,7 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
         <item
             name="Term 11"
             start="2020-10-01"
-            end="2020-03-31">
+            end="2021-03-31">
             <notes><![CDATA[Habitasse platea dictumst quisque sagittis purus sit.]]></notes>
             <courses>
                 <item
@@ -1218,13 +1219,30 @@ Venenatis cras sed felis eget velit aliquet sagittis. Ut venenatis tellus in met
                     title="Mobile Application Development"
                     status="IN_PROGRESS"
                     actualStart="2020-10-01"
-                    expectedEnd="2020-10-27"
+                    expectedEnd="2020-11-27"
                     competencyUnits="3"
                     mentorId="23">
                     <notes>
                         <![CDATA[Mauris rhoncus aenean vel elit scelerisque mauris pellentesque.
 Libero justo laoreet sit amet cursus.]]></notes>
                     <assessments>
+                        <item
+                            code="ABM1"
+                            status="NOT_PASSED"
+                            goalDate="2020-10-27"
+                            completionDate="2020-11-19"
+                            type="PERFORMANCE_EVALUATION">
+                            <assessmentAlerts>
+                                <item
+                                    subsequent="false"
+                                    timeSpec="-1"
+                                    customMessage="Submit tomorrow!" />
+                                <item
+                                    subsequent="true"
+                                    timeSpec="1"
+                                    customMessage="Check results" />
+                            </assessmentAlerts>
+                        </item>
                         <item
                             code="ABM1"
                             status="IN_PROGRESS"
@@ -1243,8 +1261,8 @@ Libero justo laoreet sit amet cursus.]]></notes>
                     number="C769"
                     title="IT Capstone Written Project"
                     status="PLANNED"
-                    expectedStart="2020-10-28"
-                    expectedEnd="2020-12-31"
+                    expectedStart="2020-11-20"
+                    expectedEnd="2021-1-31"
                     competencyUnits="4">
                     <notes>
                         <![CDATA[Viverra vitae congue eu consequat. Lectus urna duis convallis convallis. Sit amet risus nullam eget felis eget nunc lobortis mattis.]]></notes>
@@ -1258,7 +1276,7 @@ Libero justo laoreet sit amet cursus.]]></notes>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-11-14"
+                            goalDate="2020-12-01"
                             type="PERFORMANCE_EVALUATION"
                             name="Task 1">
                             <assessmentAlerts>
@@ -1271,7 +1289,7 @@ Libero justo laoreet sit amet cursus.]]></notes>
                         <item
                             code="ROM2"
                             status="NOT_STARTED"
-                            goalDate="2020-11-21"
+                            goalDate="2020-12-15"
                             type="PERFORMANCE_EVALUATION"
                             name="Task 2" />
                         <item

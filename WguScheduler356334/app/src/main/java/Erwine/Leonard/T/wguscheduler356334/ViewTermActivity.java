@@ -200,6 +200,7 @@ public class ViewTermActivity extends AppCompatActivity {
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, title);
             sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
             sendIntent.setType("text/plain");
             Intent shareIntent = Intent.createChooser(sendIntent, title);
@@ -238,7 +239,7 @@ public class ViewTermActivity extends AppCompatActivity {
 
     private void onSaveFloatingActionButtonClick(View view) {
         Log.d(LOG_TAG, "Enter onSaveFloatingActionButtonClick");
-        ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveTermComplete, this::onSaveTermError);
+        ObserverHelper.subscribeOnce(viewModel.save(false), this, m -> onSaveTermComplete(m, false), this::onSaveTermError);
     }
 
     private void onDeleteFloatingActionButtonClick(View view) {
@@ -256,7 +257,7 @@ public class ViewTermActivity extends AppCompatActivity {
                             if (!isValid) {
                                 return;
                             }
-                            ObserverHelper.subscribeOnce(viewModel.save(false), this, this::onSaveTermComplete, this::onSaveTermError);
+                            ObserverHelper.subscribeOnce(viewModel.save(false), this, m -> onSaveTermComplete(m, false), this::onSaveTermError);
                         }), null);
             } else {
                 finish();
@@ -264,9 +265,9 @@ public class ViewTermActivity extends AppCompatActivity {
         });
     }
 
-    private void onSaveTermComplete(@NonNull ResourceMessageResult messages) {
+    private void onSaveTermComplete(@NonNull ResourceMessageResult messages, boolean ignoreWarnings) {
         Log.d(LOG_TAG, "Enter onSaveTermComplete");
-        if (messages.isSucceeded()) {
+        if (messages.isSucceeded() || messages.isWarning() && ignoreWarnings) {
             finish();
         } else {
             Resources resources = getResources();
@@ -276,7 +277,7 @@ public class ViewTermActivity extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources))).setIcon(R.drawable.dialog_warning)
                         .setPositiveButton(R.string.response_yes, (dialog, which) -> {
                             dialog.dismiss();
-                            ObserverHelper.subscribeOnce(viewModel.save(true), this, this::onSaveTermComplete, this::onSaveTermError);
+                            ObserverHelper.subscribeOnce(viewModel.save(true), this, m -> onSaveTermComplete(m, true), this::onSaveTermError);
                         })
                         .setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
             } else {

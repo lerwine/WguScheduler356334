@@ -232,7 +232,7 @@ ViewCourseActivity extends AppCompatActivity {
                     sb.append("\n\tEmail:").append(s);
                 }
             }
-            AbstractTermEntity<?> termEntity = viewModel.getSelectedTerm();
+            AbstractTermEntity<?> termEntity = Objects.requireNonNull(viewModel.getSelectedTerm());
             s = termEntity.getName();
             String t = resources.getString(R.string.format_term, s);
             int i = t.indexOf(':');
@@ -273,6 +273,7 @@ ViewCourseActivity extends AppCompatActivity {
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, title);
             sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
             sendIntent.setType("text/plain");
             Intent shareIntent = Intent.createChooser(sendIntent, title);
@@ -303,15 +304,18 @@ ViewCourseActivity extends AppCompatActivity {
     private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
 
         private final boolean addingNewAlert;
+        private boolean ignoreWarnings;
         private final CourseAlert[] alertsBeforeSave;
 
         SaveOperationListener(@NonNull List<CourseAlert> alertsBeforeSave) {
             addingNewAlert = false;
+            ignoreWarnings = false;
             this.alertsBeforeSave = alertsBeforeSave.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
         }
 
         SaveOperationListener() {
             addingNewAlert = true;
+            ignoreWarnings = false;
             this.alertsBeforeSave = new CourseAlert[0];
         }
 
@@ -354,41 +358,47 @@ ViewCourseActivity extends AppCompatActivity {
 
         @Override
         public void onSuccess(@NonNull ResourceMessageResult messages) {
-            if (messages.isSucceeded()) {
-                if (addingNewAlert) {
-                    EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
-                    dlg.show(getSupportFragmentManager(), null);
-                } else {
-                    ObserverHelper.observeOnce(viewModel.getCourseAlertsLiveData(), ViewCourseActivity.this, alerts -> {
-                        CourseAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
-                        if (alertsAfterSave.length > 0) {
-                            ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> updateAlerts(alertsAfterSave, defaultAlertTime));
-                        } else {
-                            if (alertsBeforeSave.length > 0) {
-                                for (CourseAlert a : alertsBeforeSave) {
-                                    CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewCourseActivity.this);
-                                }
-                            }
-                            onSuccessComplete();
-                        }
-                    });
-                }
-            } else {
+            if (!messages.isSucceeded()) {
                 Resources resources = getResources();
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewCourseActivity.this);
                 if (messages.isWarning()) {
-                    builder.setTitle(R.string.title_save_warning)
-                            .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                            .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                                ObserverHelper.subscribeOnce(viewModel.save(true), ViewCourseActivity.this, this);
-                                dialog.dismiss();
-                                onSuccessComplete();
-                            }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                    if (!ignoreWarnings) {
+                        ignoreWarnings = true;
+                        builder.setTitle(R.string.title_save_warning)
+                                .setMessage(resources.getString(R.string.format_message_save_warning, messages.join("\n", resources))).setIcon(R.drawable.dialog_warning)
+                                .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                                    ObserverHelper.subscribeOnce(viewModel.save(true), ViewCourseActivity.this, this);
+                                    dialog.dismiss();
+                                }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                        AlertDialog dlg = builder.setCancelable(true).create();
+                        dlg.show();
+                        return;
+                    }
                 } else {
                     builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                    AlertDialog dlg = builder.setCancelable(true).create();
+                    dlg.show();
+                    return;
                 }
-                AlertDialog dlg = builder.setCancelable(true).create();
-                dlg.show();
+            }
+
+            if (addingNewAlert) {
+                EditAlertDialog dlg = EditAlertViewModel.newCourseAlert(viewModel.getId());
+                dlg.show(getSupportFragmentManager(), null);
+            } else {
+                ObserverHelper.observeOnce(viewModel.getCourseAlertsLiveData(), ViewCourseActivity.this, alerts -> {
+                    CourseAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(CourseAlert[]::new);
+                    if (alertsAfterSave.length > 0) {
+                        ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewCourseActivity.this, defaultAlertTime -> updateAlerts(alertsAfterSave, defaultAlertTime));
+                    } else {
+                        if (alertsBeforeSave.length > 0) {
+                            for (CourseAlert a : alertsBeforeSave) {
+                                CourseAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewCourseActivity.this);
+                            }
+                        }
+                        onSuccessComplete();
+                    }
+                });
             }
         }
 

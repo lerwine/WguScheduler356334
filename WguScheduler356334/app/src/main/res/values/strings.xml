@@ -26,7 +26,7 @@
     <string name="label_end">End</string>
     <string name="label_end_of_term">End of Term</string>
     <string name="label_evaluating">Currently Being Evaluated</string>
-    <string name="label_goal">Goal:</string>
+    <string name="label_goal_colon">Goal:</string>
     <string name="label_in_progress">In Progress</string>
     <string name="label_mentor">Mentor</string>
     <string name="label_mentor_name">Mentor Name</string>
@@ -122,9 +122,9 @@
     <string name="preference_next_notification_id">next_notification_id</string>
     <string name="response_no">No</string>
     <string name="response_yes">Yes</string>
-    <string name="tab_title_email">Email</string>
-    <string name="tab_title_general">General</string>
-    <string name="tab_title_phone">Phone</string>
+    <string name="label_email">Email</string>
+    <string name="label_general">General</string>
+    <string name="label_phone">Phone</string>
     <string name="title_activity_edit">Edit</string>
     <string name="format_mentor">Mentor: %s</string>
     <string name="title_activity_edit_phone_numbers">Edit Phone Numbers</string>
@@ -212,8 +212,8 @@
     <string name="title_activity_view_assessment">View Assessment</string>
     <string name="title_activity_view_course">View Course</string>
     <string name="title_activity_view_term">View Term</string>
-    <string name="message_term_start_past_course_start">Start of term is later the start date of one or more of its courses.</string>
-    <string name="message_term_end_before_course_end">Start of term is later the start date of one or more of its courses.</string>
+    <string name="message_term_start_past_course_start">Start of term is later than the start date of one or more of its courses.</string>
+    <string name="message_term_end_before_course_end">End of term is earlier than the end date of one or more of its courses.</string>
     <string name="message_term_duplicate_name">That term name is already being used.</string>
     <string name="message_mentor_duplicate_name">That mentor name is already being used.</string>
     <string name="message_course_duplicate_number">That course number is already being used.</string>

@@ -32,8 +32,8 @@ public class EditTermFragment extends Fragment {
 
     private EditTermViewModel viewModel;
     private EditText termNameEditText;
-    private DatePickerEditView termStartEditText;
-    private DatePickerEditView termEndEditText;
+    private DatePickerEditView termStartEditView;
+    private DatePickerEditView termEndEditView;
     private EditText notesEditText;
 
     /**
@@ -50,8 +50,8 @@ public class EditTermFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_term, container, false);
 
         termNameEditText = view.findViewById(R.id.termNameEditText);
-        termStartEditText = view.findViewById(R.id.termStartEditView);
-        termEndEditText = view.findViewById(R.id.termEndEditView);
+        termStartEditView = view.findViewById(R.id.termStartEditView);
+        termEndEditView = view.findViewById(R.id.termEndEditView);
         notesEditText = view.findViewById(R.id.notesEditText);
 
         return view;
@@ -74,28 +74,28 @@ public class EditTermFragment extends Fragment {
     private void onViewModelInitialized() {
         Log.d(LOG_TAG, "onViewModelInitialized");
         termNameEditText.setText(viewModel.getName());
-        termStartEditText.setSelectedDate(viewModel.getStart());
-        termEndEditText.setSelectedDate(viewModel.getEnd());
+        termStartEditView.setSelectedDate(viewModel.getStart());
+        termEndEditView.setSelectedDate(viewModel.getEnd());
         notesEditText.setText(viewModel.getNotes());
         termNameEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setName));
         notesEditText.addTextChangedListener(StringHelper.createAfterTextChangedListener(viewModel::setNotes));
-        termStartEditText.setInitialPickerDateFactory(d -> (null == d) ? termEndEditText.getSelectedDate() : d);
+        termStartEditView.setInitialPickerDateFactory(d -> (null == d) ? termEndEditView.getSelectedDate() : d);
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-        termStartEditText.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
+        termStartEditView.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
             }
 
             @Override
             public void onSuccess(@NonNull LocalDate localDate) {
-                Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
+                Log.d(LOG_TAG, "Enter termStartEditView.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
                 viewModel.setStart(localDate);
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
                 String m = e.getMessage();
-                Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
+                Log.d(LOG_TAG, "Enter termStartEditView.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
                 if (null == m || m.trim().isEmpty()) {
                     viewModel.setStart(ResourceMessageFactory.ofError(R.string.message_invalid_date));
                 } else {
@@ -105,26 +105,26 @@ public class EditTermFragment extends Fragment {
 
             @Override
             public void onComplete() {
-                Log.d(LOG_TAG, "Enter termStartEditText.observeLocalDateChange.onComplete()");
+                Log.d(LOG_TAG, "Enter termStartEditView.observeLocalDateChange.onComplete()");
                 viewModel.setStart((LocalDate) null);
             }
         });
-        termEndEditText.setInitialPickerDateFactory(d -> (null == d) ? termStartEditText.getSelectedDate() : d);
-        termEndEditText.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
+        termEndEditView.setInitialPickerDateFactory(d -> (null == d) ? termStartEditView.getSelectedDate() : d);
+        termEndEditView.observeLocalDateChange(viewLifecycleOwner, new MaybeObserver<LocalDate>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
             }
 
             @Override
             public void onSuccess(@NonNull LocalDate localDate) {
-                Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
+                Log.d(LOG_TAG, "Enter termEndEditView.observeLocalDateChange.onSuccess(" + ToStringBuilder.toEscapedString(localDate, false) + ")");
                 viewModel.setEnd(localDate);
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
                 String m = e.getMessage();
-                Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
+                Log.d(LOG_TAG, "Enter termEndEditView.observeLocalDateChange.onError(" + ToStringBuilder.toEscapedString(m) + ")");
                 if (null == m || m.trim().isEmpty()) {
                     viewModel.setEnd(ResourceMessageFactory.ofError(R.string.message_invalid_date));
                 } else {
@@ -134,7 +134,7 @@ public class EditTermFragment extends Fragment {
 
             @Override
             public void onComplete() {
-                Log.d(LOG_TAG, "Enter termEndEditText.observeLocalDateChange.onComplete()");
+                Log.d(LOG_TAG, "Enter termEndEditView.observeLocalDateChange.onComplete()");
                 viewModel.setEnd((LocalDate) null);
             }
         });
@@ -152,9 +152,9 @@ public class EditTermFragment extends Fragment {
                     if (null != f) {
                         String m = f.apply(getResources());
                         Log.d(LOG_TAG, "startMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", level: " + f.getLevel() + ")");
-                        termStartEditText.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
+                        termStartEditView.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
                     } else {
-                        termStartEditText.setError(null);
+                        termStartEditView.setError(null);
                     }
                 }
         );
@@ -163,9 +163,9 @@ public class EditTermFragment extends Fragment {
                     if (null != f) {
                         String m = f.apply(getResources());
                         Log.d(LOG_TAG, "endMessageMaybe.onSuccess(message: " + ToStringBuilder.toEscapedString(m) + ", level: " + f.getLevel().name() + ")");
-                        termEndEditText.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
+                        termEndEditView.setError(m, AppCompatResources.getDrawable(requireContext(), f.getLevel().getErrorIcon()));
                     } else {
-                        termEndEditText.setError(null);
+                        termEndEditView.setError(null);
                     }
                 }
         );

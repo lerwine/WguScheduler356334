@@ -88,6 +88,6 @@ public interface IdIndexedEntity extends ToStringBuildable {
 
     @Override
     default void appendPropertiesAsStrings(@NonNull ToStringBuilder sb) {
-        sb.appendRaw(COLNAME_ID).append("=").append(getId());
+        sb.appendRaw(COLNAME_ID).appendRaw("=").append(getId());
     }
 }

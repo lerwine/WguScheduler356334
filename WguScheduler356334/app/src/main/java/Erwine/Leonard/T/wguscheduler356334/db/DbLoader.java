@@ -233,7 +233,9 @@ public class DbLoader {
                     builder.acceptWarning(R.string.message_term_start_past_course_start);
                 }
                 if (null != end) {
-                    if (courses.stream().anyMatch(c -> ComparisonHelper.firstNonNull(c.getActualEnd(), c.getExpectedEnd()).filter(t -> t.compareTo(end) < 0).isPresent())) {
+                    if (start.compareTo(end) > 0) {
+                        builder.acceptError(R.string.message_start_after_end);
+                    } else if (courses.stream().anyMatch(c -> ComparisonHelper.firstNonNull(c.getActualEnd(), c.getExpectedEnd()).filter(t -> t.compareTo(end) > 0).isPresent())) {
                         builder.acceptWarning(R.string.message_term_end_before_course_end);
                     }
                 }

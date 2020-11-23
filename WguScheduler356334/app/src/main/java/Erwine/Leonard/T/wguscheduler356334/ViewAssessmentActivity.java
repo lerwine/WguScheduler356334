@@ -237,6 +237,7 @@ public class ViewAssessmentActivity extends AppCompatActivity {
                                             }
                                             Intent sendIntent = new Intent();
                                             sendIntent.setAction(Intent.ACTION_SEND);
+                                            sendIntent.putExtra(Intent.EXTRA_SUBJECT, title);
                                             sendIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
                                             sendIntent.setType("text/plain");
                                             Intent shareIntent = Intent.createChooser(sendIntent, title);
@@ -271,15 +272,18 @@ public class ViewAssessmentActivity extends AppCompatActivity {
     private class SaveOperationListener implements SingleObserver<ResourceMessageResult> {
 
         private final boolean addingNewAlert;
+        private boolean ignoreWarnings;
         private final AssessmentAlert[] alertsBeforeSave;
 
         SaveOperationListener(List<AssessmentAlert> alertsBeforeSave) {
             addingNewAlert = false;
+            ignoreWarnings = false;
             this.alertsBeforeSave = alertsBeforeSave.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
         }
 
         SaveOperationListener() {
             addingNewAlert = true;
+            ignoreWarnings = false;
             alertsBeforeSave = new AssessmentAlert[0];
         }
 
@@ -319,43 +323,50 @@ public class ViewAssessmentActivity extends AppCompatActivity {
 
         @Override
         public void onSuccess(ResourceMessageResult messages) {
-            if (messages.isSucceeded()) {
-                if (addingNewAlert) {
-                    EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
-                    dlg.show(getSupportFragmentManager(), null);
-                } else {
-                    ObserverHelper.observeOnce(viewModel.getAllAlerts(), ViewAssessmentActivity.this, alerts -> {
-                        AssessmentAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
-                        if (alertsAfterSave.length > 0) {
-                            ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewAssessmentActivity.this, defaultAlertTime -> {
-                                updateAlerts(alertsAfterSave, defaultAlertTime);
-                                onSucceeded();
-                            });
-                        } else {
-                            if (alertsBeforeSave.length > 0) {
-                                for (AssessmentAlert a : alertsBeforeSave) {
-                                    AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewAssessmentActivity.this);
-                                }
-                            }
-                            onSucceeded();
-                        }
-                    });
-                }
-            } else {
+            if (!messages.isSucceeded()) {
                 Resources resources = getResources();
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewAssessmentActivity.this);
                 if (messages.isWarning()) {
-                    builder.setTitle(R.string.title_save_warning)
-                            .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
-                            .setPositiveButton(R.string.response_yes, (dialog, which) -> {
-                                ObserverHelper.subscribeOnce(viewModel.save(true), ViewAssessmentActivity.this, this);
-                                dialog.dismiss();
-                            }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                    if (!ignoreWarnings) {
+                        ignoreWarnings = true;
+                        builder.setTitle(R.string.title_save_warning)
+                                .setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_warning)
+                                .setPositiveButton(R.string.response_yes, (dialog, which) -> {
+                                    ObserverHelper.subscribeOnce(viewModel.save(true), ViewAssessmentActivity.this, this);
+                                    dialog.dismiss();
+                                }).setNegativeButton(R.string.response_no, (dialog, which) -> dialog.dismiss());
+                        AlertDialog dlg = builder.setCancelable(true).create();
+                        dlg.show();
+                        return;
+                    }
                 } else {
                     builder.setTitle(R.string.title_save_error).setMessage(messages.join("\n", resources)).setIcon(R.drawable.dialog_error);
+                    AlertDialog dlg = builder.setCancelable(true).create();
+                    dlg.show();
+                    return;
                 }
-                AlertDialog dlg = builder.setCancelable(true).create();
-                dlg.show();
+            }
+
+            if (addingNewAlert) {
+                EditAlertDialog dlg = EditAlertViewModel.newAssessmentAlert(viewModel.getId());
+                dlg.show(getSupportFragmentManager(), null);
+            } else {
+                ObserverHelper.observeOnce(viewModel.getAllAlerts(), ViewAssessmentActivity.this, alerts -> {
+                    AssessmentAlert[] alertsAfterSave = alerts.stream().filter(t -> null != t.getAlertDate()).toArray(AssessmentAlert[]::new);
+                    if (alertsAfterSave.length > 0) {
+                        ObserverHelper.observeOnce(DbLoader.getPreferAlertTime(), ViewAssessmentActivity.this, defaultAlertTime -> {
+                            updateAlerts(alertsAfterSave, defaultAlertTime);
+                            onSucceeded();
+                        });
+                    } else {
+                        if (alertsBeforeSave.length > 0) {
+                            for (AssessmentAlert a : alertsBeforeSave) {
+                                AssessmentAlertBroadcastReceiver.cancelPendingAlert(a.getLink(), a.getAlert().getNotificationId(), ViewAssessmentActivity.this);
+                            }
+                        }
+                        onSucceeded();
+                    }
+                });
             }
         }
 

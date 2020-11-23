@@ -8,6 +8,7 @@ import androidx.annotation.StringRes;
 import java.util.function.Function;
 
 import Erwine.Leonard.T.wguscheduler356334.R;
+import Erwine.Leonard.T.wguscheduler356334.util.ToStringBuilder;
 
 public interface ResourceMessageFactory extends Function<Resources, String> {
     @NonNull
@@ -21,6 +22,14 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
             @Override
             public String apply(Resources resources) {
                 return resources.getString(id);
+            }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return new ToStringBuilder().appendRaw(getClass().getName()).appendRaw("{")
+                        .append("level", level, true)
+                        .append("id", id).appendRaw("}").toString();
             }
         };
     }
@@ -41,6 +50,14 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
                 }
                 return resources.getString(R.string.format_error, message);
             }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return new ToStringBuilder().appendRaw(getClass().getName()).appendRaw("{")
+                        .append("level", level, true)
+                        .append("throwable", throwable, true, true).appendRaw("}").toString();
+            }
         };
     }
 
@@ -56,6 +73,14 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
             public String apply(Resources resources) {
                 return factory.apply(resources);
             }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return new ToStringBuilder().appendRaw(getClass().getName()).appendRaw("{")
+                        .append("level", level, true)
+                        .append("factory", factory, true, true).appendRaw("}").toString();
+            }
         };
     }
 
@@ -70,6 +95,15 @@ public interface ResourceMessageFactory extends Function<Resources, String> {
             @Override
             public String apply(Resources resources) {
                 return resources.getString(id, formatArgs);
+            }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return new ToStringBuilder().appendRaw(getClass().getName()).appendRaw("{")
+                        .append("level", level, true)
+                        .append("id", id)
+                        .append("formatArgs", formatArgs, true, false).appendRaw("}").toString();
             }
         };
     }
